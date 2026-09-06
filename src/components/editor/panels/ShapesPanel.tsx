@@ -33,14 +33,6 @@ const SHAPES: { kind: ShapeKind; label: string }[] = [
   { kind: "speech", label: "Speech" },
 ];
 
-const FILLS = ["#7df9ff", "#ff0080"];
-
-const GRADIENTS: Array<{ from: string; to: string }> = [
-  { from: "#7df9ff", to: "#4d7cff" },
-  { from: "#ff0080", to: "#ffd84a" },
-  { from: "#b16bff", to: "#ff6ec7" },
-  { from: "#ccff00", to: "#00e5ff" },
-];
 
 export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
   const { add } = useEditor();
@@ -67,15 +59,16 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
 
       <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Shapes</div>
       <div className="grid grid-cols-3 gap-2">
-        {SHAPES.flatMap((s) =>
-          FILLS.map((fill) => (
+        {SHAPES.map((s) => {
+          const fill = "#9ca3af";
+          return (
             <button
-              key={s.kind + fill}
+              key={s.kind}
               onClick={() =>
                 add(
                   newShape(s.kind, {
                     fill,
-                    stroke: fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f",
+                    stroke: "#0a0f1f",
                   }),
                 )
               }
@@ -84,8 +77,8 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
             >
               <ShapePreview kind={s.kind} fill={fill} />
             </button>
-          )),
-        )}
+          );
+        })}
       </div>
 
       <div className="brutal-border-2 bg-surface p-3">
@@ -114,33 +107,6 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
         <div className="mt-3 h-5 border border-teal/30" style={{ background: `linear-gradient(${customAngle}deg, ${customFrom}, ${customTo})` }} aria-label="Custom gradient preview" />
       </div>
 
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Gradient shapes</div>
-      <div className="grid grid-cols-4 gap-2">
-        {GRADIENTS.map((g) =>
-          (["rect", "circle"] as ShapeKind[]).map((kind) => (
-            <button
-              key={kind + g.from}
-              onClick={() =>
-                add(
-                  newShape(kind, {
-                    fill: g.from,
-                    stroke: "transparent",
-                    strokeWidth: 0,
-                    cornerRadius: kind === "rect" ? 24 : 0,
-                    gradient: { from: g.from, to: g.to, angle: 45, type: "linear" },
-                  }),
-                )
-              }
-              className="brutal-border-2 brutal-press h-14 bg-surface hover:border-teal"
-              title={`Gradient ${kind}`}
-              style={{
-                background: `linear-gradient(45deg, ${g.from}, ${g.to})`,
-                borderRadius: kind === "circle" ? 999 : undefined,
-              }}
-            />
-          )),
-        )}
-      </div>
     </div>
   );
 }
