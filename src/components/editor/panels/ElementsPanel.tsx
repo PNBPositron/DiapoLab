@@ -1,213 +1,108 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import {
-  useEditor,
-  newImage,
-  newShape,
-  type ShapeKind,
-} from "@/store/editor";
+  CalendarDays,
+  Camera,
+  Check,
+  Heart,
+  Icons,
+  ImagePlus,
+  Mail,
+  MapPin,
+  Play,
+  Search,
+  Shapes,
+  Star,
+  Upload,
+  User,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import { newImage, useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
-import { Upload } from "lucide-react";
-import { shapePathD } from "../ShapeRender";
+import { ShapesPanel } from "./ShapesPanel";
 
-const SHAPES: { kind: ShapeKind; label: string }[] = [
-  { kind: "rect", label: "Rectangle" },
-  { kind: "holographic_grid", label: "Holographic Grid" },
-  { kind: "glitch", label: "Glitch Fragment" },
-  { kind: "honeycomb", label: "Honeycomb Cell" },
-  { kind: "circuit", label: "Circuit Traces" },
-  { kind: "cyber_frame", label: "Cyber Frame" },
-  { kind: "data_shard", label: "Data Shard" },
-  { kind: "tech_chevron", label: "Tech Chevron" },
-  { kind: "scanner", label: "Scanner Reticle" },
-  { kind: "circle", label: "Circle" },
-  { kind: "triangle", label: "Triangle" },
-  { kind: "star", label: "Star" },
-  { kind: "arrow", label: "Arrow" },
-  { kind: "heart", label: "Heart" },
-  { kind: "diamond", label: "Diamond" },
-  { kind: "hexagon", label: "Hexagon" },
-  { kind: "pentagon", label: "Pentagon" },
-  { kind: "parallelogram", label: "Parallelogram" },
-  { kind: "trapezoid", label: "Trapezoid" },
-  { kind: "cross", label: "Cross" },
-  { kind: "lightning", label: "Lightning" },
-  { kind: "cloud", label: "Cloud" },
-  { kind: "speech", label: "Speech" },
-  { kind: "frame_cut", label: "Cut-corner Frame" },
-  { kind: "diagonal_stripes", label: "Diagonal Stripes" },
-  { kind: "dot_grid", label: "Dot Grid" },
-  { kind: "dotted_triangle", label: "Dotted Triangle" },
-  { kind: "accent_slash", label: "Accent Slash" },
+type ElementSection = "shapes" | "icons" | null;
+
+const ICONS: Array<{ label: string; Icon: LucideIcon; paths: string }> = [
+  { label: "Heart", Icon: Heart, paths: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>' },
+  { label: "Star", Icon: Star, paths: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+  { label: "Camera", Icon: Camera, paths: '<path d="M14.5 4h-5L7 7H3v13h18V7h-4z"/><circle cx="12" cy="13" r="3"/>' },
+  { label: "Mail", Icon: Mail, paths: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>' },
+  { label: "Location", Icon: MapPin, paths: '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2.5"/>' },
+  { label: "Calendar", Icon: CalendarDays, paths: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>' },
+  { label: "User", Icon: User, paths: '<circle cx="12" cy="8" r="4"/><path d="M4 22a8 8 0 0 1 16 0"/>' },
+  { label: "Search", Icon: Search, paths: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>' },
+  { label: "Play", Icon: Play, paths: '<polygon points="6 3 20 12 6 21 6 3"/>' },
+  { label: "Check", Icon: Check, paths: '<path d="m20 6-11 11-5-5"/>' },
+  { label: "Close", Icon: X, paths: '<path d="M18 6 6 18M6 6l12 12"/>' },
 ];
 
-const FILLS = ["#7df9ff", "#ff0080"];
-
-const GRADIENTS: Array<{ from: string; to: string }> = [
-  { from: "#7df9ff", to: "#4d7cff" },
-  { from: "#ff0080", to: "#ffd84a" },
-  { from: "#b16bff", to: "#ff6ec7" },
-  { from: "#ccff00", to: "#00e5ff" },
-];
+function iconDataUri(paths: string) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 export function ElementsPanel() {
   const { add } = useEditor();
+  const [section, setSection] = useState<ElementSection>(null);
   const [uploads, setUploads] = useState<string[]>([]);
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    files.forEach((f) => {
+  const onFile = (event: ChangeEvent<HTMLInputElement>) => {
+    for (const file of Array.from(event.target.files ?? [])) {
       const reader = new FileReader();
       reader.onload = () => {
-        const src = reader.result as string;
-        setUploads((u) => [src, ...u]);
+        if (typeof reader.result !== "string") return;
+        setUploads((current) => [reader.result as string, ...current]);
+        add(newImage(reader.result));
       };
-      reader.readAsDataURL(f);
-    });
+      reader.readAsDataURL(file);
+    }
+    event.target.value = "";
   };
 
   return (
     <div className="space-y-4">
       <PanelHeader title="Elements" />
-
-      {/* Images Section */}
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-        ▸ Images
+      <div className="grid grid-cols-3 gap-2">
+        <label className="brutal-border-2 brutal-press flex h-20 cursor-pointer flex-col items-center justify-center gap-2 bg-surface text-teal hover:border-teal">
+          <Upload className="size-5" />
+          <span className="font-display text-[9px] uppercase tracking-[0.12em]">Upload</span>
+          <input type="file" accept="image/*" multiple onChange={onFile} className="hidden" />
+        </label>
+        <button onClick={() => setSection(section === "shapes" ? null : "shapes")} className={`brutal-border-2 brutal-press flex h-20 flex-col items-center justify-center gap-2 ${section === "shapes" ? "border-teal bg-blue-deep" : "bg-surface"} text-teal hover:border-teal`}>
+          <Shapes className="size-5" />
+          <span className="font-display text-[9px] uppercase tracking-[0.12em]">Shapes</span>
+        </button>
+        <button onClick={() => setSection(section === "icons" ? null : "icons")} className={`brutal-border-2 brutal-press flex h-20 flex-col items-center justify-center gap-2 ${section === "icons" ? "border-teal bg-blue-deep" : "bg-surface"} text-teal hover:border-teal`}>
+          <Icons className="size-5" />
+          <span className="font-display text-[9px] uppercase tracking-[0.12em]">Icons</span>
+        </button>
       </div>
-      <label className="brutal-border brutal-press flex cursor-pointer flex-col items-center gap-2 bg-blue-deep p-4 text-teal glow-blue">
-        <Upload className="h-6 w-6" strokeWidth={2.5} />
-        <span className="font-display text-[11px] uppercase tracking-[0.2em]">▸ Upload image</span>
-        <span className="font-mono text-[9px] text-teal/60">PNG · JPG · SVG</span>
-        <input type="file" accept="image/*" multiple onChange={onFile} className="hidden" />
-      </label>
 
-      {uploads.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2">
-          {uploads.map((src, i) => (
-            <button
-              key={i}
-              onClick={() => add(newImage(src))}
-              className="brutal-border-2 brutal-press overflow-hidden bg-surface hover:border-teal"
-            >
-              <img src={src} alt="" className="h-24 w-full object-cover" draggable={false} />
+      {section === "shapes" && <ShapesPanel embedded />}
+      {section === "icons" && (
+        <div className="grid grid-cols-3 gap-2">
+          {ICONS.map(({ label, Icon, paths }) => (
+            <button key={label} title={`Add ${label}`} onClick={() => add(newImage(iconDataUri(paths), { tint: "#111827" }))} className="brutal-border-2 brutal-press grid h-16 place-items-center bg-surface text-teal hover:border-teal">
+              <Icon className="size-6" />
             </button>
           ))}
         </div>
-      ) : (
-        <div className="brutal-border-2 bg-surface p-4 font-mono text-[11px] text-teal/50">
-          &gt; no uploads in buffer
-          <br />
-          &gt; drop files above_
+      )}
+      {uploads.length > 0 && section === null && (
+        <div className="grid grid-cols-3 gap-2">
+          {uploads.map((src, index) => (
+            <button key={`${src.slice(-16)}-${index}`} title="Add uploaded image" onClick={() => add(newImage(src))} className="brutal-border-2 brutal-press overflow-hidden bg-surface hover:border-teal">
+              <img src={src} alt="Uploaded asset" className="h-16 w-full object-cover" draggable={false} />
+            </button>
+          ))}
         </div>
       )}
-
-      {/* Shapes Section */}
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-        ▸ Shapes
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {SHAPES.flatMap((s) =>
-          FILLS.map((fill) => (
-            <button
-              key={s.kind + fill}
-              onClick={() =>
-                add(
-                  newShape(s.kind, {
-                    fill,
-                    stroke: fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f",
-                  }),
-                )
-              }
-              className="brutal-border-2 brutal-press grid h-20 place-items-center bg-surface hover:border-teal"
-              title={s.label}
-            >
-              <ShapePreview kind={s.kind} fill={fill} />
-            </button>
-          )),
-        )}
-      </div>
-
-      {/* Gradient Shapes Section */}
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-        ▸ Gradient shapes
-      </div>
-      <div className="grid grid-cols-4 gap-2">
-        {GRADIENTS.map((g) =>
-          (["rect", "circle"] as ShapeKind[]).map((kind) => (
-            <button
-              key={kind + g.from}
-              onClick={() =>
-                add(
-                  newShape(kind, {
-                    fill: g.from,
-                    stroke: "transparent",
-                    strokeWidth: 0,
-                    cornerRadius: kind === "rect" ? 24 : 0,
-                    gradient: { from: g.from, to: g.to, angle: 45, type: "linear" },
-                  }),
-                )
-              }
-              className="brutal-border-2 brutal-press h-14 bg-surface hover:border-teal"
-              title={`Gradient ${kind}`}
-              style={{
-                background: `linear-gradient(45deg, ${g.from}, ${g.to})`,
-                borderRadius: kind === "circle" ? 999 : undefined,
-              }}
-            />
-          )),
-        )}
-      </div>
+      {section === null && uploads.length === 0 && (
+        <div className="flex items-center gap-2 border border-teal/20 bg-surface p-3 font-mono text-[9px] text-teal/50">
+          <ImagePlus className="size-4" /> Choose a category above
+        </div>
+      )}
     </div>
-  );
-}
-
-function ShapePreview({ kind, fill }: { kind: ShapeKind; fill: string }) {
-  const stroke = fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f";
-  const sw = 3;
-  if (kind === "rect")
-    return (
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <rect x="3" y="3" width="38" height="38" fill={fill} stroke={stroke} strokeWidth={sw} />
-      </svg>
-    );
-  if (kind === "circle")
-    return (
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <circle cx="22" cy="22" r="19" fill={fill} stroke={stroke} strokeWidth={sw} />
-      </svg>
-    );
-  if (kind === "triangle")
-    return (
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <polygon points="22,4 40,40 4,40" fill={fill} stroke={stroke} strokeWidth={sw} />
-      </svg>
-    );
-  if (kind === "star")
-    return (
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <polygon
-          points="22,4 27,17 41,17 30,26 34,40 22,32 10,40 14,26 3,17 17,17"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={sw}
-        />
-      </svg>
-    );
-  if (kind === "arrow")
-    return (
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        <polygon
-          points="3,17 28,17 28,8 41,22 28,36 28,27 3,27"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={sw}
-        />
-      </svg>
-    );
-  const d = shapePathD(kind);
-  if (!d) return null;
-  return (
-    <svg width="44" height="44" viewBox="0 0 100 100">
-      <path d={d} fill={fill} stroke={stroke} strokeWidth={sw} />
-    </svg>
   );
 }
