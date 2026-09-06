@@ -4,7 +4,6 @@ import {
   Camera,
   Check,
   Heart,
-  Icons,
   ImagePlus,
   Mail,
   MapPin,
@@ -75,7 +74,7 @@ export function ElementsPanel() {
           <span className="font-display text-[9px] uppercase tracking-[0.12em]">Shapes</span>
         </button>
         <button onClick={() => setSection(section === "icons" ? null : "icons")} className={`brutal-border-2 brutal-press flex h-20 flex-col items-center justify-center gap-2 ${section === "icons" ? "border-teal bg-blue-deep" : "bg-surface"} text-teal hover:border-teal`}>
-          <Icons className="size-5" />
+          <Star className="size-5" />
           <span className="font-display text-[9px] uppercase tracking-[0.12em]">Icons</span>
         </button>
       </div>
