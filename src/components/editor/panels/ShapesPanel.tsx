@@ -42,7 +42,7 @@ const GRADIENTS: Array<{ from: string; to: string }> = [
   { from: "#ccff00", to: "#00e5ff" },
 ];
 
-export function ShapesPanel() {
+export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
   const { add } = useEditor();
   const [customFrom, setCustomFrom] = useState("#7df9ff");
   const [customTo, setCustomTo] = useState("#ff0080");
@@ -63,7 +63,7 @@ export function ShapesPanel() {
 
   return (
     <div className="space-y-4">
-      <PanelHeader title="Shapes" />
+      {!embedded && <PanelHeader title="Shapes" />}
 
       <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Shapes</div>
       <div className="grid grid-cols-3 gap-2">
