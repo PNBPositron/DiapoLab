@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loader2, Heart, Grid3x3 } from "lucide-react";
-import { useEditor, type Page } from "@/store/editor";
+import { useEditor, newShape, newText, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
 import {
@@ -14,9 +14,51 @@ import {
 import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 
+const BUILT_IN_TEMPLATES: PublicTemplate[] = [
+  {
+    id: "builtin:launch",
+    user_id: "builtin",
+    name: "Product launch",
+    canvas_w: 1920,
+    canvas_h: 1080,
+    thumbnail: null,
+    created_at: "2099-01-03T00:00:00.000Z",
+    pages: [{
+      id: "builtin-launch-page",
+      bgColor: "#f5f7fb",
+      duration: 3,
+      elements: [
+        newText({ text: "MAKE YOUR NEXT MOVE", x: 140, y: 170, width: 980, height: 120, fontSize: 82, color: "#172554" }),
+        newText({ text: "A clear starting point for a bold presentation.", x: 145, y: 330, width: 760, height: 80, fontSize: 34, fontWeight: 500, color: "#475569" }),
+        newShape("rect", { x: 145, y: 540, width: 360, height: 220, fill: "#2563eb", stroke: "#172554", strokeWidth: 0 }),
+        newText({ text: "START HERE", x: 210, y: 610, width: 240, height: 60, fontSize: 30, color: "#ffffff", align: "center" }),
+      ],
+    }],
+  },
+  {
+    id: "builtin:quote",
+    user_id: "builtin",
+    name: "Editorial quote",
+    canvas_w: 1920,
+    canvas_h: 1080,
+    thumbnail: null,
+    created_at: "2099-01-02T00:00:00.000Z",
+    pages: [{
+      id: "builtin-quote-page",
+      bgColor: "#172554",
+      duration: 3,
+      elements: [
+        newText({ text: "“THE BEST IDEAS FEEL OBVIOUS IN RETROSPECT.”", x: 170, y: 250, width: 1350, height: 240, fontSize: 74, color: "#ffffff", align: "center" }),
+        newShape("line", { x: 820, y: 570, width: 280, height: 8, fill: "#93c5fd", stroke: "#93c5fd", strokeWidth: 0 }),
+        newText({ text: "YOUR NAME · 2026", x: 650, y: 650, width: 620, height: 50, fontSize: 24, fontWeight: 600, color: "#bfdbfe", align: "center" }),
+      ],
+    }],
+  },
+];
+
 export function TemplatesPanel() {
   const [error, setError] = useState<string | null>(null);
-  const [community, setCommunity] = useState<PublicTemplate[]>([]);
+  const [community, setCommunity] = useState<PublicTemplate[]>(BUILT_IN_TEMPLATES);
   const [communityLoading, setCommunityLoading] = useState(false);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -28,7 +70,7 @@ export function TemplatesPanel() {
     setCommunityLoading(true);
     listPublicTemplates()
       .then(async (tpls) => {
-        setCommunity(tpls);
+        setCommunity([...BUILT_IN_TEMPLATES, ...tpls]);
         const ids = tpls.map((t) => t.id);
         const [counts, mine] = await Promise.all([
           listTemplateLikeCounts(ids),
@@ -76,7 +118,7 @@ export function TemplatesPanel() {
       {error && <p className="font-mono text-[10px] text-[#ff0080]">! {error}</p>}
 
       <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-        ▸ Top community templates
+        ▸ Community templates
       </div>
 
       {communityLoading ? (

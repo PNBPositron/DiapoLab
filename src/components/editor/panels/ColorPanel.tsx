@@ -41,15 +41,6 @@ const GRADIENT_WALLPAPERS = [
   { name: "Aurora grid", value: "linear-gradient(125deg, #07111f 0%, #14b8a6 34%, #4d7cff 68%, #ff6ec7 100%)" },
 ];
 
-const ABSTRACT_WALLPAPERS = [
-  { name: "Cyber rings", value: "radial-gradient(circle at 18% 22%, transparent 0 12%, #00d9ff 12.5% 13.5%, transparent 14% 28%, #ff0080 28.5% 30%, transparent 30.5%), linear-gradient(135deg, #050816, #172554)" },
-  { name: "Data field", value: "repeating-linear-gradient(118deg, transparent 0 22px, #7df9ff 23px 24px, transparent 25px 52px), linear-gradient(155deg, #07111f, #1b1b2f 55%, #4d7cff)" },
-  { name: "Prism cut", value: "conic-gradient(from 210deg at 68% 38%, #0a0f1f, #4d7cff, #ff0080, #ffd84a, #0a0f1f)" },
-  { name: "Scanline", value: "repeating-linear-gradient(0deg, transparent 0 7px, #00d9ff 8px 9px), radial-gradient(circle at 70% 30%, #ff0080, #0a0f1f 58%)" },
-  { name: "Vector mesh", value: "repeating-conic-gradient(from 45deg at 50% 50%, #0a0f1f 0 7deg, #16213e 8deg 15deg, #00d9ff 16deg 17deg)" },
-  { name: "Horizon", value: "linear-gradient(175deg, transparent 0 54%, #ff0080 55% 56%, transparent 57%), repeating-linear-gradient(90deg, transparent 0 38px, #4d7cff 39px 40px), linear-gradient(#0a0f1f, #16213e)" },
-];
-
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
@@ -163,15 +154,6 @@ export function ColorPanel() {
         </div>
         {gradientType === "linear" && <label className="flex items-center gap-2 font-mono text-[10px] text-teal/80">Angle <input type="range" min={0} max={360} value={gradientAngle} onChange={(e) => setGradientAngle(+e.target.value)} className="w-full accent-teal" /><span className="w-8 text-right">{gradientAngle}°</span></label>}
         <p className="font-mono text-[9px] text-teal/50">click the preview above to apply it to this slide</p>
-      </div>
-
-      <div>
-        <label className="mb-1.5 block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Abstract wallpapers</label>
-        <div className="grid grid-cols-2 gap-2">
-          {ABSTRACT_WALLPAPERS.map((wallpaper) => (
-            <button key={wallpaper.name} onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }} className="brutal-border-2 h-20 hover:border-teal" style={{ background: wallpaper.value }} aria-label={`Apply ${wallpaper.name} wallpaper`} title={wallpaper.name} />
-          ))}
-        </div>
       </div>
 
       {PALETTES.map((p) => (
