@@ -51,9 +51,10 @@ export function ElementsPanel() {
     for (const file of Array.from(event.target.files ?? [])) {
       const reader = new FileReader();
       reader.onload = () => {
-        if (typeof reader.result !== "string") return;
-        setUploads((current) => [reader.result as string, ...current]);
-        add(newImage(reader.result));
+        const result = reader.result;
+        if (typeof result !== "string") return;
+        setUploads((current) => [result, ...current]);
+        add(newImage(result));
       };
       reader.readAsDataURL(file);
     }
