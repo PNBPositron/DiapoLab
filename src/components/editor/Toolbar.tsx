@@ -198,9 +198,14 @@ export function Toolbar() {
             exporting={!!exporting}
           />
         ) : (
-          <IconBtn onClick={clear} title="Clear">
-            <Trash2 className="h-4 w-4" strokeWidth={2.5} />
-          </IconBtn>
+          <>
+            <IconBtn onClick={() => setAboutOpen(true)} title="About">
+              <Info className="h-4 w-4" strokeWidth={2.5} />
+            </IconBtn>
+            <IconBtn onClick={clear} title="Clear">
+              <Trash2 className="h-4 w-4" strokeWidth={2.5} />
+            </IconBtn>
+          </>
         )}
         <IconBtn onClick={() => importRef.current?.click()} title="Import .json design">
           <Upload className="h-4 w-4" strokeWidth={2.5} />

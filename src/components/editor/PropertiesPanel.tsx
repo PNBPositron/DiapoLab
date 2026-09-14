@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   useEditor,
   DEFAULT_FILTERS,
@@ -17,13 +18,7 @@ import {
 } from "@/store/editor";
 import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
-
-const readImageFile = (file: File, onLoad: (src: string) => void) => {
-  if (!file.type.startsWith("image/")) return;
-  const reader = new FileReader();
-  reader.onload = () => onLoad(String(reader.result));
-  reader.readAsDataURL(file);
-};
+import { uploadAccountImage } from "@/lib/image-assets";
 
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)]),
@@ -44,6 +39,8 @@ const SWATCHES = [
 export function PropertiesPanel() {
   const { elements, selectedId, update, remove, duplicate, bringForward, sendBackward } =
     useEditor();
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const el = elements.find((e) => e.id === selectedId);
   if (!el) {
     return (
@@ -298,14 +295,29 @@ export function PropertiesPanel() {
               />
             </Field>
             <Field label="Font size">
-              <input
-                type="range"
-                min={12}
-                max={240}
-                value={el.fontSize}
-                onChange={(e) => update(el.id, { fontSize: +e.target.value })}
-                className="w-full accent-teal"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min={12}
+                  max={240}
+                  value={el.fontSize}
+                  onChange={(e) => update(el.id, { fontSize: +e.target.value })}
+                  className="w-full accent-teal"
+                />
+                <input
+                  type="number"
+                  min={12}
+                  max={240}
+                  step={1}
+                  value={el.fontSize}
+                  aria-label="Font size in pixels"
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) });
+                  }}
+                  className="brutal-border-2 w-16 bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none"
+                />
+              </div>
               <div className="font-mono text-[11px] text-teal/70">{el.fontSize}px</div>
             </Field>
             <Field label="Font family">
@@ -409,11 +421,20 @@ export function PropertiesPanel() {
                     className="sr-only"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) readImageFile(file, (src) => update(el.id, { imageOverlay: src }));
+                      if (file) {
+                        setUploadingImage(true);
+                        setImageUploadError(null);
+                        uploadAccountImage(file)
+                          .then((src) => update(el.id, { imageOverlay: src }))
+                          .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
+                          .finally(() => setUploadingImage(false));
+                      }
                       e.currentTarget.value = "";
                     }}
                   />
                 </label>
+                {uploadingImage && <div className="font-mono text-[10px] text-teal/70">Compressing and storing image...</div>}
+                {imageUploadError && <div role="alert" className="font-mono text-[10px] text-pink-300">{imageUploadError}</div>}
                 <input
                   value={el.imageOverlay ?? ""}
                   onChange={(e) => update(el.id, { imageOverlay: e.target.value || undefined })}
@@ -516,11 +537,20 @@ export function PropertiesPanel() {
                     className="sr-only"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) readImageFile(file, (src) => update(el.id, { imageOverlay: src }));
+                      if (file) {
+                        setUploadingImage(true);
+                        setImageUploadError(null);
+                        uploadAccountImage(file)
+                          .then((src) => update(el.id, { imageOverlay: src }))
+                          .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
+                          .finally(() => setUploadingImage(false));
+                      }
                       e.currentTarget.value = "";
                     }}
                   />
                 </label>
+                {uploadingImage && <div className="font-mono text-[10px] text-teal/70">Compressing and storing image...</div>}
+                {imageUploadError && <div role="alert" className="font-mono text-[10px] text-pink-300">{imageUploadError}</div>}
                 <input
                   value={el.imageOverlay ?? ""}
                   onChange={(e) => update(el.id, { imageOverlay: e.target.value || undefined })}

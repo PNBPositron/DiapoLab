@@ -1,5 +1,6 @@
 import { toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
+import { stripEmbeddedImages } from "@/lib/image-assets";
 
 export function exportJSON(name: string) {
   const { pages, canvasW, canvasH, designName } = useEditor.getState();
@@ -9,7 +10,7 @@ export function exportJSON(name: string) {
     name: designName,
     canvas_w: canvasW,
     canvas_h: canvasH,
-    pages,
+    pages: stripEmbeddedImages(pages),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
