@@ -36,6 +36,18 @@ const SWATCHES = [
   "#00ff88",
 ];
 
+function PropertyGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <details className="group border border-teal/25 bg-surface/30" open={false}>
+      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-display text-[10px] uppercase tracking-[0.2em] text-teal marker:content-none hover:bg-surface/60 [&::-webkit-details-marker]:hidden">
+        <span>{label}</span>
+        <span className="font-mono text-teal/50 transition-transform group-open:rotate-90">›</span>
+      </summary>
+      <div className="flex flex-col gap-4 border-t border-teal/20 p-3">{children}</div>
+    </details>
+  );
+}
+
 export function PropertiesPanel() {
   const { elements, selectedId, update, remove, duplicate, bringForward, sendBackward } =
     useEditor();
@@ -69,7 +81,7 @@ export function PropertiesPanel() {
 
       <div className="space-y-4 p-4">
         {el.type === "ui" && (
-          <>
+          <PropertyGroup label="Content & appearance">
             <Field label="Style">
               <div className="grid grid-cols-3 gap-1.5">
                 {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
@@ -282,10 +294,10 @@ export function PropertiesPanel() {
                 Caps
               </button>
             </div>
-          </>
+          </PropertyGroup>
         )}
         {el.type === "text" && (
-          <>
+          <PropertyGroup label="Content & typography">
             <Field label="Text">
               <textarea
                 value={el.text}
@@ -514,11 +526,11 @@ export function PropertiesPanel() {
                 &gt; click opens link · shift+click to select
               </div>
             </Field>
-          </>
+          </PropertyGroup>
         )}
 
         {el.type === "shape" && (
-          <>
+          <PropertyGroup label="Shape & appearance">
             <Field label="Fill">
               <ColorRow value={el.fill} onChange={(c) => update(el.id, { fill: c })} />
             </Field>
@@ -633,15 +645,17 @@ export function PropertiesPanel() {
               </select>
             </Field>
             <ShadowEditor shadow={el.shadow} onChange={(s) => update(el.id, { shadow: s })} />
-          </>
+          </PropertyGroup>
         )}
 
         {el.type === "quiz" && (
-          <QuizEditor element={el} onChange={(patch) => update(el.id, patch)} />
+          <PropertyGroup label="Quiz content">
+            <QuizEditor element={el} onChange={(patch) => update(el.id, patch)} />
+          </PropertyGroup>
         )}
 
         {el.type === "chart" && (
-          <>
+          <PropertyGroup label="Chart data & style">
             <Field label="Style">
               <div className="grid grid-cols-3 gap-1.5">
                 {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
@@ -664,15 +678,17 @@ export function PropertiesPanel() {
               </div>
             </Field>
             <ChartEditor element={el} onChange={(patch) => update(el.id, patch)} />
-          </>
+          </PropertyGroup>
         )}
 
         {el.type === "button" && (
-          <ButtonEditor element={el} onChange={(patch) => update(el.id, patch)} />
+          <PropertyGroup label="Button content & action">
+            <ButtonEditor element={el} onChange={(patch) => update(el.id, patch)} />
+          </PropertyGroup>
         )}
 
         {el.type === "icon" && (
-          <>
+          <PropertyGroup label="Icon properties">
             <Field label="Icon name">
               <input
                 value={el.name}
@@ -698,7 +714,7 @@ export function PropertiesPanel() {
               />
               <div className="font-mono text-[11px] text-teal/70">{el.strokeWidth}</div>
             </Field>
-          </>
+          </PropertyGroup>
         )}
 
         {el.type === "image" &&
@@ -717,7 +733,7 @@ export function PropertiesPanel() {
               ["invert", "Invert", 0, 100, 1, "%"],
             ];
             return (
-              <>
+              <PropertyGroup label="Image appearance & effects">
                 <div className="font-display text-[10px] uppercase tracking-[0.25em] text-teal/80">
                   ▸ Image effects
                 </div>
@@ -838,16 +854,17 @@ export function PropertiesPanel() {
                   <RotateCcw className="h-3 w-3" strokeWidth={3} /> Reset effects
                 </button>
                 <ShadowEditor shadow={el.shadow} onChange={(s) => update(el.id, { shadow: s })} />
-              </>
+              </PropertyGroup>
             );
           })()}
 
-        <InteractionEditor
-          interaction={el.interaction}
-          onChange={(interaction) => update(el.id, { interaction })}
-        />
+        <PropertyGroup label="Interaction & layout">
+          <InteractionEditor
+            interaction={el.interaction}
+            onChange={(interaction) => update(el.id, { interaction })}
+          />
 
-        <Field label="Rotation">
+          <Field label="Rotation">
           <input
             type="range"
             min={-180}
@@ -859,7 +876,7 @@ export function PropertiesPanel() {
           <div className="font-mono text-[11px] text-teal/70">{el.rotation}°</div>
         </Field>
 
-        <Field label="Entrance animation (present mode)">
+          <Field label="Entrance animation (present mode)">
           <select
             value={el.animation ?? "none"}
             onChange={(e) =>
@@ -872,9 +889,11 @@ export function PropertiesPanel() {
             <option value="pop">pop</option>
             <option value="glitch">glitch</option>
           </select>
-        </Field>
+          </Field>
+        </PropertyGroup>
 
-        <div className="grid grid-cols-2 gap-2 pt-2">
+        <PropertyGroup label="Layer actions">
+          <div className="grid grid-cols-2 gap-2">
           <ActionBtn
             onClick={() => bringForward(el.id)}
             icon={<ArrowUp className="h-3 w-3" strokeWidth={3} />}
@@ -900,7 +919,8 @@ export function PropertiesPanel() {
           >
             Delete
           </ActionBtn>
-        </div>
+          </div>
+        </PropertyGroup>
       </div>
     </div>
   );
