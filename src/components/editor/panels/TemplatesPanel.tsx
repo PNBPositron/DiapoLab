@@ -85,7 +85,7 @@ export function TemplatesPanel() {
       <div className="space-y-2">
         <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or creator" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
         <div className="grid grid-cols-3 gap-1.5">
-          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
+          {[['style', styleFilter, setStyleFilter, ['all', 'minimal', 'editorial', 'bold', 'brutalist', 'corporate', 'playful', 'luxury', 'retro', 'tech', 'organic', 'monochrome']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
         </div>
       </div>
 
@@ -195,9 +195,19 @@ function filterTemplates(
 
 function inferTemplateStyle(template: PublicTemplate) {
   const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
-  if (text.includes("quote") || text.includes("editorial")) return "editorial";
-  if (text.includes("launch") || text.includes("bold")) return "bold";
-  return "minimal";
+  const styleKeywords: Array<[string, string[]]> = [
+    ["editorial", ["quote", "editorial", "magazine", "essay"]],
+    ["brutalist", ["brutal", "raw", "grid", "manifesto"]],
+    ["corporate", ["business", "company", "report", "strategy", "corporate"]],
+    ["playful", ["play", "fun", "party", "festival", "colorful"]],
+    ["luxury", ["luxury", "premium", "elegant", "fashion"]],
+    ["retro", ["retro", "vintage", "classic", "80s", "90s"]],
+    ["tech", ["tech", "software", "product", "startup", "digital"]],
+    ["organic", ["organic", "nature", "wellness", "earth", "green"]],
+    ["monochrome", ["mono", "black", "white", "ink"]],
+    ["bold", ["launch", "bold", "campaign", "impact"]],
+  ];
+  return styleKeywords.find(([, keywords]) => keywords.some((keyword) => text.includes(keyword)))?.[0] ?? "minimal";
 }
 
 function sortTemplates(
