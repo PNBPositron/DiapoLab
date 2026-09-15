@@ -160,13 +160,8 @@ export function Toolbar() {
     <header className="relative flex items-center justify-between gap-4 border-b border-teal/40 bg-ink px-5 py-3">
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent opacity-80" />
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center border-2 border-teal bg-blue-deep p-1 shadow-[0_0_14px_var(--blue)]">
-            <img src="/positron-mark.svg" alt="Positron Studio" className="size-full object-contain" />
-          </div>
-          <div className="font-display text-xl tracking-[0.18em] text-teal">
-            POSITRON<span className="text-blue">//</span>STUDIO
-          </div>
+        <div className="flex items-center">
+          <img src="/positron-mark.svg" alt="Positron Studio" className="h-20 w-[300px] max-w-[42vw] object-contain object-left" />
         </div>
         <div className="ml-4 hidden items-center gap-2 md:flex">
           <input
@@ -349,6 +344,15 @@ export function Toolbar() {
               className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
             >
               API USED: COLORMIND <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              href="https://unsplash.com/developers"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setAboutOpen(false)}
+              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
+            >
+              SUGGESTED API: UNSPLASH <span aria-hidden="true">↗</span>
             </a>
           </nav>
         </DialogContent>

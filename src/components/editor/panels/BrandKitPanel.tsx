@@ -26,6 +26,11 @@ export function BrandKitPanel() {
     { value: "bold", label: "Bold / warm" },
     { value: "natural", label: "Natural / earthy" },
     { value: "mono", label: "Monochrome" },
+    { value: "sunset", label: "Sunset / coral" },
+    { value: "ocean", label: "Ocean / deep blue" },
+    { value: "candy", label: "Candy / playful" },
+    { value: "forest", label: "Forest / moss" },
+    { value: "editorial", label: "Editorial / ink" },
   ];
 
   const generateRandomKit = async () => {
