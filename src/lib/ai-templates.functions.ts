@@ -1,44 +1,65 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const NVIDIA_MODEL = "meta/llama-3.1-8b-instruct";
-const pickModel = () => NVIDIA_MODEL;
+const GEMINI_MODEL = "gemini-2.5-flash";
+const pickModel = () => GEMINI_MODEL;
 
 type CohereMessage = {
   role: "system" | "user" | "assistant";
   content: string | Array<Record<string, unknown>>;
 };
 
-  /** Text generation through NVIDIA NIM. The API key is server-only. */
+/** Text generation through Gemini. The API key is server-only. */
 async function chatComplete(
   model: string,
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  const apiKey = (process.env.NVIDIA_API_KEY_2 || process.env.NVIDIA_API_KEY)
-    ?.trim()
-    .replace(/^Bearer\s+/i, "")
-    .replace(/^['"]|['"]$/g, "");
-  if (!apiKey) throw new Error("AI is not configured. Set NVIDIA_API_KEY.");
-  const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: model || NVIDIA_MODEL,
-      messages: messages.map((entry) => ({
-        role: entry.role,
-        content: typeof entry.content === "string" ? entry.content : JSON.stringify(entry.content),
-      })),
-      temperature: extra.temperature ?? 0.4,
-      max_tokens: Math.min(8192, Math.max(256, Number(extra.max_tokens ?? 8192))),
-      response_format: extra.response_format,
-    }),
-  });
+  const apiKey = process.env.API_KEY?.trim().replace(/^['"]|['"]$/g, "");
+  if (!apiKey) throw new Error("AI is not configured. Set API_KEY.");
+
+  const system = messages.find((entry) => entry.role === "system")?.content;
+  const contents = messages
+    .filter((entry) => entry.role !== "system")
+    .map((entry) => {
+      const parts = typeof entry.content === "string" ? [{ text: entry.content }] : entry.content.flatMap((part) => {
+        if (part.type === "text" && typeof part.text === "string") return [{ text: part.text }];
+        if (part.type === "image_url" && typeof part.image_url === "object" && part.image_url !== null) {
+          const url = (part.image_url as { url?: unknown }).url;
+          if (typeof url === "string" && url.startsWith("data:image/")) {
+            const [header, data] = url.split(",", 2);
+            const mimeType = header.slice(5, header.indexOf(";"));
+            return [{ inlineData: { mimeType, data } }];
+          }
+        }
+        return [];
+      });
+      return { role: entry.role === "assistant" ? "model" : "user", parts };
+    });
+
+  const generationConfig: Record<string, unknown> = {
+    temperature: extra.temperature ?? 0.4,
+    maxOutputTokens: Math.min(8192, Math.max(256, Number(extra.max_tokens ?? 8192))),
+  };
+  if (extra.response_format) generationConfig.responseMimeType = "application/json";
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model || GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...(system ? { systemInstruction: { parts: [{ text: typeof system === "string" ? system : JSON.stringify(system) }] } } : {}),
+        contents,
+        generationConfig,
+      }),
+    },
+  );
   if (res.status === 429) throw new Error("AI rate limit hit. Try again in a moment.");
-  if (res.status === 401) throw new Error("AI authentication failed. The configured NVIDIA token is invalid or expired.");
+  if (res.status === 401 || res.status === 403) throw new Error("AI authentication failed. Check API_KEY.");
   if (!res.ok) throw new Error(`AI error ${res.status}: ${await res.text()}`);
-  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const content = json.choices?.[0]?.message?.content?.trim();
+  const json = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  const content = json.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim();
   if (!content) throw new Error("AI returned an empty response");
   return content;
 }
@@ -374,7 +395,7 @@ export const suggestIcons = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }): Promise<{ icons: string[] }> => {
     const content = await chatComplete(
-      NVIDIA_MODEL,
+      GEMINI_MODEL,
       [
         {
           role: "system",
@@ -436,7 +457,7 @@ Coordinates absolute, must stay inside bounds.
 Return JSON only: { "bg": "#hex", "models": Array<{ "shape":"sphere", "x", "y", "width", "height", "color", "spinSpeed"?, "tiltX"?, "tiltY"? }> }.
 spinSpeed: 0-30 seconds (0 = static). Always set "shape" to "sphere".`;
     const content = await chatComplete(
-      NVIDIA_MODEL,
+      GEMINI_MODEL,
       [
         { role: "system", content: sys },
         { role: "user", content: `Theme: ${data.prompt}` },
@@ -468,7 +489,7 @@ export const askCohereAdvisor = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const content = await chatComplete(
-      NVIDIA_MODEL,
+      GEMINI_MODEL,
       [
         {
           role: "system",
@@ -655,7 +676,7 @@ Rules:
 Return ONLY JSON: { "translations": string[] } with exactly ${data.texts.length} entries.`;
 
     const content = await chatComplete(
-      NVIDIA_MODEL,
+      GEMINI_MODEL,
       [
         { role: "system", content: sys },
         { role: "user", content: JSON.stringify({ texts: data.texts }) },
@@ -781,7 +802,7 @@ async function cohereChat(
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  return chatComplete(NVIDIA_MODEL, messages, extra);
+  return chatComplete(GEMINI_MODEL, messages, extra);
 }
 
 export type DeckCopySlide = {
