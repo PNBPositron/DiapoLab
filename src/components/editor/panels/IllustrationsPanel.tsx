@@ -21,19 +21,14 @@ const HIGHLIGHTS = [
 const TRANSHUMANS = [
   "Entertainment.svg", "Pilot.svg", "Walking Contradiction.svg", "Ecto Plasma.svg", "Roboto.svg", "Gamestation.svg", "Wont Stop.svg", "Consumer.svg", "Mechanical Love.svg", "Whoa.svg", "Cube Leg.svg", "Coffee.svg", "Rogue.svg", "Runner.svg", "Pacheco.svg", "Polka Pup.svg", "Mask.svg", "Looking Ahead.svg", "Puppy.svg", "Bueno.svg", "Chaotic Good.svg", "Jumping.svg", "Experiments.svg", "Fling.svg", "Waiting.svg", "Astro.svg", "Pondering.svg", "Late for Class.svg", "Groceries.svg", "Kiddo.svg", "Growth.svg", "Meela Pantalones.svg", "Feliz.svg", "Reflecting.svg", "Chilly.svg", "Chillin.svg",
 ];
-
 type Collection = "Highlights" | "Transhumans";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const [collection, setCollection] = useState<Collection | null>(null);
-  const [format, setFormat] = useState<"svg" | "png">("svg");
   const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : [];
-  const getSource = (file: string) => {
-    const base = file.replace(/\.svg$/i, "");
-    return `/illustrations/${base}.${format}`;
-  };
+  const getSource = (file: string) => `/illustrations/${file}`;
 
   return (
     <div className="space-y-4">
@@ -48,23 +43,6 @@ export function IllustrationsPanel() {
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
         </button>
       </div>
-      {collection === "Transhumans" && (
-        <div className="flex items-center justify-between border border-teal/25 bg-surface/40 p-2">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-teal/70">Asset format</span>
-          <div className="flex gap-1">
-            {(["svg", "png"] as const).map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setFormat(value)}
-                className={`brutal-press border px-2 py-1 font-mono text-[10px] uppercase ${format === value ? "border-teal bg-blue-deep text-teal" : "border-teal/30 bg-surface text-teal/60"}`}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
       {collection && (
         <div className="grid grid-cols-2 gap-2">
           {files.map((file) => {
@@ -72,7 +50,7 @@ export function IllustrationsPanel() {
             const name = file.replace(/\.svg$/i, "").replaceAll("-", " ");
             return (
               <button key={file} onClick={() => add(newImage(src, { tint: editorTheme.includes("dark") ? "#ffffff" : "#0a0f1f" }))} title={`Add ${name}`} className="group brutal-border-2 brutal-press overflow-hidden bg-surface p-1 hover:border-teal">
-                <div className="grid h-24 place-items-center bg-paper/80 p-2"><img src={src} alt={`${collection} illustration: ${name}`} className="max-h-full max-w-full object-contain" draggable={false} onError={(event) => { const image = event.currentTarget; if (format === "png" && image.src.endsWith(".png")) image.src = `${src.replace(/\.png$/i, ".svg")}`; }} /></div>
+                <div className="grid h-24 place-items-center bg-paper/80 p-2"><img src={src} alt={`${collection} illustration: ${name}`} className="max-h-full max-w-full object-contain" draggable={false} /></div>
                 <span className="flex items-center gap-1 truncate px-1 py-1 font-mono text-[9px] text-teal/70"><ImagePlus className="size-3 shrink-0" />{name}</span>
               </button>
             );

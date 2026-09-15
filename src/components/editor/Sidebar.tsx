@@ -11,6 +11,7 @@ import {
   Blocks,
   Settings,
   Images,
+  Sparkles,
 } from "lucide-react";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -18,6 +19,7 @@ import { ElementsPanel } from "./panels/ElementsPanel";
 import { DesignPanel } from "./panels/DesignPanel";
 import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { IllustrationsPanel } from "./panels/IllustrationsPanel";
+import { AiPanel } from "./panels/AiPanel";
 import { SettingsDialog } from "./SettingsDialog";
 
 const TOOLS = [
@@ -25,6 +27,7 @@ const TOOLS = [
   { id: "text", label: "Text", icon: Type },
   { id: "elements", label: "Elements", icon: Shapes },
   { id: "illustrations", label: "Illus.", icon: Images },
+  { id: "ai", label: "AI", icon: Sparkles },
   { id: "components", label: "Presets", icon: Blocks },
   { id: "design", label: "Design", icon: SlidersHorizontal },
 ] as const;
@@ -172,6 +175,7 @@ export function Sidebar() {
         {tool === "components" && <ComponentsPanel />}
         {tool === "elements" && <ElementsPanel />}
         {tool === "illustrations" && <IllustrationsPanel />}
+        {tool === "ai" && <AiPanel />}
         {tool === "design" && <DesignPanel />}
       </div>
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}

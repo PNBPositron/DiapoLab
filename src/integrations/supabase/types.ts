@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_images: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          path: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          path: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       designs: {
         Row: {
           canvas_h: number
