@@ -21,16 +21,18 @@ const HIGHLIGHTS = [
 const TRANSHUMANS = [
   "Entertainment.svg", "Pilot.svg", "Walking Contradiction.svg", "Ecto Plasma.svg", "Roboto.svg", "Gamestation.svg", "Wont Stop.svg", "Consumer.svg", "Mechanical Love.svg", "Whoa.svg", "Cube Leg.svg", "Coffee.svg", "Rogue.svg", "Runner.svg", "Pacheco.svg", "Polka Pup.svg", "Mask.svg", "Looking Ahead.svg", "Puppy.svg", "Bueno.svg", "Chaotic Good.svg", "Jumping.svg", "Experiments.svg", "Fling.svg", "Waiting.svg", "Astro.svg", "Pondering.svg", "Late for Class.svg", "Groceries.svg", "Kiddo.svg", "Growth.svg", "Meela Pantalones.svg", "Feliz.svg", "Reflecting.svg", "Chilly.svg", "Chillin.svg",
 ];
+const OPEN_PEEPS = Array.from({ length: 24 }, (_, index) => `peep-standing-${index + 1}`);
 
-type Collection = "Highlights" | "Transhumans";
+type Collection = "Highlights" | "Transhumans" | "Open Peeps";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const [collection, setCollection] = useState<Collection | null>(null);
   const [format, setFormat] = useState<"svg" | "png">("svg");
-  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : [];
+  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : collection === "Open Peeps" ? OPEN_PEEPS.map((name) => `${name}.svg`) : [];
   const getSource = (file: string) => {
+    if (collection === "Open Peeps") return `/illustrations/open-peeps/${format}/${file.replaceAll(" ", "-")}`;
     const base = file.replace(/\.svg$/i, "");
     return `/illustrations/${base}.${format}`;
   };
@@ -47,8 +49,12 @@ export function IllustrationsPanel() {
           <Users className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
         </button>
+        <button onClick={() => setCollection(collection === "Open Peeps" ? null : "Open Peeps")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Open Peeps" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
+          <Users className="size-6" />
+          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Open Peeps</span>
+        </button>
       </div>
-      {collection === "Transhumans" && (
+      {(collection === "Transhumans" || collection === "Open Peeps") && (
         <div className="flex items-center justify-between border border-teal/25 bg-surface/40 p-2">
           <span className="font-mono text-[10px] uppercase tracking-wider text-teal/70">Asset format</span>
           <div className="flex gap-1">
