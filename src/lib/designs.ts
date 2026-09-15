@@ -77,15 +77,15 @@ export type PublicTemplate = {
   pages: Page[];
   thumbnail: string | null;
   created_at: string;
-  style?: string | null;
-  creator?: string | null;
+  tags?: string[] | null;
   license?: string | null;
+  creator?: string | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const { data, error } = await supabase
     .from("public_templates")
-    .select("id, user_id, name, canvas_w, canvas_h, pages, thumbnail, created_at")
+    .select("id, user_id, name, canvas_w, canvas_h, pages, thumbnail, created_at, tags, license")
     .order("created_at", { ascending: false })
     .limit(60);
   if (error) throw error;
@@ -98,6 +98,8 @@ export async function publishAsTemplate(input: {
   canvas_h: number;
   pages: Page[];
   thumbnail?: string | null;
+  tags?: string[];
+  license?: string;
 }): Promise<PublicTemplate> {
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;
@@ -111,7 +113,9 @@ export async function publishAsTemplate(input: {
       canvas_h: input.canvas_h,
     pages: stripEmbeddedImages(input.pages) as unknown as never,
       thumbnail: input.thumbnail ?? null,
-    })
+      tags: input.tags ?? [],
+      license: input.license ?? "CC BY 4.0",
+    } as never)
     .select()
     .single();
   if (error) throw error;
@@ -123,7 +127,7 @@ export async function listMyPublicTemplates(): Promise<PublicTemplate[]> {
   if (!u.user) return [];
   const { data, error } = await supabase
     .from("public_templates")
-    .select("id, user_id, name, canvas_w, canvas_h, pages, thumbnail, created_at")
+    .select("id, user_id, name, canvas_w, canvas_h, pages, thumbnail, created_at, tags, license")
     .eq("user_id", u.user.id)
     .order("created_at", { ascending: false });
   if (error) throw error;
