@@ -1,5 +1,6 @@
 import { useEditor, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { SlideThumbnail } from "./SlideThumbnail";
 
 export function PagesBar() {
   const {
@@ -33,16 +34,13 @@ export function PagesBar() {
                 className={`brutal-border-2 relative overflow-hidden transition-all ${
                   active ? "border-teal glow-teal" : "border-teal/30 hover:border-teal/70"
                 }`}
-                style={{ width: thumbW + 6, height: thumbH + 6, background: p.bgColor }}
+                style={{ width: thumbW + 6, height: thumbH + 6 }}
               >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px)",
-                    backgroundSize: "12px 12px",
-                    opacity: 0.15,
-                  }}
+                <SlideThumbnail
+                  page={p}
+                  canvasW={canvasW}
+                  canvasH={canvasH}
+                  className="h-full w-full"
                 />
                 <span className="absolute bottom-0.5 left-1 font-mono text-[9px] text-ink mix-blend-difference">
                   {String(i + 1).padStart(2, "0")}
