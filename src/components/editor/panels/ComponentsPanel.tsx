@@ -4,9 +4,6 @@ import {
   AppWindow,
   Bell,
   Blocks,
-  Image as ImageIcon,
-  Columns3,
-  PanelTop,
   Chrome,
   Command,
   CreditCard,
@@ -33,7 +30,7 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
-import { newImage, newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
+import { newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { UiRender } from "../UiRender";
 
@@ -70,14 +67,7 @@ const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
 ];
 
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
-type PresetSection = "interfaces" | "ui" | "containers" | null;
-
-const CONTAINER_PRESETS = [
-  { label: "Image frame", Icon: ImageIcon, src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23e5e7eb'/%3E%3Ccircle cx='400' cy='190' r='58' fill='%239ca3af'/%3E%3Cpath d='M170 390l150-150 100 100 65-65 145 115H170z' fill='%236b7280'/%3E%3C/svg%3E" },
-  { label: "Split image", Icon: Columns3, src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='800' height='450' fill='%23dbeafe'/%3E%3Cpath d='M0 330l180-180 125 125 105-105 390 280H0z' fill='%2360a5fa'/%3E%3C/svg%3E" },
-  { label: "Hero image", Icon: PanelTop, src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='800' height='450' fill='%230b1736'/%3E%3Ccircle cx='620' cy='120' r='180' fill='%232b6bff' opacity='.7'/%3E%3Ccircle cx='160' cy='400' r='230' fill='%23ff0080' opacity='.5'/%3E%3C/svg%3E" },
-  { label: "Color block", Icon: Square, src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='800' height='450' fill='%232b6bff'/%3E%3C/svg%3E" },
-];
+type PresetSection = "interfaces" | "ui" | null;
 
 export function ComponentsPanel() {
   const { add, selectedId, elements, update } = useEditor();
@@ -93,7 +83,6 @@ export function ComponentsPanel() {
   };
 
   const presets = section === "interfaces" ? INTERFACES : section === "ui" ? UI_KINDS : [];
-  const addContainer = (src: string) => add(newImage(src, { width: 520, height: 292 }));
 
   return (
     <div className="space-y-4">
@@ -107,23 +96,9 @@ export function ComponentsPanel() {
           <Blocks className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">UI</span>
         </button>
-        <button onClick={() => setSection(section === "containers" ? null : "containers")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${section === "containers" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
-          <ImageIcon className="size-6" />
-          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Images</span>
-        </button>
       </div>
 
-      {section === "containers" && (
-        <div className="grid grid-cols-2 gap-2">
-          {CONTAINER_PRESETS.map(({ label, Icon, src }) => (
-            <button key={label} onClick={() => addContainer(src)} className="brutal-border-2 brutal-press overflow-hidden bg-surface text-teal hover:border-teal">
-              <img src={src} alt="" className="h-20 w-full object-cover" draggable={false} />
-              <span className="flex items-center justify-center gap-1 p-2 font-display text-[9px] uppercase tracking-[0.1em]"><Icon className="size-3" />{label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-      {section && section !== "containers" && (
+      {section && (
         <>
           <div className="grid grid-cols-4 gap-1.5">
             {STYLES.map((item) => {

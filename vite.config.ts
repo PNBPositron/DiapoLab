@@ -17,7 +17,11 @@ export default defineConfig({
     // Excluding them prevents Vite from serving stale optimized-dependency
     // URLs after a lockfile or package-version change.
     optimizeDeps: {
-      exclude: ["@tanstack/router-core", "@tanstack/history"],
+      exclude: [
+        "@tanstack/react-start",
+        "@tanstack/router-core",
+        "@tanstack/history",
+      ],
     },
   },
 });
