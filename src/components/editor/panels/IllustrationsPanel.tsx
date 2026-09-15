@@ -72,7 +72,7 @@ export function IllustrationsPanel() {
             const name = file.replace(/\.svg$/i, "").replaceAll("-", " ");
             return (
               <button key={file} onClick={() => add(newImage(src, { tint: editorTheme.includes("dark") ? "#ffffff" : "#0a0f1f" }))} title={`Add ${name}`} className="group brutal-border-2 brutal-press overflow-hidden bg-surface p-1 hover:border-teal">
-                <div className="grid h-24 place-items-center bg-paper/80 p-2"><img src={src} alt={`${collection} illustration: ${name}`} className="max-h-full max-w-full object-contain" draggable={false} /></div>
+                <div className="grid h-24 place-items-center bg-paper/80 p-2"><img src={src} alt={`${collection} illustration: ${name}`} className="max-h-full max-w-full object-contain" draggable={false} onError={(event) => { const image = event.currentTarget; if (format === "png" && image.src.endsWith(".png")) image.src = `${src.replace(/\.png$/i, ".svg")}`; }} /></div>
                 <span className="flex items-center gap-1 truncate px-1 py-1 font-mono text-[9px] text-teal/70"><ImagePlus className="size-3 shrink-0" />{name}</span>
               </button>
             );

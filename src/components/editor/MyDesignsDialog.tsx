@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { X, Loader2, Trash2 } from "lucide-react";
 import { listDesigns, deleteDesign, type SavedDesign } from "@/lib/designs";
 import { useEditor } from "@/store/editor";
+import { SlideThumbnail } from "./SlideThumbnail";
 
 export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
   const { loadDesign } = useEditor();
@@ -80,15 +81,16 @@ export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
                     onClick={() => handleOpen(d)}
                     className="block w-full text-left"
                   >
-                    <div
-                      className="aspect-video w-full"
-                      style={{
-                        background: d.pages?.[0]?.bgColor ?? "#101a2e",
-                        backgroundImage:
-                          "linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px)",
-                        backgroundSize: "16px 16px",
-                      }}
-                    />
+                    {d.pages?.[0] ? (
+                      <SlideThumbnail
+                        page={d.pages[0]}
+                        canvasW={d.canvas_w}
+                        canvasH={d.canvas_h}
+                        className="w-full bg-ink"
+                      />
+                    ) : (
+                      <div className="aspect-video w-full bg-ink" />
+                    )}
                     <div className="border-t border-teal/30 px-2 py-1.5">
                       <div className="truncate font-display text-[11px] tracking-[0.15em] text-teal">
                         {d.name}
