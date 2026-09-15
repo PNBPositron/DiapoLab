@@ -34,19 +34,19 @@ const GRADIENT_PACKS = [
   {
     name: "Neon pack",
     gradients: [
-      { name: "Neon dusk", value: "linear-gradient(135deg, #050816 0%, #172554 48%, #ff0080 100%)" },
-      { name: "Electric tide", value: "linear-gradient(120deg, #07111f 0%, #00d9ff 52%, #7c3aed 100%)" },
-      { name: "Ultraviolet", value: "radial-gradient(circle at 75% 25%, #7df9ff 0%, #4d7cff 28%, #a855f7 55%, #0a0f1f 82%)" },
-      { name: "Aurora grid", value: "linear-gradient(125deg, #07111f 0%, #14b8a6 34%, #4d7cff 68%, #ff6ec7 100%)" },
+      { name: "Neon dusk", value: "linear-gradient(135deg, #050816 0%, #172554 48%, #2b6bff 100%)" },
+      { name: "Electric tide", value: "linear-gradient(45deg, #07111f 0%, #123c6a 52%, #00d9ff 100%)" },
+      { name: "Ultraviolet", value: "radial-gradient(circle at 75% 25%, #7df9ff 0%, #2b6bff 42%, #0a0f1f 88%)" },
+      { name: "Aurora grid", value: "linear-gradient(160deg, #07111f 0%, #1e40af 50%, #38aff0 100%)" },
     ],
   },
   {
     name: "Heat pack",
     gradients: [
       { name: "Signal bloom", value: "radial-gradient(circle at 20% 20%, #ff0080, #0a0f1f 62%)" },
-      { name: "Solar flare", value: "linear-gradient(145deg, #0a0f1f 5%, #ff0080 38%, #ff6b35 65%, #ffd84a 100%)" },
-      { name: "Chrome heat", value: "linear-gradient(115deg, #111827 0%, #64748b 35%, #f8fafc 50%, #ff4081 72%, #1f2937 100%)" },
-      { name: "Acid night", value: "linear-gradient(160deg, #0a0f1f 0%, #123c4a 50%, #39ff14 140%)" },
+      { name: "Solar flare", value: "linear-gradient(30deg, #0a0f1f 5%, #ff0080 38%, #ff6b35 65%, #ffd84a 100%)" },
+      { name: "Chrome heat", value: "linear-gradient(210deg, #111827 0%, #64748b 35%, #f8fafc 50%, #ff4081 72%, #1f2937 100%)" },
+      { name: "Acid night", value: "linear-gradient(300deg, #0a0f1f 0%, #123c4a 50%, #39ff14 140%)" },
     ],
   },
 ];

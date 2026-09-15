@@ -78,6 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Positron Studio" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#0b1020" },
+      { rel: "icon", href: "/positron-mark.svg", type: "image/svg+xml" },
       { property: "og:title", content: "Positron Studio — Neobrutalist Design Editor" },
       { property: "og:description", content: "Positron Studio is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides." },
       { property: "og:site_name", content: "Positron Studio" },
