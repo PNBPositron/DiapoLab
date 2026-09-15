@@ -1,7 +1,9 @@
 import { useSettings, DEFAULT_BRAND_KIT, type BrandKit } from "@/store/settings";
+import { WandSparkles } from "lucide-react";
 import { useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { FONTS } from "./TextPanel";
+import { useState } from "react";
 
 const SWATCHES: Array<{ key: keyof BrandKit; label: string }> = [
   { key: "primary", label: "Primary" },
@@ -14,10 +16,39 @@ const SWATCHES: Array<{ key: keyof BrandKit; label: string }> = [
 export function BrandKitPanel() {
   const { brandKit, setBrandKit, resetBrandKit } = useSettings();
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
+  const [generating, setGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
+  const generateRandomKit = async () => {
+    setGenerating(true);
+    setGenerationError(null);
+    try {
+      const response = await fetch("/api/colormind", { method: "POST" });
+      const payload = (await response.json()) as { result?: number[][]; error?: string };
+      if (!response.ok || !payload.result?.length) throw new Error(payload.error ?? "Could not generate colors");
+      const colors = payload.result.map(([r, g, b]) => `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("")}`);
+      setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : "Could not generate colors");
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   return (
     <div className="space-y-3">
       <PanelHeader title="Brand Kit" />
+
+      <button
+        type="button"
+        onClick={generateRandomKit}
+        disabled={generating}
+        className="brutal-border-2 brutal-press w-full bg-blue py-2 font-display text-[10px] uppercase tracking-[0.15em] text-ink disabled:opacity-60"
+      >
+        <WandSparkles className="mr-1 inline-block size-3.5" />
+        {generating ? "Generating palette..." : "Generate random color kit"}
+      </button>
+      {generationError && <p className="font-mono text-[9px] text-red-300">{generationError}</p>}
 
       <div className="grid grid-cols-1 gap-1.5">
         {SWATCHES.map((s) => (
