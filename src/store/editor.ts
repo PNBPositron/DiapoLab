@@ -135,6 +135,7 @@ export const DEFAULT_FILTERS: ImageFilters = {
 export type ImageElement = ElementBase & {
   type: "image";
   src: string;
+  illustrationFormat?: "svg" | "png";
   tint?: string;
   filters?: ImageFilters;
   shadow?: ElementShadow;

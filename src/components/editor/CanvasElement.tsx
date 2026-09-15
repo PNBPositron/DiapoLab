@@ -380,6 +380,7 @@ export function CanvasElement({
           const isOverlay = element.effect === "liquid_glass" || element.effect === "inner_glow";
           return (
             <div
+              className={element.effect === "liquid_glass" ? "liquid-glass-surface" : undefined}
               style={{
                 position: "absolute",
                 inset: 0,
@@ -407,25 +408,56 @@ export function CanvasElement({
             opacity: element.opacity ?? 1,
           }}
         >
-          <img
-            src={element.src}
-            alt=""
-            draggable={false}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: element.fit ?? "cover",
-              display: "block",
-              transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-              filter: [
-                element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
-                filterCss(element.filters),
-                shadowFilter(element.shadow),
-              ]
-                .filter(Boolean)
-                .join(" "),
-            }}
-          />
+          {element.illustrationFormat === "svg" && element.tint ? (
+            <div
+              aria-hidden="true"
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: element.tint,
+                WebkitMaskImage: `url("${element.src}")`,
+                maskImage: `url("${element.src}")`,
+                WebkitMaskSize: element.fit === "contain" ? "contain" : "100% 100%",
+                maskSize: element.fit === "contain" ? "contain" : "100% 100%",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+                transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
+                filter: [filterCss(element.filters), shadowFilter(element.shadow)]
+                  .filter(Boolean)
+                  .join(" "),
+              }}
+            />
+          ) : (
+            <img
+              src={element.src}
+              alt=""
+              onError={() => {
+                if (element.illustrationFormat === "png" && element.src.endsWith(".png")) {
+                  update(element.id, {
+                    src: element.src.replace(/\.png$/i, ".svg"),
+                    illustrationFormat: "svg",
+                  });
+                }
+              }}
+              draggable={false}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: element.fit ?? "cover",
+                display: "block",
+                transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
+                filter: [
+                  element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
+                  filterCss(element.filters),
+                  shadowFilter(element.shadow),
+                ]
+                  .filter(Boolean)
+                  .join(" "),
+              }}
+            />
+          )}
           {element.gradient && (
             <div
               aria-hidden="true"

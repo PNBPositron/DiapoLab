@@ -151,6 +151,12 @@
   --blue: oklch(0.58 0.19 250);
   --blue-deep: oklch(0.82 0.12 240);
 }
+[data-exporting="true"] .liquid-glass-surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.42), rgba(210,225,255,0.2) 52%, rgba(255,255,255,0.3)) !important;
+}
+
 [data-editor-theme="glass"] {
   --ink: oklch(0.18 0.02 260);
   --paper: oklch(0.24 0.03 260);

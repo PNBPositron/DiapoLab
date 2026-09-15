@@ -734,6 +734,17 @@ export function PropertiesPanel() {
             ];
             return (
               <PropertyGroup label="Image appearance & effects">
+                {el.src.startsWith("/illustrations/") && (
+                  <Field label="Illustration icon tint">
+                    <ColorRow
+                      value={el.tint ?? "#111827"}
+                      onChange={(tint) => update(el.id, { tint })}
+                    />
+                    <div className="mt-1 font-mono text-[9px] text-teal/50">
+                      Treat this illustration like an icon and recolor its SVG artwork.
+                    </div>
+                  </Field>
+                )}
                 <div className="font-display text-[10px] uppercase tracking-[0.25em] text-teal/80">
                   ▸ Image effects
                 </div>

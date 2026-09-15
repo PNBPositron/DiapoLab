@@ -28,7 +28,12 @@ export function IllustrationsPanel() {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const [collection, setCollection] = useState<Collection | null>(null);
+  const [format, setFormat] = useState<"svg" | "png">("svg");
   const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : [];
+  const getSource = (file: string) => {
+    const base = file.replace(/\.svg$/i, "");
+    return `/illustrations/${base}.${format}`;
+  };
 
   return (
     <div className="space-y-4">
@@ -43,10 +48,27 @@ export function IllustrationsPanel() {
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
         </button>
       </div>
+      {collection === "Transhumans" && (
+        <div className="flex items-center justify-between border border-teal/25 bg-surface/40 p-2">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-teal/70">Asset format</span>
+          <div className="flex gap-1">
+            {(["svg", "png"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setFormat(value)}
+                className={`brutal-press border px-2 py-1 font-mono text-[10px] uppercase ${format === value ? "border-teal bg-blue-deep text-teal" : "border-teal/30 bg-surface text-teal/60"}`}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {collection && (
         <div className="grid grid-cols-2 gap-2">
           {files.map((file) => {
-            const src = `/illustrations/${file}`;
+            const src = getSource(file);
             const name = file.replace(/\.svg$/i, "").replaceAll("-", " ");
             return (
               <button key={file} onClick={() => add(newImage(src, { tint: editorTheme.includes("dark") ? "#ffffff" : "#0a0f1f" }))} title={`Add ${name}`} className="group brutal-border-2 brutal-press overflow-hidden bg-surface p-1 hover:border-teal">
