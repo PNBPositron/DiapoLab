@@ -77,6 +77,9 @@ export type PublicTemplate = {
   pages: Page[];
   thumbnail: string | null;
   created_at: string;
+  style?: string | null;
+  creator?: string | null;
+  license?: string | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {

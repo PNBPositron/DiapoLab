@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Heart, Grid3x3 } from "lucide-react";
+import { Loader2, Heart, Grid3x3, Search } from "lucide-react";
 import { useEditor, newShape, newText, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -65,6 +65,10 @@ export function TemplatesPanel() {
   const { user } = useAuth();
   const [showAll, setShowAll] = useState(false);
   const [sortBy, setSortBy] = useState<"likes" | "recent">("likes");
+  const [query, setQuery] = useState("");
+  const [styleFilter, setStyleFilter] = useState("all");
+  const [creatorFilter, setCreatorFilter] = useState("all");
+  const [licenseFilter, setLicenseFilter] = useState("all");
 
   useEffect(() => {
     setCommunityLoading(true);
@@ -82,6 +86,8 @@ export function TemplatesPanel() {
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
+
+  const filteredCommunity = filterTemplates(community, { query, style: styleFilter, creator: creatorFilter, license: licenseFilter });
 
   const toggleLike = async (id: string) => {
     if (!user) {
@@ -117,8 +123,12 @@ export function TemplatesPanel() {
 
       {error && <p className="font-mono text-[10px] text-[#ff0080]">! {error}</p>}
 
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-        ▸ Community templates
+      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Community templates</div>
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or creator" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
+        <div className="grid grid-cols-3 gap-1.5">
+          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community', 'builtin']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
+        </div>
       </div>
 
       {communityLoading ? (
@@ -130,8 +140,8 @@ export function TemplatesPanel() {
           &gt; no community templates yet. Be the first — sign in and click the share icon in the toolbar.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
-          {sortTemplates(community, likeCounts, "likes").slice(0, 8).map((c) => (
+        <div className="grid grid-cols-1 gap-3">
+          {sortTemplates(filteredCommunity, likeCounts, "likes").slice(0, 8).map((c) => (
             <div
               key={c.id}
               className="brutal-border-2 group relative overflow-hidden bg-surface text-left hover:border-teal"
@@ -151,7 +161,7 @@ export function TemplatesPanel() {
                       page={c.pages[0] as Page}
                       canvasW={c.canvas_w}
                       canvasH={c.canvas_h}
-                      className="w-full"
+                      className="w-full min-h-[150px]"
                     />
                   ) : (
                     <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#0a0f1f" }} />
@@ -207,6 +217,29 @@ export function TemplatesPanel() {
       />
     </div>
   );
+}
+
+function filterTemplates(
+  templates: PublicTemplate[],
+  filters: { query: string; style: string; creator: string; license: string },
+) {
+  const query = filters.query.trim().toLowerCase();
+  return templates.filter((template) => {
+    const creator = template.creator ?? (template.user_id === "builtin" ? "builtin" : "community");
+    const style = template.style ?? inferTemplateStyle(template);
+    const license = template.license ?? (template.user_id === "builtin" ? "CC0" : "community");
+    return (!query || `${template.name} ${creator} ${style} ${license}`.toLowerCase().includes(query))
+      && (filters.style === "all" || style === filters.style)
+      && (filters.creator === "all" || creator === filters.creator)
+      && (filters.license === "all" || license === filters.license);
+  });
+}
+
+function inferTemplateStyle(template: PublicTemplate) {
+  const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
+  if (text.includes("quote") || text.includes("editorial")) return "editorial";
+  if (text.includes("launch") || text.includes("bold")) return "bold";
+  return "minimal";
 }
 
 function sortTemplates(
