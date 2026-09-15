@@ -143,6 +143,8 @@ export function Toolbar() {
         canvas_w: canvasW,
         canvas_h: canvasH,
         pages,
+        tags: meta.tags,
+        license: meta.license,
       });
       setPublishDialogOpen(false);
       const link = `${window.location.origin}/t/${tpl.id}`;
