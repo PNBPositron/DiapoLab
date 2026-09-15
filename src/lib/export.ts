@@ -52,12 +52,15 @@ async function captureAllPages(): Promise<string[]> {
     await wait(120);
     const node = document.getElementById("canvas-export");
     if (!node) continue;
+    node.dataset.exporting = "true";
     const dataUrl = await toPng(node, {
+
       width: canvasW,
       height: canvasH,
       pixelRatio: 2,
       style: { transform: "none", left: "0", top: "0", margin: "0" },
     });
+    delete node.dataset.exporting;
     shots.push(dataUrl);
   }
   setCurrentPage(original);
@@ -70,12 +73,14 @@ export async function exportPNG(name: string) {
   await wait(50);
   const node = document.getElementById("canvas-export");
   if (!node) return;
+  node.dataset.exporting = "true";
   const dataUrl = await toPng(node, {
     width: canvasW,
     height: canvasH,
     pixelRatio: 2,
     style: { transform: "none", left: "0", top: "0", margin: "0" },
   });
+  delete node.dataset.exporting;
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.png`;
   link.href = dataUrl;

@@ -380,6 +380,7 @@ export function CanvasElement({
           const isOverlay = element.effect === "liquid_glass" || element.effect === "inner_glow";
           return (
             <div
+              className={element.effect === "liquid_glass" ? "liquid-glass-surface" : undefined}
               style={{
                 position: "absolute",
                 inset: 0,

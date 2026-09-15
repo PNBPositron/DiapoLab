@@ -86,7 +86,7 @@ export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> =
   { id: "midnight", label: "Midnight", hint: "deep indigo dark" },
 ];
 
-export const DEFAULT_EDITOR_THEME = "everest";
+export const DEFAULT_EDITOR_THEME = "glass";
 
 const ALL_ON: Record<PanelId, boolean> = {
   home: true,
