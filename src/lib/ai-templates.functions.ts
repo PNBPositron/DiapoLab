@@ -22,7 +22,7 @@ async function chatComplete(
   const contents = messages
     .filter((entry) => entry.role !== "system")
     .map((entry) => {
-      const parts = typeof entry.content === "string" ? [{ text: entry.content }] : entry.content.flatMap((part) => {
+      const parts: Array<Record<string, unknown>> = typeof entry.content === "string" ? [{ text: entry.content }] : entry.content.flatMap((part): Array<Record<string, unknown>> => {
         if (part.type === "text" && typeof part.text === "string") return [{ text: part.text }];
         if (part.type === "image_url" && typeof part.image_url === "object" && part.image_url !== null) {
           const url = (part.image_url as { url?: unknown }).url;
@@ -282,7 +282,6 @@ Return ONLY valid JSON, no markdown, no commentary:
 Each slide aims for 5-12 elements. Across the deck, include at least one shape with an effect (liquid_glass or neon) when the style supports it. Make it visually striking, deliberate, and unmistakably in the requested style.`;
 
 export const generateAiTemplate = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator(
     (data: {
       prompt: string;

@@ -30,15 +30,25 @@ const PALETTES: { name: string; colors: string[] }[] = [
   },
 ];
 
-const GRADIENT_WALLPAPERS = [
-  { name: "Neon dusk", value: "linear-gradient(135deg, #050816 0%, #172554 48%, #ff0080 100%)" },
-  { name: "Electric tide", value: "linear-gradient(120deg, #07111f 0%, #00d9ff 52%, #7c3aed 100%)" },
-  { name: "Signal bloom", value: "radial-gradient(circle at 20% 20%, #ff0080, #0a0f1f 62%)" },
-  { name: "Acid night", value: "linear-gradient(160deg, #0a0f1f 0%, #123c4a 50%, #39ff14 140%)" },
-  { name: "Chrome heat", value: "linear-gradient(115deg, #111827 0%, #64748b 35%, #f8fafc 50%, #ff4081 72%, #1f2937 100%)" },
-  { name: "Ultraviolet", value: "radial-gradient(circle at 75% 25%, #7df9ff 0%, #4d7cff 28%, #a855f7 55%, #0a0f1f 82%)" },
-  { name: "Solar flare", value: "linear-gradient(145deg, #0a0f1f 5%, #ff0080 38%, #ff6b35 65%, #ffd84a 100%)" },
-  { name: "Aurora grid", value: "linear-gradient(125deg, #07111f 0%, #14b8a6 34%, #4d7cff 68%, #ff6ec7 100%)" },
+const GRADIENT_PACKS = [
+  {
+    name: "Neon pack",
+    gradients: [
+      { name: "Neon dusk", value: "linear-gradient(135deg, #050816 0%, #172554 48%, #ff0080 100%)" },
+      { name: "Electric tide", value: "linear-gradient(120deg, #07111f 0%, #00d9ff 52%, #7c3aed 100%)" },
+      { name: "Ultraviolet", value: "radial-gradient(circle at 75% 25%, #7df9ff 0%, #4d7cff 28%, #a855f7 55%, #0a0f1f 82%)" },
+      { name: "Aurora grid", value: "linear-gradient(125deg, #07111f 0%, #14b8a6 34%, #4d7cff 68%, #ff6ec7 100%)" },
+    ],
+  },
+  {
+    name: "Heat pack",
+    gradients: [
+      { name: "Signal bloom", value: "radial-gradient(circle at 20% 20%, #ff0080, #0a0f1f 62%)" },
+      { name: "Solar flare", value: "linear-gradient(145deg, #0a0f1f 5%, #ff0080 38%, #ff6b35 65%, #ffd84a 100%)" },
+      { name: "Chrome heat", value: "linear-gradient(115deg, #111827 0%, #64748b 35%, #f8fafc 50%, #ff4081 72%, #1f2937 100%)" },
+      { name: "Acid night", value: "linear-gradient(160deg, #0a0f1f 0%, #123c4a 50%, #39ff14 140%)" },
+    ],
+  },
 ];
 
 export function ColorPanel() {
@@ -131,13 +141,18 @@ export function ColorPanel() {
         )}
       </div>
 
-      <div>
-        <label className="mb-1.5 block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Gradient wallpapers</label>
-        <div className="grid grid-cols-2 gap-2">
-          {GRADIENT_WALLPAPERS.map((wallpaper) => (
-            <button key={wallpaper.name} onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }} className="brutal-border-2 h-16 hover:border-teal" style={{ background: wallpaper.value }} aria-label={`Apply ${wallpaper.name} wallpaper`} title={wallpaper.name} />
-          ))}
-        </div>
+      <div className="space-y-3">
+        <label className="block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Gradient packs</label>
+        {GRADIENT_PACKS.map((pack) => (
+          <div key={pack.name} className="space-y-1.5">
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-teal/50">{pack.name}</div>
+            <div className="grid grid-cols-2 gap-2">
+              {pack.gradients.map((wallpaper) => (
+                <button key={wallpaper.name} onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }} className="brutal-border-2 h-16 hover:border-teal" style={{ background: wallpaper.value }} aria-label={`Apply ${wallpaper.name} wallpaper`} title={wallpaper.name} />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="brutal-border-2 space-y-3 bg-surface p-3">
