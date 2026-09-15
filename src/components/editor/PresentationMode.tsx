@@ -155,12 +155,12 @@ export function PresentationMode() {
           <ChevronRight className="h-5 w-5" strokeWidth={3} />
         </button>
         <div
-          key={`${currentIndex}-${page.transition ?? "none"}`}
           style={{ width: canvasW * scale, height: canvasH * scale }}
-          className={`brutal-shadow-lg relative shrink-0 ${transition}`}
+          className="brutal-shadow-lg relative shrink-0"
         >
           <div
-            className="absolute left-0 top-0 overflow-hidden border border-teal"
+            key={morphing ? "slide-morph" : `slide-${currentIndex}`}
+            className={`absolute left-0 top-0 overflow-hidden border border-teal ${transition}`}
             style={{
               width: canvasW,
               height: canvasH,
