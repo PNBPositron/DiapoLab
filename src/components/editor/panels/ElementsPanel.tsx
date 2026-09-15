@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import {
   CalendarDays,
   Camera,
@@ -30,6 +30,7 @@ import {
 import { newImage, useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { ShapesPanel } from "./ShapesPanel";
+import { listAccountImages, uploadAccountImage, type AccountImage } from "@/lib/image-assets";
 
 type ElementSection = "shapes" | "icons" | null;
 
@@ -66,20 +67,31 @@ function iconDataUri(paths: string) {
 export function ElementsPanel() {
   const { add } = useEditor();
   const [section, setSection] = useState<ElementSection>(null);
-  const [uploads, setUploads] = useState<string[]>([]);
+  const [uploads, setUploads] = useState<AccountImage[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
 
-  const onFile = (event: ChangeEvent<HTMLInputElement>) => {
-    for (const file of Array.from(event.target.files ?? [])) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result;
-        if (typeof result !== "string") return;
-        setUploads((current) => [result, ...current]);
-        add(newImage(result));
-      };
-      reader.readAsDataURL(file);
-    }
+  useEffect(() => {
+    listAccountImages()
+      .then(setUploads)
+      .catch(() => setLibraryError("Sign in to save images to your library"));
+  }, []);
+
+  const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
     event.target.value = "";
+    if (!files.length) return;
+    setUploading(true);
+    setLibraryError(null);
+    try {
+      const added = await Promise.all(files.map(uploadAccountImage));
+      setUploads((current) => [...added, ...current]);
+      added.forEach((image) => add(newImage(image.url)));
+    } catch (error) {
+      setLibraryError(error instanceof Error ? error.message : "Could not upload image");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -88,7 +100,7 @@ export function ElementsPanel() {
       <div className="grid grid-cols-3 gap-2">
         <label className="brutal-border-2 brutal-press flex h-20 cursor-pointer flex-col items-center justify-center gap-2 bg-surface text-teal hover:border-teal">
           <Upload className="size-5" />
-          <span className="font-display text-[9px] uppercase tracking-[0.12em]">Upload</span>
+          <span className="font-display text-[9px] uppercase tracking-[0.12em]">{uploading ? "Compressing..." : "Upload"}</span>
           <input type="file" accept="image/*" multiple onChange={onFile} className="hidden" />
         </label>
         <button onClick={() => setSection(section === "shapes" ? null : "shapes")} className={`brutal-border-2 brutal-press flex h-20 flex-col items-center justify-center gap-2 ${section === "shapes" ? "border-teal bg-blue-deep" : "bg-surface"} text-teal hover:border-teal`}>
@@ -113,13 +125,15 @@ export function ElementsPanel() {
       )}
       {uploads.length > 0 && section === null && (
         <div className="grid grid-cols-3 gap-2">
-          {uploads.map((src, index) => (
-            <button key={`${src.slice(-16)}-${index}`} title="Add uploaded image" onClick={() => add(newImage(src))} className="brutal-border-2 brutal-press overflow-hidden bg-surface hover:border-teal">
-              <img src={src} alt="Uploaded asset" className="h-16 w-full object-cover" draggable={false} />
+          {uploads.map((image) => (
+            <button key={image.id} title={`Add ${image.name}`} onClick={() => add(newImage(image.url))} className="brutal-border-2 brutal-press overflow-hidden bg-surface hover:border-teal">
+              <img src={image.url} alt={image.name} className="h-16 w-full object-cover" draggable={false} />
+              <span className="block truncate px-1 py-1 text-left font-mono text-[8px] text-teal/70">{image.name}</span>
             </button>
           ))}
         </div>
       )}
+      {libraryError && <p className="border border-red-400/30 bg-red-400/10 p-2 font-mono text-[9px] text-red-300">{libraryError}</p>}
       {section === null && uploads.length === 0 && (
         <div className="flex items-center gap-2 border border-teal/20 bg-surface p-3 font-mono text-[9px] text-teal/50">
           <ImagePlus className="size-4" /> Choose a category above

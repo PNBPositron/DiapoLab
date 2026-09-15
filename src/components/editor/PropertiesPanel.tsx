@@ -437,7 +437,7 @@ export function PropertiesPanel() {
                         setUploadingImage(true);
                         setImageUploadError(null);
                         uploadAccountImage(file)
-                          .then((src) => update(el.id, { imageOverlay: src }))
+                          .then((image) => update(el.id, { imageOverlay: image.url }))
                           .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
                           .finally(() => setUploadingImage(false));
                       }
@@ -553,7 +553,7 @@ export function PropertiesPanel() {
                         setUploadingImage(true);
                         setImageUploadError(null);
                         uploadAccountImage(file)
-                          .then((src) => update(el.id, { imageOverlay: src }))
+                          .then((image) => update(el.id, { imageOverlay: image.url }))
                           .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
                           .finally(() => setUploadingImage(false));
                       }
