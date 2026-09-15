@@ -67,6 +67,17 @@ const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
 ];
 
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
+const UI_PRESETS: Array<{ kind: UiKind; label: string; Icon: LucideIcon; overrides?: Partial<ReturnType<typeof newUi>> }> = [
+  ...UI_KINDS,
+  { kind: "card", label: "Feature card", Icon: Blocks, overrides: { title: "Featured project", body: "A polished content block for product highlights and case studies." } },
+  { kind: "stat", label: "Metric row", Icon: TrendingUp, overrides: { title: "Conversion rate", body: "+12.4% this month", value: 84 } },
+  { kind: "alert", label: "Status banner", Icon: AlertTriangle, overrides: { title: "All systems operational", body: "Your workspace is running normally." } },
+  { kind: "list", label: "Checklist", Icon: ListChecks, overrides: { title: "Launch checklist", items: ["Review content", "Invite collaborators", "Publish presentation"] } },
+  { kind: "profile", label: "Team member", Icon: User, overrides: { title: "Alex Morgan", body: "Product designer" } },
+  { kind: "pricing", label: "Plan card", Icon: CreditCard, overrides: { title: "Pro plan", body: "$24 / month", items: ["Unlimited slides", "Custom themes", "Export to PDF"] } },
+  { kind: "quote", label: "Testimonial", Icon: Quote, overrides: { title: "A sharper way to present ideas.", body: "Jordan Lee, Creative Director" } },
+  { kind: "progress", label: "Completion", Icon: Gauge, overrides: { title: "Project progress", body: "Design system", value: 72 } },
+];
 type PresetSection = "interfaces" | "ui" | null;
 
 export function ComponentsPanel() {
@@ -82,7 +93,7 @@ export function ComponentsPanel() {
     }
   };
 
-  const presets = section === "interfaces" ? INTERFACES : section === "ui" ? UI_KINDS : [];
+  const presets: Array<{ kind: UiKind; label: string; Icon: LucideIcon; overrides?: Partial<ReturnType<typeof newUi>> }> = section === "interfaces" ? INTERFACES : section === "ui" ? UI_PRESETS : [];
 
   return (
     <div className="space-y-4">
@@ -111,9 +122,9 @@ export function ComponentsPanel() {
             })}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {presets.map(({ kind, label, Icon }) => (
-              <button key={kind} onClick={() => add(newUi(kind, style))} className="brutal-border-2 brutal-press flex flex-col items-center gap-1.5 bg-surface p-2 text-teal hover:border-teal">
-                <div className="pointer-events-none h-16 w-full overflow-hidden"><UiRender element={newUi(kind, style, { id: `preview-${kind}` })} preview /></div>
+            {presets.map(({ kind, label, Icon, overrides }, index) => (
+              <button key={`${kind}-${label}`} onClick={() => add(newUi(kind, style, overrides))} className="brutal-border-2 brutal-press flex flex-col items-center gap-1.5 bg-surface p-2 text-teal hover:border-teal">
+                <div className="pointer-events-none h-16 w-full overflow-hidden"><UiRender element={newUi(kind, style, { ...overrides, id: `preview-${kind}-${index}` })} preview /></div>
                 <span className="flex items-center gap-1 font-display text-[9px] uppercase tracking-[0.12em]"><Icon className="size-3" />{label}</span>
               </button>
             ))}
