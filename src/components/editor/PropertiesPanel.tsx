@@ -24,6 +24,17 @@ const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)]),
 ).sort();
 
+const IMAGE_FILTER_PRESETS: Array<{ name: string; description: string; filters: ImageFilters; preview: string }> = [
+  { name: "Original", description: "Clean", filters: { ...DEFAULT_FILTERS }, preview: "none" },
+  { name: "Noir", description: "High contrast", filters: { ...DEFAULT_FILTERS, grayscale: 100, contrast: 135, brightness: 92 }, preview: "grayscale(1) contrast(1.35) brightness(.92)" },
+  { name: "Vintage", description: "Warm film", filters: { ...DEFAULT_FILTERS, sepia: 42, contrast: 108, saturate: 82, brightness: 104 }, preview: "sepia(.42) contrast(1.08) saturate(.82) brightness(1.04)" },
+  { name: "Faded", description: "Soft light", filters: { ...DEFAULT_FILTERS, contrast: 82, saturate: 70, brightness: 116 }, preview: "contrast(.82) saturate(.7) brightness(1.16)" },
+  { name: "Crisp", description: "Punchy detail", filters: { ...DEFAULT_FILTERS, contrast: 132, saturate: 122, brightness: 98 }, preview: "contrast(1.32) saturate(1.22) brightness(.98)" },
+  { name: "Cool", description: "Blue mood", filters: { ...DEFAULT_FILTERS, hueRotate: 18, saturate: 112, contrast: 108 }, preview: "hue-rotate(18deg) saturate(1.12) contrast(1.08)" },
+  { name: "Sunset", description: "Warm glow", filters: { ...DEFAULT_FILTERS, sepia: 24, hueRotate: -12, saturate: 135, brightness: 106 }, preview: "sepia(.24) hue-rotate(-12deg) saturate(1.35) brightness(1.06)" },
+  { name: "Dream", description: "Soft color", filters: { ...DEFAULT_FILTERS, blur: 0.7, contrast: 88, saturate: 118, brightness: 110 }, preview: "blur(.7px) contrast(.88) saturate(1.18) brightness(1.1)" },
+];
+
 const SWATCHES = [
   "#7df9ff",
   "#00d9ff",
@@ -748,6 +759,30 @@ export function PropertiesPanel() {
                 <div className="font-display text-[10px] uppercase tracking-[0.25em] text-teal/80">
                   ▸ Image effects
                 </div>
+                <Field label="Filter presets">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {IMAGE_FILTER_PRESETS.map((preset) => {
+                      const active = Object.entries(preset.filters).every(([key, value]) => f[key as keyof ImageFilters] === value);
+                      return (
+                        <button
+                          key={preset.name}
+                          type="button"
+                          onClick={() => set(preset.filters)}
+                          className={`brutal-border-2 brutal-press overflow-hidden text-left ${active ? "border-teal glow-teal" : "border-teal/25 hover:border-teal"}`}
+                          title={preset.description}
+                        >
+                          <div className="h-12 bg-blue-deep" style={{ filter: preset.preview }} aria-hidden="true">
+                            <div className="h-full w-full bg-[linear-gradient(135deg,#ff0080_0%,#7df9ff_48%,#172554_100%)]" />
+                          </div>
+                          <div className="bg-surface px-2 py-1.5">
+                            <div className="font-display text-[9px] uppercase tracking-[0.12em] text-teal">{preset.name}</div>
+                            <div className="font-mono text-[8px] text-teal/50">{preset.description}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </Field>
                 <Field label="Fit">
                   <div className="grid grid-cols-3 gap-1.5">
                     {(["cover", "contain", "fill"] as const).map((fit) => (
