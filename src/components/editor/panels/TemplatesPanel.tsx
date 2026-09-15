@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loader2, Heart, Grid3x3, Search } from "lucide-react";
-import { useEditor, newShape, newText, type Page } from "@/store/editor";
+import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
 import {
@@ -14,51 +14,9 @@ import {
 import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 
-const BUILT_IN_TEMPLATES: PublicTemplate[] = [
-  {
-    id: "builtin:launch",
-    user_id: "builtin",
-    name: "Product launch",
-    canvas_w: 1920,
-    canvas_h: 1080,
-    thumbnail: null,
-    created_at: "2099-01-03T00:00:00.000Z",
-    pages: [{
-      id: "builtin-launch-page",
-      bgColor: "#f5f7fb",
-      duration: 3,
-      elements: [
-        newText({ text: "MAKE YOUR NEXT MOVE", x: 140, y: 170, width: 980, height: 120, fontSize: 82, color: "#172554" }),
-        newText({ text: "A clear starting point for a bold presentation.", x: 145, y: 330, width: 760, height: 80, fontSize: 34, fontWeight: 500, color: "#475569" }),
-        newShape("rect", { x: 145, y: 540, width: 360, height: 220, fill: "#2563eb", stroke: "#172554", strokeWidth: 0 }),
-        newText({ text: "START HERE", x: 210, y: 610, width: 240, height: 60, fontSize: 30, color: "#ffffff", align: "center" }),
-      ],
-    }],
-  },
-  {
-    id: "builtin:quote",
-    user_id: "builtin",
-    name: "Editorial quote",
-    canvas_w: 1920,
-    canvas_h: 1080,
-    thumbnail: null,
-    created_at: "2099-01-02T00:00:00.000Z",
-    pages: [{
-      id: "builtin-quote-page",
-      bgColor: "#172554",
-      duration: 3,
-      elements: [
-        newText({ text: "“THE BEST IDEAS FEEL OBVIOUS IN RETROSPECT.”", x: 170, y: 250, width: 1350, height: 240, fontSize: 74, color: "#ffffff", align: "center" }),
-        newShape("line", { x: 820, y: 570, width: 280, height: 8, fill: "#93c5fd", stroke: "#93c5fd", strokeWidth: 0 }),
-        newText({ text: "YOUR NAME · 2026", x: 650, y: 650, width: 620, height: 50, fontSize: 24, fontWeight: 600, color: "#bfdbfe", align: "center" }),
-      ],
-    }],
-  },
-];
-
 export function TemplatesPanel() {
   const [error, setError] = useState<string | null>(null);
-  const [community, setCommunity] = useState<PublicTemplate[]>(BUILT_IN_TEMPLATES);
+  const [community, setCommunity] = useState<PublicTemplate[]>([]);
   const [communityLoading, setCommunityLoading] = useState(false);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -74,7 +32,7 @@ export function TemplatesPanel() {
     setCommunityLoading(true);
     listPublicTemplates()
       .then(async (tpls) => {
-        setCommunity([...BUILT_IN_TEMPLATES, ...tpls]);
+        setCommunity(tpls);
         const ids = tpls.map((t) => t.id);
         const [counts, mine] = await Promise.all([
           listTemplateLikeCounts(ids),
@@ -127,7 +85,7 @@ export function TemplatesPanel() {
       <div className="space-y-2">
         <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or creator" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
         <div className="grid grid-cols-3 gap-1.5">
-          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community', 'builtin']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
+          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
         </div>
       </div>
 
