@@ -18,12 +18,30 @@ export function BrandKitPanel() {
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
   const [generating, setGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [mood, setMood] = useState("balanced");
+
+  const moods = [
+    { value: "balanced", label: "Balanced" },
+    { value: "calm", label: "Calm / cool" },
+    { value: "bold", label: "Bold / warm" },
+    { value: "natural", label: "Natural / earthy" },
+    { value: "mono", label: "Monochrome" },
+    { value: "sunset", label: "Sunset / coral" },
+    { value: "ocean", label: "Ocean / deep blue" },
+    { value: "candy", label: "Candy / playful" },
+    { value: "forest", label: "Forest / moss" },
+    { value: "editorial", label: "Editorial / ink" },
+  ];
 
   const generateRandomKit = async () => {
     setGenerating(true);
     setGenerationError(null);
     try {
-      const response = await fetch("/api/colormind", { method: "POST" });
+      const response = await fetch("/api/colormind", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mood }),
+      });
       const payload = (await response.json()) as { result?: number[][]; error?: string };
       if (!response.ok || !payload.result?.length) throw new Error(payload.error ?? "Could not generate colors");
       const colors = payload.result.map(([r, g, b]) => `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("")}`);
@@ -39,6 +57,12 @@ export function BrandKitPanel() {
     <div className="space-y-3">
       <PanelHeader title="Brand Kit" />
 
+      <label className="block">
+        <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">Color mood</span>
+        <select value={mood} onChange={(event) => setMood(event.target.value)} className="brutal-border-2 w-full bg-surface px-2 py-2 font-mono text-[10px] uppercase text-teal focus:border-teal focus:outline-none">
+          {moods.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </select>
+      </label>
       <button
         type="button"
         onClick={generateRandomKit}

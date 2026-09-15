@@ -40,6 +40,15 @@ function imageName(file: File) {
   return base || "uploaded-image";
 }
 
+async function blobToDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Could not read compressed image"));
+    reader.onerror = () => reject(reader.error ?? new Error("Could not read compressed image"));
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function signedImageUrl(path: string) {
   const { data, error } = await supabase.storage.from("account-images").createSignedUrl(path, 60 * 60 * 24 * 7);
   if (error || !data?.signedUrl) throw error ?? new Error("Could not create image URL");
@@ -48,8 +57,16 @@ async function signedImageUrl(path: string) {
 
 export async function uploadAccountImage(file: File): Promise<AccountImage> {
   const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) throw new Error("Sign in to store images in your account");
   const blob = await compressImage(file);
+  if (!userData.user) {
+    return {
+      id: crypto.randomUUID(),
+      name: imageName(file),
+      path: "",
+      url: await blobToDataUrl(blob),
+      createdAt: new Date().toISOString(),
+    };
+  }
   const id = crypto.randomUUID();
   const path = `${userData.user.id}/${id}.webp`;
   const name = imageName(file);
