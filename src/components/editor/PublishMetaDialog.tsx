@@ -3,6 +3,7 @@ import { Loader2, Upload, X } from "lucide-react";
 
 export type PublishMeta = {
   name: string;
+  style: string;
   description: string;
   author_name: string;
   tags: string[];
@@ -10,6 +11,19 @@ export type PublishMeta = {
 };
 
 export const PUBLISH_LICENSES = ["CC BY 4.0", "CC BY-NC 4.0", "MIT", "All rights reserved"];
+
+export const PUBLISH_STYLES = [
+  "Minimal",
+  "Editorial",
+  "Brutalist",
+  "Cyber",
+  "Glass",
+  "Retro",
+  "Corporate",
+  "Playful",
+  "Dark",
+  "Other",
+];
 
 export function PublishMetaDialog({
   open,
@@ -31,6 +45,7 @@ export function PublishMetaDialog({
   onSubmit: (meta: PublishMeta) => void;
 }) {
   const [name, setName] = useState(defaultName ?? "");
+  const [style, setStyle] = useState(PUBLISH_STYLES[0]);
   const [description, setDescription] = useState("");
   const [author, setAuthor] = useState(defaultAuthor ?? "");
   const [tags, setTags] = useState("");
@@ -48,6 +63,7 @@ export function PublishMetaDialog({
   const submit = () =>
     onSubmit({
       name: name.trim() || (kind === "theme" ? "Untitled theme" : "Untitled template"),
+      style,
       description: description.trim(),
       author_name: author.trim(),
       tags: tags
@@ -89,6 +105,19 @@ export function PublishMetaDialog({
               onChange={(e) => setName(e.target.value)}
               className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal outline-none focus:border-teal"
             />
+          </label>
+
+          <label className="block">
+            <span className="font-mono text-[10px] text-teal/70">style</span>
+            <select
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal outline-none focus:border-teal"
+            >
+              {PUBLISH_STYLES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
           </label>
 
           <label className="block">

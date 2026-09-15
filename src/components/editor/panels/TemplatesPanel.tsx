@@ -24,7 +24,7 @@ export function TemplatesPanel() {
   const [showAll, setShowAll] = useState(false);
   const [sortBy, setSortBy] = useState<"likes" | "recent">("likes");
   const [query, setQuery] = useState("");
-  const [tagFilter, setTagFilter] = useState("all");
+  const [styleFilter, setStyleFilter] = useState("all");
   const [creatorFilter, setCreatorFilter] = useState("all");
   const [licenseFilter, setLicenseFilter] = useState("all");
 
@@ -45,8 +45,7 @@ export function TemplatesPanel() {
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
-  const availableTags = Array.from(new Set(community.flatMap((template) => template.tags ?? []))).sort();
-  const filteredCommunity = filterTemplates(community, { query, tag: tagFilter, creator: creatorFilter, license: licenseFilter });
+  const filteredCommunity = filterTemplates(community, { query, style: styleFilter, creator: creatorFilter, license: licenseFilter });
 
   const toggleLike = async (id: string) => {
     if (!user) {
@@ -86,7 +85,7 @@ export function TemplatesPanel() {
       <div className="space-y-2">
         <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or creator" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
         <div className="grid grid-cols-3 gap-1.5">
-          {[['tag', tagFilter, setTagFilter, ['all', ...availableTags]], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
+          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
         </div>
       </div>
 
@@ -180,20 +179,26 @@ export function TemplatesPanel() {
 
 function filterTemplates(
   templates: PublicTemplate[],
-  filters: { query: string; tag: string; creator: string; license: string },
+  filters: { query: string; style: string; creator: string; license: string },
 ) {
   const query = filters.query.trim().toLowerCase();
   return templates.filter((template) => {
     const creator = template.creator ?? (template.user_id === "builtin" ? "builtin" : "community");
-    const tags = template.tags ?? [];
-    const license = template.license ?? "community";
-    return (!query || `${template.name} ${tags.join(" ")} ${creator} ${license}`.toLowerCase().includes(query))
-      && (filters.tag === "all" || tags.includes(filters.tag))
+    const style = template.style ?? inferTemplateStyle(template);
+    const license = template.license ?? (template.user_id === "builtin" ? "CC0" : "community");
+    return (!query || `${template.name} ${creator} ${style} ${license}`.toLowerCase().includes(query))
+      && (filters.style === "all" || style === filters.style)
       && (filters.creator === "all" || creator === filters.creator)
       && (filters.license === "all" || license === filters.license);
   });
 }
 
+function inferTemplateStyle(template: PublicTemplate) {
+  const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
+  if (text.includes("quote") || text.includes("editorial")) return "editorial";
+  if (text.includes("launch") || text.includes("bold")) return "bold";
+  return "minimal";
+}
 
 function sortTemplates(
   tpls: PublicTemplate[],
