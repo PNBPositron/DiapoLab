@@ -341,6 +341,15 @@ export function Toolbar() {
             >
               MARKETPLACE <span aria-hidden="true">→</span>
             </Link>
+            <a
+              href="http://colormind.io/api/"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setAboutOpen(false)}
+              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
+            >
+              API USED: COLORMIND <span aria-hidden="true">↗</span>
+            </a>
           </nav>
         </DialogContent>
       </Dialog>
