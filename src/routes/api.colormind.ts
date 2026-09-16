@@ -1,40 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const HEX_COLOR = /^#(?:[\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i;
+
+function extractHexColors(value: unknown): string[] {
+  if (typeof value === "string") return HEX_COLOR.test(value.trim()) ? [value.trim()] : [];
+  if (Array.isArray(value)) return value.flatMap(extractHexColors);
+  if (value && typeof value === "object") return Object.values(value).flatMap(extractHexColors);
+  return [];
+}
+
 export const Route = createFileRoute("/api/colormind")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json().catch(() => ({}))) as { mood?: string };
-        const response = await fetch("http://colormind.io/api/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model: "default" }),
+        const body = (await request.json().catch(() => ({}))) as { query?: string };
+        const query = body.query?.trim();
+        if (!query) return Response.json({ error: "Tell us a mood or color to search for." }, { status: 400 });
+        const response = await fetch(`https://colormagic.app/api/palette/search?q=${encodeURIComponent(query)}`, {
+          headers: { Accept: "application/json" },
         });
-        if (!response.ok) {
-          return Response.json({ error: "Colormind is unavailable" }, { status: 502 });
-        }
-        const payload = (await response.json()) as { result?: number[][] };
-        const result = payload.result ?? [];
-        const transform = body.mood === "mono"
-          ? (rgb: number[]) => { const value = Math.round(rgb.reduce((sum, channel) => sum + channel, 0) / 3); return [value, value, value]; }
-          : body.mood === "calm"
-            ? (rgb: number[]) => [Math.round(rgb[0] * 0.72), Math.round(rgb[1] * 0.9), Math.min(255, Math.round(rgb[2] * 1.08))]
-            : body.mood === "bold"
-              ? (rgb: number[]) => [Math.min(255, Math.round(rgb[0] * 1.12)), Math.round(rgb[1] * 0.78), Math.round(rgb[2] * 0.72)]
-              : body.mood === "natural"
-                ? (rgb: number[]) => [Math.round(rgb[0] * 0.9), Math.min(255, Math.round(rgb[1] * 1.05)), Math.round(rgb[2] * 0.78)]
-                : body.mood === "sunset"
-                  ? (rgb: number[]) => [Math.min(255, Math.round(rgb[0] * 1.14)), Math.round(rgb[1] * 0.72), Math.round(rgb[2] * 0.7)]
-                  : body.mood === "ocean"
-                    ? (rgb: number[]) => [Math.round(rgb[0] * 0.62), Math.round(rgb[1] * 0.88), Math.min(255, Math.round(rgb[2] * 1.14))]
-                    : body.mood === "candy"
-                      ? (rgb: number[]) => [Math.min(255, Math.round(rgb[0] * 1.08)), Math.round(rgb[1] * 0.78), Math.min(255, Math.round(rgb[2] * 1.12))]
-                      : body.mood === "forest"
-                        ? (rgb: number[]) => [Math.round(rgb[0] * 0.66), Math.min(255, Math.round(rgb[1] * 1.04)), Math.round(rgb[2] * 0.6)]
-                        : body.mood === "editorial"
-                          ? (rgb: number[]) => { const value = Math.round(rgb.reduce((sum, channel) => sum + channel, 0) / 3); return [Math.round(value * 0.78), Math.round(value * 0.82), Math.round(value * 0.88)]; }
-                          : (rgb: number[]) => rgb;
-        return Response.json({ ...payload, result: result.map(transform) });
+        if (!response.ok) return Response.json({ error: "ColorMagic is unavailable" }, { status: 502 });
+        const payload = await response.json() as unknown;
+        const result = extractHexColors(payload).slice(0, 5);
+        if (result.length < 3) return Response.json({ error: "No palette found for that search." }, { status: 404 });
+        return Response.json({ result });
       },
     },
   },

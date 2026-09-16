@@ -19,6 +19,7 @@ export function BrandKitPanel() {
   const [generating, setGenerating] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [mood, setMood] = useState("balanced");
+  const [paletteQuery, setPaletteQuery] = useState("balanced, modern, electric blue");
 
   const moods = [
     { value: "balanced", label: "Balanced" },
@@ -40,7 +41,7 @@ export function BrandKitPanel() {
       const response = await fetch("/api/colormind", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood }),
+        body: JSON.stringify({ query: paletteQuery }),
       });
       const payload = (await response.json()) as { result?: number[][]; error?: string };
       if (!response.ok || !payload.result?.length) throw new Error(payload.error ?? "Could not generate colors");
@@ -58,7 +59,8 @@ export function BrandKitPanel() {
       <PanelHeader title="Brand Kit" />
 
       <label className="block">
-        <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">Color mood</span>
+        <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">Palette mood or colors</span>
+        <input value={paletteQuery} onChange={(event) => setPaletteQuery(event.target.value)} placeholder="e.g. calm forest, coral sunset" className="brutal-border-2 mb-2 w-full bg-surface px-2 py-2 font-mono text-[10px] text-teal placeholder:text-teal/35 focus:border-teal focus:outline-none" />
         <select value={mood} onChange={(event) => setMood(event.target.value)} className="brutal-border-2 w-full bg-surface px-2 py-2 font-mono text-[10px] uppercase text-teal focus:border-teal focus:outline-none">
           {moods.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </select>
@@ -70,7 +72,7 @@ export function BrandKitPanel() {
         className="brutal-border-2 brutal-press w-full bg-blue py-2 font-display text-[10px] uppercase tracking-[0.15em] text-ink disabled:opacity-60"
       >
         <WandSparkles className="mr-1 inline-block size-3.5" />
-        {generating ? "Generating palette..." : "Generate random color kit"}
+        {generating ? "Searching ColorMagic..." : "Generate palette"}
       </button>
       {generationError && <p className="font-mono text-[9px] text-red-300">{generationError}</p>}
 
