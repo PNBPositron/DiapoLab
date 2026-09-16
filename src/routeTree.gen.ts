@@ -19,7 +19,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TIdRouteImport } from './routes/t.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as ApiColormindRouteImport } from './routes/api.colormind'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -75,11 +74,6 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => AuthRoute,
 } as any)
-const ApiColormindRoute = ApiColormindRouteImport.update({
-  id: '/api/colormind',
-  path: '/api/colormind',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -115,7 +109,6 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/api/colormind': typeof ApiColormindRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -132,7 +125,6 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/api/colormind': typeof ApiColormindRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -150,7 +142,6 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/api/colormind': typeof ApiColormindRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -169,7 +160,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/api/colormind'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
@@ -186,7 +176,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/api/colormind'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
@@ -203,7 +192,6 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/api/colormind'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
@@ -221,7 +209,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  ApiColormindRoute: typeof ApiColormindRoute
   TIdRoute: typeof TIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -299,13 +286,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/api/colormind': {
-      id: '/api/colormind'
-      path: '/api/colormind'
-      fullPath: '/api/colormind'
-      preLoaderRoute: typeof ApiColormindRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -359,7 +339,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
-  ApiColormindRoute: ApiColormindRoute,
   TIdRoute: TIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,

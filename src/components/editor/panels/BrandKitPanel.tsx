@@ -17,54 +17,17 @@ export function BrandKitPanel() {
   const { brandKit, setBrandKit, resetBrandKit } = useSettings();
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
   const [generating, setGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState<string | null>(null);
-  const [mood, setMood] = useState("balanced");
-  const [paletteQuery, setPaletteQuery] = useState("balanced, modern, electric blue");
-
-  const moods = [
-    { value: "balanced", label: "Balanced" },
-    { value: "calm", label: "Calm / cool" },
-    { value: "bold", label: "Bold / warm" },
-    { value: "natural", label: "Natural / earthy" },
-    { value: "mono", label: "Monochrome" },
-    { value: "sunset", label: "Sunset / coral" },
-    { value: "ocean", label: "Ocean / deep blue" },
-    { value: "candy", label: "Candy / playful" },
-    { value: "forest", label: "Forest / moss" },
-    { value: "editorial", label: "Editorial / ink" },
-  ];
-
-  const generateRandomKit = async () => {
+  const generateRandomKit = () => {
     setGenerating(true);
-    setGenerationError(null);
-    try {
-      const response = await fetch("/api/colormind", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: paletteQuery }),
-      });
-      const payload = (await response.json()) as { result?: number[][]; error?: string };
-      if (!response.ok || !payload.result?.length) throw new Error(payload.error ?? "Could not generate colors");
-      const colors = payload.result.map(([r, g, b]) => `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, "0")).join("")}`);
-      setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
-    } catch (error) {
-      setGenerationError(error instanceof Error ? error.message : "Could not generate colors");
-    } finally {
-      setGenerating(false);
-    }
+    const colors = Array.from({ length: 5 }, () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`);
+    setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
+    window.setTimeout(() => setGenerating(false), 180);
   };
 
   return (
     <div className="space-y-3">
       <PanelHeader title="Brand Kit" />
 
-      <label className="block">
-        <span className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-teal/60">Palette mood or colors</span>
-        <input value={paletteQuery} onChange={(event) => setPaletteQuery(event.target.value)} placeholder="e.g. calm forest, coral sunset" className="brutal-border-2 mb-2 w-full bg-surface px-2 py-2 font-mono text-[10px] text-teal placeholder:text-teal/35 focus:border-teal focus:outline-none" />
-        <select value={mood} onChange={(event) => setMood(event.target.value)} className="brutal-border-2 w-full bg-surface px-2 py-2 font-mono text-[10px] uppercase text-teal focus:border-teal focus:outline-none">
-          {moods.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </select>
-      </label>
       <button
         type="button"
         onClick={generateRandomKit}
@@ -72,9 +35,8 @@ export function BrandKitPanel() {
         className="brutal-border-2 brutal-press w-full bg-blue py-2 font-display text-[10px] uppercase tracking-[0.15em] text-ink disabled:opacity-60"
       >
         <WandSparkles className="mr-1 inline-block size-3.5" />
-        {generating ? "Searching ColorMagic..." : "Generate palette"}
+        {generating ? "Generating..." : "Generate random palette"}
       </button>
-      {generationError && <p className="font-mono text-[9px] text-red-300">{generationError}</p>}
 
       <div className="grid grid-cols-1 gap-1.5">
         {SWATCHES.map((s) => (
