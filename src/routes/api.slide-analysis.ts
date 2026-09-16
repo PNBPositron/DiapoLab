@@ -4,7 +4,7 @@ export const Route = createFileRoute("/api/slide-analysis")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.json().catch(() => null) as { page?: unknown; question?: string } | null;
+        const body = await request.json().catch(() => null) as { page?: unknown; slideshow?: unknown; canEdit?: boolean; question?: string } | null;
         if (!body?.page) return Response.json({ error: "A slide is required." }, { status: 400 });
         const question = body.question?.trim() || "Analyze this slide and suggest concrete improvements.";
         const apiKey = process.env.GEMINI_KEY;
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/api/slide-analysis")({
           body: JSON.stringify({
             generationConfig: { temperature: 0.35, maxOutputTokens: 900, responseMimeType: wantsEdit ? "application/json" : "text/plain" },
             systemInstruction: { parts: [{ text: wantsEdit ? "You are a presentation editor. Analyze the slide and return JSON only with keys text and edits. edits must be an array of safe operations using only {type:'update', id:string, patch:object}, {type:'delete', id:string}, or {type:'addText', text:string, x:number, y:number, width:number, height:number}. Only edit when explicitly requested. Preserve existing element IDs and never invent IDs." : "You are a concise, practical presentation art director. Analyze the supplied slide JSON and give a short diagnosis followed by 3-5 actionable suggestions." }] },
-            contents: [{ role: "user", parts: [{ text: `${question}\n\nSlide JSON:\n${JSON.stringify(body.page)}` }] }],
+            contents: [{ role: "user", parts: [{ text: `${question}\n\nEdit permission granted: ${body.canEdit === true}\n\nActive slide JSON:\n${JSON.stringify(body.page)}\n\nFull slideshow JSON:\n${JSON.stringify(body.slideshow ?? [body.page])}` }] }],
           }),
         });
         const payload = await response.json().catch(() => null) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } } | null;
