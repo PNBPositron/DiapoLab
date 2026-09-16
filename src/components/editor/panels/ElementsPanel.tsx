@@ -102,7 +102,7 @@ export function ElementsPanel() {
       <div className="grid grid-cols-3 gap-2">
         <label className="brutal-border-2 brutal-press flex h-20 cursor-pointer flex-col items-center justify-center gap-2 bg-surface text-teal hover:border-teal">
           <Upload className="size-5" />
-          <span className="font-display text-[9px] uppercase tracking-[0.12em]">{uploading ? "Compressing..." : "Upload"}</span>
+          <span className="font-display text-[9px] uppercase tracking-[0.12em]">{uploading ? "Saving..." : "Upload"}</span>
           <input type="file" accept="image/*" multiple onChange={onFile} className="hidden" />
         </label>
         <button onClick={() => setSection(section === "shapes" ? null : "shapes")} className={`brutal-border-2 brutal-press flex h-20 flex-col items-center justify-center gap-2 ${section === "shapes" ? "border-teal bg-blue-deep" : "bg-surface"} text-teal hover:border-teal`}>
