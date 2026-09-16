@@ -1,0 +1,11437 @@
+export const LINEICONS = [
+  {
+    "name": "bulk-bell-1",
+    "label": "Bell 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bell-1",
+    "label": "Bell 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bell-1",
+    "label": "Bell 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bell-1",
+    "label": "Bell 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bell-1",
+    "label": "Bell 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-all-direction",
+    "label": "All Direction",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-angle-double-down",
+    "label": "Angle Double Down",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-angle-double-left",
+    "label": "Angle Double Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-angle-double-right",
+    "label": "Angle Double Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-angle-double-up",
+    "label": "Angle Double Up",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-angular-top-left",
+    "label": "Arrow Angular Top Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-angular-top-right",
+    "label": "Arrow Angular Top Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-both-direction-horizontal",
+    "label": "Arrow Both Direction Horizontal",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-both-direction-vertical",
+    "label": "Arrow Both Direction Vertical",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-downward",
+    "label": "Arrow Downward",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-left-circle",
+    "label": "Arrow Left Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-left",
+    "label": "Arrow Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-right-circle",
+    "label": "Arrow Right Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-right",
+    "label": "Arrow Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-arrow-upward",
+    "label": "Arrow Upward",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-down-circle",
+    "label": "Chevron Down Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-down",
+    "label": "Chevron Down",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-left-circle",
+    "label": "Chevron Left Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-left",
+    "label": "Chevron Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-right-circle",
+    "label": "Chevron Right Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-up-circle",
+    "label": "Chevron Up Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-chevron-up",
+    "label": "Chevron Up",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-direction-ltr",
+    "label": "Direction Ltr",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-direction-rtl",
+    "label": "Direction Rtl",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-download-1",
+    "label": "Download 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-download-circle-1",
+    "label": "Download Circle 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-enter-down",
+    "label": "Enter Down",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-enter",
+    "label": "Enter",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-exit-up",
+    "label": "Exit Up",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-exit",
+    "label": "Exit",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shift-left",
+    "label": "Shift Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shift-right",
+    "label": "Shift Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-upload-1",
+    "label": "Upload 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-upload-circle-1",
+    "label": "Upload Circle 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-angle-double-down",
+    "label": "Angle Double Down",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-angle-double-left",
+    "label": "Angle Double Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-angle-double-right",
+    "label": "Angle Double Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-angle-double-up",
+    "label": "Angle Double Up",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-all-direction",
+    "label": "Arrow All Direction",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-angular-top-left",
+    "label": "Arrow Angular Top Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-angular-top-right",
+    "label": "Arrow Angular Top Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-both-direction-horizontal-1",
+    "label": "Arrow Both Direction Horizontal 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-both-direction-vertical-1",
+    "label": "Arrow Both Direction Vertical 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-downward",
+    "label": "Arrow Downward",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-left-circle",
+    "label": "Arrow Left Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-left",
+    "label": "Arrow Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-right-circle",
+    "label": "Arrow Right Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-right",
+    "label": "Arrow Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-arrow-upward",
+    "label": "Arrow Upward",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-down-circle",
+    "label": "Chevron Down Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-down",
+    "label": "Chevron Down",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-left-circle",
+    "label": "Chevron Left Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-left",
+    "label": "Chevron Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-up-circle",
+    "label": "Chevron Up Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-chevron-up",
+    "label": "Chevron Up",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-direction-ltr",
+    "label": "Direction Ltr",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-direction-rtl",
+    "label": "Direction Rtl",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-download-1",
+    "label": "Download 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-download-circle-1",
+    "label": "Download Circle 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-enter",
+    "label": "Enter",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-exit-down",
+    "label": "Exit Down",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-exit-up",
+    "label": "Exit Up",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-exit",
+    "label": "Exit",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shift-left",
+    "label": "Shift Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shift-right",
+    "label": "Shift Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-upload-1",
+    "label": "Upload 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-upload-circle-1",
+    "label": "Upload Circle 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-angle-double-down",
+    "label": "Angle Double Down",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-angle-double-left",
+    "label": "Angle Double Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-angle-double-right",
+    "label": "Angle Double Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-angle-double-up",
+    "label": "Angle Double Up",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-all-direction",
+    "label": "Arrow All Direction",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-angular-top-left",
+    "label": "Arrow Angular Top Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-angular-top-right",
+    "label": "Arrow Angular Top Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-both-direction-horizontal-1",
+    "label": "Arrow Both Direction Horizontal 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-both-direction-vertical-1",
+    "label": "Arrow Both Direction Vertical 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-downward",
+    "label": "Arrow Downward",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-left-circle",
+    "label": "Arrow Left Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-left",
+    "label": "Arrow Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-right-circle",
+    "label": "Arrow Right Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-right",
+    "label": "Arrow Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arrow-upward",
+    "label": "Arrow Upward",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-down-circle",
+    "label": "Chevron Down Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-down",
+    "label": "Chevron Down",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-left-circle",
+    "label": "Chevron Left Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-left",
+    "label": "Chevron Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-up-circle",
+    "label": "Chevron Up Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chevron-up",
+    "label": "Chevron Up",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-direction-ltr",
+    "label": "Direction Ltr",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-direction-rtl",
+    "label": "Direction Rtl",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-download-1",
+    "label": "Download 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-download-circle-1",
+    "label": "Download Circle 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-enter-down",
+    "label": "Enter Down",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-enter",
+    "label": "Enter",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-exit-up",
+    "label": "Exit Up",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-exit",
+    "label": "Exit",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shift-left",
+    "label": "Shift Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shift-right",
+    "label": "Shift Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-upload-1",
+    "label": "Upload 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-upload-circle-1",
+    "label": "Upload Circle 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-angle-double-down",
+    "label": "Angle Double Down",
+    "category": "solid"
+  },
+  {
+    "name": "solid-angle-double-left",
+    "label": "Angle Double Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-angle-double-right",
+    "label": "Angle Double Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-angle-double-up",
+    "label": "Angle Double Up",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-all-direction",
+    "label": "Arrow All Direction",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-angular-top-left",
+    "label": "Arrow Angular Top Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-angular-top-right",
+    "label": "Arrow Angular Top Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-both-direction-horizontal-1",
+    "label": "Arrow Both Direction Horizontal 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-both-direction-vertical-1",
+    "label": "Arrow Both Direction Vertical 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-downward",
+    "label": "Arrow Downward",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-left-circle",
+    "label": "Arrow Left Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-left",
+    "label": "Arrow Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-right-circle",
+    "label": "Arrow Right Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-right",
+    "label": "Arrow Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-arrow-upward",
+    "label": "Arrow Upward",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-down-circle",
+    "label": "Chevron Down Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-down",
+    "label": "Chevron Down",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-left-circle",
+    "label": "Chevron Left Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-left",
+    "label": "Chevron Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-up-circle",
+    "label": "Chevron Up Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-chevron-up",
+    "label": "Chevron Up",
+    "category": "solid"
+  },
+  {
+    "name": "solid-direction-ltr",
+    "label": "Direction Ltr",
+    "category": "solid"
+  },
+  {
+    "name": "solid-direction-rtl",
+    "label": "Direction Rtl",
+    "category": "solid"
+  },
+  {
+    "name": "solid-download-1",
+    "label": "Download 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-download-circle-1",
+    "label": "Download Circle 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-enter-down",
+    "label": "Enter Down",
+    "category": "solid"
+  },
+  {
+    "name": "solid-enter",
+    "label": "Enter",
+    "category": "solid"
+  },
+  {
+    "name": "solid-exit-up",
+    "label": "Exit Up",
+    "category": "solid"
+  },
+  {
+    "name": "solid-exit",
+    "label": "Exit",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shift-left",
+    "label": "Shift Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shift-right",
+    "label": "Shift Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-upload-1",
+    "label": "Upload 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-upload-circle-1",
+    "label": "Upload Circle 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-angle-double-down",
+    "label": "Angle Double Down",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-angle-double-left",
+    "label": "Angle Double Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-angle-double-right",
+    "label": "Angle Double Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-angle-double-up",
+    "label": "Angle Double Up",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-all-direction",
+    "label": "Arrow All Direction",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-angular-top-left",
+    "label": "Arrow Angular Top Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-angular-top-right",
+    "label": "Arrow Angular Top Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-both-direction-horizontal-1",
+    "label": "Arrow Both Direction Horizontal 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-both-direction-vertical-1",
+    "label": "Arrow Both Direction Vertical 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-downward",
+    "label": "Arrow Downward",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-left-circle",
+    "label": "Arrow Left Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-left",
+    "label": "Arrow Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-right-circle",
+    "label": "Arrow Right Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-right",
+    "label": "Arrow Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-arrow-upward",
+    "label": "Arrow Upward",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-down-circle",
+    "label": "Chevron Down Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-down",
+    "label": "Chevron Down",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-left-circle",
+    "label": "Chevron Left Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-left",
+    "label": "Chevron Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-up-circle",
+    "label": "Chevron Up Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-chevron-up",
+    "label": "Chevron Up",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-direction-ltr",
+    "label": "Direction Ltr",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-direction-rtl",
+    "label": "Direction Rtl",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-download-1",
+    "label": "Download 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-download-circle-1",
+    "label": "Download Circle 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-enter-down",
+    "label": "Enter Down",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-enter",
+    "label": "Enter",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-exit-up",
+    "label": "Exit Up",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-exit",
+    "label": "Exit",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shift-left",
+    "label": "Shift Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shift-right",
+    "label": "Shift Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-upload-1",
+    "label": "Upload 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-upload-circle-1",
+    "label": "Upload Circle 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-crown-3",
+    "label": "Crown 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trophy-1",
+    "label": "Trophy 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-crown-3",
+    "label": "Crown 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trophy-1",
+    "label": "Trophy 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-crown-3",
+    "label": "Crown 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trophy-1",
+    "label": "Trophy 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-crown-3",
+    "label": "Crown 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trophy-1",
+    "label": "Trophy 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-crown-3",
+    "label": "Crown 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trophy-1",
+    "label": "Trophy 1",
+    "category": "stroke"
+  },
+  {
+    "name": "outlined-500px",
+    "label": "500Px",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-adobe",
+    "label": "Adobe",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-adobefirefly",
+    "label": "Adobefirefly",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-adonis",
+    "label": "Adonis",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-agui",
+    "label": "Agui",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ai2",
+    "label": "Ai2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ai21",
+    "label": "Ai21",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ai302",
+    "label": "Ai302",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ai360",
+    "label": "Ai360",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aihubmix",
+    "label": "Aihubmix",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aimass",
+    "label": "Aimass",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aionlabs",
+    "label": "Aionlabs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-airbnb",
+    "label": "Airbnb",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-airtable",
+    "label": "Airtable",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aistudio",
+    "label": "Aistudio",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-akashchat",
+    "label": "Akashchat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-alephalpha",
+    "label": "Alephalpha",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-alibabacloud",
+    "label": "Alibabacloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-alpinejs",
+    "label": "Alpinejs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-amazon-original",
+    "label": "Amazon Original",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-amazon-pay",
+    "label": "Amazon Pay",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-amazon",
+    "label": "Amazon",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-amd",
+    "label": "Amd",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-amex",
+    "label": "Amex",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-android-old",
+    "label": "Android Old",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-android",
+    "label": "Android",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-angellist",
+    "label": "Angellist",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-angular",
+    "label": "Angular",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-antgroup",
+    "label": "Antgroup",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-anthropic",
+    "label": "Anthropic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-anyscale",
+    "label": "Anyscale",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-app-store",
+    "label": "App Store",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-apple-brand",
+    "label": "Apple Brand",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-apple-music-alt",
+    "label": "Apple Music Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-apple-music",
+    "label": "Apple Music",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-apple-pay",
+    "label": "Apple Pay",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-arc-browser",
+    "label": "Arc Browser",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-asana",
+    "label": "Asana",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-assemblyai",
+    "label": "Assemblyai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-astro",
+    "label": "Astro",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-atlassian",
+    "label": "Atlassian",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-audi-alt",
+    "label": "Audi Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-audi",
+    "label": "Audi",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-automatic",
+    "label": "Automatic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aws",
+    "label": "Aws",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aya",
+    "label": "Aya",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-aymo-ai",
+    "label": "Aymo Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-azure",
+    "label": "Azure",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-azureai",
+    "label": "Azureai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-baai",
+    "label": "Baai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-baichuan",
+    "label": "Baichuan",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-baidu",
+    "label": "Baidu",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-baiducloud",
+    "label": "Baiducloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bailian",
+    "label": "Bailian",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-baseten",
+    "label": "Baseten",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bedrock",
+    "label": "Bedrock",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-behance",
+    "label": "Behance",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bfl",
+    "label": "Bfl",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bing",
+    "label": "Bing",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bitbucket",
+    "label": "Bitbucket",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bitcoin",
+    "label": "Bitcoin",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bittorrent",
+    "label": "Bittorrent",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-blogger-alt",
+    "label": "Blogger Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-blogger",
+    "label": "Blogger",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bluetooth-logo",
+    "label": "Bluetooth Logo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bmw",
+    "label": "Bmw",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bootstrap-5-square",
+    "label": "Bootstrap 5 Square",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bootstrap-5",
+    "label": "Bootstrap 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-botpress",
+    "label": "Botpress",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-brave",
+    "label": "Brave",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-btc",
+    "label": "Btc",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-burncloud",
+    "label": "Burncloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bytedance",
+    "label": "Bytedance",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-canva",
+    "label": "Canva",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-capcut",
+    "label": "Capcut",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cash-app",
+    "label": "Cash App",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-centml",
+    "label": "Centml",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cerebras",
+    "label": "Cerebras",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chatglm",
+    "label": "Chatglm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chrome",
+    "label": "Chrome",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-chromecast",
+    "label": "Chromecast",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cisco",
+    "label": "Cisco",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-civitai",
+    "label": "Civitai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-claude",
+    "label": "Claude",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-clickup-brain",
+    "label": "Clickup Brain",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-clickup",
+    "label": "Clickup",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cline",
+    "label": "Cline",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-clipdrop",
+    "label": "Clipdrop",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloudflare",
+    "label": "Cloudflare",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-codegeex",
+    "label": "Codegeex",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-codepen",
+    "label": "Codepen",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cohere",
+    "label": "Cohere",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-coinbase",
+    "label": "Coinbase",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-colab",
+    "label": "Colab",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-comfyui",
+    "label": "Comfyui",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-connectdevelop",
+    "label": "Connectdevelop",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-copilot",
+    "label": "Copilot",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-copilotkit",
+    "label": "Copilotkit",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-copy-ai",
+    "label": "Copy Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-coqui",
+    "label": "Coqui",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-coral",
+    "label": "Coral",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-coze",
+    "label": "Coze",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cpanel",
+    "label": "Cpanel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-creative-commons",
+    "label": "Creative Commons",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-crewai",
+    "label": "Crewai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-crusoe",
+    "label": "Crusoe",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-css3",
+    "label": "Css3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cursor",
+    "label": "Cursor",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dalle",
+    "label": "Dalle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dbrx",
+    "label": "Dbrx",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deepai",
+    "label": "Deepai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deepinfra",
+    "label": "Deepinfra",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deepl",
+    "label": "Deepl",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deepmind",
+    "label": "Deepmind",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deepseek",
+    "label": "Deepseek",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-deno",
+    "label": "Deno",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-descript-ai",
+    "label": "Descript Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dev",
+    "label": "Dev",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dialogflow",
+    "label": "Dialogflow",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dify",
+    "label": "Dify",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-digitalocean",
+    "label": "Digitalocean",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-diners-club",
+    "label": "Diners Club",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-discord-chat",
+    "label": "Discord Chat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-discord",
+    "label": "Discord",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-discover",
+    "label": "Discover",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-doc2x",
+    "label": "Doc2X",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-docker",
+    "label": "Docker",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-docsearch",
+    "label": "Docsearch",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dolphin",
+    "label": "Dolphin",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-doubao",
+    "label": "Doubao",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dribbble-symbol",
+    "label": "Dribbble Symbol",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dribbble",
+    "label": "Dribbble",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-drizzle",
+    "label": "Drizzle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dropbox",
+    "label": "Dropbox",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-drupal",
+    "label": "Drupal",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-edge",
+    "label": "Edge",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-eleutherai",
+    "label": "Eleutherai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-eleven-labs",
+    "label": "Eleven Labs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-elevenx",
+    "label": "Elevenx",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-envato",
+    "label": "Envato",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ethereum-logo",
+    "label": "Ethereum Logo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-exa",
+    "label": "Exa",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-expressjs",
+    "label": "Expressjs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-facebook-messenger",
+    "label": "Facebook Messenger",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-facebook-square",
+    "label": "Facebook Square",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-facebook",
+    "label": "Facebook",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-facetime",
+    "label": "Facetime",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-fal",
+    "label": "Fal",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-fastgpt",
+    "label": "Fastgpt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-featherless",
+    "label": "Featherless",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-figma",
+    "label": "Figma",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-firebase",
+    "label": "Firebase",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-firefly-1",
+    "label": "Firefly 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-firefly-2",
+    "label": "Firefly 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-firefox",
+    "label": "Firefox",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-fireworks",
+    "label": "Fireworks",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-fishaudio",
+    "label": "Fishaudio",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-fitbit",
+    "label": "Fitbit",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flickr",
+    "label": "Flickr",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flora",
+    "label": "Flora",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flowith",
+    "label": "Flowith",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flutter",
+    "label": "Flutter",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flux",
+    "label": "Flux",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ford",
+    "label": "Ford",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-framer",
+    "label": "Framer",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-friendli",
+    "label": "Friendli",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gatsby",
+    "label": "Gatsby",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gemini",
+    "label": "Gemini",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gemma",
+    "label": "Gemma",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-git",
+    "label": "Git",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-giteeai",
+    "label": "Giteeai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-github-copilot",
+    "label": "Github Copilot",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-github",
+    "label": "Github",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-glama",
+    "label": "Glama",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-glif",
+    "label": "Glif",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-glm",
+    "label": "Glm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-glmv",
+    "label": "Glmv",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-go",
+    "label": "Go",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-goodreads",
+    "label": "Goodreads",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google-cloud",
+    "label": "Google Cloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google-drive",
+    "label": "Google Drive",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google-meet",
+    "label": "Google Meet",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google-pay",
+    "label": "Google Pay",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google-wallet",
+    "label": "Google Wallet",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-google",
+    "label": "Google",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-goose",
+    "label": "Goose",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gradio",
+    "label": "Gradio",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-grammarly-ai",
+    "label": "Grammarly Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-grammarly",
+    "label": "Grammarly",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-greptile",
+    "label": "Greptile",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-grok",
+    "label": "Grok",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-groq",
+    "label": "Groq",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hacker-news",
+    "label": "Hacker News",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hailuo",
+    "label": "Hailuo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-haiper",
+    "label": "Haiper",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hashnode",
+    "label": "Hashnode",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hedra",
+    "label": "Hedra",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-higress",
+    "label": "Higress",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-html5",
+    "label": "Html5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hubspot-ai",
+    "label": "Hubspot Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-humata-ai",
+    "label": "Humata Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hunyuan",
+    "label": "Hunyuan",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hyperbolic",
+    "label": "Hyperbolic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ibm",
+    "label": "Ibm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ideogram",
+    "label": "Ideogram",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-iflytekcloud",
+    "label": "Iflytekcloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-imdb",
+    "label": "Imdb",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-inference",
+    "label": "Inference",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-infermatic",
+    "label": "Infermatic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-infinigence",
+    "label": "Infinigence",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-instagram-logotype",
+    "label": "Instagram Logotype",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-instagram",
+    "label": "Instagram",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-intel",
+    "label": "Intel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-internlm",
+    "label": "Internlm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ios",
+    "label": "Ios",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jaguar",
+    "label": "Jaguar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jamstack",
+    "label": "Jamstack",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jasper",
+    "label": "Jasper",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-java",
+    "label": "Java",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-javascript",
+    "label": "Javascript",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jcb",
+    "label": "Jcb",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jimeng",
+    "label": "Jimeng",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jina",
+    "label": "Jina",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-joomla",
+    "label": "Joomla",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-jsfiddle",
+    "label": "Jsfiddle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kimi",
+    "label": "Kimi",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kling",
+    "label": "Kling",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kluster",
+    "label": "Kluster",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kolors",
+    "label": "Kolors",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-krea",
+    "label": "Krea",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kubernetes",
+    "label": "Kubernetes",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-kwaipilot",
+    "label": "Kwaipilot",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lambda",
+    "label": "Lambda",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-langchain",
+    "label": "Langchain",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-langfuse",
+    "label": "Langfuse",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-langgraph",
+    "label": "Langgraph",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-langsmith",
+    "label": "Langsmith",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-laravel",
+    "label": "Laravel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lemon-squeezy",
+    "label": "Lemon Squeezy",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-leptonai",
+    "label": "Leptonai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lightricks",
+    "label": "Lightricks",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-line",
+    "label": "Line",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lineicons",
+    "label": "Lineicons",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-linkedin",
+    "label": "Linkedin",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-liquid",
+    "label": "Liquid",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-livekit",
+    "label": "Livekit",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-llamaindex",
+    "label": "Llamaindex",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-llava",
+    "label": "Llava",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lmstudio",
+    "label": "Lmstudio",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-longcat",
+    "label": "Longcat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-loom",
+    "label": "Loom",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-lovable",
+    "label": "Lovable",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-luma-ai",
+    "label": "Luma Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-magento",
+    "label": "Magento",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-magic",
+    "label": "Magic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mailchimp",
+    "label": "Mailchimp",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-make",
+    "label": "Make",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-manus",
+    "label": "Manus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-manychat",
+    "label": "Manychat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-markdown",
+    "label": "Markdown",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-marketmuse",
+    "label": "Marketmuse",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mastercard",
+    "label": "Mastercard",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mastra",
+    "label": "Mastra",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mcp",
+    "label": "Mcp",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mcpso",
+    "label": "Mcpso",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-medium-alt",
+    "label": "Medium Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-medium",
+    "label": "Medium",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-meku-dev",
+    "label": "Meku Dev",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-menlo",
+    "label": "Menlo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mercedes",
+    "label": "Mercedes",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-meta-ai",
+    "label": "Meta Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-meta-alt",
+    "label": "Meta Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-meta",
+    "label": "Meta",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-metagpt",
+    "label": "Metagpt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-microsoft-edge",
+    "label": "Microsoft Edge",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-microsoft-teams",
+    "label": "Microsoft Teams",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-microsoft",
+    "label": "Microsoft",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-midjourney",
+    "label": "Midjourney",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-minimax",
+    "label": "Minimax",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mistral-ai",
+    "label": "Mistral Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-modelscope",
+    "label": "Modelscope",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mongodb",
+    "label": "Mongodb",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-monica",
+    "label": "Monica",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-moonshot",
+    "label": "Moonshot",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-myshell",
+    "label": "Myshell",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mysql",
+    "label": "Mysql",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-n8n",
+    "label": "N8N",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nasa",
+    "label": "Nasa",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nebius",
+    "label": "Nebius",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-netflix",
+    "label": "Netflix",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-netlify",
+    "label": "Netlify",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-newapi",
+    "label": "Newapi",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nextjs",
+    "label": "Nextjs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nike",
+    "label": "Nike",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nissan",
+    "label": "Nissan",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nodejs-alt",
+    "label": "Nodejs Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nodejs",
+    "label": "Nodejs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-notebooklm",
+    "label": "Notebooklm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-notion",
+    "label": "Notion",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nova",
+    "label": "Nova",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-novelai",
+    "label": "Novelai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-novita",
+    "label": "Novita",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nplcloud",
+    "label": "Nplcloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-npm",
+    "label": "Npm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nuxt",
+    "label": "Nuxt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-nvidia",
+    "label": "Nvidia",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-oculus",
+    "label": "Oculus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ollama",
+    "label": "Ollama",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-open-ai",
+    "label": "Open Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-openchat",
+    "label": "Openchat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-openrouter",
+    "label": "Openrouter",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-openwebui",
+    "label": "Openwebui",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-opera-mini",
+    "label": "Opera Mini",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-oracle",
+    "label": "Oracle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-paddle",
+    "label": "Paddle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-palm",
+    "label": "Palm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-parasail",
+    "label": "Parasail",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-patreon",
+    "label": "Patreon",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-payoneer",
+    "label": "Payoneer",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-paypal",
+    "label": "Paypal",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pepsi",
+    "label": "Pepsi",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-perplexity",
+    "label": "Perplexity",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-phidata",
+    "label": "Phidata",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-phind",
+    "label": "Phind",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-php",
+    "label": "Php",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-phrasee",
+    "label": "Phrasee",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pika",
+    "label": "Pika",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pimjo-logo",
+    "label": "Pimjo Logo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pimjo-symbol",
+    "label": "Pimjo Symbol",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pinterest",
+    "label": "Pinterest",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pixverse",
+    "label": "Pixverse",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-plantscale",
+    "label": "Plantscale",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-play-store",
+    "label": "Play Store",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-player2",
+    "label": "Player2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-playstation",
+    "label": "Playstation",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pnpm",
+    "label": "Pnpm",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-poe",
+    "label": "Poe",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pollinations",
+    "label": "Pollinations",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-postgresql",
+    "label": "Postgresql",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-postman",
+    "label": "Postman",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ppio",
+    "label": "Ppio",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-prisma",
+    "label": "Prisma",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-producthunt",
+    "label": "Producthunt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-proton-mail-logo",
+    "label": "Proton Mail Logo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-proton-mail-symbol",
+    "label": "Proton Mail Symbol",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pydanticai",
+    "label": "Pydanticai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-python",
+    "label": "Python",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-qingyan",
+    "label": "Qingyan",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-qiniu",
+    "label": "Qiniu",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-quillbot",
+    "label": "Quillbot",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-quora",
+    "label": "Quora",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-qwen",
+    "label": "Qwen",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-radis",
+    "label": "Radis",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-railway",
+    "label": "Railway",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-react",
+    "label": "React",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-recraft",
+    "label": "Recraft",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-reddit",
+    "label": "Reddit",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-remix-js",
+    "label": "Remix Js",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-replicate",
+    "label": "Replicate",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-replika",
+    "label": "Replika",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-replit-ai",
+    "label": "Replit Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-rsshub",
+    "label": "Rsshub",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-runway",
+    "label": "Runway",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-rwkv",
+    "label": "Rwkv",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-safari",
+    "label": "Safari",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sambanova",
+    "label": "Sambanova",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sanity",
+    "label": "Sanity",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-search1api",
+    "label": "Search1Api",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-searchapi",
+    "label": "Searchapi",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sensenova",
+    "label": "Sensenova",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shopify",
+    "label": "Shopify",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-signal-app",
+    "label": "Signal App",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-siliconcloud",
+    "label": "Siliconcloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sketch",
+    "label": "Sketch",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-skype",
+    "label": "Skype",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-skywork",
+    "label": "Skywork",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-slack",
+    "label": "Slack",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-slideshare",
+    "label": "Slideshare",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-smithery",
+    "label": "Smithery",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-snapchat",
+    "label": "Snapchat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-snowflake",
+    "label": "Snowflake",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sophnet",
+    "label": "Sophnet",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sora",
+    "label": "Sora",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-soundcloud",
+    "label": "Soundcloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spacex",
+    "label": "Spacex",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spark",
+    "label": "Spark",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spotify-alt",
+    "label": "Spotify Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spotify",
+    "label": "Spotify",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-squarespace",
+    "label": "Squarespace",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stability",
+    "label": "Stability",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stackoverflow",
+    "label": "Stackoverflow",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-statecloud",
+    "label": "Statecloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-statista",
+    "label": "Statista",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-steam",
+    "label": "Steam",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stepfun",
+    "label": "Stepfun",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-straico",
+    "label": "Straico",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stripe",
+    "label": "Stripe",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stumbleupon",
+    "label": "Stumbleupon",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-submodel",
+    "label": "Submodel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-suno",
+    "label": "Suno",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-supabase",
+    "label": "Supabase",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-supernormal",
+    "label": "Supernormal",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-surfer-seo",
+    "label": "Surfer Seo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-svelte",
+    "label": "Svelte",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-swift",
+    "label": "Swift",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sync",
+    "label": "Sync",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-synthesia",
+    "label": "Synthesia",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tabnine",
+    "label": "Tabnine",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tailor-brands",
+    "label": "Tailor Brands",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tailwindcss",
+    "label": "Tailwindcss",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-targon",
+    "label": "Targon",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-taskade",
+    "label": "Taskade",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tavily",
+    "label": "Tavily",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-telegram",
+    "label": "Telegram",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tencent",
+    "label": "Tencent",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tencentcloud",
+    "label": "Tencentcloud",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tesla",
+    "label": "Tesla",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tiangong",
+    "label": "Tiangong",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tidio-ai",
+    "label": "Tidio Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tii",
+    "label": "Tii",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tiktok-alt",
+    "label": "Tiktok Alt",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tiktok",
+    "label": "Tiktok",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-together",
+    "label": "Together",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-topazlabs",
+    "label": "Topazlabs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-toyota",
+    "label": "Toyota",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trae-color",
+    "label": "Trae Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trello",
+    "label": "Trello",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tripo-color",
+    "label": "Tripo Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tumblr",
+    "label": "Tumblr",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-turborepo",
+    "label": "Turborepo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-turix",
+    "label": "Turix",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-twitch",
+    "label": "Twitch",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-twitter-old",
+    "label": "Twitter Old",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-typescript",
+    "label": "Typescript",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-uber-symbol",
+    "label": "Uber Symbol",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-uber",
+    "label": "Uber",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ubuntu",
+    "label": "Ubuntu",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-udio-color",
+    "label": "Udio Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-unsplash",
+    "label": "Unsplash",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-unstructured-color",
+    "label": "Unstructured Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-upstage-color",
+    "label": "Upstage Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-v0",
+    "label": "V0",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vectorizerai",
+    "label": "Vectorizerai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vercel",
+    "label": "Vercel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vertexai",
+    "label": "Vertexai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vidu-color",
+    "label": "Vidu Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-viggle",
+    "label": "Viggle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vimeo",
+    "label": "Vimeo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-visa",
+    "label": "Visa",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vite",
+    "label": "Vite",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vk",
+    "label": "Vk",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vllm-color",
+    "label": "Vllm Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vmware",
+    "label": "Vmware",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volcengine",
+    "label": "Volcengine",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volkswagen",
+    "label": "Volkswagen",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-voyage-color",
+    "label": "Voyage Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vs-code",
+    "label": "Vs Code",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vuejs",
+    "label": "Vuejs",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-webflow",
+    "label": "Webflow",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-webhooks",
+    "label": "Webhooks",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wechat",
+    "label": "Wechat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wenxin-color",
+    "label": "Wenxin Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-whatsapp",
+    "label": "Whatsapp",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-windows",
+    "label": "Windows",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-windsurf",
+    "label": "Windsurf",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wise",
+    "label": "Wise",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wordpress",
+    "label": "Wordpress",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wordtune-ai",
+    "label": "Wordtune Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-workersai-color",
+    "label": "Workersai Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-writesonic",
+    "label": "Writesonic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-x",
+    "label": "X",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xai",
+    "label": "Xai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xampp",
+    "label": "Xampp",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xbox",
+    "label": "Xbox",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xinference-color",
+    "label": "Xinference Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xrp",
+    "label": "Xrp",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xuanyuan-color",
+    "label": "Xuanyuan Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yahoo",
+    "label": "Yahoo",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yandex",
+    "label": "Yandex",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yarn",
+    "label": "Yarn",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ycombinator",
+    "label": "Ycombinator",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yi-color",
+    "label": "Yi Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-youmind",
+    "label": "Youmind",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-youtube-kids",
+    "label": "Youtube Kids",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-youtube-music",
+    "label": "Youtube Music",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-youtube",
+    "label": "Youtube",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yuanbao",
+    "label": "Yuanbao",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zai",
+    "label": "Zai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zapier-color",
+    "label": "Zapier Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zapier",
+    "label": "Zapier",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zeabur-color",
+    "label": "Zeabur Color",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zenmux",
+    "label": "Zenmux",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zeroone",
+    "label": "Zeroone",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zhipu-ai",
+    "label": "Zhipu Ai",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zoom",
+    "label": "Zoom",
+    "category": "outlined"
+  },
+  {
+    "name": "bulk-bridge-3",
+    "label": "Bridge 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-buildings-1",
+    "label": "Buildings 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-home-2",
+    "label": "Home 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hospital-2",
+    "label": "Hospital 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-road-1",
+    "label": "Road 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bridge-3",
+    "label": "Bridge 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-buildings-1",
+    "label": "Buildings 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-home-2",
+    "label": "Home 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hospital-2",
+    "label": "Hospital 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-road-1",
+    "label": "Road 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bridge-3",
+    "label": "Bridge 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-buildings-1",
+    "label": "Buildings 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-home-2",
+    "label": "Home 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hospital-2",
+    "label": "Hospital 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-road-1",
+    "label": "Road 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bridge-3",
+    "label": "Bridge 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-buildings-1",
+    "label": "Buildings 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-home-2",
+    "label": "Home 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hospital-2",
+    "label": "Hospital 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-road-1",
+    "label": "Road 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bridge-3",
+    "label": "Bridge 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-buildings-1",
+    "label": "Buildings 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-home-2",
+    "label": "Home 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hospital-2",
+    "label": "Hospital 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-road-1",
+    "label": "Road 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-agenda",
+    "label": "Agenda",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-briefcase-1",
+    "label": "Briefcase 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-briefcase-2",
+    "label": "Briefcase 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hierarchy-1",
+    "label": "Hierarchy 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-megaphone-1",
+    "label": "Megaphone 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-paperclip-1",
+    "label": "Paperclip 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-refresh-dollar-1",
+    "label": "Refresh Dollar 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-refresh-user-1",
+    "label": "Refresh User 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-stamp",
+    "label": "Stamp",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-agenda",
+    "label": "Agenda",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-briefcase-1",
+    "label": "Briefcase 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-briefcase-2",
+    "label": "Briefcase 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hierarchy-1",
+    "label": "Hierarchy 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-megaphone-1",
+    "label": "Megaphone 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-paperclip-1",
+    "label": "Paperclip 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-refresh-dollar-1",
+    "label": "Refresh Dollar 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-refresh-user-1",
+    "label": "Refresh User 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-stamp",
+    "label": "Stamp",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-agenda",
+    "label": "Agenda",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-briefcase-1",
+    "label": "Briefcase 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-briefcase-2",
+    "label": "Briefcase 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hierarchy-1",
+    "label": "Hierarchy 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-megaphone-1",
+    "label": "Megaphone 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-paperclip-1",
+    "label": "Paperclip 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-refresh-dollar-1",
+    "label": "Refresh Dollar 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-refresh-user-1",
+    "label": "Refresh User 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stamp",
+    "label": "Stamp",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-agenda",
+    "label": "Agenda",
+    "category": "solid"
+  },
+  {
+    "name": "solid-briefcase-1",
+    "label": "Briefcase 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-briefcase-2",
+    "label": "Briefcase 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hierarchy-1",
+    "label": "Hierarchy 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-megaphone-1",
+    "label": "Megaphone 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-paperclip-1",
+    "label": "Paperclip 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-refresh-dollar-1",
+    "label": "Refresh Dollar 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-refresh-user-1",
+    "label": "Refresh User 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-stamp",
+    "label": "Stamp",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-agenda",
+    "label": "Agenda",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-briefcase-1",
+    "label": "Briefcase 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-briefcase-2",
+    "label": "Briefcase 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hierarchy-1",
+    "label": "Hierarchy 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-megaphone-1",
+    "label": "Megaphone 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-paperclip-1",
+    "label": "Paperclip 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-refresh-dollar-1",
+    "label": "Refresh Dollar 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-refresh-user-1",
+    "label": "Refresh User 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-stamp",
+    "label": "Stamp",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-hand-shake",
+    "label": "Hand Shake",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hand-taking-dollar",
+    "label": "Hand Taking Dollar",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hand-taking-leaf-1",
+    "label": "Hand Taking Leaf 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hand-taking-user",
+    "label": "Hand Taking User",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-heart",
+    "label": "Heart",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-hand-shake",
+    "label": "Hand Shake",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hand-taking-dollar",
+    "label": "Hand Taking Dollar",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hand-taking-leaf-1",
+    "label": "Hand Taking Leaf 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hand-taking-user",
+    "label": "Hand Taking User",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-heart",
+    "label": "Heart",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-hand-shake",
+    "label": "Hand Shake",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hand-taking-dollar",
+    "label": "Hand Taking Dollar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hand-taking-leaf-1",
+    "label": "Hand Taking Leaf 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hand-taking-user",
+    "label": "Hand Taking User",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-heart",
+    "label": "Heart",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-hand-shake",
+    "label": "Hand Shake",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hand-taking-dollar",
+    "label": "Hand Taking Dollar",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hand-taking-leaf-1",
+    "label": "Hand Taking Leaf 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hand-taking-user",
+    "label": "Hand Taking User",
+    "category": "solid"
+  },
+  {
+    "name": "solid-heart",
+    "label": "Heart",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-hand-shake",
+    "label": "Hand Shake",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hand-taking-dollar",
+    "label": "Hand Taking Dollar",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hand-taking-leaf-1",
+    "label": "Hand Taking Leaf 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hand-taking-user",
+    "label": "Hand Taking User",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-heart",
+    "label": "Heart",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-code-1",
+    "label": "Code 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-code-s",
+    "label": "Code S",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-code-1",
+    "label": "Code 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-code-s",
+    "label": "Code S",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-code-1",
+    "label": "Code 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-code-s",
+    "label": "Code S",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-code-1",
+    "label": "Code 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-code-s",
+    "label": "Code S",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-code-1",
+    "label": "Code 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-code-s",
+    "label": "Code S",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-chat-bubble-2",
+    "label": "Chat Bubble 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-comment-1-share",
+    "label": "Comment 1 Share",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-comment-1-text",
+    "label": "Comment 1 Text",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-comment-1",
+    "label": "Comment 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-envelope-1",
+    "label": "Envelope 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-message-2-question",
+    "label": "Message 2 Question",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-message-2",
+    "label": "Message 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-message-3-text",
+    "label": "Message 3 Text",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-telephone-1",
+    "label": "Telephone 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-telephone-3",
+    "label": "Telephone 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-chat-bubble-2",
+    "label": "Chat Bubble 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-comment-1-share",
+    "label": "Comment 1 Share",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-comment-1-text",
+    "label": "Comment 1 Text",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-comment-1",
+    "label": "Comment 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-envelope-1",
+    "label": "Envelope 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-message-2-question",
+    "label": "Message 2 Question",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-message-2",
+    "label": "Message 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-message-3-text",
+    "label": "Message 3 Text",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-telephone-1",
+    "label": "Telephone 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-telephone-3",
+    "label": "Telephone 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-chat-bubble-2",
+    "label": "Chat Bubble 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-comment-1-share",
+    "label": "Comment 1 Share",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-comment-1-text",
+    "label": "Comment 1 Text",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-comment-1",
+    "label": "Comment 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-envelope-1",
+    "label": "Envelope 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-message-2-question",
+    "label": "Message 2 Question",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-message-2",
+    "label": "Message 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-message-3-text",
+    "label": "Message 3 Text",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-telephone-1",
+    "label": "Telephone 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-telephone-3",
+    "label": "Telephone 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-chat-bubble-2",
+    "label": "Chat Bubble 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-comment-1-share",
+    "label": "Comment 1 Share",
+    "category": "solid"
+  },
+  {
+    "name": "solid-comment-1-text",
+    "label": "Comment 1 Text",
+    "category": "solid"
+  },
+  {
+    "name": "solid-comment-1",
+    "label": "Comment 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-envelope-1",
+    "label": "Envelope 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-message-2-question",
+    "label": "Message 2 Question",
+    "category": "solid"
+  },
+  {
+    "name": "solid-message-2",
+    "label": "Message 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-message-3-text",
+    "label": "Message 3 Text",
+    "category": "solid"
+  },
+  {
+    "name": "solid-telephone-1",
+    "label": "Telephone 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-telephone-3",
+    "label": "Telephone 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-chat-bubble-2",
+    "label": "Chat Bubble 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-comment-1-share",
+    "label": "Comment 1 Share",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-comment-1-text",
+    "label": "Comment 1 Text",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-comment-1",
+    "label": "Comment 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-envelope-1",
+    "label": "Envelope 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-message-2-question",
+    "label": "Message 2 Question",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-message-2",
+    "label": "Message 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-message-3-text",
+    "label": "Message 3 Text",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-telephone-1",
+    "label": "Telephone 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-telephone-3",
+    "label": "Telephone 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bricks",
+    "label": "Bricks",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bulb-2",
+    "label": "Bulb 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bulb-4",
+    "label": "Bulb 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-crane-4",
+    "label": "Crane 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hammer-1",
+    "label": "Hammer 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hammer-2",
+    "label": "Hammer 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-helmet-safety-1",
+    "label": "Helmet Safety 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-magnet",
+    "label": "Magnet",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-paint-bucket",
+    "label": "Paint Bucket",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-paint-roller-1",
+    "label": "Paint Roller 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-plug-1",
+    "label": "Plug 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-ruler-1",
+    "label": "Ruler 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-ruler-pen",
+    "label": "Ruler Pen",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shovel",
+    "label": "Shovel",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trowel-1",
+    "label": "Trowel 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-wheelbarrow-empty",
+    "label": "Wheelbarrow Empty",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bricks",
+    "label": "Bricks",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bulb-2",
+    "label": "Bulb 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bulb-4",
+    "label": "Bulb 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-crane-4",
+    "label": "Crane 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hammer-1",
+    "label": "Hammer 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hammer-2",
+    "label": "Hammer 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-helmet-safety-1",
+    "label": "Helmet Safety 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-magnet",
+    "label": "Magnet",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-paint-bucket",
+    "label": "Paint Bucket",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-paint-roller-1",
+    "label": "Paint Roller 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-plug-1",
+    "label": "Plug 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-ruler-1",
+    "label": "Ruler 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-ruler-pen",
+    "label": "Ruler Pen",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shovel",
+    "label": "Shovel",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trowel-1",
+    "label": "Trowel 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-wheelbarrow-empty",
+    "label": "Wheelbarrow Empty",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bricks",
+    "label": "Bricks",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bulb-2",
+    "label": "Bulb 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bulb-4",
+    "label": "Bulb 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-crane-4",
+    "label": "Crane 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hammer-1",
+    "label": "Hammer 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hammer-2",
+    "label": "Hammer 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-helmet-safety-1",
+    "label": "Helmet Safety 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-magnet",
+    "label": "Magnet",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-paint-bucket",
+    "label": "Paint Bucket",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-paint-roller-1",
+    "label": "Paint Roller 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-plug-1",
+    "label": "Plug 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ruler-1",
+    "label": "Ruler 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ruler-pen",
+    "label": "Ruler Pen",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shovel",
+    "label": "Shovel",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trowel-1",
+    "label": "Trowel 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wheelbarrow-empty",
+    "label": "Wheelbarrow Empty",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bricks",
+    "label": "Bricks",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bulb-2",
+    "label": "Bulb 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bulb-4",
+    "label": "Bulb 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-crane-4",
+    "label": "Crane 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hammer-1",
+    "label": "Hammer 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hammer-2",
+    "label": "Hammer 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-helmet-safety-1",
+    "label": "Helmet Safety 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-magnet",
+    "label": "Magnet",
+    "category": "solid"
+  },
+  {
+    "name": "solid-paint-bucket",
+    "label": "Paint Bucket",
+    "category": "solid"
+  },
+  {
+    "name": "solid-paint-roller-1",
+    "label": "Paint Roller 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-plug-1",
+    "label": "Plug 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-ruler-1",
+    "label": "Ruler 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-ruler-pen",
+    "label": "Ruler Pen",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shovel",
+    "label": "Shovel",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trowel-1",
+    "label": "Trowel 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-wheelbarrow-empty",
+    "label": "Wheelbarrow Empty",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bricks",
+    "label": "Bricks",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bulb-2",
+    "label": "Bulb 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bulb-4",
+    "label": "Bulb 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-crane-4",
+    "label": "Crane 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hammer-1",
+    "label": "Hammer 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hammer-2",
+    "label": "Hammer 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-helmet-safety-1",
+    "label": "Helmet Safety 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-magnet",
+    "label": "Magnet",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-paint-bucket",
+    "label": "Paint Bucket",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-paint-roller-1",
+    "label": "Paint Roller 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-plug-1",
+    "label": "Plug 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-ruler-1",
+    "label": "Ruler 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-ruler-pen",
+    "label": "Ruler Pen",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shovel",
+    "label": "Shovel",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trowel-1",
+    "label": "Trowel 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-wheelbarrow-empty",
+    "label": "Wheelbarrow Empty",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-alarm-1",
+    "label": "Alarm 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-calendar-days",
+    "label": "Calendar Days",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hourglass",
+    "label": "Hourglass",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-stopwatch",
+    "label": "Stopwatch",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-watch-beat-1",
+    "label": "Watch Beat 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-alarm-1",
+    "label": "Alarm 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-calendar-days",
+    "label": "Calendar Days",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hourglass",
+    "label": "Hourglass",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-stopwatch",
+    "label": "Stopwatch",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-watch-beat-1",
+    "label": "Watch Beat 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-alarm-1",
+    "label": "Alarm 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-calendar-days",
+    "label": "Calendar Days",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hourglass",
+    "label": "Hourglass",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stopwatch",
+    "label": "Stopwatch",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-watch-beat-1",
+    "label": "Watch Beat 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-alarm-1",
+    "label": "Alarm 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-calendar-days",
+    "label": "Calendar Days",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hourglass",
+    "label": "Hourglass",
+    "category": "solid"
+  },
+  {
+    "name": "solid-stopwatch",
+    "label": "Stopwatch",
+    "category": "solid"
+  },
+  {
+    "name": "solid-watch-beat-1",
+    "label": "Watch Beat 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-alarm-1",
+    "label": "Alarm 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-calendar-days",
+    "label": "Calendar Days",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hourglass",
+    "label": "Hourglass",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-stopwatch",
+    "label": "Stopwatch",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-watch-beat-1",
+    "label": "Watch Beat 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-align-text-center",
+    "label": "Align Text Center",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-align-text-left",
+    "label": "Align Text Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-align-text-right",
+    "label": "Align Text Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-brush-1-rotated",
+    "label": "Brush 1 Rotated",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-brush-2",
+    "label": "Brush 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-colour-palette-3",
+    "label": "Colour Palette 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-crop-2",
+    "label": "Crop 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-highlighter-1",
+    "label": "Highlighter 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-highlighter-2",
+    "label": "Highlighter 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-layers-1",
+    "label": "Layers 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-layout-26",
+    "label": "Layout 26",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-layout-9",
+    "label": "Layout 9",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-select-cursor-1",
+    "label": "Select Cursor 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-slice-2",
+    "label": "Slice 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-vector-nodes-6",
+    "label": "Vector Nodes 6",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-vector-nodes-7",
+    "label": "Vector Nodes 7",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-align-text-center",
+    "label": "Align Text Center",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-align-text-left",
+    "label": "Align Text Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-align-text-right",
+    "label": "Align Text Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-brush-1-rotated",
+    "label": "Brush 1 Rotated",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-brush-2",
+    "label": "Brush 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-colour-palette-3",
+    "label": "Colour Palette 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-crop-2",
+    "label": "Crop 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-highlighter-1",
+    "label": "Highlighter 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-highlighter-2",
+    "label": "Highlighter 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-layers-1",
+    "label": "Layers 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-layout-26",
+    "label": "Layout 26",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-layout-9",
+    "label": "Layout 9",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-select-cursor-1",
+    "label": "Select Cursor 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-slice-2",
+    "label": "Slice 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-vector-nodes-6",
+    "label": "Vector Nodes 6",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-vector-nodes-7",
+    "label": "Vector Nodes 7",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-align-text-center",
+    "label": "Align Text Center",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-align-text-left",
+    "label": "Align Text Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-align-text-right",
+    "label": "Align Text Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-brush-1-rotated",
+    "label": "Brush 1 Rotated",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-brush-2",
+    "label": "Brush 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-colour-palette-3",
+    "label": "Colour Palette 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-crop-2",
+    "label": "Crop 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-highlighter-1",
+    "label": "Highlighter 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-highlighter-2",
+    "label": "Highlighter 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-layers-1",
+    "label": "Layers 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-layout-26",
+    "label": "Layout 26",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-layout-9",
+    "label": "Layout 9",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-select-cursor-1",
+    "label": "Select Cursor 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-slice-2",
+    "label": "Slice 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vector-nodes-6",
+    "label": "Vector Nodes 6",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-vector-nodes-7",
+    "label": "Vector Nodes 7",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-align-text-center",
+    "label": "Align Text Center",
+    "category": "solid"
+  },
+  {
+    "name": "solid-align-text-left",
+    "label": "Align Text Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-align-text-right",
+    "label": "Align Text Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-brush-1-rotated",
+    "label": "Brush 1 Rotated",
+    "category": "solid"
+  },
+  {
+    "name": "solid-brush-2",
+    "label": "Brush 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-colour-palette-3",
+    "label": "Colour Palette 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-crop-2",
+    "label": "Crop 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-highlighter-1",
+    "label": "Highlighter 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-highlighter-2",
+    "label": "Highlighter 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-layers-1",
+    "label": "Layers 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-layout-26",
+    "label": "Layout 26",
+    "category": "solid"
+  },
+  {
+    "name": "solid-layout-9",
+    "label": "Layout 9",
+    "category": "solid"
+  },
+  {
+    "name": "solid-select-cursor-1",
+    "label": "Select Cursor 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-slice-2",
+    "label": "Slice 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-vector-nodes-6",
+    "label": "Vector Nodes 6",
+    "category": "solid"
+  },
+  {
+    "name": "solid-vector-nodes-7",
+    "label": "Vector Nodes 7",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-align-text-center",
+    "label": "Align Text Center",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-align-text-left",
+    "label": "Align Text Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-align-text-right",
+    "label": "Align Text Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-brush-1-rotated",
+    "label": "Brush 1 Rotated",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-brush-2",
+    "label": "Brush 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-colour-palette-3",
+    "label": "Colour Palette 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-crop-2",
+    "label": "Crop 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-highlighter-1",
+    "label": "Highlighter 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-highlighter-2",
+    "label": "Highlighter 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-layers-1",
+    "label": "Layers 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-layout-26",
+    "label": "Layout 26",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-layout-9",
+    "label": "Layout 9",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-select-cursor-1",
+    "label": "Select Cursor 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-slice-2",
+    "label": "Slice 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-vector-nodes-6",
+    "label": "Vector Nodes 6",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-vector-nodes-7",
+    "label": "Vector Nodes 7",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-calculator-1",
+    "label": "Calculator 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-calculator-2",
+    "label": "Calculator 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-camera-1",
+    "label": "Camera 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hand-mic",
+    "label": "Hand Mic",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-headphone-1",
+    "label": "Headphone 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-keyboard",
+    "label": "Keyboard",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-laptop-2",
+    "label": "Laptop 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-laptop-phone",
+    "label": "Laptop Phone",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-microphone-1",
+    "label": "Microphone 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-monitor-code",
+    "label": "Monitor Code",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-monitor-mac",
+    "label": "Monitor Mac",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-monitor",
+    "label": "Monitor",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-mouse-2",
+    "label": "Mouse 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-phone",
+    "label": "Phone",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-printer",
+    "label": "Printer",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-scroll-down-2",
+    "label": "Scroll Down 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-tab",
+    "label": "Tab",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-calculator-1",
+    "label": "Calculator 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-calculator-2",
+    "label": "Calculator 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-camera-1",
+    "label": "Camera 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hand-mic",
+    "label": "Hand Mic",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-headphone-1",
+    "label": "Headphone 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-keyboard",
+    "label": "Keyboard",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-laptop-2",
+    "label": "Laptop 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-laptop-phone",
+    "label": "Laptop Phone",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-microphone-1",
+    "label": "Microphone 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-monitor-code",
+    "label": "Monitor Code",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-monitor-mac",
+    "label": "Monitor Mac",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-monitor",
+    "label": "Monitor",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-mouse-2",
+    "label": "Mouse 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-phone",
+    "label": "Phone",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-printer",
+    "label": "Printer",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-scroll-down-2",
+    "label": "Scroll Down 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-tab",
+    "label": "Tab",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-calculator-1",
+    "label": "Calculator 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-calculator-2",
+    "label": "Calculator 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-camera-1",
+    "label": "Camera 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hand-mic",
+    "label": "Hand Mic",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-headphone-1",
+    "label": "Headphone 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-keyboard",
+    "label": "Keyboard",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-laptop-2",
+    "label": "Laptop 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-laptop-phone",
+    "label": "Laptop Phone",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-microphone-1",
+    "label": "Microphone 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-monitor-code",
+    "label": "Monitor Code",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-monitor-mac",
+    "label": "Monitor Mac",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-monitor",
+    "label": "Monitor",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mouse-2",
+    "label": "Mouse 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-phone",
+    "label": "Phone",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-printer",
+    "label": "Printer",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-scroll-down-2",
+    "label": "Scroll Down 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tab",
+    "label": "Tab",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-calculator-1",
+    "label": "Calculator 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-calculator-2",
+    "label": "Calculator 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-camera-1",
+    "label": "Camera 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hand-mic",
+    "label": "Hand Mic",
+    "category": "solid"
+  },
+  {
+    "name": "solid-headphone-1",
+    "label": "Headphone 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-keyboard",
+    "label": "Keyboard",
+    "category": "solid"
+  },
+  {
+    "name": "solid-laptop-2",
+    "label": "Laptop 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-laptop-phone",
+    "label": "Laptop Phone",
+    "category": "solid"
+  },
+  {
+    "name": "solid-microphone-1",
+    "label": "Microphone 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-monitor-code",
+    "label": "Monitor Code",
+    "category": "solid"
+  },
+  {
+    "name": "solid-monitor-mac",
+    "label": "Monitor Mac",
+    "category": "solid"
+  },
+  {
+    "name": "solid-monitor",
+    "label": "Monitor",
+    "category": "solid"
+  },
+  {
+    "name": "solid-mouse-2",
+    "label": "Mouse 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-phone",
+    "label": "Phone",
+    "category": "solid"
+  },
+  {
+    "name": "solid-printer",
+    "label": "Printer",
+    "category": "solid"
+  },
+  {
+    "name": "solid-scroll-down-2",
+    "label": "Scroll Down 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-tab",
+    "label": "Tab",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-calculator-1",
+    "label": "Calculator 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-calculator-2",
+    "label": "Calculator 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-camera-1",
+    "label": "Camera 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hand-mic",
+    "label": "Hand Mic",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-headphone-1",
+    "label": "Headphone 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-keyboard",
+    "label": "Keyboard",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-laptop-2",
+    "label": "Laptop 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-laptop-phone",
+    "label": "Laptop Phone",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-microphone-1",
+    "label": "Microphone 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-monitor-code",
+    "label": "Monitor Code",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-monitor-mac",
+    "label": "Monitor Mac",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-monitor",
+    "label": "Monitor",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-mouse-2",
+    "label": "Mouse 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-phone",
+    "label": "Phone",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-printer",
+    "label": "Printer",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-scroll-down-2",
+    "label": "Scroll Down 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-tab",
+    "label": "Tab",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-location-arrow-right",
+    "label": "Location Arrow Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sign-post-left",
+    "label": "Sign Post Left",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-signs-post-2",
+    "label": "Signs Post 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-location-arrow-right",
+    "label": "Location Arrow Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sign-post-left",
+    "label": "Sign Post Left",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-signs-post-2",
+    "label": "Signs Post 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-location-arrow-right",
+    "label": "Location Arrow Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sign-post-left",
+    "label": "Sign Post Left",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-signs-post-2",
+    "label": "Signs Post 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-location-arrow-right",
+    "label": "Location Arrow Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sign-post-left",
+    "label": "Sign Post Left",
+    "category": "solid"
+  },
+  {
+    "name": "solid-signs-post-2",
+    "label": "Signs Post 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-location-arrow-right",
+    "label": "Location Arrow Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sign-post-left",
+    "label": "Sign Post Left",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-signs-post-2",
+    "label": "Signs Post 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-badge-decagram-percent",
+    "label": "Badge Decagram Percent",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-basket-shopping-3",
+    "label": "Basket Shopping 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-box-archive-1",
+    "label": "Box Archive 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-box-closed",
+    "label": "Box Closed",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-box-gift-1",
+    "label": "Box Gift 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cart-1",
+    "label": "Cart 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cart-2",
+    "label": "Cart 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-label-dollar-2",
+    "label": "Label Dollar 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-badge-decagram-percent",
+    "label": "Badge Decagram Percent",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-basket-shopping-3",
+    "label": "Basket Shopping 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-box-archive-1",
+    "label": "Box Archive 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-box-closed",
+    "label": "Box Closed",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-box-gift-1",
+    "label": "Box Gift 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cart-1",
+    "label": "Cart 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cart-2",
+    "label": "Cart 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-label-dollar-2",
+    "label": "Label Dollar 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-badge-decagram-percent",
+    "label": "Badge Decagram Percent",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-basket-shopping-3",
+    "label": "Basket Shopping 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-box-archive-1",
+    "label": "Box Archive 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-box-closed",
+    "label": "Box Closed",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-box-gift-1",
+    "label": "Box Gift 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cart-1",
+    "label": "Cart 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cart-2",
+    "label": "Cart 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-label-dollar-2",
+    "label": "Label Dollar 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-badge-decagram-percent",
+    "label": "Badge Decagram Percent",
+    "category": "solid"
+  },
+  {
+    "name": "solid-basket-shopping-3",
+    "label": "Basket Shopping 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-box-archive-1",
+    "label": "Box Archive 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-box-closed",
+    "label": "Box Closed",
+    "category": "solid"
+  },
+  {
+    "name": "solid-box-gift-1",
+    "label": "Box Gift 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cart-1",
+    "label": "Cart 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cart-2",
+    "label": "Cart 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-label-dollar-2",
+    "label": "Label Dollar 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-badge-decagram-percent",
+    "label": "Badge Decagram Percent",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-basket-shopping-3",
+    "label": "Basket Shopping 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-box-archive-1",
+    "label": "Box Archive 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-box-closed",
+    "label": "Box Closed",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-box-gift-1",
+    "label": "Box Gift 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cart-1",
+    "label": "Cart 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cart-2",
+    "label": "Cart 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-label-dollar-2",
+    "label": "Label Dollar 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-check-circle-1",
+    "label": "Check Circle 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-check-square-2",
+    "label": "Check Square 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-gear-1",
+    "label": "Gear 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-gears-3",
+    "label": "Gears 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-minus-circle",
+    "label": "Minus Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-question-mark-circle",
+    "label": "Question Mark Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trash-3",
+    "label": "Trash 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-xmark-circle",
+    "label": "Xmark Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-check-circle-1",
+    "label": "Check Circle 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-check-square-2",
+    "label": "Check Square 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-gear-1",
+    "label": "Gear 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-gears-3",
+    "label": "Gears 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-minus-circle",
+    "label": "Minus Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-question-mark-circle",
+    "label": "Question Mark Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trash-3",
+    "label": "Trash 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-xmark-circle",
+    "label": "Xmark Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-check-circle-1",
+    "label": "Check Circle 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-check-square-2",
+    "label": "Check Square 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gear-1",
+    "label": "Gear 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gears-3",
+    "label": "Gears 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-minus-circle",
+    "label": "Minus Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-question-mark-circle",
+    "label": "Question Mark Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trash-3",
+    "label": "Trash 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xmark-circle",
+    "label": "Xmark Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-check-circle-1",
+    "label": "Check Circle 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-check-square-2",
+    "label": "Check Square 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-gear-1",
+    "label": "Gear 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-gears-3",
+    "label": "Gears 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-minus-circle",
+    "label": "Minus Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-question-mark-circle",
+    "label": "Question Mark Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trash-3",
+    "label": "Trash 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-xmark-circle",
+    "label": "Xmark Circle",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-check-circle-1",
+    "label": "Check Circle 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-check-square-2",
+    "label": "Check Square 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-gear-1",
+    "label": "Gear 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-gears-3",
+    "label": "Gears 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-minus-circle",
+    "label": "Minus Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-question-mark-circle",
+    "label": "Question Mark Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trash-3",
+    "label": "Trash 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-xmark-circle",
+    "label": "Xmark Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-board-writing-3",
+    "label": "Board Writing 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-book-1",
+    "label": "Book 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-books-2",
+    "label": "Books 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-certificate-badge-1",
+    "label": "Certificate Badge 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-compass-drafting-2",
+    "label": "Compass Drafting 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-eraser-1",
+    "label": "Eraser 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-globe-stand",
+    "label": "Globe Stand",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-graduation-cap-1",
+    "label": "Graduation Cap 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-notebook-1",
+    "label": "Notebook 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pen-to-square",
+    "label": "Pen To Square",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pencil-1",
+    "label": "Pencil 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-school-bench-1",
+    "label": "School Bench 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-school-bench-2",
+    "label": "School Bench 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-board-writing-3",
+    "label": "Board Writing 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-book-1",
+    "label": "Book 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-books-2",
+    "label": "Books 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-certificate-badge-1",
+    "label": "Certificate Badge 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-compass-drafting-2",
+    "label": "Compass Drafting 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-eraser-1",
+    "label": "Eraser 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-globe-stand",
+    "label": "Globe Stand",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-graduation-cap-1",
+    "label": "Graduation Cap 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-notebook-1",
+    "label": "Notebook 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pen-to-square",
+    "label": "Pen To Square",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pencil-1",
+    "label": "Pencil 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-school-bench-1",
+    "label": "School Bench 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-school-bench-2",
+    "label": "School Bench 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-board-writing-3",
+    "label": "Board Writing 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-book-1",
+    "label": "Book 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-books-2",
+    "label": "Books 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-certificate-badge-1",
+    "label": "Certificate Badge 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-compass-drafting-2",
+    "label": "Compass Drafting 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-eraser-1",
+    "label": "Eraser 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-globe-stand",
+    "label": "Globe Stand",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-graduation-cap-1",
+    "label": "Graduation Cap 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-notebook-1",
+    "label": "Notebook 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pen-to-square",
+    "label": "Pen To Square",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pencil-1",
+    "label": "Pencil 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-school-bench-1",
+    "label": "School Bench 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-school-bench-2",
+    "label": "School Bench 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-board-writing-3",
+    "label": "Board Writing 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-book-1",
+    "label": "Book 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-books-2",
+    "label": "Books 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-certificate-badge-1",
+    "label": "Certificate Badge 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-compass-drafting-2",
+    "label": "Compass Drafting 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-eraser-1",
+    "label": "Eraser 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-globe-stand",
+    "label": "Globe Stand",
+    "category": "solid"
+  },
+  {
+    "name": "solid-graduation-cap-1",
+    "label": "Graduation Cap 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-notebook-1",
+    "label": "Notebook 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pen-to-square",
+    "label": "Pen To Square",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pencil-1",
+    "label": "Pencil 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-school-bench-1",
+    "label": "School Bench 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-school-bench-2",
+    "label": "School Bench 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-board-writing-3",
+    "label": "Board Writing 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-book-1",
+    "label": "Book 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-books-2",
+    "label": "Books 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-certificate-badge-1",
+    "label": "Certificate Badge 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-compass-drafting-2",
+    "label": "Compass Drafting 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-eraser-1",
+    "label": "Eraser 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-globe-stand",
+    "label": "Globe Stand",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-graduation-cap-1",
+    "label": "Graduation Cap 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-notebook-1",
+    "label": "Notebook 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pen-to-square",
+    "label": "Pen To Square",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pencil-1",
+    "label": "Pencil 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-school-bench-1",
+    "label": "School Bench 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-school-bench-2",
+    "label": "School Bench 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-life-guard-tube-1",
+    "label": "Life Guard Tube 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-life-guard-tube-1",
+    "label": "Life Guard Tube 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-life-guard-tube-1",
+    "label": "Life Guard Tube 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-life-guard-tube-1",
+    "label": "Life Guard Tube 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-life-guard-tube-1",
+    "label": "Life Guard Tube 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-emoji-expressionless-flat-eyes",
+    "label": "Emoji Expressionless Flat Eyes",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-expressionless",
+    "label": "Emoji Expressionless",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-grin",
+    "label": "Emoji Grin",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-sad",
+    "label": "Emoji Sad",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-smile-side",
+    "label": "Emoji Smile Side",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-smile-sunglass",
+    "label": "Emoji Smile Sunglass",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-smile-tongue",
+    "label": "Emoji Smile Tongue",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-emoji-smile",
+    "label": "Emoji Smile",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-emoji-expressionless-flat-eyes",
+    "label": "Emoji Expressionless Flat Eyes",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-expressionless",
+    "label": "Emoji Expressionless",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-grin",
+    "label": "Emoji Grin",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-sad",
+    "label": "Emoji Sad",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-smile-side",
+    "label": "Emoji Smile Side",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-smile-sunglass",
+    "label": "Emoji Smile Sunglass",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-smile-tongue",
+    "label": "Emoji Smile Tongue",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-emoji-smile",
+    "label": "Emoji Smile",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-emoji-expressionless-flat-eyes",
+    "label": "Emoji Expressionless Flat Eyes",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-expressionless",
+    "label": "Emoji Expressionless",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-grin",
+    "label": "Emoji Grin",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-sad",
+    "label": "Emoji Sad",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-smile-side",
+    "label": "Emoji Smile Side",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-smile-sunglass",
+    "label": "Emoji Smile Sunglass",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-smile-tongue",
+    "label": "Emoji Smile Tongue",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-emoji-smile",
+    "label": "Emoji Smile",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-emoji-expressionless-flat-eyes",
+    "label": "Emoji Expressionless Flat Eyes",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-expressionless",
+    "label": "Emoji Expressionless",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-grin",
+    "label": "Emoji Grin",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-sad",
+    "label": "Emoji Sad",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-smile-side",
+    "label": "Emoji Smile Side",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-smile-sunglass",
+    "label": "Emoji Smile Sunglass",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-smile-tongue",
+    "label": "Emoji Smile Tongue",
+    "category": "solid"
+  },
+  {
+    "name": "solid-emoji-smile",
+    "label": "Emoji Smile",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-emoji-expressionless-flat-eyes",
+    "label": "Emoji Expressionless Flat Eyes",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-expressionless",
+    "label": "Emoji Expressionless",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-grin",
+    "label": "Emoji Grin",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-sad",
+    "label": "Emoji Sad",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-smile-side",
+    "label": "Emoji Smile Side",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-smile-sunglass",
+    "label": "Emoji Smile Sunglass",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-smile-tongue",
+    "label": "Emoji Smile Tongue",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-emoji-smile",
+    "label": "Emoji Smile",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bolt-2",
+    "label": "Bolt 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bolt-3",
+    "label": "Bolt 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bolt-2",
+    "label": "Bolt 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bolt-3",
+    "label": "Bolt 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bolt-2",
+    "label": "Bolt 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bolt-3",
+    "label": "Bolt 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bolt-2",
+    "label": "Bolt 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bolt-3",
+    "label": "Bolt 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bolt-2",
+    "label": "Bolt 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bolt-3",
+    "label": "Bolt 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-shirt-1",
+    "label": "Shirt 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-shirt-1",
+    "label": "Shirt 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-shirt-1",
+    "label": "Shirt 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-shirt-1",
+    "label": "Shirt 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-shirt-1",
+    "label": "Shirt 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-file-format-zip",
+    "label": "File Format Zip",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-file-multiple",
+    "label": "File Multiple",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-file-pencil",
+    "label": "File Pencil",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-file-plus-circle",
+    "label": "File Plus Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-file-question",
+    "label": "File Question",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-file-xmark",
+    "label": "File Xmark",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-folder-1",
+    "label": "Folder 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-file-format-zip",
+    "label": "File Format Zip",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-file-multiple",
+    "label": "File Multiple",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-file-pencil",
+    "label": "File Pencil",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-file-plus-circle",
+    "label": "File Plus Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-file-question",
+    "label": "File Question",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-file-xmark",
+    "label": "File Xmark",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-folder-1",
+    "label": "Folder 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-file-format-zip",
+    "label": "File Format Zip",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-file-multiple",
+    "label": "File Multiple",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-file-pencil",
+    "label": "File Pencil",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-file-plus-circle",
+    "label": "File Plus Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-file-question",
+    "label": "File Question",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-file-xmark",
+    "label": "File Xmark",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-folder-1",
+    "label": "Folder 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-file-format-zip",
+    "label": "File Format Zip",
+    "category": "solid"
+  },
+  {
+    "name": "solid-file-multiple",
+    "label": "File Multiple",
+    "category": "solid"
+  },
+  {
+    "name": "solid-file-pencil",
+    "label": "File Pencil",
+    "category": "solid"
+  },
+  {
+    "name": "solid-file-plus-circle",
+    "label": "File Plus Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-file-question",
+    "label": "File Question",
+    "category": "solid"
+  },
+  {
+    "name": "solid-file-xmark",
+    "label": "File Xmark",
+    "category": "solid"
+  },
+  {
+    "name": "solid-folder-1",
+    "label": "Folder 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-file-format-zip",
+    "label": "File Format Zip",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-file-multiple",
+    "label": "File Multiple",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-file-pencil",
+    "label": "File Pencil",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-file-plus-circle",
+    "label": "File Plus Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-file-question",
+    "label": "File Question",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-file-xmark",
+    "label": "File Xmark",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-folder-1",
+    "label": "Folder 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-dumbbell-1",
+    "label": "Dumbbell 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-zero-size",
+    "label": "Zero Size",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-dumbbell-1",
+    "label": "Dumbbell 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-zero-size",
+    "label": "Zero Size",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-dumbbell-1",
+    "label": "Dumbbell 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-zero-size",
+    "label": "Zero Size",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-dumbbell-1",
+    "label": "Dumbbell 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-zero-size",
+    "label": "Zero Size",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-dumbbell-1",
+    "label": "Dumbbell 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-zero-size",
+    "label": "Zero Size",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-burger-1",
+    "label": "Burger 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-burger-drink",
+    "label": "Burger Drink",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-coffee-cup-2",
+    "label": "Coffee Cup 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-glass-juice-1",
+    "label": "Glass Juice 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-hat-chef-3",
+    "label": "Hat Chef 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-knife-fork-1",
+    "label": "Knife Fork 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pizza-2",
+    "label": "Pizza 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-service-bell-1",
+    "label": "Service Bell 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-burger-1",
+    "label": "Burger 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-burger-drink",
+    "label": "Burger Drink",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-coffee-cup-2",
+    "label": "Coffee Cup 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-glass-juice-1",
+    "label": "Glass Juice 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-hat-chef-3",
+    "label": "Hat Chef 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-knife-fork-1",
+    "label": "Knife Fork 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pizza-2",
+    "label": "Pizza 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-service-bell-1",
+    "label": "Service Bell 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-burger-1",
+    "label": "Burger 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-burger-drink",
+    "label": "Burger Drink",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-coffee-cup-2",
+    "label": "Coffee Cup 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-glass-juice-1",
+    "label": "Glass Juice 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-hat-chef-3",
+    "label": "Hat Chef 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-knife-fork-1",
+    "label": "Knife Fork 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pizza-2",
+    "label": "Pizza 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-service-bell-1",
+    "label": "Service Bell 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-burger-1",
+    "label": "Burger 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-burger-drink",
+    "label": "Burger Drink",
+    "category": "solid"
+  },
+  {
+    "name": "solid-coffee-cup-2",
+    "label": "Coffee Cup 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-glass-juice-1",
+    "label": "Glass Juice 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-hat-chef-3",
+    "label": "Hat Chef 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-knife-fork-1",
+    "label": "Knife Fork 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pizza-2",
+    "label": "Pizza 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-service-bell-1",
+    "label": "Service Bell 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-burger-1",
+    "label": "Burger 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-burger-drink",
+    "label": "Burger Drink",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-coffee-cup-2",
+    "label": "Coffee Cup 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-glass-juice-1",
+    "label": "Glass Juice 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-hat-chef-3",
+    "label": "Hat Chef 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-knife-fork-1",
+    "label": "Knife Fork 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pizza-2",
+    "label": "Pizza 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-service-bell-1",
+    "label": "Service Bell 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-game-pad-modern-1",
+    "label": "Game Pad Modern 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-game-pad-modern-1",
+    "label": "Game Pad Modern 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-game-pad-modern-1",
+    "label": "Game Pad Modern 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-game-pad-modern-1",
+    "label": "Game Pad Modern 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-game-pad-modern-1",
+    "label": "Game Pad Modern 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-hand-stop",
+    "label": "Hand Stop",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-thumbs-down-3",
+    "label": "Thumbs Down 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-thumbs-up-3",
+    "label": "Thumbs Up 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-hand-stop",
+    "label": "Hand Stop",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-thumbs-down-3",
+    "label": "Thumbs Down 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-thumbs-up-3",
+    "label": "Thumbs Up 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-hand-stop",
+    "label": "Hand Stop",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-thumbs-down-3",
+    "label": "Thumbs Down 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-thumbs-up-3",
+    "label": "Thumbs Up 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-hand-stop",
+    "label": "Hand Stop",
+    "category": "solid"
+  },
+  {
+    "name": "solid-thumbs-down-3",
+    "label": "Thumbs Down 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-thumbs-up-3",
+    "label": "Thumbs Up 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-hand-stop",
+    "label": "Hand Stop",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-thumbs-down-3",
+    "label": "Thumbs Down 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-thumbs-up-3",
+    "label": "Thumbs Up 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-beat",
+    "label": "Beat",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-briefcase-plus-1",
+    "label": "Briefcase Plus 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-capsule-1",
+    "label": "Capsule 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-clipboard",
+    "label": "Clipboard",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-eye",
+    "label": "Eye",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-injection-1",
+    "label": "Injection 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-microscope",
+    "label": "Microscope",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-stethoscope-1",
+    "label": "Stethoscope 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-weight-machine-1",
+    "label": "Weight Machine 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-wheelchair-1",
+    "label": "Wheelchair 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-beat",
+    "label": "Beat",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-briefcase-plus-1",
+    "label": "Briefcase Plus 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-capsule-1",
+    "label": "Capsule 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-clipboard",
+    "label": "Clipboard",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-eye",
+    "label": "Eye",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-injection-1",
+    "label": "Injection 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-microscope",
+    "label": "Microscope",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-stethoscope-1",
+    "label": "Stethoscope 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-weight-machine-1",
+    "label": "Weight Machine 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-wheelchair-1",
+    "label": "Wheelchair 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-beat",
+    "label": "Beat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-briefcase-plus-1",
+    "label": "Briefcase Plus 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-capsule-1",
+    "label": "Capsule 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-clipboard",
+    "label": "Clipboard",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-eye",
+    "label": "Eye",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-injection-1",
+    "label": "Injection 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-microscope",
+    "label": "Microscope",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-stethoscope-1",
+    "label": "Stethoscope 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-weight-machine-1",
+    "label": "Weight Machine 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wheelchair-1",
+    "label": "Wheelchair 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-beat",
+    "label": "Beat",
+    "category": "solid"
+  },
+  {
+    "name": "solid-briefcase-plus-1",
+    "label": "Briefcase Plus 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-capsule-1",
+    "label": "Capsule 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-clipboard",
+    "label": "Clipboard",
+    "category": "solid"
+  },
+  {
+    "name": "solid-eye",
+    "label": "Eye",
+    "category": "solid"
+  },
+  {
+    "name": "solid-injection-1",
+    "label": "Injection 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-microscope",
+    "label": "Microscope",
+    "category": "solid"
+  },
+  {
+    "name": "solid-stethoscope-1",
+    "label": "Stethoscope 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-weight-machine-1",
+    "label": "Weight Machine 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-wheelchair-1",
+    "label": "Wheelchair 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-beat",
+    "label": "Beat",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-briefcase-plus-1",
+    "label": "Briefcase Plus 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-capsule-1",
+    "label": "Capsule 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-clipboard",
+    "label": "Clipboard",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-eye",
+    "label": "Eye",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-injection-1",
+    "label": "Injection 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-microscope",
+    "label": "Microscope",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-stethoscope-1",
+    "label": "Stethoscope 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-weight-machine-1",
+    "label": "Weight Machine 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-wheelchair-1",
+    "label": "Wheelchair 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-dashboard-square-1",
+    "label": "Dashboard Square 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-expand-arrow-1",
+    "label": "Expand Arrow 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-expand-square-4",
+    "label": "Expand Square 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-funnel-1",
+    "label": "Funnel 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-menu-cheesburger",
+    "label": "Menu Cheesburger",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-menu-hamburger-1",
+    "label": "Menu Hamburger 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-menu-meatballs-1",
+    "label": "Menu Meatballs 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-menu-meatballs-2",
+    "label": "Menu Meatballs 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-power-button",
+    "label": "Power Button",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-refresh-circle-1-clockwise",
+    "label": "Refresh Circle 1 Clockwise",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-scissors-1-vertical",
+    "label": "Scissors 1 Vertical",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-share-1-circle",
+    "label": "Share 1 Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-share-1",
+    "label": "Share 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-share-2",
+    "label": "Share 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sliders-horizontal-square-2",
+    "label": "Sliders Horizontal Square 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-dashboard-square-1",
+    "label": "Dashboard Square 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-expand-arrow-1",
+    "label": "Expand Arrow 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-expand-square-4",
+    "label": "Expand Square 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-funnel-1",
+    "label": "Funnel 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-menu-cheesburger",
+    "label": "Menu Cheesburger",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-menu-hamburger-1",
+    "label": "Menu Hamburger 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-menu-meatballs-1",
+    "label": "Menu Meatballs 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-menu-meatballs-2",
+    "label": "Menu Meatballs 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-power-button",
+    "label": "Power Button",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-refresh-circle-1-clockwise",
+    "label": "Refresh Circle 1 Clockwise",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-scissors-1-vertical",
+    "label": "Scissors 1 Vertical",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-share-1-circle",
+    "label": "Share 1 Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-share-1",
+    "label": "Share 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-share-2",
+    "label": "Share 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sliders-horizontal-square-2",
+    "label": "Sliders Horizontal Square 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-dashboard-square-1",
+    "label": "Dashboard Square 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-expand-arrow-1",
+    "label": "Expand Arrow 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-expand-square-4",
+    "label": "Expand Square 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-funnel-1",
+    "label": "Funnel 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-menu-cheesburger",
+    "label": "Menu Cheesburger",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-menu-hamburger-1",
+    "label": "Menu Hamburger 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-menu-meatballs-1",
+    "label": "Menu Meatballs 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-menu-meatballs-2",
+    "label": "Menu Meatballs 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-power-button",
+    "label": "Power Button",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-refresh-circle-1-clockwise",
+    "label": "Refresh Circle 1 Clockwise",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-scissors-1-vertical",
+    "label": "Scissors 1 Vertical",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-share-1-circle",
+    "label": "Share 1 Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-share-1",
+    "label": "Share 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-share-2",
+    "label": "Share 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sliders-horizontal-square-2",
+    "label": "Sliders Horizontal Square 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-dashboard-square-1",
+    "label": "Dashboard Square 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-expand-arrow-1",
+    "label": "Expand Arrow 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-expand-square-4",
+    "label": "Expand Square 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-funnel-1",
+    "label": "Funnel 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-menu-cheesburger",
+    "label": "Menu Cheesburger",
+    "category": "solid"
+  },
+  {
+    "name": "solid-menu-hamburger-1",
+    "label": "Menu Hamburger 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-menu-meatballs-1",
+    "label": "Menu Meatballs 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-menu-meatballs-2",
+    "label": "Menu Meatballs 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-power-button",
+    "label": "Power Button",
+    "category": "solid"
+  },
+  {
+    "name": "solid-refresh-circle-1-clockwise",
+    "label": "Refresh Circle 1 Clockwise",
+    "category": "solid"
+  },
+  {
+    "name": "solid-scissors-1-vertical",
+    "label": "Scissors 1 Vertical",
+    "category": "solid"
+  },
+  {
+    "name": "solid-share-1-circle",
+    "label": "Share 1 Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-share-1",
+    "label": "Share 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-share-2",
+    "label": "Share 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sliders-horizontal-square-2",
+    "label": "Sliders Horizontal Square 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-dashboard-square-1",
+    "label": "Dashboard Square 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-expand-arrow-1",
+    "label": "Expand Arrow 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-expand-square-4",
+    "label": "Expand Square 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-funnel-1",
+    "label": "Funnel 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-menu-cheesburger",
+    "label": "Menu Cheesburger",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-menu-hamburger-1",
+    "label": "Menu Hamburger 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-menu-meatballs-1",
+    "label": "Menu Meatballs 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-menu-meatballs-2",
+    "label": "Menu Meatballs 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-power-button",
+    "label": "Power Button",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-refresh-circle-1-clockwise",
+    "label": "Refresh Circle 1 Clockwise",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-scissors-1-vertical",
+    "label": "Scissors 1 Vertical",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-share-1-circle",
+    "label": "Share 1 Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-share-1",
+    "label": "Share 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-share-2",
+    "label": "Share 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sliders-horizontal-square-2",
+    "label": "Sliders Horizontal Square 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-diamonds-1",
+    "label": "Diamonds 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-diamonds-2",
+    "label": "Diamonds 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-diamonds-1",
+    "label": "Diamonds 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-diamonds-2",
+    "label": "Diamonds 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-diamonds-1",
+    "label": "Diamonds 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-diamonds-2",
+    "label": "Diamonds 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-diamonds-1",
+    "label": "Diamonds 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-diamonds-2",
+    "label": "Diamonds 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-diamonds-1",
+    "label": "Diamonds 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-diamonds-2",
+    "label": "Diamonds 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-flag-1",
+    "label": "Flag 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-flag-2",
+    "label": "Flag 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-map-marker-1",
+    "label": "Map Marker 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-map-marker-5",
+    "label": "Map Marker 5",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-map-pin-5",
+    "label": "Map Pin 5",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-route-1",
+    "label": "Route 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-flag-1",
+    "label": "Flag 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-flag-2",
+    "label": "Flag 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-map-marker-1",
+    "label": "Map Marker 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-map-marker-5",
+    "label": "Map Marker 5",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-map-pin-5",
+    "label": "Map Pin 5",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-route-1",
+    "label": "Route 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-flag-1",
+    "label": "Flag 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flag-2",
+    "label": "Flag 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-map-marker-1",
+    "label": "Map Marker 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-map-marker-5",
+    "label": "Map Marker 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-map-pin-5",
+    "label": "Map Pin 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-route-1",
+    "label": "Route 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-flag-1",
+    "label": "Flag 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-flag-2",
+    "label": "Flag 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-map-marker-1",
+    "label": "Map Marker 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-map-marker-5",
+    "label": "Map Marker 5",
+    "category": "solid"
+  },
+  {
+    "name": "solid-map-pin-5",
+    "label": "Map Pin 5",
+    "category": "solid"
+  },
+  {
+    "name": "solid-route-1",
+    "label": "Route 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-flag-1",
+    "label": "Flag 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-flag-2",
+    "label": "Flag 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-map-marker-1",
+    "label": "Map Marker 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-map-marker-5",
+    "label": "Map Marker 5",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-map-pin-5",
+    "label": "Map Pin 5",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-route-1",
+    "label": "Route 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bar-chart-4",
+    "label": "Bar Chart 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bar-chart-dollar",
+    "label": "Bar Chart Dollar",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pie-chart-2",
+    "label": "Pie Chart 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-seo-monitor",
+    "label": "Seo Monitor",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-target-user",
+    "label": "Target User",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trend-down-1",
+    "label": "Trend Down 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trend-up-1",
+    "label": "Trend Up 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bar-chart-4",
+    "label": "Bar Chart 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bar-chart-dollar",
+    "label": "Bar Chart Dollar",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pie-chart-2",
+    "label": "Pie Chart 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-seo-monitor",
+    "label": "Seo Monitor",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-target-user",
+    "label": "Target User",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trend-down-1",
+    "label": "Trend Down 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trend-up-1",
+    "label": "Trend Up 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bar-chart-4",
+    "label": "Bar Chart 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bar-chart-dollar",
+    "label": "Bar Chart Dollar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pie-chart-2",
+    "label": "Pie Chart 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-seo-monitor",
+    "label": "Seo Monitor",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-target-user",
+    "label": "Target User",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trend-down-1",
+    "label": "Trend Down 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trend-up-1",
+    "label": "Trend Up 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bar-chart-4",
+    "label": "Bar Chart 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bar-chart-dollar",
+    "label": "Bar Chart Dollar",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pie-chart-2",
+    "label": "Pie Chart 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-seo-monitor",
+    "label": "Seo Monitor",
+    "category": "solid"
+  },
+  {
+    "name": "solid-target-user",
+    "label": "Target User",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trend-down-1",
+    "label": "Trend Down 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trend-up-1",
+    "label": "Trend Up 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bar-chart-4",
+    "label": "Bar Chart 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bar-chart-dollar",
+    "label": "Bar Chart Dollar",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pie-chart-2",
+    "label": "Pie Chart 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-seo-monitor",
+    "label": "Seo Monitor",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-target-user",
+    "label": "Target User",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trend-down-1",
+    "label": "Trend Down 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trend-up-1",
+    "label": "Trend Up 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-camera-movie-1",
+    "label": "Camera Movie 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-gallery",
+    "label": "Gallery",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-music",
+    "label": "Music",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-next-step-2",
+    "label": "Next Step 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pause",
+    "label": "Pause",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-photos",
+    "label": "Photos",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-play",
+    "label": "Play",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-previous-step-2",
+    "label": "Previous Step 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shuffle",
+    "label": "Shuffle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-volume-1",
+    "label": "Volume 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-volume-high",
+    "label": "Volume High",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-volume-low",
+    "label": "Volume Low",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-volume-mute",
+    "label": "Volume Mute",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-volume-off",
+    "label": "Volume Off",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-camera-movie-1",
+    "label": "Camera Movie 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-gallery",
+    "label": "Gallery",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-music",
+    "label": "Music",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-next-step-2",
+    "label": "Next Step 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pause",
+    "label": "Pause",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-photos",
+    "label": "Photos",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-play",
+    "label": "Play",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-previous-step-2",
+    "label": "Previous Step 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shuffle",
+    "label": "Shuffle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-volume-1",
+    "label": "Volume 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-volume-high",
+    "label": "Volume High",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-volume-low",
+    "label": "Volume Low",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-volume-mute",
+    "label": "Volume Mute",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-volume-off",
+    "label": "Volume Off",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-camera-movie-1",
+    "label": "Camera Movie 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gallery",
+    "label": "Gallery",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-music",
+    "label": "Music",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-next-step-2",
+    "label": "Next Step 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pause",
+    "label": "Pause",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-photos",
+    "label": "Photos",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-play",
+    "label": "Play",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-previous-step-2",
+    "label": "Previous Step 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shuffle",
+    "label": "Shuffle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volume-1",
+    "label": "Volume 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volume-high",
+    "label": "Volume High",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volume-low",
+    "label": "Volume Low",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volume-mute",
+    "label": "Volume Mute",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-volume-off",
+    "label": "Volume Off",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-camera-movie-1",
+    "label": "Camera Movie 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-gallery",
+    "label": "Gallery",
+    "category": "solid"
+  },
+  {
+    "name": "solid-music",
+    "label": "Music",
+    "category": "solid"
+  },
+  {
+    "name": "solid-next-step-2",
+    "label": "Next Step 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pause",
+    "label": "Pause",
+    "category": "solid"
+  },
+  {
+    "name": "solid-photos",
+    "label": "Photos",
+    "category": "solid"
+  },
+  {
+    "name": "solid-play",
+    "label": "Play",
+    "category": "solid"
+  },
+  {
+    "name": "solid-previous-step-2",
+    "label": "Previous Step 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shuffle",
+    "label": "Shuffle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-volume-1",
+    "label": "Volume 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-volume-high",
+    "label": "Volume High",
+    "category": "solid"
+  },
+  {
+    "name": "solid-volume-low",
+    "label": "Volume Low",
+    "category": "solid"
+  },
+  {
+    "name": "solid-volume-mute",
+    "label": "Volume Mute",
+    "category": "solid"
+  },
+  {
+    "name": "solid-volume-off",
+    "label": "Volume Off",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-camera-movie-1",
+    "label": "Camera Movie 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-gallery",
+    "label": "Gallery",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-music",
+    "label": "Music",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-next-step-2",
+    "label": "Next Step 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pause",
+    "label": "Pause",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-photos",
+    "label": "Photos",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-play",
+    "label": "Play",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-previous-step-2",
+    "label": "Previous Step 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shuffle",
+    "label": "Shuffle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-volume-1",
+    "label": "Volume 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-volume-high",
+    "label": "Volume High",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-volume-low",
+    "label": "Volume Low",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-volume-mute",
+    "label": "Volume Mute",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-volume-off",
+    "label": "Volume Off",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-credit-card-multiple",
+    "label": "Credit Card Multiple",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-dollar-circle",
+    "label": "Dollar Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-dollar",
+    "label": "Dollar",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-euro",
+    "label": "Euro",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-placeholder-dollar",
+    "label": "Placeholder Dollar",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pound",
+    "label": "Pound",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-rupee",
+    "label": "Rupee",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shield-dollar",
+    "label": "Shield Dollar",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-wallet-1",
+    "label": "Wallet 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-yen",
+    "label": "Yen",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-credit-card-multiple",
+    "label": "Credit Card Multiple",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-dollar-circle",
+    "label": "Dollar Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-dollar",
+    "label": "Dollar",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-euro",
+    "label": "Euro",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-placeholder-dollar",
+    "label": "Placeholder Dollar",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pound",
+    "label": "Pound",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-rupee",
+    "label": "Rupee",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shield-dollar",
+    "label": "Shield Dollar",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-wallet-1",
+    "label": "Wallet 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-yen",
+    "label": "Yen",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-credit-card-multiple",
+    "label": "Credit Card Multiple",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dollar-circle",
+    "label": "Dollar Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-dollar",
+    "label": "Dollar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-euro",
+    "label": "Euro",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-placeholder-dollar",
+    "label": "Placeholder Dollar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pound",
+    "label": "Pound",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-rupee",
+    "label": "Rupee",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shield-dollar",
+    "label": "Shield Dollar",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-wallet-1",
+    "label": "Wallet 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-yen",
+    "label": "Yen",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-credit-card-multiple",
+    "label": "Credit Card Multiple",
+    "category": "solid"
+  },
+  {
+    "name": "solid-dollar-circle",
+    "label": "Dollar Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-dollar",
+    "label": "Dollar",
+    "category": "solid"
+  },
+  {
+    "name": "solid-euro",
+    "label": "Euro",
+    "category": "solid"
+  },
+  {
+    "name": "solid-placeholder-dollar",
+    "label": "Placeholder Dollar",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pound",
+    "label": "Pound",
+    "category": "solid"
+  },
+  {
+    "name": "solid-rupee",
+    "label": "Rupee",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shield-dollar",
+    "label": "Shield Dollar",
+    "category": "solid"
+  },
+  {
+    "name": "solid-wallet-1",
+    "label": "Wallet 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-yen",
+    "label": "Yen",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-credit-card-multiple",
+    "label": "Credit Card Multiple",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-dollar-circle",
+    "label": "Dollar Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-dollar",
+    "label": "Dollar",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-euro",
+    "label": "Euro",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-placeholder-dollar",
+    "label": "Placeholder Dollar",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pound",
+    "label": "Pound",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-rupee",
+    "label": "Rupee",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shield-dollar",
+    "label": "Shield Dollar",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-wallet-1",
+    "label": "Wallet 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-yen",
+    "label": "Yen",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bug-1",
+    "label": "Bug 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-flower-2",
+    "label": "Flower 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-island-2",
+    "label": "Island 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-leaf-1",
+    "label": "Leaf 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-leaf-6",
+    "label": "Leaf 6",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-mountains-2",
+    "label": "Mountains 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-mushroom-1",
+    "label": "Mushroom 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-mushroom-5",
+    "label": "Mushroom 5",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-tree-2",
+    "label": "Tree 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-trees-3",
+    "label": "Trees 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bug-1",
+    "label": "Bug 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-flower-2",
+    "label": "Flower 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-island-2",
+    "label": "Island 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-leaf-1",
+    "label": "Leaf 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-leaf-6",
+    "label": "Leaf 6",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-mountains-2",
+    "label": "Mountains 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-mushroom-1",
+    "label": "Mushroom 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-mushroom-5",
+    "label": "Mushroom 5",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-tree-2",
+    "label": "Tree 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-trees-3",
+    "label": "Trees 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bug-1",
+    "label": "Bug 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-flower-2",
+    "label": "Flower 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-island-2",
+    "label": "Island 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-leaf-1",
+    "label": "Leaf 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-leaf-6",
+    "label": "Leaf 6",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mountains-2",
+    "label": "Mountains 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mushroom-1",
+    "label": "Mushroom 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-mushroom-5",
+    "label": "Mushroom 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tree-2",
+    "label": "Tree 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-trees-3",
+    "label": "Trees 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bug-1",
+    "label": "Bug 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-flower-2",
+    "label": "Flower 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-island-2",
+    "label": "Island 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-leaf-1",
+    "label": "Leaf 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-leaf-6",
+    "label": "Leaf 6",
+    "category": "solid"
+  },
+  {
+    "name": "solid-mountains-2",
+    "label": "Mountains 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-mushroom-1",
+    "label": "Mushroom 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-mushroom-5",
+    "label": "Mushroom 5",
+    "category": "solid"
+  },
+  {
+    "name": "solid-tree-2",
+    "label": "Tree 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-trees-3",
+    "label": "Trees 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bug-1",
+    "label": "Bug 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-flower-2",
+    "label": "Flower 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-island-2",
+    "label": "Island 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-leaf-1",
+    "label": "Leaf 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-leaf-6",
+    "label": "Leaf 6",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-mountains-2",
+    "label": "Mountains 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-mushroom-1",
+    "label": "Mushroom 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-mushroom-5",
+    "label": "Mushroom 5",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-tree-2",
+    "label": "Tree 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-trees-3",
+    "label": "Trees 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-balloons",
+    "label": "Balloons",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cake-1",
+    "label": "Cake 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-candy-cane-2",
+    "label": "Candy Cane 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-candy-round-1",
+    "label": "Candy Round 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-firework-rocket-4",
+    "label": "Firework Rocket 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-party-flags",
+    "label": "Party Flags",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-party-spray",
+    "label": "Party Spray",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-balloons",
+    "label": "Balloons",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cake-1",
+    "label": "Cake 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-candy-cane-2",
+    "label": "Candy Cane 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-candy-round-1",
+    "label": "Candy Round 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-firework-rocket-4",
+    "label": "Firework Rocket 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-party-flags",
+    "label": "Party Flags",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-party-spray",
+    "label": "Party Spray",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-balloons",
+    "label": "Balloons",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cake-1",
+    "label": "Cake 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-candy-cane-2",
+    "label": "Candy Cane 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-candy-round-1",
+    "label": "Candy Round 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-firework-rocket-4",
+    "label": "Firework Rocket 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-party-flags",
+    "label": "Party Flags",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-party-spray",
+    "label": "Party Spray",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-balloons",
+    "label": "Balloons",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cake-1",
+    "label": "Cake 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-candy-cane-2",
+    "label": "Candy Cane 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-candy-round-1",
+    "label": "Candy Round 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-firework-rocket-4",
+    "label": "Firework Rocket 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-party-flags",
+    "label": "Party Flags",
+    "category": "solid"
+  },
+  {
+    "name": "solid-party-spray",
+    "label": "Party Spray",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-balloons",
+    "label": "Balloons",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cake-1",
+    "label": "Cake 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-candy-cane-2",
+    "label": "Candy Cane 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-candy-round-1",
+    "label": "Candy Round 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-firework-rocket-4",
+    "label": "Firework Rocket 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-party-flags",
+    "label": "Party Flags",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-party-spray",
+    "label": "Party Spray",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-search-1",
+    "label": "Search 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-search-2",
+    "label": "Search 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-search-minus",
+    "label": "Search Minus",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-search-plus",
+    "label": "Search Plus",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-search-text",
+    "label": "Search Text",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-search-1",
+    "label": "Search 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-search-2",
+    "label": "Search 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-search-minus",
+    "label": "Search Minus",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-search-plus",
+    "label": "Search Plus",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-search-text",
+    "label": "Search Text",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-search-1",
+    "label": "Search 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-search-2",
+    "label": "Search 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-search-minus",
+    "label": "Search Minus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-search-plus",
+    "label": "Search Plus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-search-text",
+    "label": "Search Text",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-search-1",
+    "label": "Search 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-search-2",
+    "label": "Search 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-search-minus",
+    "label": "Search Minus",
+    "category": "solid"
+  },
+  {
+    "name": "solid-search-plus",
+    "label": "Search Plus",
+    "category": "solid"
+  },
+  {
+    "name": "solid-search-text",
+    "label": "Search Text",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-search-1",
+    "label": "Search 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-search-2",
+    "label": "Search 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-search-minus",
+    "label": "Search Minus",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-search-plus",
+    "label": "Search Plus",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-search-text",
+    "label": "Search Text",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-key-1",
+    "label": "Key 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-locked-1",
+    "label": "Locked 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-locked-2",
+    "label": "Locked 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shield-2-check",
+    "label": "Shield 2 Check",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-shield-2",
+    "label": "Shield 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-unlocked-2",
+    "label": "Unlocked 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-key-1",
+    "label": "Key 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-locked-1",
+    "label": "Locked 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-locked-2",
+    "label": "Locked 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shield-2-check",
+    "label": "Shield 2 Check",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-shield-2",
+    "label": "Shield 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-unlocked-2",
+    "label": "Unlocked 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-key-1",
+    "label": "Key 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-locked-1",
+    "label": "Locked 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-locked-2",
+    "label": "Locked 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shield-2-check",
+    "label": "Shield 2 Check",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-shield-2",
+    "label": "Shield 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-unlocked-2",
+    "label": "Unlocked 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-key-1",
+    "label": "Key 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-locked-1",
+    "label": "Locked 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-locked-2",
+    "label": "Locked 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shield-2-check",
+    "label": "Shield 2 Check",
+    "category": "solid"
+  },
+  {
+    "name": "solid-shield-2",
+    "label": "Shield 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-unlocked-2",
+    "label": "Unlocked 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-key-1",
+    "label": "Key 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-locked-1",
+    "label": "Locked 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-locked-2",
+    "label": "Locked 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shield-2-check",
+    "label": "Shield 2 Check",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-shield-2",
+    "label": "Shield 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-unlocked-2",
+    "label": "Unlocked 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-cloud-2",
+    "label": "Cloud 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-check-circle",
+    "label": "Cloud Check Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-download",
+    "label": "Cloud Download",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-iot-2",
+    "label": "Cloud Iot 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-refresh-clockwise",
+    "label": "Cloud Refresh Clockwise",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-upload",
+    "label": "Cloud Upload",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-database-2",
+    "label": "Database 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-floppy-disk-1",
+    "label": "Floppy Disk 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-storage-hdd-2",
+    "label": "Storage Hdd 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-cloud-2",
+    "label": "Cloud 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-check-circle",
+    "label": "Cloud Check Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-download",
+    "label": "Cloud Download",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-iot-2",
+    "label": "Cloud Iot 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-refresh-clockwise",
+    "label": "Cloud Refresh Clockwise",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-upload",
+    "label": "Cloud Upload",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-database-2",
+    "label": "Database 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-floppy-disk-1",
+    "label": "Floppy Disk 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-storage-hdd-2",
+    "label": "Storage Hdd 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-cloud-2",
+    "label": "Cloud 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-check-circle",
+    "label": "Cloud Check Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-download",
+    "label": "Cloud Download",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-iot-2",
+    "label": "Cloud Iot 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-refresh-clockwise",
+    "label": "Cloud Refresh Clockwise",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-upload",
+    "label": "Cloud Upload",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-database-2",
+    "label": "Database 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-floppy-disk-1",
+    "label": "Floppy Disk 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-storage-hdd-2",
+    "label": "Storage Hdd 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-cloud-2",
+    "label": "Cloud 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-check-circle",
+    "label": "Cloud Check Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-download",
+    "label": "Cloud Download",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-iot-2",
+    "label": "Cloud Iot 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-refresh-clockwise",
+    "label": "Cloud Refresh Clockwise",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-upload",
+    "label": "Cloud Upload",
+    "category": "solid"
+  },
+  {
+    "name": "solid-database-2",
+    "label": "Database 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-floppy-disk-1",
+    "label": "Floppy Disk 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-storage-hdd-2",
+    "label": "Storage Hdd 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-cloud-2",
+    "label": "Cloud 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-check-circle",
+    "label": "Cloud Check Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-download",
+    "label": "Cloud Download",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-iot-2",
+    "label": "Cloud Iot 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-refresh-clockwise",
+    "label": "Cloud Refresh Clockwise",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-upload",
+    "label": "Cloud Upload",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-database-2",
+    "label": "Database 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-floppy-disk-1",
+    "label": "Floppy Disk 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-storage-hdd-2",
+    "label": "Storage Hdd 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-ban-2",
+    "label": "Ban 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-ban-2",
+    "label": "Ban 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-ban-2",
+    "label": "Ban 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-ban-2",
+    "label": "Ban 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-ban-2",
+    "label": "Ban 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-spinner-2-sacle",
+    "label": "Spinner 2 Sacle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-spinner-3",
+    "label": "Spinner 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-spinner-2-sacle",
+    "label": "Spinner 2 Sacle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-spinner-3",
+    "label": "Spinner 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-spinner-2-sacle",
+    "label": "Spinner 2 Sacle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spinner-3",
+    "label": "Spinner 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-spinner-2-sacle",
+    "label": "Spinner 2 Sacle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-spinner-3",
+    "label": "Spinner 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-spinner-2-sacle",
+    "label": "Spinner 2 Sacle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-spinner-3",
+    "label": "Spinner 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-busket-ball",
+    "label": "Busket Ball",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sports",
+    "label": "Sports",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-busket-ball",
+    "label": "Busket Ball",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sports",
+    "label": "Sports",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-busket-ball",
+    "label": "Busket Ball",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sports",
+    "label": "Sports",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-busket-ball",
+    "label": "Busket Ball",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sports",
+    "label": "Sports",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-busket-ball",
+    "label": "Busket Ball",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sports",
+    "label": "Sports",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-star-fat-half-2",
+    "label": "Star Fat Half 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-star-fat",
+    "label": "Star Fat",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-star-sharp-disabled",
+    "label": "Star Sharp Disabled",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-star-fat-half-2",
+    "label": "Star Fat Half 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-star-fat",
+    "label": "Star Fat",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-star-sharp-disabled",
+    "label": "Star Sharp Disabled",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-star-fat-half-2",
+    "label": "Star Fat Half 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-star-fat",
+    "label": "Star Fat",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-star-sharp-disabled",
+    "label": "Star Sharp Disabled",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-star-fat-half-2",
+    "label": "Star Fat Half 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-star-fat",
+    "label": "Star Fat",
+    "category": "solid"
+  },
+  {
+    "name": "solid-star-sharp-disabled",
+    "label": "Star Sharp Disabled",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-star-fat-half-2",
+    "label": "Star Fat Half 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-star-fat",
+    "label": "Star Fat",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-star-sharp-disabled",
+    "label": "Star Sharp Disabled",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-check",
+    "label": "Check",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-minus",
+    "label": "Minus",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-plus",
+    "label": "Plus",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-question-mark",
+    "label": "Question Mark",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-xmark",
+    "label": "Xmark",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-check",
+    "label": "Check",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-minus",
+    "label": "Minus",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-plus",
+    "label": "Plus",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-question-mark",
+    "label": "Question Mark",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-xmark",
+    "label": "Xmark",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-check",
+    "label": "Check",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-minus",
+    "label": "Minus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-plus",
+    "label": "Plus",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-question-mark",
+    "label": "Question Mark",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-xmark",
+    "label": "Xmark",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-check",
+    "label": "Check",
+    "category": "solid"
+  },
+  {
+    "name": "solid-minus",
+    "label": "Minus",
+    "category": "solid"
+  },
+  {
+    "name": "solid-plus",
+    "label": "Plus",
+    "category": "solid"
+  },
+  {
+    "name": "solid-question-mark",
+    "label": "Question Mark",
+    "category": "solid"
+  },
+  {
+    "name": "solid-xmark",
+    "label": "Xmark",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-check",
+    "label": "Check",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-minus",
+    "label": "Minus",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-plus",
+    "label": "Plus",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-question-mark",
+    "label": "Question Mark",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-xmark",
+    "label": "Xmark",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bold",
+    "label": "Bold",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-indent",
+    "label": "Indent",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-line-dashed",
+    "label": "Line Dashed",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-line-dotted",
+    "label": "Line Dotted",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-line-height",
+    "label": "Line Height",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-outdent",
+    "label": "Outdent",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-page-break-1",
+    "label": "Page Break 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pagination",
+    "label": "Pagination",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-pilcrow",
+    "label": "Pilcrow",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sort-alphabetical",
+    "label": "Sort Alphabetical",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sort-high-to-low",
+    "label": "Sort High To Low",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-spellcheck",
+    "label": "Spellcheck",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-strikethrough-1",
+    "label": "Strikethrough 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-text-format-remove",
+    "label": "Text Format Remove",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-text-format",
+    "label": "Text Format",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-text-paragraph",
+    "label": "Text Paragraph",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-underline",
+    "label": "Underline",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bold",
+    "label": "Bold",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-double-quotes-end-1",
+    "label": "Double Quotes End 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-indent",
+    "label": "Indent",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-line-dashed",
+    "label": "Line Dashed",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-line-dotted",
+    "label": "Line Dotted",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-line-height",
+    "label": "Line Height",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-outdent",
+    "label": "Outdent",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-page-break-1",
+    "label": "Page Break 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pagination",
+    "label": "Pagination",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-pilcrow",
+    "label": "Pilcrow",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sort-alphabetical",
+    "label": "Sort Alphabetical",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sort-high-to-low",
+    "label": "Sort High To Low",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-spellcheck",
+    "label": "Spellcheck",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-strikethrough-1",
+    "label": "Strikethrough 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-text-format-remove",
+    "label": "Text Format Remove",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-text-format",
+    "label": "Text Format",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-text-paragraph",
+    "label": "Text Paragraph",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-underline",
+    "label": "Underline",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bold",
+    "label": "Bold",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-double-quotes-end-1",
+    "label": "Double Quotes End 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-indent",
+    "label": "Indent",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-line-dashed",
+    "label": "Line Dashed",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-line-dotted",
+    "label": "Line Dotted",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-line-height",
+    "label": "Line Height",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-outdent",
+    "label": "Outdent",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-page-break-1",
+    "label": "Page Break 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pagination",
+    "label": "Pagination",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-pilcrow",
+    "label": "Pilcrow",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sort-alphabetical",
+    "label": "Sort Alphabetical",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sort-high-to-low",
+    "label": "Sort High To Low",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-spellcheck",
+    "label": "Spellcheck",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-strikethrough-1",
+    "label": "Strikethrough 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-text-format-remove",
+    "label": "Text Format Remove",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-text-format",
+    "label": "Text Format",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-text-paragraph",
+    "label": "Text Paragraph",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-underline",
+    "label": "Underline",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bold",
+    "label": "Bold",
+    "category": "solid"
+  },
+  {
+    "name": "solid-double-quotes-end-1",
+    "label": "Double Quotes End 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-indent",
+    "label": "Indent",
+    "category": "solid"
+  },
+  {
+    "name": "solid-line-dashed",
+    "label": "Line Dashed",
+    "category": "solid"
+  },
+  {
+    "name": "solid-line-dotted",
+    "label": "Line Dotted",
+    "category": "solid"
+  },
+  {
+    "name": "solid-line-height",
+    "label": "Line Height",
+    "category": "solid"
+  },
+  {
+    "name": "solid-outdent",
+    "label": "Outdent",
+    "category": "solid"
+  },
+  {
+    "name": "solid-page-break-1",
+    "label": "Page Break 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pagination",
+    "label": "Pagination",
+    "category": "solid"
+  },
+  {
+    "name": "solid-pilcrow",
+    "label": "Pilcrow",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sort-alphabetical",
+    "label": "Sort Alphabetical",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sort-high-to-low",
+    "label": "Sort High To Low",
+    "category": "solid"
+  },
+  {
+    "name": "solid-spellcheck",
+    "label": "Spellcheck",
+    "category": "solid"
+  },
+  {
+    "name": "solid-strikethrough-1",
+    "label": "Strikethrough 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-text-format-remove",
+    "label": "Text Format Remove",
+    "category": "solid"
+  },
+  {
+    "name": "solid-text-format",
+    "label": "Text Format",
+    "category": "solid"
+  },
+  {
+    "name": "solid-text-paragraph",
+    "label": "Text Paragraph",
+    "category": "solid"
+  },
+  {
+    "name": "solid-underline",
+    "label": "Underline",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bold",
+    "label": "Bold",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-double-quotes-end-1",
+    "label": "Double Quotes End 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-indent",
+    "label": "Indent",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-line-dashed",
+    "label": "Line Dashed",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-line-dotted",
+    "label": "Line Dotted",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-line-height",
+    "label": "Line Height",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-outdent",
+    "label": "Outdent",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-page-break-1",
+    "label": "Page Break 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pagination",
+    "label": "Pagination",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-pilcrow",
+    "label": "Pilcrow",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sort-alphabetical",
+    "label": "Sort Alphabetical",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sort-high-to-low",
+    "label": "Sort High To Low",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-spellcheck",
+    "label": "Spellcheck",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-strikethrough-1",
+    "label": "Strikethrough 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-text-format-remove",
+    "label": "Text Format Remove",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-text-format",
+    "label": "Text Format",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-text-paragraph",
+    "label": "Text Paragraph",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-underline",
+    "label": "Underline",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-ticket-1",
+    "label": "Ticket 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-tickets-3",
+    "label": "Tickets 3",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-ticket-1",
+    "label": "Ticket 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-tickets-3",
+    "label": "Tickets 3",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-ticket-1",
+    "label": "Ticket 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tickets-3",
+    "label": "Tickets 3",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-ticket-1",
+    "label": "Ticket 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-tickets-3",
+    "label": "Tickets 3",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-ticket-1",
+    "label": "Ticket 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-tickets-3",
+    "label": "Tickets 3",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-surfboard-2",
+    "label": "Surfboard 2",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-surfboard-2",
+    "label": "Surfboard 2",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-surfboard-2",
+    "label": "Surfboard 2",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-surfboard-2",
+    "label": "Surfboard 2",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-surfboard-2",
+    "label": "Surfboard 2",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-user-4",
+    "label": "User 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-user-multiple-4",
+    "label": "User Multiple 4",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-user-4",
+    "label": "User 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-user-multiple-4",
+    "label": "User Multiple 4",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-user-4",
+    "label": "User 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-user-multiple-4",
+    "label": "User Multiple 4",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-user-4",
+    "label": "User 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-user-multiple-4",
+    "label": "User Multiple 4",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-user-4",
+    "label": "User 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-user-multiple-4",
+    "label": "User Multiple 4",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-aeroplane-1",
+    "label": "Aeroplane 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-ambulance-1",
+    "label": "Ambulance 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-anchor",
+    "label": "Anchor",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bike",
+    "label": "Bike",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bus-1",
+    "label": "Bus 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-car-2",
+    "label": "Car 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-car-4",
+    "label": "Car 4",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-car-6",
+    "label": "Car 6",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-caravan-1",
+    "label": "Caravan 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-gauge-1",
+    "label": "Gauge 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-helicopter-2",
+    "label": "Helicopter 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-rocket-5",
+    "label": "Rocket 5",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-scoter",
+    "label": "Scoter",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-ship-1",
+    "label": "Ship 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-train-1",
+    "label": "Train 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-train-3",
+    "label": "Train 3",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-truck-delivery-1",
+    "label": "Truck Delivery 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-aeroplane-1",
+    "label": "Aeroplane 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-ambulance-1",
+    "label": "Ambulance 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-anchor",
+    "label": "Anchor",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bike",
+    "label": "Bike",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bus-1",
+    "label": "Bus 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-car-2",
+    "label": "Car 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-car-4",
+    "label": "Car 4",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-car-6",
+    "label": "Car 6",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-caravan-1",
+    "label": "Caravan 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-gauge-1",
+    "label": "Gauge 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-helicopter-2",
+    "label": "Helicopter 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-rocket-5",
+    "label": "Rocket 5",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-scoter",
+    "label": "Scoter",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-ship-1",
+    "label": "Ship 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-train-1",
+    "label": "Train 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-train-3",
+    "label": "Train 3",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-truck-delivery-1",
+    "label": "Truck Delivery 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-aeroplane-1",
+    "label": "Aeroplane 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ambulance-1",
+    "label": "Ambulance 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-anchor",
+    "label": "Anchor",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bike",
+    "label": "Bike",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bus-1",
+    "label": "Bus 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-car-2",
+    "label": "Car 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-car-4",
+    "label": "Car 4",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-car-6",
+    "label": "Car 6",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-caravan-1",
+    "label": "Caravan 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-gauge-1",
+    "label": "Gauge 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-helicopter-2",
+    "label": "Helicopter 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-rocket-5",
+    "label": "Rocket 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-scoter",
+    "label": "Scoter",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-ship-1",
+    "label": "Ship 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-train-1",
+    "label": "Train 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-train-3",
+    "label": "Train 3",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-truck-delivery-1",
+    "label": "Truck Delivery 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-aeroplane-1",
+    "label": "Aeroplane 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-ambulance-1",
+    "label": "Ambulance 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-anchor",
+    "label": "Anchor",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bike",
+    "label": "Bike",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bus-1",
+    "label": "Bus 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-car-2",
+    "label": "Car 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-car-4",
+    "label": "Car 4",
+    "category": "solid"
+  },
+  {
+    "name": "solid-car-6",
+    "label": "Car 6",
+    "category": "solid"
+  },
+  {
+    "name": "solid-caravan-1",
+    "label": "Caravan 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-gauge-1",
+    "label": "Gauge 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-helicopter-2",
+    "label": "Helicopter 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-rocket-5",
+    "label": "Rocket 5",
+    "category": "solid"
+  },
+  {
+    "name": "solid-scoter",
+    "label": "Scoter",
+    "category": "solid"
+  },
+  {
+    "name": "solid-ship-1",
+    "label": "Ship 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-train-1",
+    "label": "Train 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-train-3",
+    "label": "Train 3",
+    "category": "solid"
+  },
+  {
+    "name": "solid-truck-delivery-1",
+    "label": "Truck Delivery 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-aeroplane-1",
+    "label": "Aeroplane 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-ambulance-1",
+    "label": "Ambulance 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-anchor",
+    "label": "Anchor",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bike",
+    "label": "Bike",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bus-1",
+    "label": "Bus 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-car-2",
+    "label": "Car 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-car-4",
+    "label": "Car 4",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-car-6",
+    "label": "Car 6",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-caravan-1",
+    "label": "Caravan 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-gauge-1",
+    "label": "Gauge 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-helicopter-2",
+    "label": "Helicopter 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-rocket-5",
+    "label": "Rocket 5",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-scoter",
+    "label": "Scoter",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-ship-1",
+    "label": "Ship 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-train-1",
+    "label": "Train 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-train-3",
+    "label": "Train 3",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-truck-delivery-1",
+    "label": "Truck Delivery 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-cloud-bolt-1",
+    "label": "Cloud Bolt 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-bolt-2",
+    "label": "Cloud Bolt 2",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-rain",
+    "label": "Cloud Rain",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-cloud-sun",
+    "label": "Cloud Sun",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-moon-half-right-5",
+    "label": "Moon Half Right 5",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-sun-1",
+    "label": "Sun 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-water-drop-1",
+    "label": "Water Drop 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-cloud-bolt-1",
+    "label": "Cloud Bolt 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-bolt-2",
+    "label": "Cloud Bolt 2",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-rain",
+    "label": "Cloud Rain",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-cloud-sun",
+    "label": "Cloud Sun",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-moon-half-right-5",
+    "label": "Moon Half Right 5",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-sun-1",
+    "label": "Sun 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-water-drop-1",
+    "label": "Water Drop 1",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-cloud-bolt-1",
+    "label": "Cloud Bolt 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-bolt-2",
+    "label": "Cloud Bolt 2",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-rain",
+    "label": "Cloud Rain",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-cloud-sun",
+    "label": "Cloud Sun",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-moon-half-right-5",
+    "label": "Moon Half Right 5",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-sun-1",
+    "label": "Sun 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-water-drop-1",
+    "label": "Water Drop 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-cloud-bolt-1",
+    "label": "Cloud Bolt 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-bolt-2",
+    "label": "Cloud Bolt 2",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-rain",
+    "label": "Cloud Rain",
+    "category": "solid"
+  },
+  {
+    "name": "solid-cloud-sun",
+    "label": "Cloud Sun",
+    "category": "solid"
+  },
+  {
+    "name": "solid-moon-half-right-5",
+    "label": "Moon Half Right 5",
+    "category": "solid"
+  },
+  {
+    "name": "solid-sun-1",
+    "label": "Sun 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-water-drop-1",
+    "label": "Water Drop 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-cloud-bolt-1",
+    "label": "Cloud Bolt 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-bolt-2",
+    "label": "Cloud Bolt 2",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-rain",
+    "label": "Cloud Rain",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-cloud-sun",
+    "label": "Cloud Sun",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-moon-half-right-5",
+    "label": "Moon Half Right 5",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-sun-1",
+    "label": "Sun 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-water-drop-1",
+    "label": "Water Drop 1",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-globe-1",
+    "label": "Globe 1",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-www-cursor",
+    "label": "Www Cursor",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-www",
+    "label": "Www",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-globe-1",
+    "label": "Globe 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-www-cursor",
+    "label": "Www Cursor",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-www",
+    "label": "Www",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-globe-1",
+    "label": "Globe 1",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-www-cursor",
+    "label": "Www Cursor",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-www",
+    "label": "Www",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "solid"
+  },
+  {
+    "name": "solid-globe-1",
+    "label": "Globe 1",
+    "category": "solid"
+  },
+  {
+    "name": "solid-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "solid"
+  },
+  {
+    "name": "solid-www-cursor",
+    "label": "Www Cursor",
+    "category": "solid"
+  },
+  {
+    "name": "solid-www",
+    "label": "Www",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-globe-1",
+    "label": "Globe 1",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-www-cursor",
+    "label": "Www Cursor",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-www",
+    "label": "Www",
+    "category": "stroke"
+  },
+  {
+    "name": "bulk-bluetooth",
+    "label": "Bluetooth",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-rss-right",
+    "label": "Rss Right",
+    "category": "bulk"
+  },
+  {
+    "name": "bulk-tower-broadcast-1",
+    "label": "Tower Broadcast 1",
+    "category": "bulk"
+  },
+  {
+    "name": "duotone-bluetooth",
+    "label": "Bluetooth",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bookmark-1",
+    "label": "Bookmark 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-bookmark-circle",
+    "label": "Bookmark Circle",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-globe-1",
+    "label": "Globe 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-link-2-angular-right",
+    "label": "Link 2 Angular Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-rss-right",
+    "label": "Rss Right",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-tower-broadcast-1",
+    "label": "Tower Broadcast 1",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-unlink-2-angular-eft",
+    "label": "Unlink 2 Angular Eft",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-www-cursor",
+    "label": "Www Cursor",
+    "category": "duotone"
+  },
+  {
+    "name": "duotone-www",
+    "label": "Www",
+    "category": "duotone"
+  },
+  {
+    "name": "outlined-bluetooth",
+    "label": "Bluetooth",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-rss-right",
+    "label": "Rss Right",
+    "category": "outlined"
+  },
+  {
+    "name": "outlined-tower-broadcast-1",
+    "label": "Tower Broadcast 1",
+    "category": "outlined"
+  },
+  {
+    "name": "solid-bluetooth",
+    "label": "Bluetooth",
+    "category": "solid"
+  },
+  {
+    "name": "solid-rss-right",
+    "label": "Rss Right",
+    "category": "solid"
+  },
+  {
+    "name": "solid-tower-broadcast-1",
+    "label": "Tower Broadcast 1",
+    "category": "solid"
+  },
+  {
+    "name": "stroke-bluetooth",
+    "label": "Bluetooth",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-rss-right",
+    "label": "Rss Right",
+    "category": "stroke"
+  },
+  {
+    "name": "stroke-tower-broadcast-1",
+    "label": "Tower Broadcast 1",
+    "category": "stroke"
+  }
+] as const;
