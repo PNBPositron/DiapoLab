@@ -21,15 +21,14 @@ const HIGHLIGHTS = [
 const TRANSHUMANS = [
   "rogue.png", "chaotic-good.png", "coffee.png", "whoa.png", "consumer.png", "gamestation.png", "ecto-plasma.png", "roboto.png", "polka-pup.png", "entertainment.png", "pilot.png", "cube-leg.png", "looking-ahead.png", "chillin.png", "chilly.png", "plants.png", "reflecting.png", "feliz.png", "growth.png", "groceries.png", "kiddo.png", "pondering.png", "jumping-air.png", "astro.png", "late-for-class.png", "waiting.png", "fling.png", "experiments.png",
 ];
-const PIXELART = ["heart", "star", "camera", "mail", "home", "search", "settings", "user", "bell", "cloud", "bookmark", "calendar", "image", "folder", "music", "rocket", "globe", "check", "close", "arrow-right"];
-type Collection = "Highlights" | "Transhumans" | "Pixelart";
+type Collection = "Highlights" | "Transhumans";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const [collection, setCollection] = useState<Collection | null>(null);
-  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : collection === "Pixelart" ? PIXELART : [];
-  const getSource = (file: string) => collection === "Pixelart" ? `https://cdn.jsdelivr.net/npm/pixelarticons/svg/${file}.svg` : collection === "Transhumans" ? `/illustrations/${file}` : `/illustrations/${file}`;
+  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : [];
+  const getSource = (file: string) => `/illustrations/${file}`;
 
   return (
     <div className="space-y-4">
@@ -42,10 +41,6 @@ export function IllustrationsPanel() {
         <button onClick={() => setCollection(collection === "Transhumans" ? null : "Transhumans")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Transhumans" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
           <Users className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
-        </button>
-        <button onClick={() => setCollection(collection === "Pixelart" ? null : "Pixelart")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Pixelart" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
-          <span className="font-display text-xl">▦</span>
-          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Pixelart</span>
         </button>
       </div>
       {collection && (
