@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { generateAiTemplate, type AiStyle } from "@/lib/ai-templates.functions";
 import { useEditor, type Page } from "@/store/editor";
@@ -7,7 +7,13 @@ import { PanelHeader } from "./TextPanel";
 const styles: AiStyle[] = ["auto", "minimal", "editorial", "liquid_glass", "cyberpunk", "brutalist", "organic", "y2k"];
 
 export function AiPanel() {
-  const { canvasW, canvasH, loadPages } = useEditor();
+  const { canvasW, canvasH, loadPages, pages, currentIndex } = useEditor();
+  const currentPage = pages[currentIndex];
+  const [chatInput, setChatInput] = useState("");
+  const [chatBusy, setChatBusy] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
+  const slideSummary = useMemo(() => `${currentPage?.elements.length ?? 0} elements · ${canvasW}×${canvasH}`, [currentPage, canvasW, canvasH]);
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<AiStyle>("auto");
   const [slideCount, setSlideCount] = useState(3);
@@ -37,9 +43,48 @@ export function AiPanel() {
     }
   };
 
+  const askAssistant = async (question = chatInput) => {
+    if (!question.trim() || !currentPage) return;
+    setChatBusy(true);
+    setChatError(null);
+    setMessages((current) => [...current, { role: "user", text: question.trim() }]);
+    setChatInput("");
+    try {
+      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: currentPage, question }) });
+      const payload = await response.json() as { text?: string; error?: string };
+      if (!response.ok || !payload.text) throw new Error(payload.error || "Could not analyze this slide.");
+      setMessages((current) => [...current, { role: "assistant", text: payload.text! }]);
+    } catch (analysisError) {
+      setChatError(analysisError instanceof Error ? analysisError.message : "Could not analyze this slide.");
+    } finally {
+      setChatBusy(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <PanelHeader title="AI template generator" />
+      <PanelHeader title="AI studio" />
+      <section className="brutal-border-2 border-teal/35 bg-surface/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <div>
+            <h3 className="font-display text-[11px] uppercase tracking-[0.15em] text-teal">Slide assistant</h3>
+            <p className="font-mono text-[9px] text-teal/50">{slideSummary}</p>
+          </div>
+          <Sparkles className="size-4 text-teal" />
+        </div>
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => <button key={question} type="button" onClick={() => void askAssistant(question)} disabled={chatBusy} className="brutal-border bg-paper px-2 py-1 font-mono text-[9px] text-ink hover:border-teal disabled:opacity-50">{question}</button>)}
+        </div>
+        <div className="max-h-64 space-y-2 overflow-y-auto">
+          {messages.length === 0 && <p className="font-mono text-[10px] leading-relaxed text-teal/55">Ask for a critique, layout ideas, or a stronger visual direction for the current slide.</p>}
+          {messages.map((message, index) => <div key={`${message.role}-${index}`} className={`p-2 font-mono text-[10px] leading-relaxed ${message.role === "user" ? "ml-5 bg-teal/10 text-teal" : "mr-2 bg-paper text-ink"}`}><span className="mb-1 block font-display text-[8px] uppercase tracking-[0.12em] opacity-55">{message.role === "user" ? "You" : "Assistant"}</span>{message.text}</div>)}
+        </div>
+        {chatError && <p role="alert" className="mt-2 font-mono text-[10px] text-red-300">{chatError}</p>}
+        <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="mt-2 flex gap-2">
+          <input value={chatInput} onChange={(event) => setChatInput(event.target.value)} placeholder="Ask about this slide..." className="brutal-border-2 min-w-0 flex-1 bg-paper px-2 py-2 font-mono text-[10px] text-ink outline-none placeholder:text-ink/45 focus:border-teal" />
+          <button type="submit" disabled={chatBusy || !chatInput.trim()} className="brutal-border-2 brutal-press bg-teal px-3 font-display text-[9px] uppercase text-ink disabled:opacity-40">{chatBusy ? "..." : "Ask"}</button>
+        </form>
+      </section>
       <p className="font-mono text-[10px] leading-relaxed text-teal/60">Describe the presentation you want. The generator creates a complete editable deck.</p>
       <label className="flex flex-col gap-1">
         <span className="font-mono text-[10px] uppercase tracking-wider text-teal/70">Brief</span>
