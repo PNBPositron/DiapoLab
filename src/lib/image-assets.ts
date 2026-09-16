@@ -1,32 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const MAX_DIMENSION = 1920;
-const MAX_BYTES = 2_500_000;
-
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not compress image"))), type, quality);
-  });
-}
-
-async function compressImage(file: File): Promise<Blob> {
-  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file");
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  let quality = 0.82;
-  let blob = await canvasToBlob(canvas, "image/webp", quality);
-  while (blob.size > MAX_BYTES && quality > 0.5) {
-    quality -= 0.08;
-    blob = await canvasToBlob(canvas, "image/webp", quality);
-  }
-  return blob;
-}
-
 export type AccountImage = {
   id: string;
   name: string;
@@ -40,15 +13,6 @@ function imageName(file: File) {
   return base || "uploaded-image";
 }
 
-async function blobToDataUrl(blob: Blob) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => typeof reader.result === "string" ? resolve(reader.result) : reject(new Error("Could not read compressed image"));
-    reader.onerror = () => reject(reader.error ?? new Error("Could not read compressed image"));
-    reader.readAsDataURL(blob);
-  });
-}
-
 async function signedImageUrl(path: string) {
   const { data, error } = await supabase.storage.from("account-images").createSignedUrl(path, 60 * 60 * 24 * 7);
   if (error || !data?.signedUrl) throw error ?? new Error("Could not create image URL");
@@ -56,22 +20,15 @@ async function signedImageUrl(path: string) {
 }
 
 export async function uploadAccountImage(file: File): Promise<AccountImage> {
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file");
   const { data: userData } = await supabase.auth.getUser();
-  const blob = await compressImage(file);
-  if (!userData.user) {
-    return {
-      id: crypto.randomUUID(),
-      name: imageName(file),
-      path: "",
-      url: await blobToDataUrl(blob),
-      createdAt: new Date().toISOString(),
-    };
-  }
+  if (!userData.user) throw new Error("Sign in to save images to your account");
   const id = crypto.randomUUID();
-  const path = `${userData.user.id}/${id}.webp`;
+  const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "bin";
+  const path = `${userData.user.id}/${id}.${extension}`;
   const name = imageName(file);
-  const { error } = await supabase.storage.from("account-images").upload(path, blob, {
-    contentType: "image/webp",
+  const { error } = await supabase.storage.from("account-images").upload(path, file, {
+    contentType: file.type,
     upsert: false,
   });
   if (error) throw error;
@@ -118,5 +75,3 @@ export function stripEmbeddedImages<T>(value: T): T {
 export function isEmbeddedImage(value: string | undefined) {
   return Boolean(value?.startsWith("data:image/"));
 }
-
-export { compressImage };
