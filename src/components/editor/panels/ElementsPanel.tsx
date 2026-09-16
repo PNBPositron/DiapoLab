@@ -59,6 +59,8 @@ const ICONS: Array<{ label: string; Icon: LucideIcon; paths: string }> = [
   { label: "Settings", Icon: Settings, paths: '<path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.4 1.4-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L9 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H7v-2h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L8.4 9l1.4-1.4.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2h2v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.2 9l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v2h-.2a1.7 1.7 0 0 0-1 1z"/>' },
 ];
 
+const LINEICONS = ["bridge-3", "buildings-1", "dashboard-square-1", "expand-arrow-1", "expand-square-4", "funnel-1", "game-pad-modern-1", "home-2", "hospital-2", "menu-cheesburger", "menu-hamburger-1", "menu-meatballs-1", "power-button", "refresh-circle-1-clockwise", "road-1", "scissors-1-vertical", "share-1-circle", "share-1", "share-2", "sliders-horizontal-square-2", "wifi"];
+
 function iconDataUri(paths: string) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -70,6 +72,7 @@ export function ElementsPanel() {
   const [uploads, setUploads] = useState<AccountImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [libraryError, setLibraryError] = useState<string | null>(null);
+  const [iconSearch, setIconSearch] = useState("");
 
   useEffect(() => {
     listAccountImages()
@@ -115,12 +118,14 @@ export function ElementsPanel() {
 
       {section === "shapes" && <ShapesPanel embedded />}
       {section === "icons" && (
-        <div className="grid grid-cols-3 gap-2">
-          {ICONS.map(({ label, Icon, paths }) => (
-            <button key={label} title={`Add ${label}`} onClick={() => add(newImage(iconDataUri(paths), { tint: "#111827" }))} className="brutal-border-2 brutal-press grid h-16 place-items-center bg-surface text-teal hover:border-teal">
-              <Icon className="size-6" />
-            </button>
-          ))}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={iconSearch} onChange={(event) => setIconSearch(event.target.value)} placeholder="Search lineicons" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
+          <div className="grid grid-cols-3 gap-2">
+            {LINEICONS.filter((name) => name.includes(iconSearch.toLowerCase())).map((name) => {
+              const src = `/lineicons/${name}.svg`;
+              return <button key={name} title={`Add ${name}`} onClick={() => add(newImage(src, { tint: "#111827" }))} className="brutal-border-2 brutal-press grid h-16 place-items-center bg-surface text-teal hover:border-teal"><img src={src} alt={name.replaceAll("-", " ")} className="size-7" draggable={false} /></button>;
+            })}
+          </div>
         </div>
       )}
       {uploads.length > 0 && section === null && (

@@ -19,16 +19,17 @@ const HIGHLIGHTS = [
   ...Array.from({ length: 8 }, (_, index) => `Whirl-${index + 1}.svg`),
 ];
 const TRANSHUMANS = [
-  "Entertainment.svg", "Pilot.svg", "Walking Contradiction.svg", "Ecto Plasma.svg", "Roboto.svg", "Gamestation.svg", "Wont Stop.svg", "Consumer.svg", "Mechanical Love.svg", "Whoa.svg", "Cube Leg.svg", "Coffee.svg", "Rogue.svg", "Runner.svg", "Pacheco.svg", "Polka Pup.svg", "Mask.svg", "Looking Ahead.svg", "Puppy.svg", "Bueno.svg", "Chaotic Good.svg", "Jumping.svg", "Experiments.svg", "Fling.svg", "Waiting.svg", "Astro.svg", "Pondering.svg", "Late for Class.svg", "Groceries.svg", "Kiddo.svg", "Growth.svg", "Meela Pantalones.svg", "Feliz.svg", "Reflecting.svg", "Chilly.svg", "Chillin.svg",
+  "rogue.png", "chaotic-good.png", "coffee.png", "whoa.png", "consumer.png", "gamestation.png", "ecto-plasma.png", "roboto.png", "polka-pup.png", "entertainment.png", "pilot.png", "cube-leg.png", "looking-ahead.png", "chillin.png", "chilly.png", "plants.png", "reflecting.png", "feliz.png", "growth.png", "groceries.png", "kiddo.png", "pondering.png", "jumping-air.png", "astro.png", "late-for-class.png", "waiting.png", "fling.png", "experiments.png",
 ];
-type Collection = "Highlights" | "Transhumans";
+const PIXELART = ["heart", "star", "camera", "mail", "home", "search", "settings", "user", "bell", "cloud", "bookmark", "calendar", "image", "folder", "music", "rocket", "globe", "check", "close", "arrow-right"];
+type Collection = "Highlights" | "Transhumans" | "Pixelart";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const [collection, setCollection] = useState<Collection | null>(null);
-  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : [];
-  const getSource = (file: string) => `/illustrations/${file}`;
+  const files = collection === "Highlights" ? HIGHLIGHTS : collection === "Transhumans" ? TRANSHUMANS : collection === "Pixelart" ? PIXELART : [];
+  const getSource = (file: string) => collection === "Pixelart" ? `https://cdn.jsdelivr.net/npm/pixelarticons/svg/${file}.svg` : collection === "Transhumans" ? `/illustrations/${file}` : `/illustrations/${file}`;
 
   return (
     <div className="space-y-4">
@@ -42,12 +43,16 @@ export function IllustrationsPanel() {
           <Users className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
         </button>
+        <button onClick={() => setCollection(collection === "Pixelart" ? null : "Pixelart")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Pixelart" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
+          <span className="font-display text-xl">▦</span>
+          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Pixelart</span>
+        </button>
       </div>
       {collection && (
         <div className="grid grid-cols-2 gap-2">
           {files.map((file) => {
             const src = getSource(file);
-            const name = file.replace(/\.svg$/i, "").replaceAll("-", " ");
+            const name = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ");
             return (
               <button key={file} onClick={() => add(newImage(src, { tint: editorTheme.includes("dark") ? "#ffffff" : "#0a0f1f" }))} title={`Add ${name}`} className="group brutal-border-2 brutal-press overflow-hidden bg-surface p-1 hover:border-teal">
                 <div className="grid h-24 place-items-center bg-paper/80 p-2"><img src={src} alt={`${collection} illustration: ${name}`} className="max-h-full max-w-full object-contain" draggable={false} /></div>
