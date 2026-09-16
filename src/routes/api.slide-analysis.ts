@@ -7,26 +7,31 @@ export const Route = createFileRoute("/api/slide-analysis")({
         const body = await request.json().catch(() => null) as { page?: unknown; question?: string } | null;
         if (!body?.page) return Response.json({ error: "A slide is required." }, { status: 400 });
         const question = body.question?.trim() || "Analyze this slide and suggest concrete improvements.";
-        const apiKey = process.env.COHERE_API_KEY;
+        const apiKey = process.env.GEMINI_KEY;
         if (!apiKey) return Response.json({ error: "The slide assistant is not configured." }, { status: 503 });
-        const response = await fetch("https://api.cohere.com/v2/chat", {
+        const wantsEdit = /\b(edit|change|update|move|resize|delete|remove|add|rewrite|modify)\b/i.test(question);
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "command-r-08-2024",
-            temperature: 0.35,
-            max_tokens: 700,
-            messages: [
-              { role: "system", content: "You are a concise, practical presentation art director. Analyze the supplied slide JSON. Give specific suggestions about hierarchy, copy, layout, color, accessibility, and visual interest. Do not invent elements that are not present. Format your response with a short diagnosis followed by 3-5 actionable suggestions." },
-              { role: "user", content: `${question}\n\nSlide JSON:\n${JSON.stringify(body.page)}` },
-            ],
+            generationConfig: { temperature: 0.35, maxOutputTokens: 900, responseMimeType: wantsEdit ? "application/json" : "text/plain" },
+            systemInstruction: { parts: [{ text: wantsEdit ? "You are a presentation editor. Analyze the slide and return JSON only with keys text and edits. edits must be an array of safe operations using only {type:'update', id:string, patch:object}, {type:'delete', id:string}, or {type:'addText', text:string, x:number, y:number, width:number, height:number}. Only edit when explicitly requested. Preserve existing element IDs and never invent IDs." : "You are a concise, practical presentation art director. Analyze the supplied slide JSON and give a short diagnosis followed by 3-5 actionable suggestions." }] },
+            contents: [{ role: "user", parts: [{ text: `${question}\n\nSlide JSON:\n${JSON.stringify(body.page)}` }] }],
           }),
         });
-        const payload = await response.json().catch(() => null) as { message?: { content?: Array<{ text?: string }> }; text?: string; error?: string } | null;
-        if (!response.ok) return Response.json({ error: payload?.error || "The slide assistant could not respond." }, { status: 502 });
-        const text = payload?.message?.content?.map((part) => part.text || "").join("\n") || payload?.text;
-        if (!text) return Response.json({ error: "The slide assistant returned an empty response." }, { status: 502 });
-        return Response.json({ text });
+        const payload = await response.json().catch(() => null) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>; error?: { message?: string } } | null;
+        if (!response.ok) return Response.json({ error: payload?.error?.message || "The slide assistant could not respond." }, { status: 502 });
+        const rawText = payload?.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("\n");
+        if (!rawText) return Response.json({ error: "The slide assistant returned an empty response." }, { status: 502 });
+        if (wantsEdit) {
+          try {
+            const result = JSON.parse(rawText) as { text?: string; edits?: unknown[] };
+            return Response.json({ text: result.text || "I prepared the requested slide changes.", edits: Array.isArray(result.edits) ? result.edits : [] });
+          } catch {
+            return Response.json({ text: rawText, edits: [] });
+          }
+        }
+        return Response.json({ text: rawText });
       },
     },
   },
