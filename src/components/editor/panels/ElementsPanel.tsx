@@ -72,6 +72,7 @@ export function ElementsPanel() {
   const [uploading, setUploading] = useState(false);
   const [libraryError, setLibraryError] = useState<string | null>(null);
   const [iconSearch, setIconSearch] = useState("");
+  const [iconLimit, setIconLimit] = useState(120);
 
   useEffect(() => {
     listAccountImages()
@@ -118,13 +119,14 @@ export function ElementsPanel() {
       {section === "shapes" && <ShapesPanel embedded />}
       {section === "icons" && (
         <div className="space-y-2">
-          <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={iconSearch} onChange={(event) => setIconSearch(event.target.value)} placeholder="Search lineicons" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
+          <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={iconSearch} onChange={(event) => { setIconSearch(event.target.value); setIconLimit(120); }} placeholder="Search lineicons" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
           <div className="grid grid-cols-3 gap-2">
-            {LINEICONS.filter((icon) => `${icon.label} ${icon.category} ${icon.name}`.toLowerCase().includes(iconSearch.toLowerCase())).map((icon) => {
+            {LINEICONS.filter((icon) => `${icon.label} ${icon.category} ${icon.name}`.toLowerCase().includes(iconSearch.toLowerCase())).slice(0, iconLimit).map((icon) => {
               const src = `/lineicons/${icon.name}.svg`;
-              return <button key={icon.name} title={`Add ${icon.label}`} onClick={() => add(newImage(src, { tint: "#111827" }))} className="brutal-border-2 brutal-press overflow-hidden bg-paper text-ink hover:border-teal"><span className="grid h-16 place-items-center bg-white"><img src={src} alt={icon.label} className="size-8 object-contain" draggable={false} /></span><span className="block truncate px-1 py-1 text-left font-mono text-[7px] text-ink/70">{icon.label}</span></button>;
+              return <button key={icon.name} title={`Add ${icon.label}`} onClick={() => add(newImage(src, { tint: "#111827" }))} className="brutal-border-2 brutal-press overflow-hidden bg-paper text-ink hover:border-teal"><span className="grid h-16 place-items-center bg-white"><img src={src} alt={icon.label} loading="lazy" decoding="async" width={32} height={32} className="size-8 object-contain" draggable={false} /></span><span className="block truncate px-1 py-1 text-left font-mono text-[7px] text-ink/70">{icon.label}</span></button>;
             })}
           </div>
+          {LINEICONS.filter((icon) => `${icon.label} ${icon.category} ${icon.name}`.toLowerCase().includes(iconSearch.toLowerCase())).length > iconLimit && <button type="button" onClick={() => setIconLimit((limit) => limit + 120)} className="brutal-border-2 brutal-press w-full bg-surface py-2 font-display text-[9px] uppercase tracking-[0.12em] text-teal hover:border-teal">Load more icons</button>}
         </div>
       )}
       {uploads.length > 0 && section === null && (
