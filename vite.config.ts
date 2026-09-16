@@ -19,6 +19,7 @@ export default defineConfig({
     optimizeDeps: {
       exclude: [
         "@tanstack/react-start",
+        "@tanstack/react-router",
         "@tanstack/router-core",
         "@tanstack/history",
       ],
