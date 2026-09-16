@@ -10,7 +10,7 @@ export const Route = createFileRoute("/api/slide-analysis")({
         const apiKey = process.env.GEMINI_KEY;
         if (!apiKey) return Response.json({ error: "The slide assistant is not configured." }, { status: 503 });
         const wantsEdit = /\b(edit|change|update|move|resize|delete|remove|add|rewrite|modify)\b/i.test(question);
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

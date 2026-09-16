@@ -136,6 +136,7 @@ export type ImageElement = ElementBase & {
   type: "image";
   src: string;
   illustrationFormat?: "svg" | "png";
+  assetKind?: "image" | "icon";
   tint?: string;
   filters?: ImageFilters;
   shadow?: ElementShadow;
