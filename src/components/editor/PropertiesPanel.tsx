@@ -728,7 +728,7 @@ export function PropertiesPanel() {
           </PropertyGroup>
         )}
 
-        {el.type === "image" &&
+        {el.type === "image" && el.assetKind !== "icon" &&
           (() => {
             const f: ImageFilters = { ...DEFAULT_FILTERS, ...(el.filters ?? {}) };
             const set = (patch: Partial<ImageFilters>) =>
