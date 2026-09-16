@@ -45,7 +45,7 @@ import {
 
 
 export function Toolbar() {
-  const { undo, redo, clear, designId, designName, setDesignName, setDesignMeta, newDesign, pages, currentIndex, canvasW, canvasH } =
+  const { undo, redo, clear, designId, designName, setDesignName, setDesignMeta, newDesign, pages, currentIndex, canvasW, canvasH, loadPages } =
     useEditor();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -112,9 +112,18 @@ export function Toolbar() {
     setAssistantInput("");
     try {
       const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, question }) });
-      const payload = await response.json() as { text?: string; error?: string };
+      const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }> };
       if (!response.ok || !payload.text) throw new Error(payload.error || "Could not analyze this slide.");
-      setAssistantMessages((current) => [...current, { role: "assistant", text: payload.text! }]);
+      if (payload.edits?.length) {
+        const nextPages = pages.map((slide, slideIndex) => slideIndex !== currentIndex ? slide : { ...slide, elements: slide.elements.flatMap((element) => {
+          const edits = payload.edits!.filter((edit) => edit.id === element.id);
+          if (edits.some((edit) => edit.type === "delete")) return [];
+          const update = edits.find((edit) => edit.type === "update");
+          return update?.patch ? [{ ...element, ...update.patch }] : [element];
+        }) });
+        loadPages(nextPages);
+      }
+      setAssistantMessages((current) => [...current, { role: "assistant", text: payload.edits?.length ? `${payload.text}\n\nApplied ${payload.edits.length} requested change${payload.edits.length === 1 ? "" : "s"}.` : payload.text! }]);
     } catch (error) {
       setAssistantError(error instanceof Error ? error.message : "Could not analyze this slide.");
     } finally {
@@ -205,7 +214,7 @@ export function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Open Cohere slide assistant">
+        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Open Gemini slide assistant">
           <Sparkles className="size-4" /> ASSIST
         </button>
         <IconBtn onClick={undo} title="Undo">
@@ -320,13 +329,13 @@ export function Toolbar() {
 
   {open && <MyDesignsDialog onClose={() => setOpen(false)} />}
   <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
-    <DialogContent className="brutal-border-2 max-w-lg border-teal bg-ink text-teal">
-      <DialogHeader><DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em]"><Sparkles className="size-4" /> Cohere slide assistant</DialogTitle><DialogDescription className="font-mono text-xs text-teal/60">Analyze the current slide and get actionable ideas.</DialogDescription></DialogHeader>
-      <div className="font-mono text-[10px] text-teal/50">{pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}</div>
+    <DialogContent className="brutal-border-2 max-w-lg border-teal bg-surface text-foreground">
+      <DialogHeader><DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em] text-foreground"><Sparkles className="size-4" /> Gemini slide assistant</DialogTitle><DialogDescription className="font-mono text-xs text-muted-foreground">Analyze the current slide and get actionable ideas.</DialogDescription></DialogHeader>
+      <div className="font-mono text-[10px] text-muted-foreground">{pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}</div>
       <div className="flex flex-wrap gap-2">{["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => <button key={question} type="button" onClick={() => void askAssistant(question)} disabled={assistantBusy} className="brutal-border bg-paper px-2 py-1 font-mono text-[9px] text-ink hover:border-teal disabled:opacity-50">{question}</button>)}</div>
-      <div className="max-h-64 space-y-2 overflow-y-auto">{assistantMessages.length === 0 && <p className="font-mono text-xs leading-relaxed text-teal/55">Ask for a critique, layout ideas, or a stronger visual direction.</p>}{assistantMessages.map((message, index) => <div key={`${message.role}-${index}`} className={`p-2 font-mono text-xs leading-relaxed ${message.role === "user" ? "ml-8 bg-teal/10" : "mr-3 bg-paper text-ink"}`}><span className="mb-1 block font-display text-[9px] uppercase opacity-55">{message.role === "user" ? "You" : "Cohere"}</span>{message.text}</div>)}</div>
+      <div className="max-h-64 space-y-2 overflow-y-auto">{assistantMessages.length === 0 && <p className="font-mono text-xs leading-relaxed text-teal/55">Ask for a critique, layout ideas, or a stronger visual direction.</p>}{assistantMessages.map((message, index) => <div key={`${message.role}-${index}`} className={`p-2 font-mono text-xs leading-relaxed ${message.role === "user" ? "ml-8 bg-teal/10 text-foreground" : "mr-3 bg-muted text-foreground"}`}><span className="mb-1 block font-display text-[9px] uppercase text-muted-foreground">{message.role === "user" ? "You" : "Gemini"}</span>{message.text}</div>)}</div>
       {assistantError && <p role="alert" className="font-mono text-xs text-red-300">{assistantError}</p>}
-      <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="flex gap-2"><input value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Ask about this slide..." className="brutal-border-2 min-w-0 flex-1 bg-paper px-3 py-2 font-mono text-xs text-ink outline-none placeholder:text-ink/45 focus:border-teal" /><button type="submit" disabled={assistantBusy || !assistantInput.trim()} className="brutal-border-2 brutal-press bg-teal px-4 font-display text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "..." : "Ask"}</button></form>
+      <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="flex gap-2"><input value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Ask about this slide..." className="brutal-border-2 min-w-0 flex-1 bg-background px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-teal" /><button type="submit" disabled={assistantBusy || !assistantInput.trim()} className="brutal-border-2 brutal-press bg-teal px-4 font-display text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "..." : "Ask"}</button></form>
     </DialogContent>
   </Dialog>
   <PublishMetaDialog
