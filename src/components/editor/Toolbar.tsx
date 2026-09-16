@@ -20,6 +20,7 @@ import {
   Settings,
   Info,
   Atom,
+  Sparkles,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign, publishAsTemplate } from "@/lib/designs";
@@ -44,7 +45,7 @@ import {
 
 
 export function Toolbar() {
-  const { undo, redo, clear, designId, designName, setDesignName, setDesignMeta, newDesign } =
+  const { undo, redo, clear, designId, designName, setDesignName, setDesignMeta, newDesign, pages, currentIndex, canvasW, canvasH } =
     useEditor();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -56,6 +57,11 @@ export function Toolbar() {
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantInput, setAssistantInput] = useState("");
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const [assistantError, setAssistantError] = useState<string | null>(null);
+  const [assistantMessages, setAssistantMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
 
   useEffect(() => {
     if (!savedAt) return;
@@ -94,6 +100,25 @@ export function Toolbar() {
       alert(e instanceof Error ? e.message : "Export failed");
     } finally {
       setExporting(null);
+    }
+  };
+
+  const askAssistant = async (question = assistantInput) => {
+    const page = pages[currentIndex];
+    if (!question.trim() || !page || assistantBusy) return;
+    setAssistantBusy(true);
+    setAssistantError(null);
+    setAssistantMessages((current) => [...current, { role: "user", text: question.trim() }]);
+    setAssistantInput("");
+    try {
+      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, question }) });
+      const payload = await response.json() as { text?: string; error?: string };
+      if (!response.ok || !payload.text) throw new Error(payload.error || "Could not analyze this slide.");
+      setAssistantMessages((current) => [...current, { role: "assistant", text: payload.text! }]);
+    } catch (error) {
+      setAssistantError(error instanceof Error ? error.message : "Could not analyze this slide.");
+    } finally {
+      setAssistantBusy(false);
     }
   };
 
@@ -180,6 +205,9 @@ export function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2">
+        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Open Cohere slide assistant">
+          <Sparkles className="size-4" /> ASSIST
+        </button>
         <IconBtn onClick={undo} title="Undo">
           <Undo2 className="h-4 w-4" strokeWidth={2.5} />
         </IconBtn>
@@ -290,8 +318,18 @@ export function Toolbar() {
         </div>
       </div>
 
-      {open && <MyDesignsDialog onClose={() => setOpen(false)} />}
-      <PublishMetaDialog
+  {open && <MyDesignsDialog onClose={() => setOpen(false)} />}
+  <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
+    <DialogContent className="brutal-border-2 max-w-lg border-teal bg-ink text-teal">
+      <DialogHeader><DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em]"><Sparkles className="size-4" /> Cohere slide assistant</DialogTitle><DialogDescription className="font-mono text-xs text-teal/60">Analyze the current slide and get actionable ideas.</DialogDescription></DialogHeader>
+      <div className="font-mono text-[10px] text-teal/50">{pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}</div>
+      <div className="flex flex-wrap gap-2">{["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => <button key={question} type="button" onClick={() => void askAssistant(question)} disabled={assistantBusy} className="brutal-border bg-paper px-2 py-1 font-mono text-[9px] text-ink hover:border-teal disabled:opacity-50">{question}</button>)}</div>
+      <div className="max-h-64 space-y-2 overflow-y-auto">{assistantMessages.length === 0 && <p className="font-mono text-xs leading-relaxed text-teal/55">Ask for a critique, layout ideas, or a stronger visual direction.</p>}{assistantMessages.map((message, index) => <div key={`${message.role}-${index}`} className={`p-2 font-mono text-xs leading-relaxed ${message.role === "user" ? "ml-8 bg-teal/10" : "mr-3 bg-paper text-ink"}`}><span className="mb-1 block font-display text-[9px] uppercase opacity-55">{message.role === "user" ? "You" : "Cohere"}</span>{message.text}</div>)}</div>
+      {assistantError && <p role="alert" className="font-mono text-xs text-red-300">{assistantError}</p>}
+      <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="flex gap-2"><input value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Ask about this slide..." className="brutal-border-2 min-w-0 flex-1 bg-paper px-3 py-2 font-mono text-xs text-ink outline-none placeholder:text-ink/45 focus:border-teal" /><button type="submit" disabled={assistantBusy || !assistantInput.trim()} className="brutal-border-2 brutal-press bg-teal px-4 font-display text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "..." : "Ask"}</button></form>
+    </DialogContent>
+  </Dialog>
+  <PublishMetaDialog
         open={publishDialogOpen}
         kind="template"
         defaultName={designName || "Untitled template"}
