@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Loader2, Pencil, Trash2, X } from "lucide-re
 import { ThemeStudio } from "./ThemeStudio";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId } from "@/store/settings";
 import { useAuth } from "@/hooks/use-auth";
+import { useEditor } from "@/store/editor";
 import {
   listMyPublicTemplates,
   renamePublicTemplate,
@@ -23,6 +24,10 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const [templates, setTemplates] = useState<PublicTemplate[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { pages, loadPages } = useEditor();
+  const [developerOpen, setDeveloperOpen] = useState(false);
+  const [jsonDraft, setJsonDraft] = useState(() => JSON.stringify(pages, null, 2));
+  const [jsonStatus, setJsonStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -45,6 +50,23 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
       setError(e instanceof Error ? e.message : "Rename failed");
     } finally {
       setBusy(null);
+    }
+  };
+
+  const openDeveloperMode = () => {
+    setJsonDraft(JSON.stringify(pages, null, 2));
+    setJsonStatus(null);
+    setDeveloperOpen(true);
+  };
+
+  const applyJson = () => {
+    try {
+      const parsed = JSON.parse(jsonDraft);
+      if (!Array.isArray(parsed) || parsed.some((page) => !page || !Array.isArray(page.elements))) throw new Error("Expected an array of slides with elements.");
+      loadPages(parsed);
+      setJsonStatus("Applied slideshow JSON");
+    } catch (e) {
+      setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON");
     }
   };
 
@@ -78,6 +100,19 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         <p className="mb-5 font-mono text-[11px] text-teal/60">
           preferences are stored on this device.
         </p>
+
+        <section className="brutal-border-2 mb-4 bg-surface p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div><div className="font-display text-[12px] tracking-[0.2em] text-teal">DEVELOPER MODE</div><p className="mt-1 font-mono text-[10px] text-teal/60">Inspect and edit the active slideshow JSON. The Gemini assistant can use and modify this same document.</p></div>
+            <button type="button" onClick={openDeveloperMode} className="brutal-border-2 brutal-press shrink-0 bg-blue-deep px-3 py-2 font-mono text-[10px] uppercase text-teal hover:border-teal">Open developer mode</button>
+          </div>
+        </section>
+
+        {developerOpen && <section className="brutal-border-2 mb-4 border-teal bg-ink p-4">
+          <div className="mb-3 flex items-center justify-between"><div><h3 className="font-display text-[12px] tracking-[0.2em] text-teal">SLIDESHOW JSON</h3><p className="mt-1 font-mono text-[10px] text-teal/60">Changes apply to the current presentation.</p></div><button type="button" onClick={() => setDeveloperOpen(false)} className="text-teal/60 hover:text-teal" aria-label="Close developer mode"><X className="size-4" /></button></div>
+          <textarea value={jsonDraft} onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }} spellCheck={false} className="h-96 w-full resize-y border-2 border-teal/30 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-teal outline-none focus:border-teal" aria-label="Slideshow JSON editor" />
+          <div className="mt-3 flex items-center justify-between gap-3"><span className="font-mono text-[10px] text-teal/60">{jsonStatus ?? `${pages.length} slides loaded`}</span><div className="flex gap-2"><button type="button" onClick={() => setJsonDraft(JSON.stringify(pages, null, 2))} className="brutal-border px-3 py-2 font-mono text-[10px] uppercase text-teal">Reset</button><button type="button" onClick={applyJson} className="brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink">Apply JSON</button></div></div>
+        </section>}
 
         {/* Panels */}
         <section className="brutal-border-2 mb-4 bg-surface p-4">

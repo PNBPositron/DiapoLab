@@ -698,32 +698,22 @@ export function PropertiesPanel() {
           </PropertyGroup>
         )}
 
-        {el.type === "icon" && (
+        {(el.type === "icon" || (el.type === "image" && el.assetKind === "icon")) && (
           <PropertyGroup label="Icon properties">
-            <Field label="Icon name">
-              <input
-                value={el.name}
-                onChange={(e) => update(el.id, { name: e.target.value })}
-                className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal"
-              />
-              <div className="font-mono text-[10px] text-teal/50">
-                &gt; lucide PascalCase, e.g. Sparkles
-              </div>
-            </Field>
+            {el.type === "icon" && <Field label="Icon name">
+              <input value={el.name} onChange={(e) => update(el.id, { name: e.target.value })} className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal" />
+              <div className="font-mono text-[10px] text-teal/50">&gt; lucide PascalCase, e.g. Sparkles</div>
+            </Field>}
             <Field label="Color">
-              <ColorRow value={el.color} onChange={(c) => update(el.id, { color: c })} />
+              <ColorRow value={el.type === "icon" ? el.color : el.tint ?? "#111827"} onChange={(c) => update(el.id, el.type === "icon" ? { color: c } : { tint: c })} />
             </Field>
-            <Field label="Stroke">
-              <input
-                type="range"
-                min={0.5}
-                max={4}
-                step={0.25}
-                value={el.strokeWidth}
-                onChange={(e) => update(el.id, { strokeWidth: +e.target.value })}
-                className="w-full accent-teal"
-              />
+            {el.type === "icon" && <Field label="Stroke">
+              <input type="range" min={0.5} max={4} step={0.25} value={el.strokeWidth} onChange={(e) => update(el.id, { strokeWidth: +e.target.value })} className="w-full accent-teal" />
               <div className="font-mono text-[11px] text-teal/70">{el.strokeWidth}</div>
+            </Field>}
+            <Field label="Opacity">
+              <input type="range" min={0} max={1} step={0.05} value={"opacity" in el ? el.opacity ?? 1 : 1} onChange={(e) => update(el.id, { opacity: +e.target.value })} className="w-full accent-teal" />
+              <div className="font-mono text-[11px] text-teal/70">{Math.round((("opacity" in el ? el.opacity : 1) ?? 1) * 100)}%</div>
             </Field>
           </PropertyGroup>
         )}
@@ -822,7 +812,7 @@ export function PropertiesPanel() {
                     className="w-full accent-teal"
                   />
                   <div className="font-mono text-[11px] text-teal/70">
-                    {Math.round((el.opacity ?? 1) * 100)}%
+{Math.round((("opacity" in el ? el.opacity : 1) ?? 1) * 100)}%
                   </div>
                 </Field>
                 <Field label="Border">

@@ -111,16 +111,20 @@ export function Toolbar() {
     setAssistantMessages((current) => [...current, { role: "user", text: question.trim() }]);
     setAssistantInput("");
     try {
-      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, question }) });
+      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, slideshow: pages, canEdit: true, question }) });
       const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }> };
       if (!response.ok || !payload.text) throw new Error(payload.error || "Could not analyze this slide.");
       if (payload.edits?.length) {
-        const nextPages = pages.map((slide, slideIndex) => slideIndex !== currentIndex ? slide : { ...slide, elements: slide.elements.flatMap((element) => {
-          const edits = payload.edits!.filter((edit) => edit.id === element.id);
-          if (edits.some((edit) => edit.type === "delete")) return [];
-          const update = edits.find((edit) => edit.type === "update");
-          return update?.patch ? [{ ...element, ...update.patch }] : [element];
-        }) });
+        const activeEdits = payload.edits!.filter((edit) => edit.type === "addText" || edit.id);
+        const nextPages = pages.map((slide, slideIndex) => slideIndex !== currentIndex ? slide : { ...slide, elements: [
+          ...slide.elements.flatMap((element) => {
+            const edits = activeEdits.filter((edit) => edit.id === element.id);
+            if (edits.some((edit) => edit.type === "delete")) return [];
+            const update = edits.find((edit) => edit.type === "update");
+            return update?.patch ? [{ ...element, ...update.patch }] : [element];
+          }),
+          ...activeEdits.filter((edit) => edit.type === "addText" && typeof edit.text === "string").map((edit) => ({ id: crypto.randomUUID(), type: "text" as const, text: edit.text!, x: edit.x ?? 80, y: edit.y ?? 80, width: edit.width ?? 500, height: edit.height ?? 80, rotation: 0, color: "#111827", fontSize: 32, fontWeight: 400, fontFamily: "Inter", align: "left" as const }))
+        ] });
         loadPages(nextPages);
       }
       setAssistantMessages((current) => [...current, { role: "assistant", text: payload.edits?.length ? `${payload.text}\n\nApplied ${payload.edits.length} requested change${payload.edits.length === 1 ? "" : "s"}.` : payload.text! }]);
