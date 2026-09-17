@@ -427,6 +427,7 @@ export function CanvasElement({
                 filter: [filterCss(element.filters), shadowFilter(element.shadow)]
                   .filter(Boolean)
                   .join(" "),
+                opacity: element.opacity ?? 1,
               }}
             />
           ) : (
@@ -449,7 +450,7 @@ export function CanvasElement({
                 display: "block",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
                 filter: [
-                  element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
+                  element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
                   filterCss(element.filters),
                   shadowFilter(element.shadow),
                 ]
