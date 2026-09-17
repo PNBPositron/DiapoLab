@@ -28,6 +28,9 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const [developerOpen, setDeveloperOpen] = useState(false);
   const [jsonDraft, setJsonDraft] = useState(() => JSON.stringify(pages, null, 2));
   const [jsonStatus, setJsonStatus] = useState<string | null>(null);
+  const [assistantPrompt, setAssistantPrompt] = useState("");
+  const [assistantReply, setAssistantReply] = useState("");
+  const [assistantBusy, setAssistantBusy] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -67,6 +70,22 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
       setJsonStatus("Applied slideshow JSON");
     } catch (e) {
       setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON");
+    }
+  };
+
+  const askDeveloperAssistant = async () => {
+    if (!assistantPrompt.trim() || assistantBusy) return;
+    setAssistantBusy(true);
+    setAssistantReply("");
+    try {
+      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: pages[0], slideshow: pages, canEdit: true, question: assistantPrompt }) });
+      const payload = await response.json() as { text?: string; error?: string; edits?: unknown[] };
+      if (!response.ok || !payload.text) throw new Error(payload.error || "Assistant unavailable");
+      setAssistantReply(payload.edits?.length ? `${payload.text}\n\n${payload.edits.length} edit operation(s) are ready to apply from the assistant.` : payload.text);
+    } catch (error) {
+      setAssistantReply(error instanceof Error ? error.message : "Assistant unavailable");
+    } finally {
+      setAssistantBusy(false);
     }
   };
 
@@ -112,6 +131,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           <div className="mb-3 flex items-center justify-between"><div><h3 className="font-display text-[12px] tracking-[0.2em] text-teal">SLIDESHOW JSON</h3><p className="mt-1 font-mono text-[10px] text-teal/60">Changes apply to the current presentation.</p></div><button type="button" onClick={() => setDeveloperOpen(false)} className="text-teal/60 hover:text-teal" aria-label="Close developer mode"><X className="size-4" /></button></div>
           <textarea value={jsonDraft} onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }} spellCheck={false} className="h-96 w-full resize-y border-2 border-teal/30 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-teal outline-none focus:border-teal" aria-label="Slideshow JSON editor" />
           <div className="mt-3 flex items-center justify-between gap-3"><span className="font-mono text-[10px] text-teal/60">{jsonStatus ?? `${pages.length} slides loaded`}</span><div className="flex gap-2"><button type="button" onClick={() => setJsonDraft(JSON.stringify(pages, null, 2))} className="brutal-border px-3 py-2 font-mono text-[10px] uppercase text-teal">Reset</button><button type="button" onClick={applyJson} className="brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink">Apply JSON</button></div></div>
+          <div className="mt-4 border-t border-teal/20 pt-4"><div className="mb-2 font-display text-[11px] tracking-[0.16em] text-teal">DEVELOPER ASSIST</div><textarea value={assistantPrompt} onChange={(event) => setAssistantPrompt(event.target.value)} placeholder="Ask Gemini to inspect or edit this JSON..." className="h-20 w-full resize-y border-2 border-teal/30 bg-black/30 p-2 font-mono text-[11px] text-teal outline-none focus:border-teal" /><button type="button" onClick={() => void askDeveloperAssistant()} disabled={assistantBusy || !assistantPrompt.trim()} className="mt-2 brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "Thinking..." : "Ask Gemini"}</button>{assistantReply && <pre className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap border border-teal/20 bg-black/20 p-2 font-mono text-[11px] leading-relaxed text-teal">{assistantReply}</pre>}</div>
         </section>}
 
         {/* Panels */}
