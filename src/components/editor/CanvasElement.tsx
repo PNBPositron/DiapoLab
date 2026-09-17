@@ -489,7 +489,7 @@ export function CanvasElement({
       {element.type === "icon" &&
         (() => {
           if (element.src) {
-            return <img src={element.src} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", filter: `brightness(0) drop-shadow(0 0 0 ${element.color})`, opacity: 1 }} />;
+            return <div aria-hidden="true" style={{ width: "100%", height: "100%", display: "block", backgroundColor: element.color, maskImage: `url("${element.src}")`, maskSize: "contain", maskPosition: "center", maskRepeat: "no-repeat", WebkitMaskImage: `url("${element.src}")`, WebkitMaskSize: "contain", WebkitMaskPosition: "center", WebkitMaskRepeat: "no-repeat", opacity: 1 }} />;
           }
           const Comp =
             (

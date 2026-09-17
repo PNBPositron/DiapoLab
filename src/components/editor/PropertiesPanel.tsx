@@ -702,7 +702,7 @@ export function PropertiesPanel() {
           <PropertyGroup label="Icon properties">
             {el.type === "icon" && <Field label="Icon name">
               <input value={el.name} onChange={(e) => update(el.id, { name: e.target.value })} className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal" />
-              <div className="font-mono text-[10px] text-teal/50">&gt; lucide PascalCase, e.g. Sparkles</div>
+              <div className="font-mono text-[10px] text-teal/50">&gt; Lineicons SVG asset name</div>
             </Field>}
             <Field label="Color">
               <ColorRow value={el.type === "icon" ? el.color : el.tint ?? "#111827"} onChange={(c) => update(el.id, el.type === "icon" ? { color: c } : { tint: c })} />
