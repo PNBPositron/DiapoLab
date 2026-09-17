@@ -154,6 +154,7 @@ export type ImageElement = ElementBase & {
 export type IconElement = ElementBase & {
   type: "icon";
   name: string; // lucide icon name in PascalCase
+  src?: string; // optional Lineicons SVG asset
   color: string;
   strokeWidth: number;
 };
@@ -1272,6 +1273,7 @@ export const useEditor = create<State>((set, get) => {
         ...p,
         id: p.id ?? uid(),
         duration: p.duration ?? DEFAULT_PAGE_DURATION,
+        elements: p.elements.map((element) => element.type === "image" && element.assetKind === "icon" ? { ...element, type: "icon" as const, name: ("name" in element && typeof element.name === "string" ? element.name : element.src.split("/").pop()?.replace(/\.svg$/i, "") ?? "Icon"), color: element.tint ?? "#111827", strokeWidth: 2, src: element.src } : element),
       }));
       set({ ...syncCurrent(safe, 0), selectedId: null });
     },
