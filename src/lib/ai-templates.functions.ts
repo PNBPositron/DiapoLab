@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 const pickModel = () => GEMINI_MODEL;
 
 type CohereMessage = {
@@ -15,8 +15,8 @@ async function chatComplete(
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  const apiKey = process.env.API_KEY?.trim().replace(/^['"]|['"]$/g, "");
-  if (!apiKey) throw new Error("AI is not configured. Set API_KEY.");
+  const apiKey = process.env.GEMINI_KEY?.trim().replace(/^['"]|['"]$/g, "");
+  if (!apiKey) throw new Error("Gemini is not configured. Set GEMINI_KEY.");
 
   const system = messages.find((entry) => entry.role === "system")?.content;
   const contents = messages
@@ -56,7 +56,7 @@ async function chatComplete(
     },
   );
   if (res.status === 429) throw new Error("AI rate limit hit. Try again in a moment.");
-  if (res.status === 401 || res.status === 403) throw new Error("AI authentication failed. Check API_KEY.");
+  if (res.status === 401 || res.status === 403) throw new Error("Gemini authentication failed. Check GEMINI_KEY.");
   if (!res.ok) throw new Error(`AI error ${res.status}: ${await res.text()}`);
   const json = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
   const content = json.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim();
