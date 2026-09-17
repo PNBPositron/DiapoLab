@@ -39,7 +39,7 @@ export function AiPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PanelHeader title="AI deck generator" />
+      <PanelHeader title="Gemini template generator" />
       <p className="font-mono text-[10px] leading-relaxed text-teal/60">Describe the presentation you want. The generator creates a complete editable deck.</p>
       <label className="flex flex-col gap-1">
         <span className="font-mono text-[10px] uppercase tracking-wider text-teal/70">Brief</span>
@@ -62,7 +62,7 @@ export function AiPanel() {
         {busy ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
         {busy ? "Generating..." : "Generate editable deck"}
       </button>
-      <p className="font-mono text-[9px] leading-relaxed text-teal/45">AI generation uses the project&apos;s server-side configured model. Your API key never reaches the browser.</p>
+      <p className="font-mono text-[9px] leading-relaxed text-teal/45">Gemini generates the deck on the server. Your API key never reaches the browser.</p>
     </div>
   );
 }
