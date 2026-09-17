@@ -7,12 +7,34 @@ import { PanelHeader } from "./TextPanel";
 const styles: AiStyle[] = ["auto", "minimal", "editorial", "liquid_glass", "cyberpunk", "brutalist", "organic", "y2k"];
 
 export function AiPanel() {
-  const { canvasW, canvasH, loadPages } = useEditor();
+  const { canvasW, canvasH, loadPages, pages, currentIndex } = useEditor();
+  const [redesigning, setRedesigning] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<AiStyle>("auto");
   const [slideCount, setSlideCount] = useState(3);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const redesignSlide = async () => {
+    const page = pages[currentIndex];
+    if (!page || redesigning) return;
+    setRedesigning(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, slideshow: pages, canEdit: true, question: "Redesign this slide to improve hierarchy, spacing, typography, and visual impact. Return safe edit operations." }) });
+      const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }> };
+      if (!response.ok || !payload.text) throw new Error(payload.error || "Could not redesign the slide");
+      if (payload.edits?.length) {
+        const nextPages = pages.map((slide, index) => index !== currentIndex ? slide : { ...slide, elements: slide.elements.flatMap((element) => { const matching = payload.edits!.filter((edit) => edit.id === element.id); if (matching.some((edit) => edit.type === "delete")) return []; const update = matching.find((edit) => edit.type === "update"); return update?.patch ? [{ ...element, ...update.patch }] : [element]; }) });
+        loadPages(nextPages);
+      }
+      setError(payload.edits?.length ? `Applied ${payload.edits.length} redesign edits.` : payload.text);
+    } catch (redesignError) {
+      setError(redesignError instanceof Error ? redesignError.message : "Could not redesign the slide");
+    } finally {
+      setRedesigning(false);
+    }
+  };
 
   const generate = async () => {
     if (!prompt.trim()) return;
@@ -58,6 +80,10 @@ export function AiPanel() {
         </label>
       </div>
       {error && <p role="alert" className="border border-red-400/30 bg-red-400/10 p-2 font-mono text-[10px] text-red-300">{error}</p>}
+      <button type="button" onClick={redesignSlide} disabled={redesigning || busy || !pages[currentIndex]} className="brutal-border-2 brutal-press flex items-center justify-center gap-2 bg-blue-deep px-3 py-3 font-display text-[10px] uppercase tracking-[0.14em] text-teal disabled:cursor-not-allowed disabled:opacity-40">
+        {redesigning ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+        {redesigning ? "Redesigning..." : "Redesign current slide"}
+      </button>
       <button type="button" onClick={generate} disabled={busy || !prompt.trim()} className="brutal-border-2 brutal-press flex items-center justify-center gap-2 bg-teal px-3 py-3 font-display text-[10px] uppercase tracking-[0.14em] text-ink disabled:cursor-not-allowed disabled:opacity-40">
         {busy ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
         {busy ? "Generating..." : "Generate editable deck"}
