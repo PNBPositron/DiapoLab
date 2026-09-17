@@ -488,6 +488,9 @@ export function CanvasElement({
       )}
       {element.type === "icon" &&
         (() => {
+          if (element.src) {
+            return <img src={element.src} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", filter: `brightness(0) drop-shadow(0 0 0 ${element.color})`, opacity: 1 }} />;
+          }
           const Comp =
             (
               LucideIcons as unknown as Record<string, React.ComponentType<LucideIcons.LucideProps>>
