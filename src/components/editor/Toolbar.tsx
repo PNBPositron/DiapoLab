@@ -218,8 +218,8 @@ export function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Open Gemini slide assistant">
-          <Sparkles className="size-4" /> ASSIST
+        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Redesign current slide with Gemini">
+          <Sparkles className="size-4" /> REDESIGN
         </button>
         <IconBtn onClick={undo} title="Undo">
           <Undo2 className="h-4 w-4" strokeWidth={2.5} />
