@@ -31,6 +31,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const [assistantPrompt, setAssistantPrompt] = useState("");
   const [assistantReply, setAssistantReply] = useState("");
   const [assistantBusy, setAssistantBusy] = useState(false);
+  const [assistantEdits, setAssistantEdits] = useState<Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }>>([]);
 
   useEffect(() => {
     if (!user) {
@@ -77,16 +78,42 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
     if (!assistantPrompt.trim() || assistantBusy) return;
     setAssistantBusy(true);
     setAssistantReply("");
+    setAssistantEdits([]);
     try {
       const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page: pages[0], slideshow: pages, canEdit: true, question: assistantPrompt }) });
-      const payload = await response.json() as { text?: string; error?: string; edits?: unknown[] };
+      const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }> };
       if (!response.ok || !payload.text) throw new Error(payload.error || "Assistant unavailable");
-      setAssistantReply(payload.edits?.length ? `${payload.text}\n\n${payload.edits.length} edit operation(s) are ready to apply from the assistant.` : payload.text);
+      setAssistantEdits(payload.edits ?? []);
+      setAssistantReply(payload.text);
     } catch (error) {
       setAssistantReply(error instanceof Error ? error.message : "Assistant unavailable");
     } finally {
       setAssistantBusy(false);
     }
+  };
+
+  const applyAssistantEdits = () => {
+    if (!assistantEdits.length) return;
+    const nextPages = pages.map((page) => ({
+      ...page,
+      elements: [
+        ...page.elements.flatMap((element) => {
+          const matching = assistantEdits.filter((edit) => edit.id === element.id);
+          if (matching.some((edit) => edit.type === "delete")) return [];
+          const update = matching.find((edit) => edit.type === "update");
+          return update?.patch ? [{ ...element, ...update.patch }] : [element];
+        }),
+        ...assistantEdits.filter((edit) => edit.type === "addText" && edit.text).map((edit) => ({
+          id: crypto.randomUUID(), type: "text" as const, text: edit.text!, x: edit.x ?? 80, y: edit.y ?? 80,
+          width: edit.width ?? 500, height: edit.height ?? 80, rotation: 0, color: "#111827", fontSize: 32,
+          fontWeight: 400, fontFamily: "Inter", align: "left" as const,
+        })),
+      ],
+    }));
+    loadPages(nextPages);
+    setJsonDraft(JSON.stringify(nextPages, null, 2));
+    setJsonStatus(`Applied ${assistantEdits.length} AI edit operation${assistantEdits.length === 1 ? "" : "s"}`);
+    setAssistantEdits([]);
   };
 
   const remove = async (t: PublicTemplate) => {
@@ -131,7 +158,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           <div className="mb-3 flex items-center justify-between"><div><h3 className="font-display text-[12px] tracking-[0.2em] text-teal">SLIDESHOW JSON</h3><p className="mt-1 font-mono text-[10px] text-teal/60">Changes apply to the current presentation.</p></div><button type="button" onClick={() => setDeveloperOpen(false)} className="text-teal/60 hover:text-teal" aria-label="Close developer mode"><X className="size-4" /></button></div>
           <textarea value={jsonDraft} onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }} spellCheck={false} className="h-96 w-full resize-y border-2 border-teal/30 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-teal outline-none focus:border-teal" aria-label="Slideshow JSON editor" />
           <div className="mt-3 flex items-center justify-between gap-3"><span className="font-mono text-[10px] text-teal/60">{jsonStatus ?? `${pages.length} slides loaded`}</span><div className="flex gap-2"><button type="button" onClick={() => setJsonDraft(JSON.stringify(pages, null, 2))} className="brutal-border px-3 py-2 font-mono text-[10px] uppercase text-teal">Reset</button><button type="button" onClick={applyJson} className="brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink">Apply JSON</button></div></div>
-          <div className="mt-4 border-t border-teal/20 pt-4"><div className="mb-2 font-display text-[11px] tracking-[0.16em] text-teal">DEVELOPER ASSIST</div><textarea value={assistantPrompt} onChange={(event) => setAssistantPrompt(event.target.value)} placeholder="Ask Gemini to inspect or edit this JSON..." className="h-20 w-full resize-y border-2 border-teal/30 bg-black/30 p-2 font-mono text-[11px] text-teal outline-none focus:border-teal" /><button type="button" onClick={() => void askDeveloperAssistant()} disabled={assistantBusy || !assistantPrompt.trim()} className="mt-2 brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "Thinking..." : "Ask Gemini"}</button>{assistantReply && <pre className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap border border-teal/20 bg-black/20 p-2 font-mono text-[11px] leading-relaxed text-teal">{assistantReply}</pre>}</div>
+          <div className="mt-4 border-t border-teal/20 pt-4"><div className="mb-2 font-display text-[11px] tracking-[0.16em] text-teal">DEVELOPER ASSIST</div><textarea value={assistantPrompt} onChange={(event) => setAssistantPrompt(event.target.value)} placeholder="Ask Gemini to inspect or edit this JSON..." className="h-20 w-full resize-y border-2 border-teal/30 bg-black/30 p-2 font-mono text-[11px] text-teal outline-none focus:border-teal" /><div className="mt-2 flex gap-2"><button type="button" onClick={() => void askDeveloperAssistant()} disabled={assistantBusy || !assistantPrompt.trim()} className="brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "Thinking..." : "Ask Gemini"}</button>{assistantEdits.length > 0 && <button type="button" onClick={applyAssistantEdits} className="brutal-border-2 brutal-press bg-blue-deep px-3 py-2 font-mono text-[10px] uppercase text-teal">Apply {assistantEdits.length} edit{assistantEdits.length === 1 ? "" : "s"}</button>}</div>{assistantReply && <pre className="mt-3 max-h-48 overflow-auto whitespace-pre-wrap border border-teal/20 bg-black/20 p-2 font-mono text-[11px] leading-relaxed text-teal">{assistantReply}</pre>}</div>
         </section>}
 
         {/* Panels */}
