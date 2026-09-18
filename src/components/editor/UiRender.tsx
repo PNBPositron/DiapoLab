@@ -346,6 +346,19 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
     );
   }
 
+  if (K === "timeline") {
+    const timelineItems = element.items.length ? element.items : ["Research", "Build", "Ship"];
+    return (
+      <div style={{ ...shell, justifyContent: "center", gap: 10 * s, padding: 16 * s }}>
+        <div style={{ ...titleStyle, fontSize: 11 * s }}>{element.title}</div>
+        <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 0 }}>
+          {timelineItems.map((item, index) => <div key={`${item}-${index}`} style={{ display: "flex", alignItems: "center", flex: 1 }}><div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 * s, minWidth: 0 }}><div style={{ width: 12 * s, height: 12 * s, borderRadius: "50%", background: index / Math.max(1, timelineItems.length - 1) <= element.value / 100 ? element.accentColor : `${element.fgColor ?? "#fff"}55`, border: `2px solid ${element.accentColor}` }} /><span style={{ ...bodyStyle, fontSize: 8 * s, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 72 * s }}>{item}</span></div>{index < timelineItems.length - 1 && <div style={{ height: 2 * s, flex: 1, background: index / Math.max(1, timelineItems.length - 1) < element.value / 100 ? element.accentColor : `${element.fgColor ?? "#fff"}35` }} />}</div>)}
+        </div>
+        <div style={{ ...bodyStyle, fontSize: 9 * s }}>{element.body}</div>
+      </div>
+    );
+  }
+
   if (K === "taskbar") {
     return (
       <div

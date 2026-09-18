@@ -253,7 +253,8 @@ export type UiKind =
   | "kdePanel"
   | "kdeFiles"
   | "kdeRunner"
-  | "kdeSettings";
+  | "kdeSettings"
+  | "timeline";
 
 export type UiElement = ElementBase & {
   type: "ui";
@@ -856,6 +857,7 @@ const UI_DEFAULTS: Record<
   },
   badge: { w: 280, h: 96, title: "NEW", body: "", value: 0, items: [] },
   progress: { w: 560, h: 160, title: "Progress", body: "Loading assets", value: 68, items: [] },
+  timeline: { w: 640, h: 220, title: "Product launch", body: "Discovery → Build → Launch", value: 68, items: ["Discovery", "Prototype", "Launch"] },
   alert: {
     w: 620,
     h: 200,
