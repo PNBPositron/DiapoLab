@@ -8,10 +8,10 @@ export const Route = createFileRoute("/t/$id")({
   component: SharedTemplate,
   head: () => ({
     meta: [
-      { title: "Shared deck — Positron Studio" },
-      { name: "description", content: "View a deck shared publicly from Positron Studio, the neobrutalist design and presentation editor." },
-      { property: "og:title", content: "Shared deck — Positron Studio" },
-      { property: "og:description", content: "View a deck shared publicly from Positron Studio." },
+      { title: "Shared deck — DiapoLab" },
+      { name: "description", content: "View a deck shared publicly from DiapoLab, the neobrutalist design and presentation editor." },
+      { property: "og:title", content: "Shared deck — DiapoLab" },
+      { property: "og:description", content: "View a deck shared publicly from DiapoLab." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -72,7 +72,7 @@ function SharedTemplate() {
         )}
         <div className="mt-6">
           <Link to="/" className="font-mono text-[11px] text-teal/60 underline">
-            open Positron Studio
+            open DiapoLab
           </Link>
         </div>
       </div>

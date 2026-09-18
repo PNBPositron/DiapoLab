@@ -19,7 +19,7 @@ import {
   Upload,
   Settings,
   Info,
-  Atom,
+  FlaskConical,
   Sparkles,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
@@ -200,11 +200,11 @@ export function Toolbar() {
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent opacity-80" />
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center border-2 border-teal bg-blue-deep shadow-[0_0_14px_var(--blue)]" aria-label="Positron Studio">
-            <Atom className="size-6 text-teal" strokeWidth={1.8} aria-hidden="true" />
+          <div className="grid size-10 place-items-center border-2 border-teal bg-blue-deep shadow-[0_0_14px_var(--blue)]" aria-label="DiapoLab">
+            <FlaskConical className="size-6 text-teal" strokeWidth={1.8} aria-hidden="true" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal">
-            POSITRON<span className="text-blue">//</span>STUDIO
+            DIAPOLAB
           </div>
         </div>
         <div className="ml-4 hidden items-center gap-2 md:flex">
@@ -356,10 +356,10 @@ export function Toolbar() {
         <DialogContent className="brutal-border-2 max-w-sm rounded-none border-teal bg-ink text-teal shadow-[8px_8px_0_var(--blue)]">
           <DialogHeader className="text-left">
             <DialogTitle className="font-display text-base tracking-[0.2em] text-teal">
-              ABOUT POSITRON
+              ABOUT DIAPOLAB
             </DialogTitle>
             <DialogDescription className="font-mono text-[11px] leading-relaxed text-teal/70">
-              Learn more about Positron Studio and its terms.
+              Learn more about DiapoLab and its terms.
             </DialogDescription>
           </DialogHeader>
             <nav aria-label="About links" className="flex flex-col gap-2">

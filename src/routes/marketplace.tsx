@@ -15,7 +15,7 @@ export const Route = createFileRoute("/marketplace")({
       {
         name: "description",
         content:
-          "Browse community-made presentation templates and editor themes for Positron Studio, then load them straight into the editor.",
+          "Browse community-made presentation templates and editor themes for DiapoLab, then load them straight into the editor.",
       },
       { property: "og:title", content: "Marketplace — Community Themes & Templates" },
       {
@@ -146,7 +146,7 @@ function Marketplace() {
                         className="font-display text-[10px] tracking-[0.2em]"
                         style={{ color: t.tokens.teal }}
                       >
-                        Aa POSITRON
+                        Aa DIAPOLAB
                       </span>
                       <div className="flex gap-1">
                         {Object.values(vars)

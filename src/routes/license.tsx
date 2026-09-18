@@ -5,16 +5,16 @@ export const Route = createFileRoute("/license")({
   component: LicensePage,
   head: () => ({
     meta: [
-      { title: "MIT License — Positron Studio" },
+      { title: "MIT License — DiapoLab" },
       {
         name: "description",
         content:
-          "Positron Studio is open source under the MIT License. Read the permissions, conditions and limitations.",
+          "DiapoLab is open source under the MIT License. Read the permissions, conditions and limitations.",
       },
-      { property: "og:title", content: "MIT License — Positron Studio" },
+      { property: "og:title", content: "MIT License — DiapoLab" },
       {
         property: "og:description",
-        content: "Positron Studio is open source under the MIT License.",
+        content: "DiapoLab is open source under the MIT License.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -39,7 +39,7 @@ function LicensePage() {
         <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">Full text</h2>
         <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-teal/70">{`MIT License
 
-Copyright (c) 2026 Positron Studio
+Copyright (c) 2026 DiapoLab
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ SOFTWARE.`}</pre>
         <p className="font-mono text-[12px] text-teal/70">
           The MIT license covers the editor itself. Templates and themes published to the
           marketplace stay the property of their authors, who grant everyone the right to use and
-          remix them inside Positron Studio.
+          remix them inside DiapoLab.
         </p>
       </section>
     </LegalShell>

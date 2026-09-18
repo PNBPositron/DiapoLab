@@ -901,7 +901,7 @@ const UI_DEFAULTS: Record<
   browser: {
     w: 800,
     h: 500,
-    title: "Positron Studio",
+    title: "DiapoLab",
     body: "https://positronstudio.lovable.app",
     value: 0,
     items: ["Home", "Docs", "Pricing"],
@@ -974,7 +974,7 @@ const UI_DEFAULTS: Record<
   vtabs: {
     w: 860,
     h: 520,
-    title: "Positron Studio",
+    title: "DiapoLab",
     body: "https://positronstudio.lovable.app",
     value: 0,
     items: ["Dashboard", "Editor", "Templates", "Settings"],

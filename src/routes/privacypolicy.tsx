@@ -4,16 +4,16 @@ export const Route = createFileRoute("/privacypolicy")({
   component: PrivacyPolicy,
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Positron Studio" },
+      { title: "Privacy Policy — DiapoLab" },
       {
         name: "description",
         content:
-          "How Positron Studio handles your designs, account data, AI prompts and published templates.",
+          "How DiapoLab handles your designs, account data, AI prompts and published templates.",
       },
-      { property: "og:title", content: "Privacy Policy — Positron Studio" },
+      { property: "og:title", content: "Privacy Policy — DiapoLab" },
       {
         property: "og:description",
-        content: "How Positron Studio handles your designs, account data and AI prompts.",
+        content: "How DiapoLab handles your designs, account data and AI prompts.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -79,14 +79,14 @@ function Consent() {
             <Zap className="h-5 w-5 text-teal" strokeWidth={2.5} fill="currentColor" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal text-glow">
-            POSITRON<span className="text-blue text-glow-blue">//</span>STUDIO
+            DIAPOLAB
           </div>
         </div>
         <h1 className="font-display text-xl uppercase tracking-[0.2em] text-teal">
           // Connect {clientName}
         </h1>
         <p className="mt-2 font-mono text-[11px] text-teal/70">
-          &gt; {clientName} wants to use Positron Studio as you — read, create and delete your
+          &gt; {clientName} wants to use DiapoLab as you — read, create and delete your
           designs, and browse community templates.
         </p>
         {error && <p className="mt-3 font-mono text-[10px] text-[#ff0080]" role="alert">! {error}</p>}
