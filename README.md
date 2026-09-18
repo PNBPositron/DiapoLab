@@ -1,22 +1,45 @@
-![Icon of the website.](/public/screenshot.png)
-# DiapoLab
+<div align="center">
 
-DiapoLab is a modern presentation editor, open source under MIT license.
+# 📽️ DiapoLab
 
-## Development
+**A modern, intuitive presentation editor designed for speed and clarity.**
 
-Install dependencies and start the development server:
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
-```sh
-npm install
-npm run dev
-```
+[Overview](#-overview) • [Quick Start](#-quick-start) • [Production](#-production-build) • [Contributing](#-contributing) • [License](#-license)
 
-Open the local URL shown in the terminal to use the editor.
+<br />
 
-## Production build
+<!-- Screenshot with rounded frame -->
+<kbd>
+  <img src="/public/screenshot.png" alt="DiapoLab Preview" width="850" style="border-radius: 12px;" />
+</kbd>
 
-```sh
-npm run build
-npm run preview
-```
+</div>
+
+---
+
+## 🌟 Features
+
+- 🎨 **Modern Interface** — Clean, distraction-free slide design experience.
+- 🛠️ **A lot of features** — Elements, illustrations, presets, developer mode and AI generator...
+- 🔓 **100% Open Source** — Free to use, modify, and distribute under the MIT license.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Ensure you have [Node.js](https://nodejs.org/) (v18+) and [npm](https://www.npmjs.com/) installed.
+
+### Development
+
+1. **Clone the repository and install dependencies:**
+
+   ```sh
+   git clone https://github.com/your-username/diapolab.git
+   cd diapolab
+   npm install
