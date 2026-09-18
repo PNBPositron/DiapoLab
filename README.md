@@ -1,12 +1,10 @@
 <div align="center">
 
-# 📽️ DiapoLab
+#  DiapoLab
 
 **A modern, intuitive presentation editor designed for speed and clarity.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
 [Overview](#-overview) • [Quick Start](#-quick-start) • [Production](#-production-build) • [Contributing](#-contributing) • [License](#-license)
 
