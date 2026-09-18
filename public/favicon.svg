@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Tile Gradient -->
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2F6CF6" />
+      <stop offset="50%" stop-color="#215AE2" />
+      <stop offset="100%" stop-color="#1444C2" />
+    </linearGradient>
+
+    <!-- White Material Gradient -->
+    <linearGradient id="whiteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#EEF3FC" />
+    </linearGradient>
+
+    <!-- Soft Depth Shadow for 3D/Embossed look -->
+    <filter id="flaskShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <!-- Ambient occlusion / blur shadow -->
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#092570" flood-opacity="0.5" />
+      <!-- Sharp contact shadow -->
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#071D57" flood-opacity="0.3" />
+    </filter>
+
+    <!-- Subtle surface reflection on the tile -->
+    <linearGradient id="tileHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.02" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Card / Tile (Modern Rounded Squircle) -->
+  <rect width="512" height="512" rx="76" fill="url(#blueGradient)" />
+
+  <!-- Subtle Inner Glass Highlight Border -->
+  <rect x="1.5" y="1.5" width="509" height="509" rx="74.5" fill="none" stroke="url(#tileHighlight)" stroke-width="3" />
+
+  <!-- Flask Group with Elevation Shadow -->
+  <g filter="url(#flaskShadow)">
+
+    <!-- Main Flask Body (Neck + Conical Base) -->
+    <path d="M 226 132
+             L 226 194
+             C 226 236, 168 334, 148 367
+             C 137 385, 152 394, 174 394
+             Q 256 398, 338 394
+             C 360 394, 375 385, 364 367
+             C 344 334, 286 236, 286 194
+             L 286 132"
+          fill="none"
+          stroke="url(#whiteGrad)"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round" />
+
+    <!-- Liquid Level Line (Horizontal Crossbar) -->
+    <path d="M 191 298 Q 256 300, 321 298"
+          fill="none"
+          stroke="url(#whiteGrad)"
+          stroke-width="25"
+          stroke-linecap="round" />
+
+    <!-- Top Flask Lip / Rim -->
+    <rect x="200" y="118" width="112" height="26" rx="13" fill="url(#whiteGrad)" />
+
+  </g>
+</svg>
