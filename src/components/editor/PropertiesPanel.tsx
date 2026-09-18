@@ -18,7 +18,6 @@ import {
 } from "@/store/editor";
 import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
-import { uploadAccountImage } from "@/lib/image-assets";
 
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)]),
@@ -447,10 +446,13 @@ export function PropertiesPanel() {
                       if (file) {
                         setUploadingImage(true);
                         setImageUploadError(null);
-                        uploadAccountImage(file)
-                          .then((image) => update(el.id, { imageOverlay: image.url }))
-                          .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
-                          .finally(() => setUploadingImage(false));
+                        try {
+                          update(el.id, { imageOverlay: URL.createObjectURL(file) });
+                        } catch {
+                          setImageUploadError("Could not load image");
+                        } finally {
+                          setUploadingImage(false);
+                        }
                       }
                       e.currentTarget.value = "";
                     }}
@@ -563,10 +565,13 @@ export function PropertiesPanel() {
                       if (file) {
                         setUploadingImage(true);
                         setImageUploadError(null);
-                        uploadAccountImage(file)
-                          .then((image) => update(el.id, { imageOverlay: image.url }))
-                          .catch((error) => setImageUploadError(error instanceof Error ? error.message : "Image upload failed"))
-                          .finally(() => setUploadingImage(false));
+                        try {
+                          update(el.id, { imageOverlay: URL.createObjectURL(file) });
+                        } catch {
+                          setImageUploadError("Could not load image");
+                        } finally {
+                          setUploadingImage(false);
+                        }
                       }
                       e.currentTarget.value = "";
                     }}
