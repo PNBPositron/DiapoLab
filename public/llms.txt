@@ -1,10 +1,12 @@
-# Positron Studio
+# DiapoLab
 
 > A futuristic presentation and design editor for creating bold multipage slides, posters, and social graphics.
 
-Positron Studio is a browser-based design tool. Users build multipage designs on a canvas with text, shapes, icons, images, AI-generated assets, interactive quizzes, and animated timelines, then export to PNG, PDF, PPTX, HTML, MP4, or JSON. Signed-in users can save designs to the cloud and publish them as community templates.
+DiapoLab is a browser-based design tool. Users build multipage designs on a canvas with text, shapes, icons, images, AI-generated assets, interactive quizzes, and animated timelines, then export to PNG, PDF, PPTX, HTML, MP4, or JSON. Signed-in users can save designs to the cloud and publish them as community templates.
 
 ## Pages
 
 - [Editor](/): The main design and presentation editor.
 - [Sign in](/auth): Sign in or create an account to save and sync designs.
+- [Settings](/settings): Edit the editor settings.
+- [Marketplace](/marketplace): Find themes and templates.
