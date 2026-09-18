@@ -1,3 +1,5 @@
+![Icon of the website.](/public/favicon.ico)/
+
 # DiapoLab
 
 DiapoLab is a modern presentation editor, open source under MIT license.
