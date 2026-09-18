@@ -11,13 +11,13 @@ export const Route = createFileRoute("/")({
   component: Editor,
   head: () => ({
     meta: [
-      { title: "Positron Studio — Neobrutalist Design Editor" },
+      { title: "DiapoLab — Neobrutalist Design Editor" },
       {
         name: "description",
         content:
           "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship.",
       },
-      { property: "og:title", content: "Positron Studio — Neobrutalist Design Editor" },
+      { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
       { property: "og:description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
       { property: "og:url", content: "https://positronstudio.lovable.app/" },
     ],
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
 function Editor() {
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-ink">
-      <h1 className="sr-only">Positron Studio — Neobrutalist Design &amp; Presentation Editor</h1>
+      <h1 className="sr-only">DiapoLab — Neobrutalist Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />

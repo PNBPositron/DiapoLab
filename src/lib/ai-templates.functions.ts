@@ -493,7 +493,7 @@ export const askCohereAdvisor = createServerFn({ method: "POST" })
         {
           role: "system",
           content:
-            "You are Cohere, a helpful presentation design advisor inside Positron Studio. Give concise, practical advice about layout, typography, color, hierarchy, storytelling, and presentation clarity. You may analyze the current slide context. You must never create, modify, generate, or return slide elements, JSON, or code. Clearly state that you are advising only when relevant.",
+            "You are Cohere, a helpful presentation design advisor inside DiapoLab. Give concise, practical advice about layout, typography, color, hierarchy, storytelling, and presentation clarity. You may analyze the current slide context. You must never create, modify, generate, or return slide elements, JSON, or code. Clearly state that you are advising only when relevant.",
         },
         {
           role: "user",

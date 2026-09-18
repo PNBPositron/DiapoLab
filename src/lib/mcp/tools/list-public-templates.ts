@@ -5,7 +5,7 @@ import { supabaseForUser, notAuthed } from "./list-designs";
 export default defineTool({
   name: "list_public_templates",
   title: "List community templates",
-  description: "Browse community-published Positron Studio templates, newest first.",
+  description: "Browse community-published DiapoLab templates, newest first.",
   inputSchema: { limit: z.number().int().min(1).max(50).default(20) },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ limit }, ctx) => {

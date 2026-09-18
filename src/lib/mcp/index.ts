@@ -9,10 +9,10 @@ const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unse
 
 export default defineMcp({
   name: "positron-studio-mcp",
-  title: "Positron Studio",
+  title: "DiapoLab",
   version: "0.1.0",
   instructions:
-    "Tools for Positron Studio, a neobrutalist deck/design editor. List, read, create and delete the signed-in user's designs, and browse community templates.",
+    "Tools for DiapoLab, a neobrutalist deck/design editor. List, read, create and delete the signed-in user's designs, and browse community templates.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",

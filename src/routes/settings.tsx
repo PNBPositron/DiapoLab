@@ -5,13 +5,13 @@ export const Route = createFileRoute("/settings")({
   component: SettingsPage,
   head: () => ({
     meta: [
-      { title: "Settings — Positron Studio" },
+      { title: "Settings — DiapoLab" },
       {
         name: "description",
-        content: "Customize Positron Studio editor behavior, AI features, panels, motion, and themes.",
+        content: "Customize DiapoLab editor behavior, AI features, panels, motion, and themes.",
       },
-      { property: "og:title", content: "Settings — Positron Studio" },
-      { property: "og:description", content: "Customize your Positron Studio design editor experience." },
+      { property: "og:title", content: "Settings — DiapoLab" },
+      { property: "og:description", content: "Customize your DiapoLab design editor experience." },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "https://positronstudio.lovable.app/settings" }],
@@ -23,7 +23,7 @@ function SettingsPage() {
 
   return (
     <main className="min-h-screen bg-ink">
-      <h1 className="sr-only">Positron Studio settings</h1>
+      <h1 className="sr-only">DiapoLab settings</h1>
       <SettingsDialog onClose={() => navigate({ to: "/" })} />
     </main>
   );

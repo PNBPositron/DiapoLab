@@ -12,10 +12,10 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — Positron Studio" },
-      { name: "description", content: "Sign in to Positron Studio to save and sync your neobrutalist designs." },
-      { property: "og:title", content: "Sign in — Positron Studio" },
-      { property: "og:description", content: "Sign in to Positron Studio to save and sync your neobrutalist designs." },
+      { title: "Sign in — DiapoLab" },
+      { name: "description", content: "Sign in to DiapoLab to save and sync your neobrutalist designs." },
+      { property: "og:title", content: "Sign in — DiapoLab" },
+      { property: "og:description", content: "Sign in to DiapoLab to save and sync your neobrutalist designs." },
       { property: "og:url", content: "https://positronstudio.lovable.app/auth" },
     ],
     links: [
@@ -115,7 +115,7 @@ function AuthPage() {
             <Zap className="h-5 w-5 text-teal" strokeWidth={2.5} fill="currentColor" />
           </div>
           <div className="font-display text-xl tracking-[0.18em] text-teal text-glow">
-            POSITRON<span className="text-blue text-glow-blue">//</span>STUDIO
+            DIAPOLAB
           </div>
         </Link>
 
