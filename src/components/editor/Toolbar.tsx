@@ -20,6 +20,7 @@ import {
   Settings,
   Info,
   FlaskConical,
+  Code2,
   Sparkles,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
@@ -218,8 +219,8 @@ export function Toolbar() {
       </div>
 
       <div className="flex items-center gap-2">
-        <button onClick={() => setAssistantOpen(true)} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Redesign current slide with Gemini">
-          <Sparkles className="size-4" /> REDESIGN
+        <button onClick={() => navigate({ to: "/settings" })} className="brutal-border brutal-press flex items-center gap-2 bg-teal px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-ink hover:bg-blue" title="Open developer mode">
+          <Code2 className="size-4" /> DEVELOPER MODE
         </button>
         <IconBtn onClick={undo} title="Undo">
           <Undo2 className="h-4 w-4" strokeWidth={2.5} />
