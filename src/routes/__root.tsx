@@ -106,13 +106,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             {
               "@type": "Organization",
               name: "DiapoLab",
-              url: "https://positronstudio.lovable.app",
-              logo: "https://positronstudio.lovable.app/favicon.ico",
+              url: "https://diapolab.lovable.app",
+              logo: "https://diapolab.lovable.app/favicon.ico",
             },
             {
               "@type": "WebSite",
               name: "DiapoLab",
-              url: "https://positronstudio.lovable.app",
+              url: "https://diapolab.lovable.app",
             },
           ],
         }),

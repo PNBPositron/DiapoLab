@@ -714,7 +714,7 @@ export const stockSearch = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ results: StockImage[] }> => {
     const url = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(data.query)}&page=${data.page}&page_size=20&license_type=commercial&mature=false`;
     const res = await fetch(url, {
-      headers: { Accept: "application/json", "User-Agent": "Positron-Studio/1.0" },
+      headers: { Accept: "application/json", "User-Agent": "DiapoLab/1.0" },
     });
     if (!res.ok) throw new Error(`Stock search failed: ${res.status}`);
     const json = (await res.json()) as {

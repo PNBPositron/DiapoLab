@@ -18,7 +18,7 @@ export const Route = createFileRoute("/privacypolicy")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "https://positronstudio.lovable.app/privacypolicy" }],
+    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/privacypolicy" }],
   }),
 });
 

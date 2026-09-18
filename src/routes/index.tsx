@@ -19,10 +19,10 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
       { property: "og:description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
-      { property: "og:url", content: "https://positronstudio.lovable.app/" },
+      { property: "og:url", content: "https://diapolab.lovable.app/" },
     ],
     links: [
-      { rel: "canonical", href: "https://positronstudio.lovable.app/" },
+      { rel: "canonical", href: "https://diapolab.lovable.app/" },
     ],
   }),
 });

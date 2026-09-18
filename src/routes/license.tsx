@@ -19,7 +19,7 @@ export const Route = createFileRoute("/license")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "https://positronstudio.lovable.app/license" }],
+    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/license" }],
   }),
 });
 
