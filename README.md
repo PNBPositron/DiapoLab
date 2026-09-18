@@ -1,26 +1,21 @@
 # Positron Studio
 
-Create a presentation editor/design editor inspired by polotno studio, but with a neobrutalist ui. Color scheme is teal, blue and yellow.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://positronstudio.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/084dcd8b-9260-49e2-a705-5721deed6223).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+Positron Studio is a neobrutalist presentation editor inspired by Polotno Studio. It uses a teal, blue, and yellow visual system for creating and editing slides.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Install dependencies and start the development server:
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
+```
+
+Open the local URL shown in the terminal to use the editor.
+
+## Production build
+
+```sh
+npm run build
+npm run preview
 ```
