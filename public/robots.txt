@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://positronstudio.lovable.app/sitemap.xml
+Sitemap: https://diapolab.vercel.app/sitemap.xml
