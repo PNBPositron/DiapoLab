@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "DiapoLab" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#0b1020" },
-      { rel: "icon", href: "/diapolab-mark.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot-2026-09-18-at-12-38-38-DiapoLab-%E2%80%94-Neobrutalist-Design-Editor_1_.ico-AlDQvUWF9TQAvP67GUpnGwM64vdGFR.x-icon", type: "image/x-icon" },
       { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
       { property: "og:description", content: "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides." },
       { property: "og:site_name", content: "DiapoLab" },

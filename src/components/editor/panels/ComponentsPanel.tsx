@@ -28,6 +28,7 @@ import {
   ToggleRight,
   TrendingUp,
   User,
+  Milestone,
   type LucideIcon,
 } from "lucide-react";
 import { newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
@@ -77,6 +78,7 @@ const UI_PRESETS: Array<{ kind: UiKind; label: string; Icon: LucideIcon; overrid
   { kind: "pricing", label: "Plan card", Icon: CreditCard, overrides: { title: "Pro plan", body: "$24 / month", items: ["Unlimited slides", "Custom themes", "Export to PDF"] } },
   { kind: "quote", label: "Testimonial", Icon: Quote, overrides: { title: "A sharper way to present ideas.", body: "Jordan Lee, Creative Director" } },
   { kind: "progress", label: "Completion", Icon: Gauge, overrides: { title: "Project progress", body: "Design system", value: 72 } },
+  { kind: "timeline", label: "Timeline", Icon: Milestone, overrides: { title: "Product launch", body: "Discovery → Build → Launch", value: 68, items: ["Discovery", "Prototype", "Launch"] } },
 ];
 type PresetSection = "interfaces" | "ui" | null;
 
