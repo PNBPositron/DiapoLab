@@ -1,6 +1,6 @@
-# Positron Studio
+# DiapoLab
 
-Positron Studio is a neobrutalist presentation editor inspired by Polotno Studio. It uses a teal, blue, and yellow visual system for creating and editing slides.
+DiapoLab is a neobrutalist presentation editor inspired by Polotno Studio. It uses a teal, blue, and yellow visual system for creating and editing slides.
 
 ## Development
 

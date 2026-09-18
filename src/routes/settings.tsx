@@ -14,7 +14,7 @@ export const Route = createFileRoute("/settings")({
       { property: "og:description", content: "Customize your DiapoLab design editor experience." },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://positronstudio.lovable.app/settings" }],
+    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/settings" }],
   }),
 });
 

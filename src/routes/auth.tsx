@@ -16,10 +16,10 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to DiapoLab to save and sync your neobrutalist designs." },
       { property: "og:title", content: "Sign in — DiapoLab" },
       { property: "og:description", content: "Sign in to DiapoLab to save and sync your neobrutalist designs." },
-      { property: "og:url", content: "https://positronstudio.lovable.app/auth" },
+      { property: "og:url", content: "https://diapolab.lovable.app/auth" },
     ],
     links: [
-      { rel: "canonical", href: "https://positronstudio.lovable.app/auth" },
+      { rel: "canonical", href: "https://diapolab.lovable.app/auth" },
     ],
   }),
 });

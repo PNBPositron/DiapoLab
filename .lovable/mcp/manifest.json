@@ -13,13 +13,13 @@
     "server": {
       "name": "positron-studio-mcp",
       "version": "0.1.0",
-      "title": "Positron Studio"
+      "title": "DiapoLab"
     },
     "tools": [
       {
         "name": "list_designs",
         "title": "List my designs",
-        "description": "List the signed-in user's saved Positron Studio designs (decks), newest first.",
+        "description": "List the signed-in user's saved DiapoLab designs (decks), newest first.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -145,7 +145,7 @@
       {
         "name": "list_public_templates",
         "title": "List community templates",
-        "description": "Browse community-published Positron Studio templates, newest first.",
+        "description": "Browse community-published DiapoLab templates, newest first.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
