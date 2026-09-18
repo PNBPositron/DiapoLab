@@ -2,7 +2,7 @@
 
 #  DiapoLab
 
-**A modern, intuitive presentation editor designed for speed and clarity.**
+**A modern, intuitive presentation editor designed for liberty and modernity.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
