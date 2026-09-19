@@ -138,8 +138,6 @@ export function Sidebar() {
                 setHovering(true);
               }}
               className={`group relative flex flex-col items-center gap-0.5 px-0.5 py-2 text-[8px] font-bold uppercase tracking-[0.08em] transition-all ${
-                t.id === "home" ? "rounded-2xl" : ""
-              } ${
                 active
                   ? "bg-blue-deep text-teal border border-teal glow-blue"
                   : "border border-teal/20 bg-surface text-teal/70 hover:text-teal hover:border-teal/60 hover:bg-surface-2"
