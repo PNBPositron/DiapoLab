@@ -5,13 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
-  --radius-4xl: 0px;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.75rem;
+  --radius-4xl: 2rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -54,38 +54,45 @@
 }
 
 :root {
-  --radius: 0px;
+  --radius: 0.875rem;
 
-  /* Cyberpunk palette */
-  --ink: oklch(0.08 0.02 240);
-  --paper: oklch(0.12 0.03 240);
-  --surface: oklch(0.16 0.04 245);
-  --surface-2: oklch(0.21 0.05 250);
-  --grid: oklch(0.28 0.08 220);
+  /* Liquid Glass palette */
+  --ink: #f5f7fb;
+  --paper: #0d1222;
+  --surface: rgba(255, 255, 255, 0.1);
+  --surface-2: rgba(255, 255, 255, 0.15);
+  --grid: rgba(255, 255, 255, 0.07);
 
-  --teal: oklch(0.86 0.16 195);
-  --teal-deep: oklch(0.62 0.16 195);
-  --blue: oklch(0.66 0.22 255);
-  --blue-deep: oklch(0.42 0.24 265);
+  --teal: #edf4ff;
+  --teal-deep: #aabbd4;
+  --blue: #8bb8ff;
+  --blue-deep: #597fc4;
+
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.28);
+  --glass-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  --glass-blur: 20px;
 
   --background: var(--paper);
   --foreground: var(--teal);
   --card: var(--surface);
   --card-foreground: var(--teal);
-  --popover: var(--surface);
+  --popover: var(--surface-2);
   --popover-foreground: var(--teal);
   --primary: var(--blue);
-  --primary-foreground: oklch(0.08 0.02 240);
-  --secondary: var(--teal);
-  --secondary-foreground: var(--ink);
-  --muted: var(--surface-2);
-  --muted-foreground: oklch(0.62 0.07 220);
-  --accent: var(--teal);
-  --accent-foreground: var(--ink);
-  --destructive: oklch(0.65 0.27 18);
-  --destructive-foreground: oklch(1 0 0);
-  --border: var(--teal);
-  --input: var(--teal-deep);
+  --primary-foreground: #0b1426;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--teal);
+  --muted: rgba(255, 255, 255, 0.08);
+  --muted-foreground: var(--teal-deep);
+  --accent: rgba(139, 184, 255, 0.22);
+  --accent-foreground: var(--teal);
+  --destructive: #f08b9d;
+  --destructive-foreground: #fff;
+  --border: var(--glass-border);
+  --input: rgba(255, 255, 255, 0.18);
   --ring: var(--blue);
 }
 
@@ -274,39 +281,28 @@
   }
   html,
   body {
-    background-color: var(--ink);
+    background-color: var(--paper);
     color: var(--teal);
-    font-family: "JetBrains Mono", "Inter", system-ui, monospace;
+    font-family: "Inter", system-ui, sans-serif;
     background-image:
-      linear-gradient(color-mix(in oklab, var(--teal) 12%, transparent) 1px, transparent 1px),
-      linear-gradient(
-        90deg,
-        color-mix(in oklab, var(--blue) 12%, transparent) 1px,
-        transparent 1px
-      ),
-      radial-gradient(
-        ellipse at 20% 10%,
-        color-mix(in oklab, var(--blue) 22%, transparent),
-        transparent 60%
-      ),
-      radial-gradient(
-        ellipse at 80% 90%,
-        color-mix(in oklab, var(--teal) 18%, transparent),
-        transparent 60%
-      );
-    background-size:
-      40px 40px,
-      40px 40px,
-      100% 100%,
-      100% 100%;
+      radial-gradient(circle at 8% 12%, rgba(93, 143, 255, 0.18), transparent 28%),
+      radial-gradient(circle at 92% 86%, rgba(124, 91, 214, 0.16), transparent 30%),
+      linear-gradient(135deg, #0b1020 0%, #121b32 50%, #0c1325 100%);
+    background-attachment: fixed;
   }
   h1,
   h2,
   h3,
   h4 {
-    font-family: var(--font-display);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-family: "Inter", system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    text-transform: none;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
   }
   ::selection {
     background: var(--teal);
@@ -315,27 +311,28 @@
 }
 
 @layer utilities {
-  .brutal-border {
-    border: 2px solid var(--teal);
-  }
+  .brutal-border,
   .brutal-border-2 {
-    border: 1px solid color-mix(in oklab, var(--teal) 60%, transparent);
+    border: 1px solid var(--glass-border);
   }
-  .brutal-shadow {
-    box-shadow:
-      0 0 0 2px var(--teal),
-      6px 6px 0 0 var(--blue-deep);
-  }
-  .brutal-shadow-sm {
-    box-shadow:
-      0 0 0 1px var(--teal),
-      3px 3px 0 0 var(--blue-deep);
-  }
+  .brutal-shadow,
+  .brutal-shadow-sm,
   .brutal-shadow-lg {
-    box-shadow:
-      0 0 0 2px var(--teal),
-      12px 12px 0 0 var(--blue-deep),
-      var(--shadow-glow-blue);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-surface {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+  }
+  .liquid-glass-surface {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
   }
   .glow-teal {
     box-shadow: var(--shadow-glow-teal);
@@ -354,33 +351,29 @@
       0 0 18px color-mix(in oklab, var(--blue) 35%, transparent);
   }
   .brutal-press {
-    transition:
-      transform 90ms ease,
-      box-shadow 90ms ease,
-      filter 120ms ease;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
   }
   .brutal-press:hover {
-    transform: translate(-2px, -2px);
-    box-shadow:
-      0 0 0 2px var(--teal),
-      8px 8px 0 0 var(--blue-deep),
-      var(--shadow-glow-teal);
-    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22), 0 0 24px rgba(139, 184, 255, 0.12);
   }
   .brutal-press:active {
-    transform: translate(2px, 2px);
-    box-shadow:
-      0 0 0 2px var(--teal),
-      2px 2px 0 0 var(--blue-deep);
+    transform: scale(0.98);
   }
   .scanlines {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 2px,
-      color-mix(in oklab, var(--teal) 6%, transparent) 2px,
-      color-mix(in oklab, var(--teal) 6%, transparent) 3px
-    );
+    background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
   }
   .neon-divider {
     background: linear-gradient(90deg, transparent, var(--teal), var(--blue), transparent);
