@@ -1,6 +1,6 @@
 # 🎤 DiapoLab
 
-> Build sharper decks, faster. Open-source presentation editing with templates, AI assistance, cloud saves, and polished export workflows.
+> Build modern decks, faster. Open-source presentation editing with templates, AI assistance, cloud saves, and polished export workflows.
 
 A modern, open-source presentation editor for creating beautiful slides with speed, flexibility, and creative control.
 
@@ -26,15 +26,6 @@ The app includes:
 - 📦 import/export for sharing and downstream workflows
 - 🔐 authenticated cloud saves and publishing
 
-## 💡 Why DiapoLab?
-
-DiapoLab combines the workflow of a presentation tool with the flexibility of a creative design studio. It is built for:
-
-- 🚀 startup pitches and investor decks
-- 📣 product walkthroughs and demos
-- 🎓 course slides and teaching materials
-- 🏢 internal communication and product collateral
-- ✨ designers and makers who want a lightweight, open presentation system
 
 ## ⚡ Features
 
@@ -54,7 +45,7 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 - Custom themes and editor styling controls
 - Background and layout adjustments
 - Template-driven starter experiences
-- Design system with branded UI styling
+- Presets in different styles
 - Flexible visual identity for presentation output
 
 ### 🤖 AI Assistance
