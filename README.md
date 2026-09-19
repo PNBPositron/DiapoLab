@@ -1,4 +1,4 @@
-# 🎤 DiapoLab
+#  DiapoLab
 
 > Build modern decks, faster. Open-source presentation editing with templates, AI assistance, cloud saves, and polished export workflows.
 
