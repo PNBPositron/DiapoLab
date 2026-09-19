@@ -15,7 +15,7 @@ A modern, open-source presentation editor for creating beautiful slides with spe
 ## 📸 Screenshot
 
 <p align="center">
-  <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" style="border-radius: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);" />
+  <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);" />
 </p>
 
 > Replace `./public/screenshot.png` with your preferred screenshot filename when ready.
