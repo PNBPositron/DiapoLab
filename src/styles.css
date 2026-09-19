@@ -54,26 +54,26 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 1.25rem;
 
   /* Liquid Glass palette */
-  --ink: #f5f7fb;
-  --paper: #0d1222;
-  --surface: rgba(255, 255, 255, 0.1);
-  --surface-2: rgba(255, 255, 255, 0.15);
-  --grid: rgba(255, 255, 255, 0.07);
+  --ink: #f7f9ff;
+  --paper: #091326;
+  --surface: rgba(181, 211, 255, 0.1);
+  --surface-2: rgba(191, 220, 255, 0.17);
+  --grid: rgba(190, 220, 255, 0.09);
 
-  --teal: #edf4ff;
-  --teal-deep: #aabbd4;
-  --blue: #8bb8ff;
-  --blue-deep: #597fc4;
+  --teal: #eef7ff;
+  --teal-deep: #b5c8e7;
+  --blue: #86b9ff;
+  --blue-deep: #526fe0;
 
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-bg-strong: rgba(255, 255, 255, 0.16);
-  --glass-border: rgba(255, 255, 255, 0.16);
-  --glass-highlight: rgba(255, 255, 255, 0.28);
-  --glass-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
-  --glass-blur: 20px;
+  --glass-bg: rgba(166, 201, 255, 0.12);
+  --glass-bg-strong: rgba(202, 226, 255, 0.2);
+  --glass-border: rgba(221, 237, 255, 0.24);
+  --glass-highlight: rgba(255, 255, 255, 0.42);
+  --glass-shadow: 0 22px 60px rgba(0, 8, 30, 0.34);
+  --glass-blur: 24px;
 
   --background: var(--paper);
   --foreground: var(--teal);
@@ -314,6 +314,7 @@
   .brutal-border,
   .brutal-border-2 {
     border: 1px solid var(--glass-border);
+    border-radius: 1rem;
   }
   .brutal-shadow,
   .brutal-shadow-sm,

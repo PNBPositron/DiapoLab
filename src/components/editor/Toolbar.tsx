@@ -19,7 +19,6 @@ import {
   Upload,
   Settings,
   Info,
-  FlaskConical,
   Sparkles,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
@@ -196,13 +195,15 @@ export function Toolbar() {
 
 
   return (
-    <header className="relative flex items-center justify-between gap-4 border-b border-teal/40 bg-ink px-5 py-3">
+    <header className="liquid-glass-surface relative flex items-center justify-between gap-4 rounded-b-[1.5rem] border-b border-teal/30 bg-ink/70 px-5 py-3">
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent opacity-80" />
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid size-10 place-items-center border-2 border-teal bg-blue-deep shadow-[0_0_14px_var(--blue)]" aria-label="DiapoLab">
-            <FlaskConical className="size-6 text-teal" strokeWidth={1.8} aria-hidden="true" />
-          </div>
+          <img
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
+            alt="DiapoLab flask logo"
+            className="size-11 rounded-[0.9rem] object-cover shadow-[0_0_24px_rgba(104,155,255,0.5)]"
+          />
           <div className="font-display text-xl tracking-[0.18em] text-teal">
             DIAPOLAB
           </div>
