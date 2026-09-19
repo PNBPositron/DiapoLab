@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   component: Editor,
   head: () => ({
     meta: [
-      { title: "DiapoLab — Neobrutalist Design Editor" },
+      { title: "DiapoLab — Liquid Glass Design Editor" },
       {
         name: "description",
         content:
@@ -29,8 +29,8 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-ink">
-      <h1 className="sr-only">DiapoLab — Neobrutalist Design &amp; Presentation Editor</h1>
+    <div className="flex h-screen flex-col overflow-hidden bg-paper">
+      <h1 className="sr-only">DiapoLab — Liquid Glass Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
