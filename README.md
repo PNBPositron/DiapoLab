@@ -15,14 +15,14 @@ A modern, open-source presentation editor for creating beautiful slides with spe
 ## 📸 Screenshot
 
 <p align="center">
-  <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" />
+  <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" style="border-radius: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);" />
 </p>
 
 > Replace `./public/screenshot.png` with your preferred screenshot filename when ready.
 
 ## 🌍 Overview
 
-DiapoLab is a browser-based presentation workspace built with React, Vite, TypeScript, and Supabase. It is designed for users who want a flexible editor that feels fast and expressive while remaining approachable for everyday creative work.
+DiapoLab is a browser-based presentation workspace built with React, Vite, TypeScript, and Supabase. It is designed for users who want a flexible editor that feels fast and expressive while remaining approachable for real-world deck creation.
 
 The app includes:
 
@@ -124,10 +124,10 @@ The app includes:
 ├── .env
 ├── .gitignore
 ├── components.json
-├── eslint.config.js
+���── eslint.config.js
 ├── LICENSE
 ├── package.json
-├��─ tsconfig.json
+├── tsconfig.json
 ├── vite.config.ts
 ├── wrangler.jsonc
 ├── README.md
@@ -201,7 +201,7 @@ npm run format   # format source files with Prettier
 
 ## 🧠 Development Notes
 
-This project is structured around a centralized editor store and route-based application shell. The core editor logic lives under `src/components/editor` and `src/store`, while route pages and supporting application scaffolding are organized around the Vite + React app structure.
+This project is structured around a centralized editor store and route-based application shell. The core editor logic lives under `src/components/editor` and `src/store`, while route pages and supporting UI live in the app shell. The project uses Vite for local dev and build tooling, with Supabase as the backend data layer and Radix/Tailwind for UI primitives.
 
 ## 🤝 Contributing
 
@@ -220,7 +220,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📌 Project Status
 
-DiapoLab is actively evolving as a presentation editor with template publishing, AI support, and export workflows. It is suitable for experimentation, local development, and open-source extension.
+DiapoLab is actively evolving as a presentation editor with template publishing, AI support, and export workflows. It is suitable for experimentation, local development, and open-source extension as a personal project or collaborative codebase.
 
 ## 🔗 Links
 
