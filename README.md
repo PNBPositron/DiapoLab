@@ -1,4 +1,4 @@
-# DiapoLab
+# 🎤 DiapoLab
 
 A modern, open-source presentation editor for creating beautiful slides with speed, flexibility, and creative control.
 
@@ -6,37 +6,37 @@ A modern, open-source presentation editor for creating beautiful slides with spe
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-A creative slide editor with templates, AI-assisted slide ideas, theme controls, secure cloud saves, and export options for real-world presentations.
+✨ A creative slide editor with templates, AI-assisted slide ideas, theme controls, secure cloud saves, and export options for real-world presentations.
 
 </div>
 
-## Overview
+## 🌍 Overview
 
 DiapoLab is a browser-based presentation workspace built with React, Vite, TypeScript, and Supabase. It is designed for users who want a flexible editor that feels fast and expressive while remaining open and customizable.
 
 The app includes:
 
-- a multi-slide editor canvas
-- rich text and layout controls
-- reusable design components and templates
-- AI-assisted slide analysis and improvement suggestions
-- theme customization and presentation mode
-- import/export for sharing and downstream workflows
-- authenticated cloud saves and publishing
+- 🖼️ a multi-slide editor canvas
+- 📝 rich text and layout controls
+- 🧩 reusable design components and templates
+- 🤖 AI-assisted slide analysis and improvement suggestions
+- 🎨 theme customization and presentation mode
+- 📦 import/export for sharing and downstream workflows
+- 🔐 authenticated cloud saves and publishing
 
-## Why DiapoLab?
+## 💡 Why DiapoLab?
 
 DiapoLab combines the workflow of a presentation tool with the flexibility of a creative design studio. It is built for:
 
-- startup pitches and investor decks
-- product walkthroughs and demos
-- course slides and teaching materials
-- internal communication and product collateral
-- designers and makers who want a lightweight, open presentation system
+- 🚀 startup pitches and investor decks
+- 📣 product walkthroughs and demos
+- 🎓 course slides and teaching materials
+- 🏢 internal communication and product collateral
+- ✨ designers and makers who want a lightweight, open presentation system
 
-## Features
+## ⚡ Features
 
-### Editor Features
+### 🖊️ Editor Features
 
 - Multi-slide deck editing
 - Canvas-based positioning and manipulation for elements
@@ -47,7 +47,7 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 - Presentation mode for full-screen playback
 - Undo/redo and quick design cleanup tools
 
-### Design & Styling
+### 🎨 Design & Styling
 
 - Custom themes and editor styling controls
 - Background and layout adjustments
@@ -55,14 +55,14 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 - Design system with branded UI styling
 - Flexible visual identity for presentation output
 
-### AI Assistance
+### 🤖 AI Assistance
 
 - AI slide analysis for current slide content
 - Suggestions for hierarchy and visual improvement
 - Help generating or refining slide ideas
 - Personalized editing assistance inside the editor
 
-### Cloud & Collaboration
+### ☁️ Cloud & Collaboration
 
 - Sign-in flow with Supabase auth
 - Save designs to user account
@@ -70,7 +70,7 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 - Public share links for published decks
 - Marketplace and template publishing workflow
 
-### Import / Export
+### 📤 Import / Export
 
 - Import existing design JSON
 - Export decks as:
@@ -81,14 +81,14 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
   - JSON
   - GIF
 
-### App Experience
+### 🧭 App Experience
 
 - Responsive modern UI
 - Settings and preferences screen
 - About, privacy policy, and license pages
 - Open-source MIT license
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - React 19
 - TypeScript
@@ -100,7 +100,7 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 - Radix UI primitives
 - Lucide icons
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 .
@@ -133,14 +133,14 @@ DiapoLab combines the workflow of a presentation tool with the flexibility of a 
 └── bun.lock
 ```
 
-## Requirements
+## ✅ Requirements
 
 Before starting the app, make sure you have:
 
 - Node.js 18+
 - npm 9+
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Clone the repository
 
@@ -176,7 +176,7 @@ npm run dev
 
 Then open the local URL shown in the terminal.
 
-## Production Build
+## 📦 Production Build
 
 ```bash
 npm run build
@@ -188,7 +188,7 @@ Preview the production build locally:
 npm run preview
 ```
 
-## Available Scripts
+## 🧪 Available Scripts
 
 ```bash
 npm run dev      # start the development app
@@ -198,11 +198,11 @@ npm run lint     # run ESLint
 npm run format   # format source files with Prettier
 ```
 
-## Development Notes
+## 🧠 Development Notes
 
 This project is structured around a centralized editor store and route-based application shell. The core editor logic lives under `src/components/editor` and `src/store`, while route pages and supporting integrations live under `src/routes` and `src/lib`.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome.
 
@@ -213,17 +213,16 @@ If you want to contribute:
 3. Commit your changes
 4. Open a pull request with a clear description
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Project Status
+## 📌 Project Status
 
 DiapoLab is actively evolving as a presentation editor with template publishing, AI support, and export workflows. It is suitable for experimentation, local development, and open-source extension.
 
-## Links
+## 🔗 Links
 
 - Repository: https://github.com/PNBPositron/DiapoLab
 - License: MIT
 - App concept: Presentation editor / slide design tool
-
