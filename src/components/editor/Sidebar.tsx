@@ -143,9 +143,6 @@ export function Sidebar() {
                   : "border border-teal/20 bg-surface text-teal/70 hover:text-teal hover:border-teal/60 hover:bg-surface-2"
               }`}
             >
-              {active && (
-                <span className="absolute left-0 top-0 h-full w-[3px] bg-teal glow-teal" />
-              )}
               <Icon className="h-4 w-4" strokeWidth={2} />
               {t.label}
             </button>
