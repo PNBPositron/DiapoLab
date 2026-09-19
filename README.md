@@ -12,6 +12,14 @@ A modern, open-source presentation editor for creating beautiful slides with spe
 
 </div>
 
+## 📸 Screenshot
+
+<p align="center">
+  <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" />
+</p>
+
+> Replace `./public/screenshot.png` with your preferred screenshot filename when ready.
+
 ## 🌍 Overview
 
 DiapoLab is a browser-based presentation workspace built with React, Vite, TypeScript, and Supabase. It is designed for users who want a flexible editor that feels fast and expressive while remaining open and customizable.
@@ -120,7 +128,7 @@ The app includes:
 ├── LICENSE
 ├── package.json
 ├── tsconfig.json
-├── vite.config.ts
+├���─ vite.config.ts
 ├── wrangler.jsonc
 ├── README.md
 └── bun.lock
