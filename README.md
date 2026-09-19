@@ -1,5 +1,7 @@
 # 🎤 DiapoLab
 
+> Build sharper decks, faster. Open-source presentation editing with templates, AI assistance, cloud saves, and polished export workflows.
+
 A modern, open-source presentation editor for creating beautiful slides with speed, flexibility, and creative control.
 
 <div align="center">
