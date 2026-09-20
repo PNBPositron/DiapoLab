@@ -129,7 +129,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="flex w-16 flex-col gap-1 border-r border-teal/20 bg-ink p-1.5">
+      <nav className="flex w-16 flex-col gap-1 border-r border-teal/20 bg-transparent p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
