@@ -5,7 +5,6 @@ import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
-import { Timeline } from "@/components/editor/Timeline";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -49,7 +48,6 @@ function Editor() {
         <PropertiesPanel />
       </div>
       <PagesBar />
-      <Timeline />
       <PresentationMode />
     </div>
   );

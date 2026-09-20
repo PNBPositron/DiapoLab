@@ -9,7 +9,8 @@ export type PanelId =
   | "elements"
   | "illustrations"
   | "design"
-  | "ai";
+  | "ai"
+  | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
   home: "Home",
@@ -19,7 +20,8 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   illustrations: "Illus.",
   design: "Design",
   ai: "AI",
-  };
+  "my-designs": "My Designs",
+};
 
 export type BrandKit = {
   primary: string;
@@ -97,7 +99,8 @@ const ALL_ON: Record<PanelId, boolean> = {
   illustrations: true,
   design: true,
   ai: true,
-  };
+  "my-designs": true,
+};
 
 export const useSettings = create<SettingsState>()(
   persist(

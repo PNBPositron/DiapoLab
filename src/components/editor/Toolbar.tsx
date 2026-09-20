@@ -9,7 +9,6 @@ import {
   Play,
   Save,
   Cloud,
-  FolderOpen,
   LogOut,
   FilePlus,
   Loader2,
@@ -23,7 +22,6 @@ import {
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign, publishAsTemplate } from "@/lib/designs";
-import { MyDesignsDialog } from "./MyDesignsDialog";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import {
   exportPNG,
@@ -54,7 +52,6 @@ export function Toolbar() {
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
-  const [open, setOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantInput, setAssistantInput] = useState("");
@@ -230,8 +227,7 @@ export function Toolbar() {
           <BentoMenu
             onSettings={() => navigate({ to: "/settings" })}
             onNewDesign={newDesign}
-            onMyDesigns={() => setOpen(true)}
-            onShare={handlePublish}
+                  onShare={handlePublish}
             onAbout={() => setAboutOpen(true)}
             onExport={() => setExportOpen((v) => !v)}
             publishing={publishing}
@@ -330,7 +326,6 @@ export function Toolbar() {
         </div>
       </div>
 
-  {open && <MyDesignsDialog onClose={() => setOpen(false)} />}
   <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
     <DialogContent className="brutal-border-2 max-w-lg border-teal bg-surface text-foreground">
       <DialogHeader><DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em] text-foreground"><Sparkles className="size-4" /> Gemini slide assistant</DialogTitle><DialogDescription className="font-mono text-xs text-muted-foreground">Analyze the current slide and get actionable ideas.</DialogDescription></DialogHeader>
@@ -472,8 +467,7 @@ function BentoMenu({
   const items = [
     { label: "Settings", icon: Settings, action: onSettings },
     { label: "New design", icon: FilePlus, action: onNewDesign },
-    { label: "My designs", icon: FolderOpen, action: onMyDesigns },
-    { label: "About", icon: Info, action: onAbout },
+      { label: "About", icon: Info, action: onAbout },
     {
       label: publishing ? "Sharing..." : "Share",
       icon: publishing ? Loader2 : Share2,

@@ -12,6 +12,7 @@ import {
   Settings,
   Images,
   Sparkles,
+  FolderHeart,
 } from "lucide-react";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -21,6 +22,7 @@ import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { IllustrationsPanel } from "./panels/IllustrationsPanel";
 import { AiPanel } from "./panels/AiPanel";
 import { SettingsDialog } from "./SettingsDialog";
+import { MyDesignsDialog } from "./MyDesignsDialog";
 
 const TOOLS = [
   { id: "home", label: "Home", icon: LayoutTemplate },
@@ -30,6 +32,7 @@ const TOOLS = [
   { id: "components", label: "Presets", icon: Blocks },
   { id: "design", label: "Design", icon: SlidersHorizontal },
   { id: "ai", label: "AI", icon: Sparkles },
+  { id: "my-designs", label: "Designs", icon: FolderHeart },
 ] as const;
 
 export function Sidebar() {
@@ -137,7 +140,7 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`group relative flex flex-col items-center gap-0.5 rounded-xl px-0.5 py-2 text-[8px] font-bold uppercase tracking-[0.08em] transition-all ${
+              className={`group relative flex flex-col items-center gap-0.5 rounded-xl px-0.5 py-2 text-[7px] font-semibold uppercase tracking-[0.06em] transition-all ${
                 active
                   ? "bg-blue-deep text-teal border border-teal glow-blue"
                   : "border border-teal/20 bg-surface text-teal/70 hover:text-teal hover:border-teal/60 hover:bg-surface-2"
@@ -152,7 +155,7 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="mt-auto flex flex-col items-center gap-0.5 rounded-xl border border-teal/20 bg-surface px-0.5 py-2 text-[8px] font-bold uppercase tracking-[0.08em] text-teal/70 transition-colors duration-200 hover:border-teal/60 hover:bg-surface-2 hover:text-teal"
+          className="mt-auto flex flex-col items-center gap-0.5 rounded-xl border border-teal/20 bg-surface px-0.5 py-2 text-[7px] font-semibold uppercase tracking-[0.06em] text-teal/70 transition-colors duration-200 hover:border-teal/60 hover:bg-surface-2 hover:text-teal"
         >
           <Settings className="h-5 w-5" strokeWidth={2} />
           Settings
@@ -174,6 +177,7 @@ export function Sidebar() {
         {tool === "illustrations" && <IllustrationsPanel />}
         {tool === "design" && <DesignPanel />}
         {tool === "ai" && <AiPanel />}
+        {tool === "my-designs" && <MyDesignsDialog embedded onClose={() => setTool("home")} />}
       </div>
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </aside>
