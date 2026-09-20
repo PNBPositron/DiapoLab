@@ -18,107 +18,54 @@ export function PagesBar() {
   } = useEditor();
   const currentTransition: SlideTransition = pages[currentIndex]?.transition ?? "none";
   const ratio = canvasW / canvasH;
-  const thumbW = ratio >= 1 ? 96 : 96 * ratio;
-  const thumbH = ratio >= 1 ? 96 / ratio : 96;
+  const thumbW = ratio >= 1 ? 138 : 138 * ratio;
+  const thumbH = ratio >= 1 ? 138 / ratio : 138;
 
   return (
-    <div className="flex items-center gap-2 border-t border-teal/30 bg-ink px-3 py-2">
-      <span className="font-display text-[10px] tracking-[0.2em] text-teal/70">PAGES</span>
-      <div className="flex flex-1 items-center gap-2 overflow-x-auto py-1">
+    <div className="flex h-[116px] shrink-0 items-center gap-4 border-t border-slate-200 bg-white px-5 py-3 text-slate-700 shadow-[0_-2px_10px_rgba(15,23,42,0.06)]">
+      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Pages</span>
+      <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`brutal-border-2 relative overflow-hidden transition-all ${
-                  active ? "border-teal glow-teal" : "border-teal/30 hover:border-teal/70"
+                className={`relative overflow-hidden rounded-xl border bg-white transition-all duration-200 ${
+                  active
+                    ? "border-slate-500 shadow-[0_2px_7px_rgba(15,23,42,0.2)]"
+                    : "border-slate-200 hover:border-slate-400 hover:shadow-[0_2px_6px_rgba(15,23,42,0.12)]"
                 }`}
-                style={{ width: thumbW + 6, height: thumbH + 6 }}
+                style={{ width: thumbW + 4, height: thumbH + 4 }}
               >
-                <SlideThumbnail
-                  page={p}
-                  canvasW={canvasW}
-                  canvasH={canvasH}
-                  className="h-full w-full"
-                />
-                <span className="absolute bottom-0.5 left-1 font-mono text-[9px] text-ink mix-blend-difference">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+                <SlideThumbnail page={p} canvasW={canvasW} canvasH={canvasH} className="h-full w-full" />
+                <span className="absolute bottom-1 left-1 rounded bg-white/85 px-1 font-mono text-[10px] text-slate-700">{i + 1}</span>
               </button>
-              <div className="absolute -right-1 -top-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-                {i > 0 && (
-                  <button
-                    onClick={() => movePage(i, i - 1)}
-                    title="Move page left"
-                    aria-label={`Move page ${i + 1} left`}
-                    className="grid h-5 w-5 place-items-center bg-teal text-ink"
-                  >
-                    <ChevronLeft className="h-3 w-3" strokeWidth={3} />
-                  </button>
-                )}
-                {i < pages.length - 1 && (
-                  <button
-                    onClick={() => movePage(i, i + 1)}
-                    title="Move page right"
-                    aria-label={`Move page ${i + 1} right`}
-                    className="grid h-5 w-5 place-items-center bg-teal text-ink"
-                  >
-                    <ChevronRight className="h-3 w-3" strokeWidth={3} />
-                  </button>
-                )}
-                <button
-                  onClick={() => duplicatePage(i)}
-                  title="Duplicate"
-                  aria-label={`Duplicate page ${i + 1}`}
-                  className="grid h-5 w-5 place-items-center bg-blue text-ink"
-                >
-                  <Copy className="h-3 w-3" strokeWidth={3} />
-                </button>
-                {pages.length > 1 && (
-                  <button
-                    onClick={() => removePage(i)}
-                    title="Delete"
-                    aria-label={`Delete page ${i + 1}`}
-                    className="grid h-5 w-5 place-items-center bg-[#ff0080] text-ink"
-                  >
-                    <Trash2 className="h-3 w-3" strokeWidth={3} />
-                  </button>
-                )}
+              <div className="absolute -right-1 -top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                {i > 0 && <button onClick={() => movePage(i, i - 1)} title="Move page left" aria-label={`Move page ${i + 1} left`} className="grid h-5 w-5 place-items-center rounded-full bg-slate-700 text-white"><ChevronLeft className="h-3 w-3" /></button>}
+                {i < pages.length - 1 && <button onClick={() => movePage(i, i + 1)} title="Move page right" aria-label={`Move page ${i + 1} right`} className="grid h-5 w-5 place-items-center rounded-full bg-slate-700 text-white"><ChevronRight className="h-3 w-3" /></button>}
+                <button onClick={() => duplicatePage(i)} title="Duplicate" aria-label={`Duplicate page ${i + 1}`} className="grid h-5 w-5 place-items-center rounded-full bg-blue-600 text-white"><Copy className="h-3 w-3" /></button>
+                {pages.length > 1 && <button onClick={() => removePage(i)} title="Delete" aria-label={`Delete page ${i + 1}`} className="grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-white"><Trash2 className="h-3 w-3" /></button>}
               </div>
             </div>
           );
         })}
-        <button
-          onClick={addPage}
-          className="brutal-border-2 brutal-press flex shrink-0 items-center gap-1 bg-surface px-3 font-display text-[10px] tracking-[0.2em] text-teal hover:bg-surface-2"
-          style={{ height: thumbH + 6 }}
-        >
-          <Plus className="h-3.5 w-3.5" strokeWidth={3} /> ADD
+        <button onClick={addPage} className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300 px-5 font-medium text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600" style={{ height: thumbH + 4 }}>
+          <Plus className="h-4 w-4" /> Add page
         </button>
       </div>
-      <div className="flex items-center gap-1">
-        <span className="font-mono text-[10px] text-teal/60">TRANS</span>
-        <select
-          value={currentTransition}
-          onChange={(e) => setTransition(e.target.value as SlideTransition)}
-          className="border border-teal/40 bg-surface px-1.5 py-1 font-mono text-[10px] text-teal focus:border-teal focus:outline-none"
-        >
-          <option value="none">none</option>
-          <option value="fade">fade</option>
-          <option value="morph">morph</option>
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Transition</span>
+        <select value={currentTransition} onChange={(e) => setTransition(e.target.value as SlideTransition)} className="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:border-blue-400 focus:outline-none">
+          <option value="none">None</option>
+          <option value="fade">Fade</option>
+          <option value="morph">Morph</option>
         </select>
+        <span className="text-xs text-slate-400">{currentIndex + 1} / {pages.length}</span>
+        <button onClick={() => setPresenting(true)} className="flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700">
+          <Play className="h-4 w-4 fill-white" /> Present
+        </button>
       </div>
-      <span className="font-mono text-[10px] text-teal/60">
-        {currentIndex + 1}/{pages.length}
-      </span>
-      <button
-        onClick={() => setPresenting(true)}
-        className="brutal-border brutal-press flex shrink-0 items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink"
-      >
-        <Play className="h-3.5 w-3.5 fill-ink" strokeWidth={3} />
-        PRESENT
-      </button>
     </div>
   );
 }
