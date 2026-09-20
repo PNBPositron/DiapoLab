@@ -140,15 +140,15 @@
   --teal-deep: #9fc1dc;
 }
 [data-editor-theme="everest"] {
-  --ink: oklch(0.98 0.015 240);
-  --paper: oklch(0.95 0.025 235);
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.91 0.035 235);
-  --grid: oklch(0.82 0.045 235);
-  --teal: oklch(0.32 0.12 245);
-  --teal-deep: oklch(0.48 0.12 245);
-  --blue: oklch(0.58 0.19 250);
-  --blue-deep: oklch(0.82 0.12 240);
+  --ink: oklch(1 0 0);
+  --paper: oklch(1 0 0);
+  --surface: oklch(0.99 0 0);
+  --surface-2: oklch(0.94 0.01 250);
+  --grid: oklch(0.84 0.015 250);
+  --teal: oklch(0.2 0.025 255);
+  --teal-deep: oklch(0.34 0.035 255);
+  --blue: oklch(0.27 0.04 255);
+  --blue-deep: oklch(0.42 0.055 255);
 }
 [data-editor-theme="glass"] {
   --ink: oklch(0.18 0.02 260);
