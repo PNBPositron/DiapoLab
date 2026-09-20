@@ -137,13 +137,13 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`sidebar-dock-item group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
+              className={`sidebar-dock-item group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 hover:scale-110 hover:origin-bottom ${
                 active && panelOpen
                   ? "border-white/40 bg-white/20 text-teal backdrop-blur-xl"
                   : "border-transparent bg-transparent text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
               }`}
             >
-              <Icon className="h-4 w-4" strokeWidth={2} />
+              <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" strokeWidth={2} />
               {t.label}
             </button>
           );
@@ -152,9 +152,9 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="sidebar-dock-item mt-auto flex flex-col items-center gap-1 rounded-xl border border-transparent bg-transparent px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
+          className="sidebar-dock-item mt-auto flex flex-col items-center gap-1 rounded-xl border border-transparent bg-transparent px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 transition-all duration-200 hover:scale-110 hover:origin-bottom hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
         >
-          <Settings className="h-5 w-5" strokeWidth={2} />
+          <Settings className="h-5 w-5 transition-transform duration-200 group-hover:scale-105" strokeWidth={2} />
           Settings
         </button>
       </nav>
