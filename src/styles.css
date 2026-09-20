@@ -156,8 +156,8 @@
   --surface: oklch(0.3 0.03 260);
   --surface-2: oklch(0.36 0.03 260);
   --grid: oklch(0.45 0.04 260);
-  --teal: oklch(0.95 0.02 250);
-  --teal-deep: oklch(0.75 0.04 250);
+  --teal: oklch(0.22 0.03 260);
+  --teal-deep: oklch(0.34 0.04 260);
   --blue: oklch(0.72 0.13 255);
   --blue-deep: oklch(0.5 0.14 260);
 }
