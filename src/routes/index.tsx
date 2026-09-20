@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-paper">
+    <div className="liquid-glass-editor relative flex h-screen flex-col overflow-hidden bg-paper">
       <h1 className="sr-only">DiapoLab — Liquid Glass Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
