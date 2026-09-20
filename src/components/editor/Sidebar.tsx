@@ -129,7 +129,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="flex w-16 flex-col gap-1 border-r border-teal/30 bg-ink p-1.5">
+      <nav className="liquid-glass-surface flex w-16 flex-col gap-1 border-r border-white/20 bg-ink/60 p-1.5 backdrop-blur-2xl">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -140,10 +140,10 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`group relative flex flex-col items-center gap-0.5 rounded-xl px-0.5 py-2 text-[7px] font-semibold uppercase tracking-[0.06em] transition-all ${
+              className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
                 active
-                  ? "bg-blue-deep text-teal border border-teal glow-blue"
-                  : "border border-teal/20 bg-surface text-teal/70 hover:text-teal hover:border-teal/60 hover:bg-surface-2"
+                  ? "border-white/40 bg-white/20 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_8px_20px_rgba(80,140,255,0.18)] backdrop-blur-xl"
+                  : "border-white/10 bg-white/[0.06] text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
               }`}
             >
               <Icon className="h-4 w-4" strokeWidth={2} />
@@ -155,7 +155,7 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="mt-auto flex flex-col items-center gap-0.5 rounded-xl border border-teal/20 bg-surface px-0.5 py-2 text-[7px] font-semibold uppercase tracking-[0.06em] text-teal/70 transition-colors duration-200 hover:border-teal/60 hover:bg-surface-2 hover:text-teal"
+          className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/[0.06] px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 backdrop-blur-xl transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
         >
           <Settings className="h-5 w-5" strokeWidth={2} />
           Settings
@@ -164,7 +164,7 @@ export function Sidebar() {
       <div
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
-        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-teal/30 bg-paper p-3 shadow-2xl will-change-[transform,opacity,filter] ${
+        className={`liquid-glass-surface absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-white/20 bg-paper/80 p-3 shadow-[18px_0_48px_rgba(10,24,60,0.18)] backdrop-blur-2xl will-change-[transform,opacity,filter] ${
           panelOpen
             ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}`
             : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`

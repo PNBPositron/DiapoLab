@@ -192,7 +192,7 @@ export function Toolbar() {
 
 
   return (
-    <header className="liquid-glass-surface relative z-30 mx-3 mt-3 flex items-center justify-between gap-4 rounded-[1.5rem] border border-teal/30 bg-ink/70 px-5 py-3 shadow-[0_18px_48px_rgba(17,36,66,0.2)] backdrop-blur-xl">
+    <header className="liquid-glass-surface relative z-30 flex min-h-16 items-center justify-between gap-4 border-b border-white/20 bg-ink/70 px-5 py-3 shadow-[0_12px_32px_rgba(17,36,66,0.14)] backdrop-blur-xl">
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent opacity-80" />
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-3">
