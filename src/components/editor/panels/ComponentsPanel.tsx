@@ -30,7 +30,7 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
-import { newChart, newQuiz, newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
+import { newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { UiRender } from "../UiRender";
 
@@ -67,11 +67,6 @@ const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
 ];
 
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
-const ELEMENT_PRESETS = [
-  { label: "Chart", Icon: TrendingUp, create: () => newChart("bar") },
-  { label: "Graph", Icon: TrendingUp, create: () => newChart("line") },
-  { label: "Quiz", Icon: ListChecks, create: () => newQuiz() },
-];
 
 const UI_PRESETS: Array<{ kind: UiKind; label: string; Icon: LucideIcon; overrides?: Partial<ReturnType<typeof newUi>> }> = [
   ...UI_KINDS,
@@ -113,22 +108,7 @@ export function ComponentsPanel() {
           <Blocks className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">UI</span>
         </button>
-        <button onClick={() => setSection(section === "elements" ? null : "elements")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${section === "elements" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
-          <TrendingUp className="size-6" />
-          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Data & Quiz</span>
-        </button>
       </div>
-
-      {section === "elements" && (
-        <div className="grid grid-cols-3 gap-2">
-          {ELEMENT_PRESETS.map(({ label, Icon, create }) => (
-            <button key={label} onClick={() => add(create())} className="brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 bg-surface text-teal hover:border-teal">
-              <Icon className="size-7" />
-              <span className="font-display text-[9px] uppercase tracking-[0.1em]">{label}</span>
-            </button>
-          ))}
-        </div>
-      )}
 
       {(section === "interfaces" || section === "ui") && (
         <>
