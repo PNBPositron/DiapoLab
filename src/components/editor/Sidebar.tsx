@@ -141,9 +141,9 @@ export function Sidebar() {
                 setHovering(true);
               }}
               className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
-                active
+                active && panelOpen
                   ? "border-white/40 bg-white/20 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_8px_20px_rgba(80,140,255,0.18)] backdrop-blur-xl"
-                  : "border-white/10 bg-white/[0.06] text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
+                  : "border-transparent bg-transparent text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
               }`}
             >
               <Icon className="h-4 w-4" strokeWidth={2} />
