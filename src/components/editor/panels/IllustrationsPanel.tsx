@@ -40,11 +40,11 @@ export function IllustrationsPanel() {
     <div className="space-y-4">
       <PanelHeader title="Illustrations" />
       <div className="grid grid-cols-2 gap-2">
-        <button onClick={() => setCollection(collection === "Highlights" ? null : "Highlights")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Highlights" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
+        <button onClick={() => setCollection(collection === "Highlights" ? null : "Highlights")} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl border text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition ${collection === "Highlights" ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
           <Sparkles className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Highlights</span>
         </button>
-        <button onClick={() => setCollection(collection === "Transhumans" ? null : "Transhumans")} className={`brutal-border-2 brutal-press flex h-24 flex-col items-center justify-center gap-2 text-teal hover:border-teal ${collection === "Transhumans" ? "border-teal bg-blue-deep" : "bg-surface"}`}>
+        <button onClick={() => setCollection(collection === "Transhumans" ? null : "Transhumans")} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl border text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition ${collection === "Transhumans" ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
           <ImagePlus className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Transhumans</span>
         </button>
@@ -55,9 +55,11 @@ export function IllustrationsPanel() {
             const src = getSource(file);
             const name = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ");
             return (
-              <button key={file} onClick={() => add(newImage(src, { illustrationFormat: "svg", fit: "contain", ...(collection === "Highlights" ? { tint: editorTheme.includes("dark") ? "#ffffff" : "#0a0f1f" } : {}) }))} title={`Add ${name}`} className="group brutal-border-2 brutal-press overflow-hidden bg-surface p-1 hover:border-teal">
-                <div className="grid h-24 place-items-center bg-white p-2"><img src={src} alt={`${collection} illustration: ${name}`} loading="lazy" decoding="async" width={240} height={160} className="max-h-full max-w-full object-contain" draggable={false} /></div>
-                <span className="flex items-center gap-1 truncate px-1 py-1 font-mono text-[9px] text-teal/70"><ImagePlus className="size-3 shrink-0" />{name}</span>
+              <button key={file} onClick={() => add(newImage(src, { illustrationFormat: "svg", fit: "contain", ...(collection === "Highlights" ? { tint: editorTheme.includes("dark") ? "#ffffff" : "#0f172a" } : {}) }))} className="overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition hover:border-slate-300 hover:bg-slate-50">
+                <div className="grid h-24 place-items-center bg-slate-50 p-2">
+                  <img src={src} alt={`${collection} illustration: ${name}`} loading="lazy" decoding="async" width={240} height={160} className="max-h-full max-w-full object-contain" />
+                </div>
+                <span className="flex items-center gap-1 truncate px-2 py-1.5 font-mono text-[9px] text-slate-600"><ImagePlus className="size-3 shrink-0" />{name}</span>
               </button>
             );
           })}
