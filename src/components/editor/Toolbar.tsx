@@ -40,7 +40,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-
 export function Toolbar() {
   const { undo, redo, clear, designId, designName, setDesignName, setDesignMeta, newDesign, pages, currentIndex, canvasW, canvasH, loadPages } =
     useEditor();
@@ -65,9 +64,7 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<
-    null | "png" | "pdf" | "pptx" | "gif" | "html" | "json"
-  >(null);
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pptx" | "gif" | "html" | "json">(null);
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -108,7 +105,7 @@ export function Toolbar() {
     setAssistantInput("");
     try {
       const response = await fetch("/api/slide-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ page, slideshow: pages, canEdit: true, question }) });
-      const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; width?: number; height?: number }> };
+      const payload = await response.json() as { text?: string; error?: string; edits?: Array<{ type: string; id?: string; patch?: Record<string, unknown>; text?: string; x?: number; y?: number; }> };
       if (!response.ok || !payload.text) throw new Error(payload.error || "Could not analyze this slide.");
       if (payload.edits?.length) {
         const activeEdits = payload.edits!.filter((edit) => edit.type === "addText" || edit.id);
@@ -119,11 +116,11 @@ export function Toolbar() {
             const update = edits.find((edit) => edit.type === "update");
             return update?.patch ? [{ ...element, ...update.patch }] : [element];
           }),
-          ...activeEdits.filter((edit) => edit.type === "addText" && typeof edit.text === "string").map((edit) => ({ id: crypto.randomUUID(), type: "text" as const, text: edit.text!, x: edit.x ?? 80, y: edit.y ?? 80, width: edit.width ?? 500, height: edit.height ?? 80, rotation: 0, color: "#111827", fontSize: 32, fontWeight: 400, fontFamily: "Inter", align: "left" as const }))
+          ...activeEdits.filter((edit) => edit.type === "addText" && typeof edit.text === "string").map((edit) => ({ id: crypto.randomUUID(), type: "text" as const, text: edit.text!, x: edit.x ?? 120, y: edit.y ?? 120, fontSize: 48, color: "#0b1736", rotation: 0, opacity: 1, width: 420, height: 100, align: "left", weight: 700, shadow: "none" }))
         ] });
         loadPages(nextPages);
       }
-      setAssistantMessages((current) => [...current, { role: "assistant", text: payload.edits?.length ? `${payload.text}\n\nApplied ${payload.edits.length} requested change${payload.edits.length === 1 ? "" : "s"}.` : payload.text! }]);
+      setAssistantMessages((current) => [...current, { role: "assistant", text: payload.edits?.length ? `${payload.text}\n\nApplied ${payload.edits.length} requested change${payload.edits.length > 1 ? "s" : ""}.` : payload.text! }]);
     } catch (error) {
       setAssistantError(error instanceof Error ? error.message : "Could not analyze this slide.");
     } finally {
@@ -190,44 +187,35 @@ export function Toolbar() {
     }
   };
 
-
   return (
-    <header className="relative z-30 flex min-h-16 items-center justify-between gap-4 border-b border-white/20 bg-ink/55 px-5 py-3">
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent opacity-80" />
+    <header className="relative z-30 flex min-h-[62px] items-center justify-between gap-3 border-b border-transparent bg-transparent px-3 py-2">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-3">
           <img
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
             alt="DiapoLab flask logo"
-            className="size-11 rounded-[0.9rem] object-cover shadow-[0_0_24px_rgba(104,155,255,0.5)]"
+            className="size-9 rounded-xl object-cover"
           />
-          <div className="font-display text-xl tracking-[0.18em] text-teal">
-            DIAPOLAB
-          </div>
+          <div className="font-display text-lg tracking-[0.18em] text-slate-700">DIAPOLAB</div>
         </div>
-        <div className="ml-4 hidden items-center gap-2 md:flex">
+        <div className="ml-2 hidden items-center gap-2 md:flex">
           <input
             value={designName}
             onChange={(e) => setDesignName(e.target.value)}
-            className="brutal-border-2 bg-surface px-3 py-1.5 font-mono text-xs text-teal focus:outline-none focus:border-teal focus:bg-surface-2"
+            className="rounded-lg border border-slate-200 bg-white/80 px-3 py-1.5 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none"
           />
-          {savedAt && <span className="font-mono text-[10px] text-teal/70">✓ saved</span>}
+          {savedAt && <span className="font-mono text-[10px] text-slate-500">✓ saved</span>}
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-
-        <IconBtn onClick={undo} title="Undo">
-          <Undo2 className="h-4 w-4" strokeWidth={2.5} />
-        </IconBtn>
-        <IconBtn onClick={redo} title="Redo">
-          <Redo2 className="h-4 w-4" strokeWidth={2.5} />
-        </IconBtn>
+        <IconBtn onClick={undo} title="Undo"><Undo2 className="h-4 w-4" strokeWidth={2.5} /></IconBtn>
+        <IconBtn onClick={redo} title="Redo"><Redo2 className="h-4 w-4" strokeWidth={2.5} /></IconBtn>
         {user ? (
           <BentoMenu
             onSettings={() => navigate({ to: "/settings" })}
             onNewDesign={newDesign}
-                  onShare={handlePublish}
+            onShare={handlePublish}
             onAbout={() => setAboutOpen(true)}
             onExport={() => setExportOpen((v) => !v)}
             publishing={publishing}
@@ -235,90 +223,39 @@ export function Toolbar() {
           />
         ) : (
           <>
-            <IconBtn onClick={() => setAboutOpen(true)} title="About">
-              <Info className="h-4 w-4" strokeWidth={2.5} />
-            </IconBtn>
-            <IconBtn onClick={clear} title="Clear">
-              <Trash2 className="h-4 w-4" strokeWidth={2.5} />
-            </IconBtn>
+            <IconBtn onClick={() => setAboutOpen(true)} title="About"><Info className="h-4 w-4" strokeWidth={2.5} /></IconBtn>
+            <IconBtn onClick={clear} title="Clear"><Trash2 className="h-4 w-4" strokeWidth={2.5} /></IconBtn>
           </>
         )}
-        <IconBtn onClick={() => importRef.current?.click()} title="Import .json design">
-          <Upload className="h-4 w-4" strokeWidth={2.5} />
-        </IconBtn>
-        <input
-          ref={importRef}
-          type="file"
-          accept="application/json,.json"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) handleImport(f);
-            e.target.value = "";
-          }}
-        />
+        <IconBtn onClick={() => importRef.current?.click()} title="Import .json design"><Upload className="h-4 w-4" strokeWidth={2.5} /></IconBtn>
+        <input ref={importRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImport(f); e.target.value = ""; }} />
 
         {user ? (
           <>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="brutal-border brutal-press flex items-center gap-2 bg-surface px-4 py-2 font-display text-xs tracking-[0.2em] text-teal hover:bg-teal/10 disabled:opacity-60"
-            >
-              {saving ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Save className="h-3.5 w-3.5" strokeWidth={3} />
-              )}
-              SAVE
+            <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-slate-700 transition-colors hover:border-slate-300 hover:bg-white disabled:opacity-60">
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" strokeWidth={3} />}
+              Save
             </button>
             <UserMenu email={user.email ?? ""} />
           </>
         ) : (
-          <Link
-            to="/auth"
-            search={{ next: undefined }}
-            className="brutal-border brutal-press flex items-center gap-2 bg-surface px-4 py-2 font-display text-xs tracking-[0.2em] text-teal hover:bg-teal/10"
-          >
-            <Cloud className="h-3.5 w-3.5" strokeWidth={3} />
-            SIGN IN
+          <Link to="/auth" search={{ next: undefined }} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-slate-700 transition-colors hover:border-slate-300 hover:bg-white">
+            <Cloud className="h-3.5 w-3.5" strokeWidth={3} /> Sign in
           </Link>
         )}
 
         <div className="relative" ref={exportRef}>
-          <button
-            onClick={() => setExportOpen((v) => !v)}
-            disabled={!!exporting}
-            className="brutal-border brutal-shadow-sm brutal-press flex items-center gap-2 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-black disabled:opacity-60"
-          >
-            {exporting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={3} />
-            ) : (
-              <Download className="h-3.5 w-3.5" strokeWidth={3} />
-            )}
-            {exporting ? exporting.toUpperCase() : "EXPORT"}
+          <button onClick={() => setExportOpen((v) => !v)} disabled={!!exporting} className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-60">
+            {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={3} /> : <Download className="h-3.5 w-3.5" strokeWidth={3} />}
+            {exporting ? exporting.toUpperCase() : "Export"}
             <ChevronDown className="h-3 w-3" strokeWidth={3} />
           </button>
           {exportOpen && (
-            <div className="brutal-border-2 absolute right-0 top-12 z-50 w-52 bg-ink p-1">
+            <div className="absolute right-0 top-12 z-50 w-52 rounded-xl border border-slate-200 bg-white/95 p-1 shadow-[0_8px_18px_rgba(15,23,42,0.08)]">
               {(["png", "pdf", "pptx", "html", "json", "gif"] as const).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => runExport(k)}
-                  className="flex w-full items-center justify-between px-3 py-2 font-display text-[11px] tracking-[0.2em] text-teal hover:bg-surface"
-                >
+                <button key={k} onClick={() => runExport(k)} className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-display text-[10px] tracking-[0.14em] text-slate-700 hover:bg-slate-100">
                   <span>EXPORT .{k.toUpperCase()}</span>
-                  <span className="font-mono text-[9px] text-teal/60">
-                    {k === "png"
-                      ? "current"
-                      : k === "gif"
-                        ? "animated"
-                        : k === "html"
-                          ? "interactive"
-                          : k === "json"
-                            ? "editable"
-                            : "all pages"}
-                  </span>
+                  <span className="font-mono text-[9px] text-slate-500">{k === "png" ? "current" : k === "gif" ? "animated" : k === "html" ? "interactive" : k === "json" ? "editable" : "all pages"}</span>
                 </button>
               ))}
             </div>
@@ -326,17 +263,22 @@ export function Toolbar() {
         </div>
       </div>
 
-  <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
-    <DialogContent className="brutal-border-2 max-w-lg border-teal bg-surface text-foreground">
-      <DialogHeader><DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em] text-foreground"><Sparkles className="size-4" /> Gemini slide assistant</DialogTitle><DialogDescription className="font-mono text-xs text-muted-foreground">Analyze the current slide and get actionable ideas.</DialogDescription></DialogHeader>
-      <div className="font-mono text-[10px] text-muted-foreground">{pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}</div>
-      <div className="flex flex-wrap gap-2">{["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => <button key={question} type="button" onClick={() => void askAssistant(question)} disabled={assistantBusy} className="brutal-border bg-paper px-2 py-1 font-mono text-[9px] text-ink hover:border-teal disabled:opacity-50">{question}</button>)}</div>
-      <div className="max-h-64 space-y-2 overflow-y-auto">{assistantMessages.length === 0 && <p className="font-mono text-xs leading-relaxed text-teal/55">Ask for a critique, layout ideas, or a stronger visual direction.</p>}{assistantMessages.map((message, index) => <div key={`${message.role}-${index}`} className={`p-2 font-mono text-xs leading-relaxed ${message.role === "user" ? "ml-8 bg-teal/10 text-foreground" : "mr-3 bg-muted text-foreground"}`}><span className="mb-1 block font-display text-[9px] uppercase text-muted-foreground">{message.role === "user" ? "You" : "Gemini"}</span>{message.text}</div>)}</div>
-      {assistantError && <p role="alert" className="font-mono text-xs text-red-300">{assistantError}</p>}
-      <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="flex gap-2"><input value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Ask about this slide..." className="brutal-border-2 min-w-0 flex-1 bg-background px-3 py-2 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-teal" /><button type="submit" disabled={assistantBusy || !assistantInput.trim()} className="brutal-border-2 brutal-press bg-teal px-4 font-display text-[10px] uppercase text-ink disabled:opacity-40">{assistantBusy ? "..." : "Ask"}</button></form>
-    </DialogContent>
-  </Dialog>
-  <PublishMetaDialog
+      <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
+        <DialogContent className="max-w-lg border border-slate-200 bg-white text-slate-700">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-display uppercase tracking-[0.14em] text-slate-700"><Sparkles className="size-4" /> Gemini slide assistant</DialogTitle>
+          </DialogHeader>
+          <div className="font-mono text-[10px] text-slate-500">{pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}</div>
+          <div className="mt-3 flex flex-wrap gap-2">{["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => <button key={question} type="button" onClick={() => void askAssistant(question)} className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-display text-[9px] uppercase tracking-[0.12em] text-slate-700 hover:bg-slate-100">{question}</button>)}</div>
+          <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">{assistantMessages.length === 0 && <p className="font-mono text-xs leading-relaxed text-slate-500">Ask for a critique, layout ideas, or a slide rewrite.</p>}{assistantMessages.map((m, i) => <div key={`${m.role}-${i}`} className={`rounded-xl border px-3 py-2 font-mono text-xs leading-relaxed ${m.role === "user" ? "border-slate-200 bg-slate-50 text-slate-700" : "border-blue-100 bg-blue-50 text-slate-700"}`}>{m.text}</div>)}{assistantError && <p role="alert" className="font-mono text-xs text-red-500">{assistantError}</p>}</div>
+          <form onSubmit={(event) => { event.preventDefault(); void askAssistant(); }} className="mt-4 flex gap-2">
+            <input value={assistantInput} onChange={(event) => setAssistantInput(event.target.value)} placeholder="Ask for a slide tweak…" className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none" />
+            <button type="submit" disabled={assistantBusy} className="rounded-lg bg-blue-600 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-white disabled:opacity-60">{assistantBusy ? "…" : "Send"}</button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <PublishMetaDialog
         open={publishDialogOpen}
         kind="template"
         defaultName={designName || "Untitled template"}
@@ -346,96 +288,33 @@ export function Toolbar() {
         onCancel={() => setPublishDialogOpen(false)}
         onSubmit={submitPublish}
       />
+
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="brutal-border-2 max-w-sm rounded-none border-teal bg-ink text-teal shadow-[8px_8px_0_var(--blue)]">
+        <DialogContent className="max-w-sm rounded-xl border border-slate-200 bg-white text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
           <DialogHeader className="text-left">
-            <DialogTitle className="font-display text-base tracking-[0.2em] text-teal">
-              ABOUT DIAPOLAB
-            </DialogTitle>
-            <DialogDescription className="font-mono text-[11px] leading-relaxed text-teal/70">
-              Learn more about DiapoLab and its terms.
-            </DialogDescription>
+            <DialogTitle className="font-display text-base tracking-[0.2em] text-slate-700">ABOUT DIAPOLAB</DialogTitle>
+            <DialogDescription className="font-mono text-[11px] leading-relaxed text-slate-500">Learn more about DiapoLab and its terms.</DialogDescription>
           </DialogHeader>
-            <nav aria-label="About links" className="flex flex-col gap-2">
-            <a
-              href="https://github.com/PNBPositron/positronstudio-project"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              GITHUB <span aria-hidden="true">↗</span>
-            </a>
-            <Link
-              to="/privacypolicy"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              PRIVACY POLICY <span aria-hidden="true">→</span>
-            </Link>
-            <Link
-              to="/license"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              LICENSE <span aria-hidden="true">→</span>
-            </Link>
-            <Link
-              to="/marketplace"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              MARKETPLACE <span aria-hidden="true">→</span>
-            </Link>
-            <a
-              href="http://colormind.io/api/"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              API USED: COLORMIND <span aria-hidden="true">↗</span>
-            </a>
-            <a
-              href="https://unsplash.com/developers"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setAboutOpen(false)}
-              className="brutal-border flex items-center justify-between bg-surface px-3 py-3 font-display text-[11px] tracking-[0.16em] text-teal hover:bg-blue-deep"
-            >
-              SUGGESTED API: UNSPLASH <span aria-hidden="true">↗</span>
-            </a>
+          <nav aria-label="About links" className="mt-2 flex flex-col gap-2">
+            <a href="https://github.com/PNBPositron/positronstudio-project" target="_blank" rel="noreferrer" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">GITHUB <span aria-hidden="true">↗</span></a>
+            <Link to="/privacypolicy" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">PRIVACY POLICY <span aria-hidden="true">→</span></Link>
+            <Link to="/license" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">LICENSE <span aria-hidden="true">→</span></Link>
+            <Link to="/marketplace" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">MARKETPLACE <span aria-hidden="true">→</span></Link>
+            <a href="http://colormind.io/api/" target="_blank" rel="noreferrer" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">API USED: COLORMIND <span aria-hidden="true">↗</span></a>
+            <a href="https://unsplash.com/developers" target="_blank" rel="noreferrer" onClick={() => setAboutOpen(false)} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 font-display text-[11px] tracking-[0.16em] text-slate-700 hover:bg-slate-100">SUGGESTED API: UNSPLASH <span aria-hidden="true">↗</span></a>
           </nav>
         </DialogContent>
       </Dialog>
+
       {shareLink && (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-ink/80 p-6">
-          <div className="brutal-border-2 w-full max-w-md bg-surface p-6">
-            <div className="font-display text-sm tracking-[0.2em] text-teal">
-              ✓ PUBLISHED · SHARE LINK
-            </div>
-            <p className="mt-2 font-mono text-[11px] text-teal/60">
-              Anyone with this link can view your deck.
-            </p>
-            <input
-              readOnly
-              value={shareLink}
-              onFocus={(e) => e.currentTarget.select()}
-              className="brutal-border-2 mt-4 w-full bg-ink px-3 py-2 font-mono text-xs text-teal"
-            />
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-900/60 p-6">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_18px_44px_rgba(15,23,42,0.18)]">
+            <div className="font-display text-sm tracking-[0.2em] text-slate-700">✓ PUBLISHED · SHARE LINK</div>
+            <p className="mt-2 font-mono text-[11px] text-slate-500">Anyone with this link can view your deck.</p>
+            <input readOnly value={shareLink} onFocus={(e) => e.currentTarget.select()} className="mt-4 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700" />
             <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
-                className="brutal-border brutal-press flex-1 bg-blue px-4 py-2 font-display text-xs tracking-[0.2em] text-ink"
-              >
-                COPY LINK
-              </button>
-              <button
-                onClick={() => setShareLink(null)}
-                className="brutal-border brutal-press flex-1 bg-surface px-4 py-2 font-display text-xs tracking-[0.2em] text-teal"
-              >
-                CLOSE
-              </button>
+              <button onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})} className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-display text-xs uppercase tracking-[0.2em] text-white">Copy link</button>
+              <button onClick={() => setShareLink(null)} className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 font-display text-xs uppercase tracking-[0.2em] text-slate-700">Close</button>
             </div>
           </div>
         </div>
@@ -467,23 +346,13 @@ function BentoMenu({
   const items = [
     { label: "Settings", icon: Settings, action: onSettings },
     { label: "New design", icon: FilePlus, action: onNewDesign },
-      { label: "About", icon: Info, action: onAbout },
-    {
-      label: publishing ? "Sharing..." : "Share",
-      icon: publishing ? Loader2 : Share2,
-      action: onShare,
-    },
+    { label: "About", icon: Info, action: onAbout },
+    { label: publishing ? "Sharing..." : "Share", icon: publishing ? Loader2 : Share2, action: onShare },
     { label: exporting ? "Exporting..." : "Export", icon: Download, action: onExport },
   ];
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-label="Open editor menu"
-        title="Editor menu"
-        className="brutal-border-2 brutal-press grid h-10 w-10 place-items-center bg-blue text-ink"
-      >
+      <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label="Open editor menu" title="Editor menu" className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-white">
         <span className="grid grid-cols-2 gap-0.5" aria-hidden="true">
           <span className="size-1.5 bg-current" />
           <span className="size-1.5 bg-current" />
@@ -492,20 +361,10 @@ function BentoMenu({
         </span>
       </button>
       {open && (
-        <div className="brutal-border-2 absolute right-0 top-12 z-50 grid w-52 grid-cols-2 gap-1 bg-ink p-1">
+        <div className="absolute right-0 top-12 z-50 grid w-52 grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white/95 p-1 shadow-[0_8px_18px_rgba(15,23,42,0.08)]">
           {items.map(({ label, icon: Icon, action }) => (
-            <button
-              key={label}
-              onClick={() => {
-                action();
-                setOpen(false);
-              }}
-              className="flex min-h-16 flex-col items-center justify-center gap-1 bg-surface px-2 py-2 font-display text-[9px] tracking-[0.12em] text-teal hover:bg-blue-deep"
-            >
-              <Icon
-                className={label === "Sharing..." ? "h-4 w-4 animate-spin" : "h-4 w-4"}
-                strokeWidth={2.5}
-              />
+            <button key={label} onClick={() => { action(); setOpen(false); }} className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 px-2 py-2 font-display text-[9px] tracking-[0.12em] text-slate-700 hover:bg-slate-100">
+              <Icon className={label === "Sharing..." ? "h-4 w-4 animate-spin" : "h-4 w-4"} strokeWidth={2.5} />
               {label.toUpperCase()}
             </button>
           ))}
@@ -519,49 +378,22 @@ function UserMenu({ email }: { email: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        title={email}
-        className="brutal-border-2 brutal-press grid h-10 w-10 place-items-center bg-blue-deep text-teal glow-blue"
-      >
+      <button onClick={() => setOpen((v) => !v)} title={email} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-white">
         <UserIcon className="h-4 w-4" strokeWidth={2.5} />
       </button>
       {open && (
-        <div
-          className="brutal-border-2 absolute right-0 top-12 z-50 w-56 bg-ink p-2"
-          onMouseLeave={() => setOpen(false)}
-        >
-          <div className="border-b border-teal/30 px-2 py-1.5 font-mono text-[10px] text-teal/70 truncate">
-            {email}
-          </div>
-          <button
-            onClick={() => signOut()}
-            className="mt-1 flex w-full items-center gap-2 px-2 py-1.5 font-display text-[11px] tracking-[0.2em] text-teal hover:bg-surface"
-          >
-            <LogOut className="h-3.5 w-3.5" /> SIGN OUT
-          </button>
+        <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-slate-200 bg-white/95 p-2 shadow-[0_8px_18px_rgba(15,23,42,0.08)]" onMouseLeave={() => setOpen(false)}>
+          <div className="border-b border-slate-200 px-2 py-1.5 font-mono text-[10px] text-slate-500 truncate">{email}</div>
+          <button onClick={() => signOut()} className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 font-display text-[11px] tracking-[0.2em] text-slate-700 hover:bg-slate-100"><LogOut className="h-3.5 w-3.5" /> SIGN OUT</button>
         </div>
       )}
     </div>
   );
 }
 
-function IconBtn({
-  children,
-  onClick,
-  title,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  title: string;
-}) {
+function IconBtn({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string; }) {
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      aria-label={title}
-      className="brutal-border-2 brutal-press grid h-10 w-10 place-items-center bg-surface text-teal hover:bg-surface-2 hover:text-teal hover:border-teal"
-    >
+    <button onClick={onClick} title={title} aria-label={title} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-white">
       {children}
     </button>
   );
