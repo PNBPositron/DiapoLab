@@ -12,6 +12,7 @@ import {
   Settings,
   Images,
   Sparkles,
+  FolderHeart,
 } from "lucide-react";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -21,6 +22,7 @@ import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { IllustrationsPanel } from "./panels/IllustrationsPanel";
 import { AiPanel } from "./panels/AiPanel";
 import { SettingsDialog } from "./SettingsDialog";
+import { MyDesignsDialog } from "./MyDesignsDialog";
 
 const TOOLS = [
   { id: "home", label: "Home", icon: LayoutTemplate },
@@ -30,6 +32,7 @@ const TOOLS = [
   { id: "components", label: "Presets", icon: Blocks },
   { id: "design", label: "Design", icon: SlidersHorizontal },
   { id: "ai", label: "AI", icon: Sparkles },
+  { id: "my-designs", label: "Designs", icon: FolderHeart },
 ] as const;
 
 export function Sidebar() {
@@ -126,7 +129,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="flex w-16 flex-col gap-1 border-r border-teal/30 bg-ink p-1.5">
+      <nav className="flex w-16 flex-col gap-1 border-r border-teal/20 bg-ink p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -137,10 +140,10 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`group relative flex flex-col items-center gap-0.5 rounded-xl px-0.5 py-2 text-[8px] font-bold uppercase tracking-[0.08em] transition-all ${
+              className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
                 active
-                  ? "bg-blue-deep text-teal border border-teal glow-blue"
-                  : "border border-teal/20 bg-surface text-teal/70 hover:text-teal hover:border-teal/60 hover:bg-surface-2"
+                  ? "border-white/40 bg-white/20 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_8px_20px_rgba(80,140,255,0.18)] backdrop-blur-xl"
+                  : "border-white/10 bg-white/[0.06] text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
               }`}
             >
               <Icon className="h-4 w-4" strokeWidth={2} />
@@ -152,7 +155,7 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="mt-auto flex flex-col items-center gap-0.5 rounded-xl border border-teal/20 bg-surface px-0.5 py-2 text-[8px] font-bold uppercase tracking-[0.08em] text-teal/70 transition-colors duration-200 hover:border-teal/60 hover:bg-surface-2 hover:text-teal"
+          className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/[0.06] px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 backdrop-blur-xl transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
         >
           <Settings className="h-5 w-5" strokeWidth={2} />
           Settings
@@ -161,7 +164,7 @@ export function Sidebar() {
       <div
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
-        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-teal/30 bg-paper p-3 shadow-2xl will-change-[transform,opacity,filter] ${
+        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-teal/20 bg-paper p-3 shadow-lg will-change-[transform,opacity,filter] ${
           panelOpen
             ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}`
             : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`
@@ -174,6 +177,7 @@ export function Sidebar() {
         {tool === "illustrations" && <IllustrationsPanel />}
         {tool === "design" && <DesignPanel />}
         {tool === "ai" && <AiPanel />}
+        {tool === "my-designs" && <MyDesignsDialog embedded onClose={() => setTool("home")} />}
       </div>
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </aside>

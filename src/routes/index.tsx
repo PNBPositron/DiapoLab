@@ -5,13 +5,12 @@ import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
-import { Timeline } from "@/components/editor/Timeline";
 
 export const Route = createFileRoute("/")({
   component: Editor,
   head: () => ({
     meta: [
-      { title: "DiapoLab — Liquid Glass Design Editor" },
+      { title: "DiapoLab — Design & Presentation Editor" },
       {
         name: "description",
         content:
@@ -29,8 +28,8 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-paper">
-      <h1 className="sr-only">DiapoLab — Liquid Glass Design &amp; Presentation Editor</h1>
+    <div className="relative flex h-screen flex-col overflow-hidden bg-paper">
+      <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
@@ -49,7 +48,6 @@ function Editor() {
         <PropertiesPanel />
       </div>
       <PagesBar />
-      <Timeline />
       <PresentationMode />
     </div>
   );

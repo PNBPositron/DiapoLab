@@ -4,7 +4,7 @@ import { listDesigns, deleteDesign, type SavedDesign } from "@/lib/designs";
 import { useEditor } from "@/store/editor";
 import { SlideThumbnail } from "./SlideThumbnail";
 
-export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
+export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const { loadDesign } = useEditor();
   const [items, setItems] = useState<SavedDesign[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,27 +41,27 @@ export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-6 scanlines"
+      className={embedded ? "flex min-h-full flex-col bg-paper" : "fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-6 scanlines"}
       onClick={onClose}
     >
       <div
-        className="brutal-border-2 brutal-shadow-lg relative max-h-[80vh] w-full max-w-3xl overflow-hidden bg-surface"
+        className={embedded ? "w-full overflow-hidden bg-surface" : "brutal-border-2 brutal-shadow-lg relative max-h-[80vh] w-full max-w-3xl overflow-hidden bg-surface"}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-teal/30 bg-ink px-4 py-3">
           <h2 className="font-display text-sm uppercase tracking-[0.25em] text-teal text-glow">
             // my_designs
           </h2>
-          <button
+          {!embedded && <button
             onClick={onClose}
             aria-label="Close my designs"
             className="brutal-border grid h-8 w-8 place-items-center bg-surface text-teal"
           >
             <X className="h-4 w-4" strokeWidth={3} />
-          </button>
+          </button>}
         </div>
 
-        <div className="max-h-[70vh] overflow-y-auto p-4">
+        <div className={embedded ? "max-h-full overflow-y-auto p-2" : "max-h-[70vh] overflow-y-auto p-4"}>
           {error && <p className="font-mono text-[11px] text-[#ff0080]">! {error}</p>}
           {!items && !error && (
             <div className="flex items-center justify-center gap-2 py-12 font-mono text-xs text-teal/60">
@@ -74,9 +74,9 @@ export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
             </div>
           )}
           {items && items.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               {items.map((d) => (
-                <div key={d.id} className="brutal-border-2 group relative bg-ink">
+                <div key={d.id} className="brutal-border-2 group relative overflow-hidden bg-ink">
                   <button
                     onClick={() => handleOpen(d)}
                     className="block w-full text-left"
@@ -86,7 +86,7 @@ export function MyDesignsDialog({ onClose }: { onClose: () => void }) {
                         page={d.pages[0]}
                         canvasW={d.canvas_w}
                         canvasH={d.canvas_h}
-                        className="w-full bg-ink"
+                        className="aspect-[16/10] w-full bg-ink object-cover"
                       />
                     ) : (
                       <div className="aspect-video w-full bg-ink" />
