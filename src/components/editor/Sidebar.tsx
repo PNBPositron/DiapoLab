@@ -114,13 +114,10 @@ export function Sidebar() {
   const panelTransition = `transform ${dur}ms ${ease}, opacity ${Math.round(dur * 0.62)}ms ${ease}, filter ${Math.round(dur * 0.7)}ms ease-out`;
 
   const visible = TOOLS.filter((t) => panels[t.id as PanelId] !== false);
-
   const visibleKey = visible.map((t) => t.id).join(",");
   useEffect(() => {
     const ids = visibleKey.split(",").filter(Boolean);
-    if (ids.length && !ids.includes(tool)) {
-      setTool(ids[0] as typeof tool);
-    }
+    if (ids.length && !ids.includes(tool)) setTool(ids[0] as typeof tool);
   }, [visibleKey, tool, setTool]);
 
   return (
@@ -129,7 +126,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="flex w-16 flex-col gap-1 border-r border-teal/20 bg-transparent p-1.5">
+      <nav className="sidebar-dock flex w-16 flex-col gap-1 bg-transparent p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -140,9 +137,9 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
+              className={`sidebar-dock-item group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
                 active && panelOpen
-                  ? "border-white/40 bg-white/20 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_8px_20px_rgba(80,140,255,0.18)] backdrop-blur-xl"
+                  ? "border-white/40 bg-white/20 text-teal backdrop-blur-xl"
                   : "border-transparent bg-transparent text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
               }`}
             >
@@ -155,7 +152,7 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/[0.06] px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 backdrop-blur-xl transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
+          className="sidebar-dock-item mt-auto flex flex-col items-center gap-1 rounded-xl border border-transparent bg-transparent px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
         >
           <Settings className="h-5 w-5" strokeWidth={2} />
           Settings
