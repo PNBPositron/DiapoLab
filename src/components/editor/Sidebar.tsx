@@ -129,7 +129,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="liquid-glass-surface flex w-16 flex-col gap-1 border-r border-white/20 bg-ink/60 p-1.5 backdrop-blur-2xl">
+      <nav className="flex w-16 flex-col gap-1 border-r border-teal/20 bg-ink p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -164,7 +164,7 @@ export function Sidebar() {
       <div
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
-        className={`liquid-glass-surface absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-white/20 bg-paper/80 p-3 shadow-[18px_0_48px_rgba(10,24,60,0.18)] backdrop-blur-2xl will-change-[transform,opacity,filter] ${
+        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-teal/20 bg-paper p-3 shadow-lg will-change-[transform,opacity,filter] ${
           panelOpen
             ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}`
             : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`

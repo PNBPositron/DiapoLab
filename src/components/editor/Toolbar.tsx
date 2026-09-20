@@ -456,7 +456,7 @@ function BentoMenu({
 }: {
   onSettings: () => void;
   onNewDesign: () => void;
-  onMyDesigns: () => void;
+  onMyDesigns?: () => void;
   onShare: () => void;
   onAbout: () => void;
   onExport: () => void;

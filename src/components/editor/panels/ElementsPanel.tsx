@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import {
-  Activity, Airplay, AlarmClock, AlertCircle, Archive, ArrowDown, ArrowDownCircle, ArrowLeft, ArrowLeftCircle, ArrowRight, ArrowRightCircle, ArrowUp, ArrowUpCircle, AtSign, Award, Baby, BadgeCheck, Banknote, BarChart3, Battery, Bell, Bike, Bluetooth, Bold, BookOpen, Bookmark, Box, Briefcase, CalendarDays, Camera, Cast, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clipboard, Clock, Cloud, Code, Cog, Compass, Copy, CreditCard, Database, Disc3, Download, Edit3, Ellipsis, Eye, FileText, Film, Filter, Flag, Flame, Folder, FolderOpen, Gauge, Gift, GitBranch, Github, Globe, Grid2X2, HardDrive, Hash, Headphones, Heart, HelpCircle, Home, ImagePlus, Inbox, Info, KeyRound, Laptop, Layers, LayoutDashboard, Lightbulb, Link, List, LoaderCircle, Lock, LogIn, LogOut, Mail, MapPin, Maximize2, Menu, MessageCircle, Mic, Minus, Monitor, Moon, MoreHorizontal, MousePointer2, Music, Navigation, Paperclip, Pause, Pencil, Phone, Pin, Play, Plus, Printer, Radio, RefreshCw, Rocket, Save, Search, Send, Server, Settings, Share2, Shield, ShoppingBag, SlidersHorizontal, Smartphone, Sparkles, Star, Sun, Tag, Target, ThumbsUp, ToggleLeft, Trash2, TrendingUp, Trophy, Truck, Tv, Unlock, Upload, User, UserPlus, Users, Video, Volume2, Wallet, Wifi, Wrench, X, XCircle, Zap, ZoomIn, ZoomOut, type LucideIcon,
+  Activity, Airplay, AlarmClock, Shapes, AlertCircle, Archive, ArrowDown, ArrowDownCircle, ArrowLeft, ArrowLeftCircle, ArrowRight, ArrowRightCircle, ArrowUp, ArrowUpCircle, AtSign, Award, Baby, BadgeCheck, Banknote, BarChart3, Battery, Bell, Bike, Bluetooth, Bold, BookOpen, Bookmark, Box, Briefcase, CalendarDays, Camera, Cast, Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Circle, Clipboard, Clock, Cloud, Code, Cog, Compass, Copy, CreditCard, Database, Disc3, Download, Edit3, Ellipsis, Eye, FileText, Film, Filter, Flag, Flame, Folder, FolderOpen, Gauge, Gift, GitBranch, Github, Globe, Grid2X2, HardDrive, Hash, Headphones, Heart, HelpCircle, Home, ImagePlus, Inbox, Info, KeyRound, Laptop, Layers, LayoutDashboard, Lightbulb, Link, List, LoaderCircle, Lock, LogIn, LogOut, Mail, MapPin, Maximize2, Menu, MessageCircle, Mic, Minus, Monitor, Moon, MoreHorizontal, MousePointer2, Music, Navigation, Paperclip, Pause, Pencil, Phone, Pin, Play, Plus, Printer, Radio, RefreshCw, Rocket, Save, Search, Send, Server, Settings, Share2, Shield, ShoppingBag, SlidersHorizontal, Smartphone, Sparkles, Star, Sun, Tag, Target, ThumbsUp, ToggleLeft, Trash2, TrendingUp, Trophy, Truck, Tv, Unlock, Upload, User, UserPlus, Users, Video, Volume2, Wallet, Wifi, Wrench, X, XCircle, Zap, ZoomIn, ZoomOut, type LucideIcon,
 } from "lucide-react";
 import { newIcon, newImage, useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
@@ -45,13 +45,13 @@ export function ElementsPanel() {
       {section === "shapes" && <ShapesPanel embedded />}
       {section === "icons" && (
         <div className="flex flex-col gap-3">
-          <label className="liquid-glass-surface flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-teal/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+          <label className="flex items-center gap-2 rounded-lg border border-teal/20 bg-surface px-3 py-2 text-teal/70">
             <Search className="size-4" />
             <input value={iconQuery} onChange={(event) => setIconQuery(event.target.value)} placeholder="Search 100+ icons" aria-label="Search icons" className="min-w-0 flex-1 bg-transparent font-mono text-[10px] text-teal outline-none placeholder:text-teal/45" />
           </label>
           <div className="grid grid-cols-3 gap-2">
           {filteredIcons.map(({ label, Icon }) => (
-            <button key={label} title={`Add ${label}`} onClick={() => add(newIcon(label))} className="liquid-glass-surface brutal-press flex h-20 flex-col items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] hover:border-teal hover:bg-white/20">
+            <button key={label} title={`Add ${label}`} onClick={() => add(newIcon(label))} className="brutal-press flex h-20 flex-col items-center justify-center gap-2 rounded-lg border border-teal/20 bg-surface text-teal transition-colors hover:border-teal hover:bg-surface-2">
               <Icon className="size-7" strokeWidth={2} />
               <span className="truncate px-1 font-mono text-[8px] text-ink/70">{label}</span>
             </button>

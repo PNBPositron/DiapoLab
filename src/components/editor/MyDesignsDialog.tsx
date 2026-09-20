@@ -61,7 +61,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
           </button>}
         </div>
 
-        <div className={embedded ? "max-h-full overflow-y-auto p-1" : "max-h-[70vh] overflow-y-auto p-4"}>
+        <div className={embedded ? "max-h-full overflow-y-auto p-2" : "max-h-[70vh] overflow-y-auto p-4"}>
           {error && <p className="font-mono text-[11px] text-[#ff0080]">! {error}</p>}
           {!items && !error && (
             <div className="flex items-center justify-center gap-2 py-12 font-mono text-xs text-teal/60">
@@ -74,9 +74,9 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
             </div>
           )}
           {items && items.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               {items.map((d) => (
-                <div key={d.id} className="brutal-border-2 group relative bg-ink">
+                <div key={d.id} className="brutal-border-2 group relative overflow-hidden bg-ink">
                   <button
                     onClick={() => handleOpen(d)}
                     className="block w-full text-left"
@@ -86,7 +86,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                         page={d.pages[0]}
                         canvasW={d.canvas_w}
                         canvasH={d.canvas_h}
-                        className="w-full bg-ink"
+                        className="aspect-[16/10] w-full bg-ink object-cover"
                       />
                     ) : (
                       <div className="aspect-video w-full bg-ink" />
