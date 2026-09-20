@@ -147,8 +147,8 @@
   --grid: oklch(0.84 0.015 250);
   --teal: oklch(0.2 0.025 255);
   --teal-deep: oklch(0.34 0.035 255);
-  --blue: oklch(0.27 0.04 255);
-  --blue-deep: oklch(0.42 0.055 255);
+  --blue: #001f3f;
+  --blue-deep: #00152b;
 }
 [data-editor-theme="glass"] {
   --ink: oklch(0.18 0.02 260);
