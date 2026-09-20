@@ -664,9 +664,14 @@ export function PropertiesPanel() {
           </PropertyGroup>
         )}
 
-        {el.type === "quiz" && (
-          <PropertyGroup label="Quiz content">
-            <QuizEditor element={el} onChange={(patch) => update(el.id, patch)} />
+  {el.type === "quiz" && (
+  <PropertyGroup label="Quiz content">
+  <Field label="Effect">
+  <select value={el.effect ?? "none"} onChange={(e) => update(el.id, { effect: e.target.value as QuizElement["effect"] })} className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal">
+  <option value="none">None</option><option value="liquid_glass">Liquid glass</option>
+  </select>
+  </Field>
+  <QuizEditor element={el} onChange={(patch) => update(el.id, patch)} />
           </PropertyGroup>
         )}
 
@@ -693,7 +698,12 @@ export function PropertiesPanel() {
                 })}
               </div>
             </Field>
-            <ChartEditor element={el} onChange={(patch) => update(el.id, patch)} />
+            <Field label="Effect">
+  <select value={el.effect ?? "none"} onChange={(e) => update(el.id, { effect: e.target.value as ChartElement["effect"] })} className="brutal-border-2 w-full bg-surface px-2 py-1.5 font-mono text-xs text-teal">
+  <option value="none">None</option><option value="liquid_glass">Liquid glass</option>
+  </select>
+  </Field>
+  <ChartEditor element={el} onChange={(patch) => update(el.id, patch)} />
           </PropertyGroup>
         )}
 

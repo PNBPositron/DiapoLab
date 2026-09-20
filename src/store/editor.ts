@@ -162,6 +162,7 @@ export type IconElement = ElementBase & {
 export type QuizOption = { id: string; text: string };
 export type QuizElement = ElementBase & {
   type: "quiz";
+  effect?: ShapeEffect;
   question: string;
   options: QuizOption[];
   correctId: string;
@@ -178,6 +179,7 @@ export type ChartKind = "bar" | "line" | "area" | "pie" | "donut";
 export type ChartDataPoint = { label: string; value: number };
 export type ChartElement = ElementBase & {
   type: "chart";
+  effect?: ShapeEffect;
   chart: ChartKind;
   data: ChartDataPoint[];
   colors: string[];

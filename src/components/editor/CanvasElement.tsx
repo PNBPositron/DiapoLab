@@ -618,10 +618,18 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     chanRef.current?.postMessage({ type: "reset" });
   };
 
+  const glassStyle = element.effect === "liquid_glass" ? {
+    backdropFilter: "blur(14px) saturate(160%)",
+    WebkitBackdropFilter: "blur(14px) saturate(160%)",
+    background: "linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08))",
+    boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.55), 0 18px 40px rgba(0,0,0,0.22)",
+  } : {};
+
   return (
     <div
       onMouseDown={(e) => interactive && e.stopPropagation()}
       style={{
+        ...glassStyle,
         width: "100%",
         height: "100%",
         background: element.bgColor,
