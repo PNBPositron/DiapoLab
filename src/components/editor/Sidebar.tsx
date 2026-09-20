@@ -114,10 +114,13 @@ export function Sidebar() {
   const panelTransition = `transform ${dur}ms ${ease}, opacity ${Math.round(dur * 0.62)}ms ${ease}, filter ${Math.round(dur * 0.7)}ms ease-out`;
 
   const visible = TOOLS.filter((t) => panels[t.id as PanelId] !== false);
+
   const visibleKey = visible.map((t) => t.id).join(",");
   useEffect(() => {
     const ids = visibleKey.split(",").filter(Boolean);
-    if (ids.length && !ids.includes(tool)) setTool(ids[0] as typeof tool);
+    if (ids.length && !ids.includes(tool)) {
+      setTool(ids[0] as typeof tool);
+    }
   }, [visibleKey, tool, setTool]);
 
   return (
@@ -126,7 +129,7 @@ export function Sidebar() {
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <nav className="sidebar-dock flex w-16 flex-col gap-1 bg-transparent p-1.5">
+      <nav className="flex w-16 flex-col gap-1 border-r border-slate-200/80 bg-transparent p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -137,13 +140,13 @@ export function Sidebar() {
                 setTool(t.id);
                 setHovering(true);
               }}
-              className={`sidebar-dock-item group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 hover:scale-110 hover:origin-bottom ${
+              className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
                 active && panelOpen
-                  ? "border-white/40 bg-white/20 text-teal backdrop-blur-xl"
-                  : "border-transparent bg-transparent text-teal/70 hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
+                  ? "border-slate-300 bg-white text-slate-700 shadow-[0_1px_6px_rgba(15,23,42,0.08)]"
+                  : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white/70 hover:text-slate-700"
               }`}
             >
-              <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-105" strokeWidth={2} />
+              <Icon className="h-4 w-4" strokeWidth={2.2} />
               {t.label}
             </button>
           );
@@ -152,16 +155,16 @@ export function Sidebar() {
           onClick={() => setSettingsOpen(true)}
           title="Settings"
           aria-label="Settings"
-          className="sidebar-dock-item mt-auto flex flex-col items-center gap-1 rounded-xl border border-transparent bg-transparent px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-teal/70 transition-all duration-200 hover:scale-110 hover:origin-bottom hover:border-white/30 hover:bg-white/[0.13] hover:text-teal"
+          className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white/70 px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-slate-600 hover:border-slate-300 hover:bg-white"
         >
-          <Settings className="h-5 w-5 transition-transform duration-200 group-hover:scale-105" strokeWidth={2} />
+          <Settings className="h-5 w-5" strokeWidth={2.2} />
           Settings
         </button>
       </nav>
       <div
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
-        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-teal/20 bg-paper p-3 shadow-lg will-change-[transform,opacity,filter] ${
+        className={`absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto border-r border-slate-200/80 bg-white/90 p-3 shadow-[0_6px_20px_rgba(15,23,42,0.06)] backdrop-blur-[2px] will-change-[transform,opacity,filter] ${
           panelOpen
             ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}`
             : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`
