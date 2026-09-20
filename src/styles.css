@@ -149,6 +149,7 @@
   --teal-deep: oklch(0.34 0.035 255);
   --blue: #001f3f;
   --blue-deep: #00152b;
+  --accent: var(--blue);
 }
 [data-editor-theme="glass"] {
   --ink: oklch(0.18 0.02 260);
