@@ -130,15 +130,15 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/85 p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-md sm:p-6" onClick={onClose}>
       <div
-        className="brutal-border-2 relative my-6 w-full max-w-2xl bg-ink p-6"
+        className="relative my-4 max-h-[min(860px,calc(100vh-2rem))] w-full max-w-4xl overflow-y-auto rounded-3xl border border-white/80 bg-white/95 p-5 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:my-8 sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           aria-label="Close settings"
-          className="absolute right-3 top-3 grid h-8 w-8 place-items-center border-2 border-teal/40 text-teal hover:border-teal"
+          className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
         >
           <X className="h-4 w-4" />
         </button>
@@ -154,7 +154,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           </div>
         </section>
 
-        {developerOpen && <section className="brutal-border-2 mb-4 border-teal bg-ink p-4">
+        {developerOpen && <section className="mb-4 rounded-2xl border border-slate-200 bg-slate-950 p-4 shadow-inner">
           <div className="mb-3 flex items-center justify-between"><div><h3 className="font-display text-[12px] tracking-[0.2em] text-teal">SLIDESHOW JSON</h3><p className="mt-1 font-mono text-[10px] text-teal/60">Changes apply to the current presentation.</p></div><button type="button" onClick={() => setDeveloperOpen(false)} className="text-teal/60 hover:text-teal" aria-label="Close developer mode"><X className="size-4" /></button></div>
           <textarea value={jsonDraft} onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }} spellCheck={false} className="h-96 w-full resize-y border-2 border-teal/30 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-teal outline-none focus:border-teal" aria-label="Slideshow JSON editor" />
           <div className="mt-3 flex items-center justify-between gap-3"><span className="font-mono text-[10px] text-teal/60">{jsonStatus ?? `${pages.length} slides loaded`}</span><div className="flex gap-2"><button type="button" onClick={() => setJsonDraft(JSON.stringify(pages, null, 2))} className="brutal-border px-3 py-2 font-mono text-[10px] uppercase text-teal">Reset</button><button type="button" onClick={applyJson} className="brutal-border-2 brutal-press bg-teal px-3 py-2 font-mono text-[10px] uppercase text-ink">Apply JSON</button></div></div>

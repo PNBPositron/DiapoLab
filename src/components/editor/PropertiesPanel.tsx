@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useEditor,
   DEFAULT_FILTERS,
@@ -16,7 +16,7 @@ import {
   type ButtonAction,
   type UiStyle,
 } from "@/store/editor";
-import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload } from "lucide-react";
+import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload, MoreHorizontal, Palette, WandSparkles, Play, ChevronDown, Minus, AlignCenter, Sparkles } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 
 const FONT_FAMILIES: string[] = Array.from(
@@ -48,12 +48,12 @@ const SWATCHES = [
 
 function PropertyGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <details className="group border border-teal/25 bg-surface/30" open={false}>
-      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-display text-[10px] uppercase tracking-[0.2em] text-teal marker:content-none hover:bg-surface/60 [&::-webkit-details-marker]:hidden">
+    <details className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)]" open={false}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 font-display text-[10px] uppercase tracking-[0.16em] text-slate-700 marker:content-none hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+        <span className="transition-transform group-open:rotate-90">›</span>
         <span>{label}</span>
-        <span className="font-mono text-teal/50 transition-transform group-open:rotate-90">›</span>
       </summary>
-      <div className="flex flex-col gap-4 border-t border-teal/20 p-3">{children}</div>
+      <div className="flex flex-col gap-4 border-t border-slate-100 p-3">{children}</div>
     </details>
   );
 }
@@ -63,33 +63,101 @@ export function PropertiesPanel() {
     useEditor();
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [colorPaletteOpen, setColorPaletteOpen] = useState(false);
   const el = elements.find((e) => e.id === selectedId);
+
+  useEffect(() => {
+    setAdvancedOpen(false);
+  }, [selectedId]);
+
   if (!el) {
     return (
-      <div className="hidden w-72 border-l border-teal/30 bg-paper p-4 lg:block">
-        <div className="brutal-border bg-ink px-3 py-2.5">
-          <div className="font-display text-xs uppercase tracking-[0.25em] text-teal/60">
-            ▌ No selection
-          </div>
-        </div>
-        <div className="mt-4 space-y-2 font-mono text-[11px] text-teal/50">
-          <p>&gt; awaiting input...</p>
-          <p>&gt; click a layer to inspect</p>
-          <p className="text-teal/30">&gt; _</p>
+      <div className="hidden w-80 border-l border-slate-200 bg-slate-50/70 p-4 lg:block">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+          <div className="font-display text-xs uppercase tracking-[0.18em] text-slate-700">No selection</div>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">Select an element on the canvas to edit its properties.</p>
         </div>
       </div>
     );
   }
-  return (
-    <div className="w-72 overflow-y-auto border-l border-teal/30 bg-paper">
-      <div className="border-b border-teal/40 bg-blue-deep px-4 py-3 glow-blue">
-        <div className="flex items-center gap-2 font-display text-xs uppercase tracking-[0.25em] text-teal">
-          <Layers className="h-3.5 w-3.5" strokeWidth={2.5} />
-          {el.type}_layer
+  if (!advancedOpen) {
+    return (
+      <div className="pointer-events-none absolute left-1/2 top-[74px] z-20 -translate-x-1/2 lg:block">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] backdrop-blur">
+          <div className="flex items-center gap-2 px-2.5 py-1.5">
+            <Layers className="size-4 text-sky-600" strokeWidth={2.2} />
+            <span className="font-display text-[10px] uppercase tracking-[0.16em] text-slate-700">{el.type}</span>
+          </div>
+          <button onClick={() => duplicate(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Duplicate">
+            <Copy className="size-4" />
+          </button>
+          <div className="relative">
+            <button
+              onClick={() => el.type === "text" && setColorPaletteOpen((open) => !open)}
+              disabled={el.type !== "text"}
+              className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-35"
+              title="Text color"
+              aria-label="Text color"
+              aria-expanded={colorPaletteOpen}
+            >
+              <Palette className="size-4" />
+            </button>
+            {colorPaletteOpen && el.type === "text" && (
+              <div className="absolute left-1/2 top-full z-30 mt-2 grid w-36 -translate-x-1/2 grid-cols-5 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-[0_14px_36px_rgba(15,23,42,0.18)]">
+                {SWATCHES.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => { update(el.id, { color }); setColorPaletteOpen(false); }}
+                    className={`size-5 rounded-full border border-slate-200 shadow-sm transition hover:scale-110 ${el.color === color ? "ring-2 ring-sky-500 ring-offset-1" : ""}`}
+                    style={{ backgroundColor: color }}
+                    aria-label={`Set text color to ${color}`}
+                  />
+                ))}
+                <label className="col-span-5 mt-1 flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-slate-300 px-2 py-1.5 text-[10px] font-medium text-slate-600 hover:bg-slate-50">
+                  Custom
+                  <input type="color" value={el.color} onChange={(event) => update(el.id, { color: event.target.value })} className="sr-only" />
+                </label>
+              </div>
+            )}
+          </div>
+          {el.type === "text" && (
+            <div className="flex h-9 items-center rounded-xl border border-slate-200 bg-slate-50 px-0.5" title="Text size">
+              <button type="button" onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900" aria-label="Decrease text size"><Minus className="size-3.5" /></button>
+              <input type="number" min={12} max={240} value={el.fontSize} onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) }); }} className="w-9 appearance-none border-0 bg-transparent text-center text-xs font-semibold text-slate-800 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" aria-label="Text size in pixels" />
+              <button type="button" onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900" aria-label="Increase text size"><Plus className="size-3.5" /></button>
+            </div>
+          )}
+          <button onClick={() => update(el.id, { animation: el.animation === "fade-up" ? "none" : "fade-up" })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Animation"> 
+            <WandSparkles className="size-4" />
+          </button>
+          <button onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Rotate">
+            <RotateCcw className="size-4" />
+          </button>
+          <button onClick={() => remove(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600" title="Delete">
+            <Trash2 className="size-4" />
+          </button>
+          <button onClick={() => setAdvancedOpen(true)} className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-white transition hover:bg-slate-700">
+            <MoreHorizontal className="size-4" />
+            More
+          </button>
         </div>
       </div>
+    );
+  }
 
-      <div className="space-y-4 p-4">
+  return (
+    <div className="w-80 overflow-y-auto border-l border-slate-200 bg-slate-50/70">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+        <div className="flex items-center gap-2 font-display text-xs uppercase tracking-[0.18em] text-slate-700">
+          <Layers className="size-4 text-sky-600" strokeWidth={2} />
+          Properties
+        </div>
+        <span className="rounded-full bg-slate-100 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">{el.type}</span>
+      </div>
+
+      <div className="flex flex-col gap-3 p-4">
         {el.type === "ui" && (
           <PropertyGroup label="Content & appearance">
             <Field label="Style">
@@ -317,30 +385,12 @@ export function PropertiesPanel() {
               />
             </Field>
             <Field label="Font size">
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={12}
-                  max={240}
-                  value={el.fontSize}
-                  onChange={(e) => update(el.id, { fontSize: +e.target.value })}
-                  className="w-full accent-teal"
-                />
-                <input
-                  type="number"
-                  min={12}
-                  max={240}
-                  step={1}
-                  value={el.fontSize}
-                  aria-label="Font size in pixels"
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) });
-                  }}
-                  className="brutal-border-2 w-16 bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none"
-                />
+              <div className="flex h-10 items-center justify-between rounded-xl border border-slate-200 bg-white px-1 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+                <button type="button" onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })} className="grid size-8 place-items-center rounded-lg text-slate-600 transition hover:bg-slate-100" aria-label="Decrease font size"><Minus className="size-4" /></button>
+                <input type="number" min={12} max={240} step={1} value={el.fontSize} aria-label="Font size in pixels" onChange={(e) => { const value = Number(e.target.value); if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) }); }} className="w-14 appearance-none border-0 bg-transparent text-center font-semibold text-slate-800 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                <button type="button" onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })} className="grid size-8 place-items-center rounded-lg text-slate-600 transition hover:bg-slate-100" aria-label="Increase font size"><Plus className="size-4" /></button>
               </div>
-              <div className="font-mono text-[11px] text-teal/70">{el.fontSize}px</div>
+              <input type="range" min={12} max={240} value={el.fontSize} onChange={(e) => update(el.id, { fontSize: +e.target.value })} className="mt-2 w-full accent-sky-600" />
             </Field>
             <Field label="Font family">
               <select
