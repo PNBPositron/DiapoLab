@@ -82,7 +82,7 @@ export function PropertiesPanel() {
   }
   if (!advancedOpen) {
     return (
-      <div className="pointer-events-none absolute right-4 top-[74px] z-20 lg:block">
+      <div className="pointer-events-none absolute left-1/2 top-[74px] z-20 -translate-x-1/2 lg:block">
         <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] backdrop-blur">
           <div className="flex items-center gap-2 px-2.5 py-1.5">
             <Layers className="size-4 text-sky-600" strokeWidth={2.2} />
