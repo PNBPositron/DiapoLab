@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useEditor,
   DEFAULT_FILTERS,
@@ -16,7 +16,7 @@ import {
   type ButtonAction,
   type UiStyle,
 } from "@/store/editor";
-import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload } from "lucide-react";
+import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload, MoreHorizontal } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 
 const FONT_FAMILIES: string[] = Array.from(
@@ -63,7 +63,13 @@ export function PropertiesPanel() {
     useEditor();
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const el = elements.find((e) => e.id === selectedId);
+
+  useEffect(() => {
+    setAdvancedOpen(false);
+  }, [selectedId]);
+
   if (!el) {
     return (
       <div className="hidden w-80 border-l border-slate-200 bg-slate-50/70 p-4 lg:block">
@@ -74,6 +80,29 @@ export function PropertiesPanel() {
       </div>
     );
   }
+  if (!advancedOpen) {
+    return (
+      <div className="pointer-events-none absolute right-4 top-[74px] z-20 lg:block">
+        <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] backdrop-blur">
+          <div className="flex items-center gap-2 px-2.5 py-1.5">
+            <Layers className="size-4 text-sky-600" strokeWidth={2.2} />
+            <span className="font-display text-[10px] uppercase tracking-[0.16em] text-slate-700">{el.type}</span>
+          </div>
+          <button onClick={() => duplicate(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Duplicate">
+            <Copy className="size-4" />
+          </button>
+          <button onClick={() => remove(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600" title="Delete">
+            <Trash2 className="size-4" />
+          </button>
+          <button onClick={() => setAdvancedOpen(true)} className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-white transition hover:bg-slate-700">
+            <MoreHorizontal className="size-4" />
+            More
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-80 overflow-y-auto border-l border-slate-200 bg-slate-50/70">
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
