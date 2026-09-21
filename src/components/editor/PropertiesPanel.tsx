@@ -83,11 +83,35 @@ export function PropertiesPanel() {
   if (!advancedOpen) {
     return (
       <div className="pointer-events-none absolute left-1/2 top-[74px] z-20 -translate-x-1/2 lg:block">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] backdrop-blur">
+        <div className="pointer-events-auto flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white/95 p-1.5 shadow-[0_12px_32px_rgba(15,23,42,0.14)] backdrop-blur">
           <div className="flex items-center gap-2 px-2.5 py-1.5">
             <Layers className="size-4 text-sky-600" strokeWidth={2.2} />
             <span className="font-display text-[10px] uppercase tracking-[0.16em] text-slate-700">{el.type}</span>
           </div>
+          <div className="hidden items-center gap-1 rounded-xl bg-slate-50 px-1.5 py-1 sm:flex">
+            {(["x", "y", "width", "height"] as const).map((key) => (
+              <label key={key} className="flex items-center gap-1 text-[9px] font-medium uppercase tracking-wider text-slate-400">
+                {key}
+                <input
+                  aria-label={key}
+                  type="number"
+                  value={Math.round(el[key])}
+                  onChange={(event) => update(el.id, { [key]: Math.max(1, Number(event.target.value)) })}
+                  className="w-11 rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-center font-mono text-[10px] text-slate-700 outline-none focus:border-sky-400"
+                />
+              </label>
+            ))}
+          </div>
+          <label className="hidden items-center gap-1 rounded-xl bg-slate-50 px-2 py-2 text-[9px] font-medium uppercase tracking-wider text-slate-400 md:flex">
+            <RotateCcw className="size-3" />
+            <input
+              aria-label="Rotation"
+              type="number"
+              value={Math.round(el.rotation)}
+              onChange={(event) => update(el.id, { rotation: Number(event.target.value) })}
+              className="w-10 bg-transparent text-center font-mono text-[10px] text-slate-700 outline-none"
+            />°
+          </label>
           <button onClick={() => duplicate(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Duplicate">
             <Copy className="size-4" />
           </button>
