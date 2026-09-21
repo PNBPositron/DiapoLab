@@ -77,10 +77,11 @@ export const springEasing = (stiffness: number) => {
 export type CustomTheme = { id: string; name: string; tokens: ThemeTokens };
 
 export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> = [
-  { id: "auto-light", label: "Auto Light", hint: "light editor chrome" },
+  { id: "everest", label: "Light", hint: "fixed light editor chrome" },
 ];
 
-export const DEFAULT_EDITOR_THEME = "auto-light";
+// Everest is a fixed light palette. It deliberately does not depend on slide colors.
+export const DEFAULT_EDITOR_THEME = "everest";
 
 const ALL_ON: Record<PanelId, boolean> = {
   home: true,
@@ -134,14 +135,22 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 5,
-      migrate: (state) => ({
-        ...(state as SettingsState),
-        customThemes: (state as SettingsState)?.customThemes ?? [],
-        editorTheme: DEFAULT_EDITOR_THEME,
-        reduceMotion: true,
-        brandKit: { ...DEFAULT_BRAND_KIT, ...((state as SettingsState)?.brandKit ?? {}) },
-      }),
+      version: 6,
+      migrate: (state) => {
+        const previous = state as SettingsState;
+        const previousTheme = previous?.editorTheme;
+        return {
+          ...previous,
+          customThemes: previous?.customThemes ?? [],
+          // Replace all legacy slide-dependent theme values with the fixed light theme.
+          editorTheme:
+            previousTheme === "auto" || previousTheme === "auto-light" || previousTheme === "auto-dark"
+              ? DEFAULT_EDITOR_THEME
+              : previousTheme ?? DEFAULT_EDITOR_THEME,
+          reduceMotion: true,
+          brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
+        };
+      },
     },
   ),
 );
