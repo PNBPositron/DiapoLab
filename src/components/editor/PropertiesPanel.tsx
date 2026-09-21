@@ -48,12 +48,12 @@ const SWATCHES = [
 
 function PropertyGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <details className="group border border-teal/25 bg-surface/30" open={false}>
-      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-display text-[10px] uppercase tracking-[0.2em] text-teal marker:content-none hover:bg-surface/60 [&::-webkit-details-marker]:hidden">
+    <details className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)]" open={false}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 font-display text-[10px] uppercase tracking-[0.16em] text-slate-700 marker:content-none hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+        <span className="transition-transform group-open:rotate-90">›</span>
         <span>{label}</span>
-        <span className="font-mono text-teal/50 transition-transform group-open:rotate-90">›</span>
       </summary>
-      <div className="flex flex-col gap-4 border-t border-teal/20 p-3">{children}</div>
+      <div className="flex flex-col gap-4 border-t border-slate-100 p-3">{children}</div>
     </details>
   );
 }
@@ -66,30 +66,25 @@ export function PropertiesPanel() {
   const el = elements.find((e) => e.id === selectedId);
   if (!el) {
     return (
-      <div className="hidden w-72 border-l border-teal/30 bg-paper p-4 lg:block">
-        <div className="brutal-border bg-ink px-3 py-2.5">
-          <div className="font-display text-xs uppercase tracking-[0.25em] text-teal/60">
-            ▌ No selection
-          </div>
-        </div>
-        <div className="mt-4 space-y-2 font-mono text-[11px] text-teal/50">
-          <p>&gt; awaiting input...</p>
-          <p>&gt; click a layer to inspect</p>
-          <p className="text-teal/30">&gt; _</p>
+      <div className="hidden w-80 border-l border-slate-200 bg-slate-50/70 p-4 lg:block">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+          <div className="font-display text-xs uppercase tracking-[0.18em] text-slate-700">No selection</div>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">Select an element on the canvas to edit its properties.</p>
         </div>
       </div>
     );
   }
   return (
-    <div className="w-72 overflow-y-auto border-l border-teal/30 bg-paper">
-      <div className="border-b border-teal/40 bg-blue-deep px-4 py-3 glow-blue">
-        <div className="flex items-center gap-2 font-display text-xs uppercase tracking-[0.25em] text-teal">
-          <Layers className="h-3.5 w-3.5" strokeWidth={2.5} />
-          {el.type}_layer
+    <div className="w-80 overflow-y-auto border-l border-slate-200 bg-slate-50/70">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+        <div className="flex items-center gap-2 font-display text-xs uppercase tracking-[0.18em] text-slate-700">
+          <Layers className="size-4 text-sky-600" strokeWidth={2} />
+          Properties
         </div>
+        <span className="rounded-full bg-slate-100 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">{el.type}</span>
       </div>
 
-      <div className="space-y-4 p-4">
+      <div className="flex flex-col gap-3 p-4">
         {el.type === "ui" && (
           <PropertyGroup label="Content & appearance">
             <Field label="Style">

@@ -114,10 +114,6 @@ export function ComponentsPanel() {
           <Blocks className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">UI</span>
         </button>
-        <button onClick={() => setSection(section === "elements" ? null : "elements")} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl border text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition ${section === "elements" ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
-          <TrendingUp className="size-6" />
-          <span className="font-display text-[10px] uppercase tracking-[0.12em]">Data & Quiz</span>
-        </button>
       </div>
 
       {section === "elements" && (
