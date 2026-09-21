@@ -78,9 +78,9 @@ export function Sidebar() {
         </button>
       </nav>
       <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto rounded-r-2xl border-r border-slate-200 bg-white p-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
-        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "ai" && <AiPanel />}{tool === "my-designs" && <MyDesignsDialog embedded onClose={() => setTool("home")} />}
+        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "ai" && <AiPanel />}
       </div>
-      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
+      {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}{settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </aside>
   );
 }
