@@ -4,6 +4,7 @@ import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { useUi } from "@/store/ui";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
 import { LayoutTemplate, Type, Shapes, SlidersHorizontal, Blocks, Settings, Images, Sparkles, FolderHeart } from "lucide-react";
+import "@/editor-ui.css";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
 import { ElementsPanel } from "./panels/ElementsPanel";
@@ -39,22 +40,12 @@ export function Sidebar() {
     const root = document.documentElement;
     root.style.setProperty("--font-display", "Inter, system-ui, sans-serif");
     root.style.setProperty("--font-mono", "Inter, system-ui, sans-serif");
-
     const custom = editorTheme.startsWith(CUSTOM_THEME_PREFIX)
       ? customThemes.find((t) => `${CUSTOM_THEME_PREFIX}${t.id}` === editorTheme)
       : undefined;
-
     root.dataset.editorTheme = custom ? "custom" : editorTheme;
-
-    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS))) {
-      root.style.removeProperty(key);
-    }
-
-    if (custom) {
-      for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) {
-        root.style.setProperty(k, v);
-      }
-    }
+    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS))) root.style.removeProperty(key);
+    if (custom) for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) root.style.setProperty(k, v);
   }, [editorTheme, customThemes]);
 
   useEffect(() => {
@@ -77,59 +68,19 @@ export function Sidebar() {
   }, [visibleKey, tool, setTool]);
 
   return (
-    <aside className="relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
+    <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
       <nav className="flex w-16 flex-col gap-1 border-r border-slate-200 bg-transparent p-1.5">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => {
-                setTool(t.id);
-                setHovering(true);
-              }}
-              className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${
-                active && panelOpen
-                  ? "border-slate-300 bg-white text-slate-700 shadow-sm"
-                  : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"
-              }`}
-            >
-              <Icon className="h-4 w-4" strokeWidth={2.2} />
-              {t.label}
-            </button>
-          );
+          return <button key={t.id} onClick={() => { setTool(t.id); setHovering(true); }} className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${active && panelOpen ? "border-slate-300 bg-white text-slate-700 shadow-sm" : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"}`}><Icon className="h-4 w-4" strokeWidth={2.2} />{t.label}</button>;
         })}
-        <button
-          onClick={() => setSettingsOpen(true)}
-          title="Settings"
-          aria-label="Settings"
-          className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-slate-600 shadow-sm hover:border-slate-300"
-        >
-          <Settings className="h-5 w-5" strokeWidth={2.2} />
-          Settings
-        </button>
+        <button onClick={() => setSettingsOpen(true)} title="Settings" aria-label="Settings" className="mt-auto flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-white px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] text-slate-600 shadow-sm hover:border-slate-300"><Settings className="h-5 w-5" strokeWidth={2.2} />Settings</button>
       </nav>
-
-      <div
-        aria-hidden={!panelOpen}
-        style={{ transition: panelTransition }}
-        className={`editor-side-panel absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto rounded-r-2xl border-r border-slate-200 bg-white p-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] will-change-[transform,opacity,filter] ${
-          panelOpen
-            ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}`
-            : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`
-        }`}
-      >
-        {tool === "home" && <TemplatesPanel />}
-        {tool === "text" && <TextPanel />}
-        {tool === "components" && <ComponentsPanel />}
-        {tool === "elements" && <ElementsPanel />}
-        {tool === "illustrations" && <IllustrationsPanel />}
-        {tool === "design" && <DesignPanel />}
-        {tool === "ai" && <AiPanel />}
+      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-16 top-0 z-40 h-full w-64 origin-left overflow-y-auto rounded-r-2xl border-r border-slate-200 bg-white p-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
+        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "ai" && <AiPanel />}
       </div>
-      {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}
-      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
+      {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}{settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </aside>
   );
 }

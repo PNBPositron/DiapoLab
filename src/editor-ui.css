@@ -1,0 +1,87 @@
+@layer components {
+  /* Keep the editor controls consistent with the clean canvas UI. */
+  .editor-side-panel,
+  .editor-side-panel * {
+    font-family: Inter, system-ui, sans-serif !important;
+  }
+
+  .editor-side-panel {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.96);
+    border-color: #e2e8f0;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+  }
+
+  .editor-side-panel .brutal-border,
+  .editor-side-panel .brutal-border-2 {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+  }
+
+  .editor-side-panel .brutal-press:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+
+  .editor-side-panel .bg-ink {
+    background: #f8fafc;
+    color: #334155;
+  }
+
+  .editor-side-panel .bg-surface {
+    background: #fff;
+    color: #334155;
+  }
+
+  .editor-side-panel .bg-surface-2 {
+    background: #f1f5f9;
+    color: #334155;
+  }
+
+  .editor-side-panel .text-teal,
+  .editor-side-panel .text-teal\/80,
+  .editor-side-panel .text-teal\/70,
+  .editor-side-panel .text-teal\/60,
+  .editor-side-panel .text-teal\/50 {
+    color: #475569;
+  }
+
+  .editor-side-panel .text-teal {
+    color: #1e293b;
+  }
+
+  .editor-side-panel .border-teal\/20,
+  .editor-side-panel .border-teal\/25,
+  .editor-side-panel .border-teal\/30,
+  .editor-side-panel .border-teal\/40 {
+    border-color: #e2e8f0;
+  }
+
+  .editor-side-panel input:not([type="color"]),
+  .editor-side-panel textarea,
+  .editor-side-panel select {
+    border-color: #e2e8f0;
+    border-radius: 0.625rem;
+    background: #f8fafc;
+    color: #334155;
+  }
+
+  .editor-side-panel input:not([type="color"]):focus,
+  .editor-side-panel textarea:focus,
+  .editor-side-panel select:focus {
+    border-color: #93c5fd;
+    outline: 2px solid rgba(147, 197, 253, 0.25);
+    outline-offset: 0;
+  }
+
+  .editor-side-panel button {
+    border-radius: 0.625rem;
+  }
+}
+
+/* The editor UI uses one readable typeface; slide text keeps its own design font. */
+.editor-ui,
+.editor-ui * {
+  font-family: Inter, system-ui, sans-serif !important;
+}
