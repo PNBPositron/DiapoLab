@@ -64,6 +64,7 @@ export function PropertiesPanel() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [colorPaletteOpen, setColorPaletteOpen] = useState(false);
   const el = elements.find((e) => e.id === selectedId);
 
   useEffect(() => {
@@ -91,10 +92,44 @@ export function PropertiesPanel() {
           <button onClick={() => duplicate(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Duplicate">
             <Copy className="size-4" />
           </button>
-          <button onClick={() => el.type === "text" && update(el.id, { color: el.color === "#0b1736" ? "#2563eb" : "#0b1736" })} disabled={el.type !== "text"} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-35" title="Color">
-            <Palette className="size-4" />
-          </button>
-          <button onClick={() => update(el.id, { animation: el.animation === "fade-up" ? "none" : "fade-up" })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Animation">
+          <div className="relative">
+            <button
+              onClick={() => el.type === "text" && setColorPaletteOpen((open) => !open)}
+              disabled={el.type !== "text"}
+              className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-35"
+              title="Text color"
+              aria-label="Text color"
+              aria-expanded={colorPaletteOpen}
+            >
+              <Palette className="size-4" />
+            </button>
+            {colorPaletteOpen && el.type === "text" && (
+              <div className="absolute left-1/2 top-full z-30 mt-2 grid w-36 -translate-x-1/2 grid-cols-5 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-[0_14px_36px_rgba(15,23,42,0.18)]">
+                {SWATCHES.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => { update(el.id, { color }); setColorPaletteOpen(false); }}
+                    className={`size-5 rounded-full border border-slate-200 shadow-sm transition hover:scale-110 ${el.color === color ? "ring-2 ring-sky-500 ring-offset-1" : ""}`}
+                    style={{ backgroundColor: color }}
+                    aria-label={`Set text color to ${color}`}
+                  />
+                ))}
+                <label className="col-span-5 mt-1 flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-slate-300 px-2 py-1.5 text-[10px] font-medium text-slate-600 hover:bg-slate-50">
+                  Custom
+                  <input type="color" value={el.color} onChange={(event) => update(el.id, { color: event.target.value })} className="sr-only" />
+                </label>
+              </div>
+            )}
+          </div>
+          {el.type === "text" && (
+            <div className="flex h-9 items-center rounded-xl border border-slate-200 bg-slate-50 px-0.5" title="Text size">
+              <button type="button" onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900" aria-label="Decrease text size"><Minus className="size-3.5" /></button>
+              <input type="number" min={12} max={240} value={el.fontSize} onChange={(event) => { const value = Number(event.target.value); if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) }); }} className="w-9 border-0 bg-transparent text-center text-xs font-semibold text-slate-800 outline-none" aria-label="Text size in pixels" />
+              <button type="button" onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-white hover:text-slate-900" aria-label="Increase text size"><Plus className="size-3.5" /></button>
+            </div>
+          )}
+          <button onClick={() => update(el.id, { animation: el.animation === "fade-up" ? "none" : "fade-up" })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Animation"> 
             <WandSparkles className="size-4" />
           </button>
           <button onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Rotate">
