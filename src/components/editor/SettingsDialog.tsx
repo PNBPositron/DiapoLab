@@ -130,15 +130,15 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/85 p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-md sm:p-6" onClick={onClose}>
       <div
-        className="brutal-border-2 relative my-6 w-full max-w-2xl bg-ink p-6"
+        className="relative my-4 w-full max-w-3xl overflow-hidden rounded-3xl border border-white/70 bg-slate-50/95 p-5 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:my-8 sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           aria-label="Close settings"
-          className="absolute right-3 top-3 grid h-8 w-8 place-items-center border-2 border-teal/40 text-teal hover:border-teal"
+          className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
         >
           <X className="h-4 w-4" />
         </button>

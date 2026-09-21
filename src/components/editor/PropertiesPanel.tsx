@@ -16,7 +16,7 @@ import {
   type ButtonAction,
   type UiStyle,
 } from "@/store/editor";
-import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload, MoreHorizontal } from "lucide-react";
+import { Copy, Trash2, ArrowUp, ArrowDown, Layers, RotateCcw, Plus, Check, Upload, MoreHorizontal, Palette, WandSparkles, Play, ChevronDown, Minus, AlignCenter, Sparkles } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 
 const FONT_FAMILIES: string[] = Array.from(
@@ -90,6 +90,15 @@ export function PropertiesPanel() {
           </div>
           <button onClick={() => duplicate(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Duplicate">
             <Copy className="size-4" />
+          </button>
+          <button onClick={() => el.type === "text" && update(el.id, { color: el.color === "#0b1736" ? "#2563eb" : "#0b1736" })} disabled={el.type !== "text"} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-35" title="Color">
+            <Palette className="size-4" />
+          </button>
+          <button onClick={() => update(el.id, { animation: el.animation === "fade-up" ? "none" : "fade-up" })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Animation">
+            <WandSparkles className="size-4" />
+          </button>
+          <button onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Rotate">
+            <RotateCcw className="size-4" />
           </button>
           <button onClick={() => remove(el.id)} className="rounded-xl p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600" title="Delete">
             <Trash2 className="size-4" />
@@ -341,30 +350,12 @@ export function PropertiesPanel() {
               />
             </Field>
             <Field label="Font size">
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={12}
-                  max={240}
-                  value={el.fontSize}
-                  onChange={(e) => update(el.id, { fontSize: +e.target.value })}
-                  className="w-full accent-teal"
-                />
-                <input
-                  type="number"
-                  min={12}
-                  max={240}
-                  step={1}
-                  value={el.fontSize}
-                  aria-label="Font size in pixels"
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
-                    if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) });
-                  }}
-                  className="brutal-border-2 w-16 bg-surface px-2 py-1.5 font-mono text-xs text-teal focus:outline-none"
-                />
+              <div className="flex h-10 items-center justify-between rounded-xl border border-slate-200 bg-white px-1 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+                <button type="button" onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })} className="grid size-8 place-items-center rounded-lg text-slate-600 transition hover:bg-slate-100" aria-label="Decrease font size"><Minus className="size-4" /></button>
+                <input type="number" min={12} max={240} step={1} value={el.fontSize} aria-label="Font size in pixels" onChange={(e) => { const value = Number(e.target.value); if (Number.isFinite(value)) update(el.id, { fontSize: Math.min(240, Math.max(12, value)) }); }} className="w-14 border-0 bg-transparent text-center font-semibold text-slate-800 outline-none" />
+                <button type="button" onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })} className="grid size-8 place-items-center rounded-lg text-slate-600 transition hover:bg-slate-100" aria-label="Increase font size"><Plus className="size-4" /></button>
               </div>
-              <div className="font-mono text-[11px] text-teal/70">{el.fontSize}px</div>
+              <input type="range" min={12} max={240} value={el.fontSize} onChange={(e) => update(el.id, { fontSize: +e.target.value })} className="mt-2 w-full accent-sky-600" />
             </Field>
             <Field label="Font family">
               <select
