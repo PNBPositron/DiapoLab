@@ -140,7 +140,8 @@ export function ComponentsPanel() {
               );
             })}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+      <div className="panel-section-label">Browse library</div>
+      <div className="grid grid-cols-2 gap-2">
             {presets.map(({ kind, label, Icon, overrides }, index) => (
               <button key={`${kind}-${label}`} onClick={() => add(newUi(kind, style, overrides))} className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition hover:border-slate-300 hover:bg-slate-50">
                 <div className="pointer-events-none h-16 w-full overflow-hidden rounded-lg border border-slate-100 bg-slate-50"><UiRender element={newUi(kind, style, { ...overrides, id: `preview-${kind}-${index}` })} preview /></div>
