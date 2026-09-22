@@ -8,13 +8,18 @@ import { ShapesPanel } from "./ShapesPanel";
 
 type ElementSection = "shapes" | "icons" | null;
 
-const ICONS: Array<{ label: string; Icon: LucideIcon }> = Object.entries(LucideIcons)
-  .filter(([name, icon]) => name !== "createLucideIcon" && typeof icon === "function" && /^[A-Z]/.test(name))
+const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.entries(LucideIcons)
+  .filter(([name, icon]) => {
+    const isReactComponent = typeof icon === "function" || (typeof icon === "object" && icon !== null && "$$typeof" in icon);
+    return name !== "createLucideIcon" && isReactComponent && /^[A-Z]/.test(name);
+  })
   .map(([name, Icon]) => ({
+    name,
     label: name.replace(/([a-z])([A-Z])/g, "$1 $2"),
     Icon: Icon as LucideIcon,
   }))
-  .sort((a, b) => a.label.localeCompare(b.label));
+  .sort((a, b) => a.label.localeCompare(b.label))
+  .slice(0, 500);
 
 export function ElementsPanel() {
   const { add } = useEditor();
@@ -67,8 +72,8 @@ export function ElementsPanel() {
           </label>
       <div className="panel-section-label">Add to canvas</div>
       <div className="grid grid-cols-3 gap-2">
-          {filteredIcons.map(({ label, Icon }) => (
-            <button key={label} title={`Add ${label}`} onClick={() => add(newIcon(label))} className="brutal-press flex h-20 flex-col items-center justify-center gap-2 rounded-lg border border-teal/20 bg-surface text-teal transition-colors hover:border-teal hover:bg-surface-2">
+          {filteredIcons.map(({ name, label, Icon }) => (
+            <button key={name} title={`Add ${label}`} onClick={() => add(newIcon(name))} className="brutal-press flex h-20 flex-col items-center justify-center gap-2 rounded-lg border border-teal/20 bg-surface text-teal transition-colors hover:border-teal hover:bg-surface-2">
               <Icon className="size-7" strokeWidth={2} />
               <span className="truncate px-1 font-mono text-[8px] text-ink/70">{label}</span>
             </button>
