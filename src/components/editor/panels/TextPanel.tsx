@@ -53,8 +53,7 @@ export function TextPanel() {
   const { add } = useEditor();
   return (
     <div className="panel-content">
-      <PanelHeader title="Text" />
-      <div className="panel-intro">Choose a type scale or browse the full font library.</div>
+          <div className="panel-intro">Choose a type scale or browse the full font library.</div>
       <div className="panel-section-label">Quick add</div>
       <div className="flex flex-col gap-2">
         {PRESETS.map((p) => (

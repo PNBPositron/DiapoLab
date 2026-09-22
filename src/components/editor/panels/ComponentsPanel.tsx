@@ -31,7 +31,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { newChart, newQuiz, newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
-import { PanelHeader } from "./TextPanel";
 import { UiRender } from "../UiRender";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [

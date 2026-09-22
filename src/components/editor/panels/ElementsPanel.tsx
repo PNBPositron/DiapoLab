@@ -3,7 +3,6 @@ import * as LucideIcons from "lucide-react";
 import { Upload, Shapes, Star, BarChart3, TrendingUp, HelpCircle, Search, ImagePlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newChart, newIcon, newImage, newQuiz, useEditor } from "@/store/editor";
-import { PanelHeader } from "./TextPanel";
 import { ShapesPanel } from "./ShapesPanel";
 
 type ElementSection = "shapes" | "icons" | null;
