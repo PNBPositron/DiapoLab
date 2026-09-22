@@ -134,7 +134,7 @@ export function ComponentsPanel() {
             {STYLES.map((item) => {
               const theme = UI_STYLE_THEMES[item];
               return (
-                <button key={item} onClick={() => pickStyle(item)} className={`group flex h-14 flex-col justify-between rounded-none border px-2 py-1.5 text-left font-display text-[9px] uppercase tracking-[0.08em] transition ${style === item ? "border-slate-900 bg-slate-50 text-slate-900 shadow-[0_2px_0_#0f172a]" : "border-slate-300 bg-white text-slate-900 hover:-translate-y-px hover:border-slate-500"}`}>
+                <button key={item} onClick={() => pickStyle(item)} className={`group flex h-14 flex-col justify-between rounded-xl border px-2 py-1.5 text-left font-display text-[9px] uppercase tracking-[0.08em] transition ${style === item ? "border-slate-900 bg-slate-50 text-slate-900 shadow-[0_2px_0_#0f172a]" : "border-slate-300 bg-white text-slate-900 hover:-translate-y-px hover:border-slate-500"}`}>
                   <span className="block h-2 w-full" style={{ background: theme.accent }} />
                   <span>{theme.label}</span>
                 </button>
