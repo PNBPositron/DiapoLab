@@ -71,16 +71,7 @@ export function PropertiesPanel() {
     setAdvancedOpen(false);
   }, [selectedId]);
 
-  if (!el) {
-    return (
-      <div className="hidden w-80 border-l border-slate-200 bg-slate-50/70 p-4 lg:block">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
-          <div className="font-display text-xs uppercase tracking-[0.18em] text-slate-700">No selection</div>
-          <p className="mt-2 text-sm leading-relaxed text-slate-500">Select an element on the canvas to edit its properties.</p>
-        </div>
-      </div>
-    );
-  }
+  if (!el) return null;
   if (!advancedOpen) {
     return (
       <div className="pointer-events-none absolute left-1/2 top-[74px] z-20 -translate-x-1/2 lg:block">

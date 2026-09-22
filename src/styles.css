@@ -31,8 +31,8 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-grid: var(--grid);
-  --font-display: "Orbitron", "Archivo Black", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-mono: "Inter", system-ui, sans-serif;
 }
 
 :root {
