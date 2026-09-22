@@ -1,5 +1,5 @@
 import { useEditor, type SlideTransition } from "@/store/editor";
-import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
 
 export function PagesBar() {
@@ -55,14 +55,25 @@ export function PagesBar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-slate-400">Trans</span>
-        <select value={currentTransition} onChange={(e) => setTransition(e.target.value as SlideTransition)} className="rounded-md border border-slate-200/80 bg-white/70 px-2 py-1 text-[10px] text-slate-700 focus:border-blue-400 focus:outline-none">
-          <option value="none">None</option>
-          <option value="fade">Fade</option>
-          <option value="morph">Morph</option>
-        </select>
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-2 py-1.5 shadow-sm">
+          <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+          <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">Transition</span>
+          <div className="flex items-center gap-1" role="group" aria-label="Slide transition">
+            {(["none", "fade", "slide", "zoom", "flip", "morph"] as SlideTransition[]).map((transition) => (
+              <button
+                key={transition}
+                type="button"
+                onClick={() => setTransition(transition)}
+                aria-pressed={currentTransition === transition}
+                className={`rounded-lg px-2 py-1 text-[9px] font-medium capitalize transition-all duration-200 ${currentTransition === transition ? "bg-slate-900 text-white shadow-sm" : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"}`}
+              >
+                {transition}
+              </button>
+            ))}
+          </div>
+        </div>
         <span className="text-[10px] text-slate-400">{currentIndex + 1} / {pages.length}</span>
-        <button onClick={() => setPresenting(true)} className="flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm transition-colors hover:bg-blue-700">
+        <button onClick={() => setPresenting(true)} className="flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-blue-700 hover:shadow-md">
           <Play className="h-3.5 w-3.5 fill-white" /> Present
         </button>
       </div>
