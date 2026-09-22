@@ -139,7 +139,7 @@ export function PropertiesPanel() {
   }
 
   return (
-    <div className="w-80 overflow-y-auto border-l border-slate-200 bg-slate-50/70">
+    <div className="w-80 overflow-y-auto rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_12px_32px_rgba(15,23,42,0.1)] backdrop-blur-xl">
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-2 font-display text-xs uppercase tracking-[0.18em] text-slate-700">
           <Layers className="size-4 text-sky-600" strokeWidth={2} />

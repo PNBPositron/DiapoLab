@@ -78,6 +78,25 @@
   .editor-side-panel button {
     border-radius: 0.625rem;
   }
+
+  .editor-side-panel .panel-section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0.125rem;
+    color: #94a3b8;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .editor-side-panel .panel-section-label::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: #e2e8f0;
+  }
 }
 
 /* The editor UI uses one readable typeface; slide text keeps its own design font. */

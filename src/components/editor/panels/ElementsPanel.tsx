@@ -1,4 +1,6 @@
+import { useState, type ChangeEvent } from "react";
 import * as LucideIcons from "lucide-react";
+import { Upload, Shapes, Star, BarChart3, TrendingUp, HelpCircle, Search, ImagePlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newChart, newIcon, newImage, newQuiz, useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
@@ -63,7 +65,8 @@ export function ElementsPanel() {
             <Search className="size-4" />
             <input value={iconQuery} onChange={(event) => setIconQuery(event.target.value)} placeholder="Search all Lucide icons" aria-label="Search icons" className="min-w-0 flex-1 bg-transparent font-mono text-[10px] text-teal outline-none placeholder:text-teal/45" />
           </label>
-          <div className="grid grid-cols-3 gap-2">
+      <div className="panel-section-label">Add to canvas</div>
+      <div className="grid grid-cols-3 gap-2">
           {filteredIcons.map(({ label, Icon }) => (
             <button key={label} title={`Add ${label}`} onClick={() => add(newIcon(label))} className="brutal-press flex h-20 flex-col items-center justify-center gap-2 rounded-lg border border-teal/20 bg-surface text-teal transition-colors hover:border-teal hover:bg-surface-2">
               <Icon className="size-7" strokeWidth={2} />

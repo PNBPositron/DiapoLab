@@ -54,7 +54,8 @@ export function TextPanel() {
   return (
     <div className="space-y-4">
       <PanelHeader title="Text" />
-      <div className="space-y-2">
+      <div className="panel-section-label">Quick add</div>
+      <div className="flex flex-col gap-2">
         {PRESETS.map((p) => (
           <button
             key={p.label}

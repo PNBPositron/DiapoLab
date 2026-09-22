@@ -323,9 +323,9 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
   glass: {
     label: "Glass",
     bg: "rgba(255,255,255,0.24)",
-    fg: "#ffffff",
-    muted: "rgba(255,255,255,0.82)",
-    accent: "#72a7ff",
+  fg: "#172033",
+  muted: "rgba(23,32,51,0.68)",
+  accent: "#72a7ff",
     border: "rgba(205,226,255,0.68)",
     borderWidth: 1,
     radius: 22,

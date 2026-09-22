@@ -28,6 +28,7 @@ export function DesignPanel() {
   return (
     <div className="flex flex-col gap-3">
       <PanelHeader title="Design" />
+      <div className="panel-section-label">Workspace controls</div>
       <DesignSection title="Canvas size"><SizePanel /></DesignSection>
       <DesignSection title="Brand kit"><BrandKitPanel /></DesignSection>
       <DesignSection title="Background & color"><ColorPanel /></DesignSection>
