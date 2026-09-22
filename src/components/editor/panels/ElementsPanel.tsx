@@ -10,8 +10,8 @@ type ElementSection = "shapes" | "icons" | null;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.entries(LucideIcons)
   .filter(([name, icon]) => {
-    const isReactComponent = typeof icon === "function" || (typeof icon === "object" && icon !== null && "$$typeof" in icon);
-    return name !== "createLucideIcon" && isReactComponent && /^[A-Z]/.test(name);
+    const isLucideComponent = typeof icon === "object" && icon !== null && "render" in icon;
+    return name !== "createLucideIcon" && isLucideComponent && /^[A-Z]/.test(name);
   })
   .map(([name, Icon]) => ({
     name,
@@ -33,9 +33,10 @@ export function ElementsPanel() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="panel-content">
       <PanelHeader title="Elements" />
-      <div className="grid grid-cols-3 gap-2">
+      <div className="panel-intro">Drop in visual building blocks for your slide.</div>
+      <div className="panel-action-grid">
         <label className="brutal-border-2 brutal-press flex h-20 cursor-pointer flex-col items-center justify-center gap-2 bg-surface text-teal hover:border-teal">
           <Upload className="size-5" />
           <span className="font-display text-[9px] uppercase tracking-[0.12em]">Upload</span>
