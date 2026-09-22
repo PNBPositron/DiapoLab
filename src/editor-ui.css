@@ -79,6 +79,21 @@
     border-radius: 0.625rem;
   }
 
+  .editor-side-panel .grid > button,
+  .editor-side-panel .grid > label {
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  .editor-side-panel .grid > button:hover,
+  .editor-side-panel .grid > label:hover {
+    transform: translateY(-1px);
+  }
+
+  .editor-side-panel .font-mono,
+  .editor-side-panel .font-display {
+    font-family: Inter, system-ui, sans-serif !important;
+  }
+
   .editor-side-panel .panel-section-label {
     display: flex;
     align-items: center;
