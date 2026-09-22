@@ -103,9 +103,10 @@ export function ComponentsPanel() {
   const presets: Array<{ kind: UiKind; label: string; Icon: LucideIcon; overrides?: Partial<ReturnType<typeof newUi>> }> = section === "interfaces" ? INTERFACES : section === "ui" ? UI_PRESETS : [];
 
   return (
-    <div className="space-y-4">
+    <div className="panel-content">
       <PanelHeader title="Presets" />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="panel-intro">Build a polished starting point, then customize it on canvas.</div>
+      <div className="panel-choice-grid">
         <button onClick={() => setSection(section === "interfaces" ? null : "interfaces")} className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl border text-slate-700 shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition ${section === "interfaces" ? "border-sky-200 bg-sky-50" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}`}>
           <MonitorCog className="size-6" />
           <span className="font-display text-[10px] uppercase tracking-[0.12em]">Interfaces</span>
