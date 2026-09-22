@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { newChart, newQuiz, newUi, UI_STYLE_THEMES, useEditor, type UiKind, type UiStyle } from "@/store/editor";
 import { UiRender } from "../UiRender";
+import { PanelHeader } from "./TextPanel";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },

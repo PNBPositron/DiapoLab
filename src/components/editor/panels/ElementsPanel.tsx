@@ -4,6 +4,7 @@ import { Upload, Shapes, Star, BarChart3, TrendingUp, HelpCircle, Search, ImageP
 import type { LucideIcon } from "lucide-react";
 import { newChart, newIcon, newImage, newQuiz, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
+import { PanelHeader } from "./TextPanel";
 
 type ElementSection = "shapes" | "icons" | null;
 
