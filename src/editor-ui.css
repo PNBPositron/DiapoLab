@@ -1,5 +1,7 @@
 @layer components {
-  /* Keep the editor controls consistent with the clean canvas UI. */
+  /* Modern side-panel design system: frosted surface, soft layered shadows,
+     subtle borders, spring-like hover/press states, refined typography. */
+
   .editor-side-panel,
   .editor-side-panel * {
     font-family: Inter, system-ui, sans-serif !important;
@@ -7,21 +9,52 @@
 
   .editor-side-panel {
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.96);
-    border-color: #e2e8f0;
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 12px 32px -6px rgba(15, 23, 42, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  /* Thin modern scrollbar */
+  .editor-side-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+  .editor-side-panel::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.25);
+    border-radius: 99px;
+  }
+  .editor-side-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.4);
+  }
+  .editor-side-panel::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .editor-side-panel .brutal-border,
   .editor-side-panel .brutal-border-2 {
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 0.75rem;
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  .editor-side-panel .brutal-border:hover,
+  .editor-side-panel .brutal-border-2:hover {
+    border-color: rgba(148, 163, 184, 0.45);
+    box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.1);
   }
 
   .editor-side-panel .brutal-press:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.12);
+  }
+
+  .editor-side-panel .brutal-press:active {
+    transform: translateY(0) scale(0.98);
   }
 
   .editor-side-panel .bg-ink {
@@ -30,7 +63,7 @@
   }
 
   .editor-side-panel .bg-surface {
-    background: #fff;
+    background: #ffffff;
     color: #334155;
   }
 
@@ -55,33 +88,50 @@
   .editor-side-panel .border-teal\/25,
   .editor-side-panel .border-teal\/30,
   .editor-side-panel .border-teal\/40 {
-    border-color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.25);
   }
 
+  /* Inputs: soft filled style, modern focus ring */
   .editor-side-panel input:not([type="color"]),
   .editor-side-panel textarea,
   .editor-side-panel select {
-    border-color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.28);
     border-radius: 0.625rem;
-    background: #f8fafc;
+    background: rgba(248, 250, 252, 0.8);
     color: #334155;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  .editor-side-panel input:not([type="color"]):hover,
+  .editor-side-panel textarea:hover,
+  .editor-side-panel select:hover {
+    border-color: rgba(148, 163, 184, 0.5);
+  }
+
+  .editor-side-panel input:not([type="color"])::placeholder,
+  .editor-side-panel textarea::placeholder {
+    color: #94a3b8;
   }
 
   .editor-side-panel input:not([type="color"]):focus,
   .editor-side-panel textarea:focus,
   .editor-side-panel select:focus {
-    border-color: #93c5fd;
-    outline: 2px solid rgba(147, 197, 253, 0.25);
-    outline-offset: 0;
+    border-color: rgba(59, 130, 246, 0.55);
+    background: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
   }
 
   .editor-side-panel button {
     border-radius: 0.625rem;
+    transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button,
   .editor-side-panel .grid > label {
-    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button:hover,
@@ -103,7 +153,7 @@
   .editor-side-panel .panel-intro {
     color: #64748b;
     font-size: 0.6875rem;
-    line-height: 1.45;
+    line-height: 1.5;
     padding: 0 0.125rem;
   }
 
@@ -121,21 +171,23 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  /* Cards: clean white surface, hairline border, lift on hover */
   .editor-side-panel .panel-choice-grid > button,
   .editor-side-panel .panel-action-grid > button,
   .editor-side-panel .panel-action-grid > label {
-    border-color: #e2e8f0;
-    background: linear-gradient(145deg, #ffffff, #f8fafc);
-    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
-    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    border-color: rgba(148, 163, 184, 0.22);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
   }
 
   .editor-side-panel .panel-choice-grid > button:hover,
   .editor-side-panel .panel-action-grid > button:hover,
   .editor-side-panel .panel-action-grid > label:hover {
-    border-color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.45);
     background: #ffffff;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.09);
+    box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.14);
     transform: translateY(-2px);
   }
 
@@ -143,23 +195,28 @@
   .editor-side-panel .panel-action-grid > button:active,
   .editor-side-panel .panel-action-grid > label:active {
     transform: translateY(0) scale(0.98);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    transition-duration: 80ms;
   }
 
+  /* Selected state: accent ring instead of heavy grey inset */
   .editor-side-panel .panel-choice-grid > button[aria-pressed="true"],
   .editor-side-panel .panel-action-grid > button[aria-pressed="true"] {
-    border-color: #64748b;
-    box-shadow: inset 0 0 0 1px #64748b, 0 5px 14px rgba(15, 23, 42, 0.08);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow:
+      inset 0 0 0 1px rgba(59, 130, 246, 0.5),
+      0 4px 12px -4px rgba(59, 130, 246, 0.25);
   }
 
   .editor-side-panel .panel-section-label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0.25rem 0 0.125rem;
+    margin: 0.375rem 0 0.125rem;
     color: #94a3b8;
     font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
@@ -167,7 +224,7 @@
     content: "";
     height: 1px;
     flex: 1;
-    background: #e2e8f0;
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0.08));
   }
 }
 
