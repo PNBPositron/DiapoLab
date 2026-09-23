@@ -1,6 +1,7 @@
 import { toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
 import { stripEmbeddedImages } from "@/lib/image-assets";
+import { buildInteractiveHTML } from "@/lib/export-html";
 
 export function exportJSON(name: string) {
   const { pages, canvasW, canvasH, designName } = useEditor.getState();
@@ -54,7 +55,6 @@ async function captureAllPages(): Promise<string[]> {
     if (!node) continue;
     node.dataset.exporting = "true";
     const dataUrl = await toPng(node, {
-
       width: canvasW,
       height: canvasH,
       pixelRatio: 2,
@@ -119,71 +119,12 @@ export async function exportPPTX(name: string) {
   await pptx.writeFile({ fileName: `${name || "positron"}-${Date.now()}.pptx` });
 }
 
-export async function exportHTML(name: string) {
-  const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
-  select(null);
-  const original = currentIndex;
-  const sections: string[] = [];
-  for (let i = 0; i < pages.length; i++) {
-    setCurrentPage(i);
-    await wait(140);
-    const node = document.getElementById("canvas-export");
-    if (!node) continue;
-    const clone = node.cloneNode(true) as HTMLElement;
-    // strip the editor scale transform so the export renders 1:1
-    clone.style.transform = "none";
-    clone.style.left = "0";
-    clone.style.top = "0";
-    clone.style.position = "relative";
-    clone.style.margin = "0 auto";
-    // remove selection outlines and resize handles (anything with cursor:move outline)
-    clone.querySelectorAll<HTMLElement>("[style*='outline: rgb(43, 107, 255)']").forEach((el) => {
-      el.style.outline = "none";
-    });
-    // Remove pink alignment guides if any captured
-    clone.querySelectorAll<HTMLElement>(".pointer-events-none").forEach((el) => el.remove());
-    sections.push(`<section class="page">${clone.outerHTML}</section>`);
-  }
-  setCurrentPage(original);
-  if (sections.length === 0) return;
-
-  const html = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${(name || "positron").replace(/[<>&]/g, "")}</title>
-<style>
-  :root { color-scheme: light dark; }
-  html, body { margin: 0; padding: 0; background: #111; font-family: system-ui, -apple-system, Segoe UI, sans-serif; }
-  body { display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 32px; }
-  .page {
-    width: ${canvasW}px;
-    max-width: 100%;
-    aspect-ratio: ${canvasW} / ${canvasH};
-    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
-    background: #fff;
-    overflow: hidden;
-    position: relative;
-  }
-  .page > #canvas-export { width: 100% !important; height: 100% !important; }
-  /* Responsive scale-down on small screens */
-  @media (max-width: ${canvasW}px) {
-    .page { width: 100%; }
-    .page > #canvas-export {
-      transform-origin: top left;
-      transform: scale(calc(100vw / ${canvasW}));
-      width: ${canvasW}px !important;
-      height: ${canvasH}px !important;
-    }
-  }
-</style>
-</head>
-<body>
-${sections.join("\n")}
-</body>
-</html>`;
-
+export function exportHTML(name: string) {
+  const { pages, canvasW, canvasH } = useEditor.getState();
+  if (pages.length === 0) return;
+  // Build a fully interactive, standalone HTML presentation from the
+  // design data (real DOM elements, navigation, links, quizzes).
+  const html = buildInteractiveHTML({ pages, canvasW, canvasH, name: name || "positron" });
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
