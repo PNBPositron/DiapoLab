@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEditor } from "@/store/editor";
 import {
@@ -18,6 +18,9 @@ import {
   Settings,
   Info,
   Sparkles,
+  ExternalLink,
+  CheckCircle2,
+  Sliders,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign, publishAsTemplate } from "@/lib/designs";
@@ -39,7 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Petit hook réutilisable pour fermer au clic extérieur
+// Hook pour fermer les menus au clic extérieur
 function useClickOutside<T extends HTMLElement>(handler: () => void) {
   const ref = useRef<T>(null);
   useEffect(() => {
@@ -95,7 +98,7 @@ export function Toolbar() {
 
   useEffect(() => {
     if (!savedAt) return;
-    const t = setTimeout(() => setSavedAt(null), 2500);
+    const t = setTimeout(() => setSavedAt(null), 3000);
     return () => clearTimeout(t);
   }, [savedAt]);
 
@@ -267,42 +270,54 @@ export function Toolbar() {
   };
 
   return (
-    <header className="relative z-30 flex min-h-[62px] items-center justify-between gap-3 border-b border-slate-200/60 bg-white/70 px-4 py-2 backdrop-blur-md">
-      {/* Côté gauche : Logo + Nom du projet */}
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]">
+      {/* GAUCHE : Logo + Nom du projet moderne */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-3">
-          <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
-            alt="DiapoLab flask logo"
-            className="size-9 rounded-xl object-cover shadow-sm"
-          />
-          <div className="font-display text-lg tracking-[0.18em] text-slate-800">DIAPOLAB</div>
-        </div>
+        <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
+          <div className="relative overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all group-hover:shadow-indigo-500/20 group-hover:ring-indigo-500/30">
+            <img
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
+              alt="DiapoLab flask logo"
+              className="size-9 object-cover"
+            />
+          </div>
+          <span className="font-display text-base font-bold tracking-[0.2em] text-slate-800 transition-colors group-hover:text-blue-600">
+            DIAPOLAB
+          </span>
+        </Link>
 
-        <div className="ml-2 hidden items-center gap-2 md:flex">
-          <input
-            value={designName}
-            onChange={(e) => setDesignName(e.target.value)}
-            placeholder="Untitled design"
-            className="rounded-lg border border-slate-200 bg-white/80 px-3 py-1.5 font-mono text-xs text-slate-700 placeholder:text-slate-400 transition-all focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
-          />
+        {/* Barre verticale décorative */}
+        <div className="hidden h-5 w-px bg-slate-200 md:block" />
+
+        {/* Édition du nom de la présentation */}
+        <div className="hidden items-center gap-2 md:flex">
+          <div className="group relative flex items-center">
+            <input
+              value={designName}
+              onChange={(e) => setDesignName(e.target.value)}
+              placeholder="Untitled design"
+              className="h-8 rounded-lg border border-transparent bg-transparent px-2.5 font-mono text-xs font-medium text-slate-700 transition-all hover:bg-slate-100/80 focus:border-slate-300 focus:bg-white focus:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10"
+            />
+          </div>
+
           {savedAt && (
-            <span className="flex items-center gap-1 font-mono text-[10px] text-emerald-600">
-              ✓ saved
-            </span>
+            <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-emerald-700 animate-in fade-in">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Saved
+            </div>
           )}
         </div>
       </div>
 
-      {/* Côté droit : Commandes + Actions + Hamburger Menu */}
+      {/* DROITE : Outils, IA, Enregistrement, Export et Menu Hamburger */}
       <div className="flex items-center gap-2">
-        {/* Undo / Redo groupés */}
-        <div className="flex items-center rounded-lg border border-slate-200 bg-white/80 shadow-sm">
+        {/* Undo / Redo groupés façon macOS/Figma */}
+        <div className="flex items-center rounded-xl border border-slate-200/90 bg-white/70 p-0.5 shadow-sm">
           <button
             onClick={undo}
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
-            className="grid h-9 w-9 place-items-center text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 rounded-l-lg"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           >
             <Undo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
@@ -311,25 +326,32 @@ export function Toolbar() {
             onClick={redo}
             title="Redo (Ctrl+Y)"
             aria-label="Redo"
-            className="grid h-9 w-9 place-items-center text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 rounded-r-lg"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           >
             <Redo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
         </div>
 
-        {/* Bouton Gemini Assistant */}
-        <IconBtn
+        {/* Bouton IA Gemini (Accents Violet / Gradient) */}
+        <button
           onClick={() => setAssistantOpen(true)}
-          title="Gemini AI Assistant"
-          className="border-purple-200 bg-purple-50/50 text-purple-700 hover:border-purple-300 hover:bg-purple-100/50"
+          title="Gemini Slide Assistant"
+          className="group flex h-9 items-center gap-2 rounded-xl border border-purple-200/90 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50 px-3 text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:shadow-purple-500/10 active:scale-95"
         >
-          <Sparkles className="h-4 w-4 text-purple-600" strokeWidth={2.2} />
-        </IconBtn>
+          <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
+          <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-purple-800">
+            Assistant
+          </span>
+        </button>
 
-        {/* Bouton Importation */}
-        <IconBtn onClick={() => importRef.current?.click()} title="Import .json design">
+        {/* Import JSON */}
+        <button
+          onClick={() => importRef.current?.click()}
+          title="Import .json design"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/70 text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-white hover:text-slate-900 active:scale-95"
+        >
           <Upload className="h-4 w-4" strokeWidth={2.2} />
-        </IconBtn>
+        </button>
         <input
           ref={importRef}
           type="file"
@@ -342,43 +364,44 @@ export function Toolbar() {
           }}
         />
 
-        {/* Sauvegarder ou Se connecter */}
+        {/* Bouton Save / Sign-in */}
         {user ? (
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white/90 px-3.5 font-display text-[10px] uppercase tracking-[0.14em] text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-white active:scale-95 disabled:opacity-60"
+            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95 disabled:opacity-60"
           >
             {saving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" />
             ) : (
-              <Save className="h-3.5 w-3.5 text-slate-600" strokeWidth={2.5} />
+              <Save className="h-3.5 w-3.5 text-slate-500" strokeWidth={2.4} />
             )}
-            Save
+            <span>SAVE</span>
           </button>
         ) : (
           <Link
             to="/auth"
             search={{ next: undefined }}
-            className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white/90 px-3.5 font-display text-[10px] uppercase tracking-[0.14em] text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-white"
+            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95"
           >
-            <Cloud className="h-3.5 w-3.5 text-blue-500" strokeWidth={2.5} /> Sign in
+            <Cloud className="h-3.5 w-3.5 text-blue-500" strokeWidth={2.4} />
+            <span>SIGN IN</span>
           </Link>
         )}
 
-        {/* Dropdown Export */}
+        {/* Bouton Export Moderne avec dégradé */}
         <div className="relative" ref={exportRef}>
           <button
             onClick={() => setExportOpen((v) => !v)}
             disabled={!!exporting}
-            className="flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-3.5 font-display text-[10px] uppercase tracking-[0.14em] text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-60"
+            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-md shadow-blue-500/20 transition-all hover:brightness-105 active:scale-95 disabled:opacity-60"
           >
             {exporting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
             ) : (
               <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            {exporting ? exporting.toUpperCase() : "Export"}
+            <span>{exporting ? exporting.toUpperCase() : "EXPORT"}</span>
             <ChevronDown
               className={`h-3 w-3 transition-transform duration-200 ${exportOpen ? "rotate-180" : ""}`}
               strokeWidth={2.5}
@@ -386,27 +409,27 @@ export function Toolbar() {
           </button>
 
           {exportOpen && (
-            <div className="absolute right-0 top-11 z-50 w-56 rounded-xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95">
-              <div className="px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-slate-400">
-                Formats de sortie
+            <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+              <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                Formats de document
               </div>
               {(["png", "pdf", "pptx", "html", "json", "gif"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
-                  className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left font-display text-[11px] tracking-wide text-slate-700 transition-colors hover:bg-slate-100"
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left font-display text-xs text-slate-700 transition-colors hover:bg-slate-100/90"
                 >
-                  <span className="font-semibold">.{k.toUpperCase()}</span>
-                  <span className="font-mono text-[9px] text-slate-400">
+                  <span className="font-semibold text-slate-800">.{k.toUpperCase()}</span>
+                  <span className="font-mono text-[10px] text-slate-400">
                     {k === "png"
-                      ? "current slide"
+                      ? "Slide courante"
                       : k === "gif"
-                      ? "animated"
+                      ? "Animé"
                       : k === "html"
-                      ? "interactive"
+                      ? "Interactif"
                       : k === "json"
-                      ? "source"
-                      : "all slides"}
+                      ? "Fichier source"
+                      : "Toutes les slides"}
                   </span>
                 </button>
               ))}
@@ -414,11 +437,11 @@ export function Toolbar() {
           )}
         </div>
 
-        {/* Menu Utilisateur si connecté */}
+        {/* Profil utilisateur */}
         {user && <UserMenu email={user.email ?? ""} />}
 
-        {/* Nouveau Menu Hamburger Moderne */}
-        <ModernHamburgerMenu
+        {/* NOUVEAU MENU HAMBURGER AGRANDI ET ULTRA-STYLÉ */}
+        <LargeModernHamburger
           onSettings={() => navigate({ to: "/settings" })}
           onNewDesign={newDesign}
           onShare={handlePublish}
@@ -432,14 +455,15 @@ export function Toolbar() {
 
       {/* Assistant Gemini Dialog */}
       <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
-        <DialogContent className="max-w-lg border border-slate-200 bg-white text-slate-700 shadow-xl">
+        <DialogContent className="max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-display text-sm uppercase tracking-[0.14em] text-slate-800">
-              <Sparkles className="size-4 text-purple-600" /> Gemini slide assistant
+            <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-wide text-slate-800">
+              <Sparkles className="size-5 text-purple-600" />
+              Gemini Slide Assistant
             </DialogTitle>
           </DialogHeader>
-          <div className="font-mono text-[10px] text-slate-500">
-            {pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}
+          <div className="font-mono text-[11px] text-slate-400">
+            Slide courante : {pages[currentIndex]?.elements.length ?? 0} éléments · {canvasW}×{canvasH}px
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => (
@@ -447,25 +471,25 @@ export function Toolbar() {
                 key={question}
                 type="button"
                 onClick={() => void askAssistant(question)}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-display text-[9px] uppercase tracking-[0.12em] text-slate-700 transition-colors hover:bg-slate-100"
+                className="rounded-lg border border-purple-100 bg-purple-50/50 px-3 py-1.5 font-display text-[10px] font-medium tracking-wide text-purple-700 transition-colors hover:bg-purple-100"
               >
                 {question}
               </button>
             ))}
           </div>
-          <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
+          <div className="mt-3 max-h-64 space-y-2.5 overflow-y-auto">
             {assistantMessages.length === 0 && (
-              <p className="font-mono text-xs leading-relaxed text-slate-400">
-                Ask for design suggestions, copy improvements, or layout ideas.
+              <p className="rounded-xl border border-dashed border-slate-200 p-4 text-center font-mono text-xs text-slate-400">
+                Demandez une analyse de votre slide, une retouche de texte ou une suggestion de mise en page.
               </p>
             )}
             {assistantMessages.map((m, i) => (
               <div
                 key={`${m.role}-${i}`}
-                className={`rounded-xl border px-3 py-2 font-mono text-xs leading-relaxed ${
+                className={`rounded-xl border p-3 font-mono text-xs leading-relaxed ${
                   m.role === "user"
                     ? "border-slate-200 bg-slate-50 text-slate-700"
-                    : "border-purple-100 bg-purple-50/60 text-slate-700"
+                    : "border-purple-100 bg-purple-50/70 text-purple-950"
                 }`}
               >
                 {m.text}
@@ -487,21 +511,21 @@ export function Toolbar() {
             <input
               value={assistantInput}
               onChange={(event) => setAssistantInput(event.target.value)}
-              placeholder="Ask for a slide tweak…"
-              className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-200"
+              placeholder="Que voulez-vous améliorer sur cette slide ?..."
+              className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
             />
             <button
               type="submit"
               disabled={assistantBusy}
-              className="rounded-lg bg-purple-600 px-4 py-2 font-display text-[10px] uppercase tracking-[0.14em] text-white transition-colors hover:bg-purple-700 disabled:opacity-60"
+              className="rounded-xl bg-purple-600 px-4 py-2 font-display text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-purple-700 active:scale-95 disabled:opacity-60"
             >
-              {assistantBusy ? "…" : "Send"}
+              {assistantBusy ? "…" : "Envoyer"}
             </button>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Publication Template */}
+      {/* Dialog Publication */}
       <PublishMetaDialog
         open={publishDialogOpen}
         kind="template"
@@ -513,80 +537,80 @@ export function Toolbar() {
         onSubmit={submitPublish}
       />
 
-      {/* Dialog About */}
+      {/* Dialog À Propos */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="max-w-sm rounded-xl border border-slate-200 bg-white text-slate-700 shadow-2xl">
+        <DialogContent className="max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
           <DialogHeader className="text-left">
-            <DialogTitle className="font-display text-base tracking-[0.2em] text-slate-800">
-              ABOUT DIAPOLAB
+            <DialogTitle className="font-display text-lg tracking-[0.16em] text-slate-900">
+              DIAPOLAB
             </DialogTitle>
-            <DialogDescription className="font-mono text-[11px] leading-relaxed text-slate-500">
-              Next-generation presentation & canvas editor.
+            <DialogDescription className="font-mono text-xs leading-relaxed text-slate-500">
+              Studio créatif de présentations nouvelle génération.
             </DialogDescription>
           </DialogHeader>
-          <nav aria-label="About links" className="mt-2 flex flex-col gap-1.5">
+          <nav className="mt-3 flex flex-col gap-2">
             <a
               href="https://github.com/PNBPositron/positronstudio-project"
               target="_blank"
               rel="noreferrer"
               onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2.5 font-display text-[11px] tracking-[0.14em] text-slate-700 transition-colors hover:bg-slate-100"
+              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              GITHUB <span aria-hidden="true">↗</span>
+              GITHUB <ExternalLink className="size-3.5 opacity-60" />
             </a>
             <Link
               to="/privacypolicy"
               onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2.5 font-display text-[11px] tracking-[0.14em] text-slate-700 transition-colors hover:bg-slate-100"
+              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              PRIVACY POLICY <span aria-hidden="true">→</span>
+              POLITIQUE DE CONFIDENTIALITÉ →
             </Link>
             <Link
               to="/license"
               onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2.5 font-display text-[11px] tracking-[0.14em] text-slate-700 transition-colors hover:bg-slate-100"
+              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              LICENSE <span aria-hidden="true">→</span>
+              LICENCE →
             </Link>
             <Link
               to="/marketplace"
               onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-lg border border-slate-200/80 bg-slate-50 px-3 py-2.5 font-display text-[11px] tracking-[0.14em] text-slate-700 transition-colors hover:bg-slate-100"
+              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              MARKETPLACE <span aria-hidden="true">→</span>
+              MARKETPLACE →
             </Link>
           </nav>
         </DialogContent>
       </Dialog>
 
-      {/* Modal Partage / Publié */}
+      {/* Notification lien publié */}
       {shareLink && (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-900/40 backdrop-blur-sm p-6">
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="font-display text-sm tracking-[0.2em] text-emerald-600">
-              ✓ PUBLISHED · SHARE LINK
+            <div className="flex items-center gap-2 font-display text-sm tracking-wider text-emerald-600">
+              <CheckCircle2 className="size-5" /> PUBLIÉ AVEC SUCCÈS
             </div>
-            <p className="mt-2 font-mono text-[11px] text-slate-500">
-              Anyone with this link can view your deck.
+            <p className="mt-2 font-mono text-xs text-slate-500">
+              Votre présentation est en ligne. N'importe qui possédant ce lien peut la consulter.
             </p>
             <input
               readOnly
               value={shareLink}
               onFocus={(e) => e.currentTarget.select()}
-              className="mt-4 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 select-all"
+              className="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 font-mono text-xs text-slate-700 select-all focus:outline-none"
             />
-            <div className="mt-4 flex gap-2">
+            <div className="mt-5 flex gap-2.5">
               <button
                 onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
-                className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-display text-xs uppercase tracking-[0.2em] text-white transition-colors hover:bg-blue-700"
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
               >
-                Copy link
+                Copier le lien
               </button>
               <button
                 onClick={() => setShareLink(null)}
-                className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 font-display text-xs uppercase tracking-[0.2em] text-slate-700 transition-colors hover:bg-slate-100"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-100 active:scale-95"
               >
-                Close
+                Fermer
               </button>
             </div>
           </div>
@@ -597,9 +621,9 @@ export function Toolbar() {
 }
 
 /**
- * Menu Hamburger Moderne et animé
+ * MENU HAMBURGER PLUS GRAND, PLUS BEAU & STRUCTURÉ
  */
-function ModernHamburgerMenu({
+function LargeModernHamburger({
   onSettings,
   onNewDesign,
   onShare,
@@ -621,7 +645,6 @@ function ModernHamburgerMenu({
   const [open, setOpen] = useState(false);
   const menuRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
 
-  // Fermeture automatique à la touche Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -637,94 +660,107 @@ function ModernHamburgerMenu({
 
   return (
     <div className="relative" ref={menuRef}>
+      {/* Bouton déclencheur agrandi (42x42px) */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        aria-label="Toggle menu"
+        aria-label="Toggle Navigation Menu"
         title="Menu"
-        className={`group relative flex h-9 w-9 items-center justify-center rounded-lg border transition-all duration-200 active:scale-95 ${
+        className={`group relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-200 active:scale-95 ${
           open
-            ? "border-slate-300 bg-slate-100 text-slate-900"
-            : "border-slate-200 bg-white/80 text-slate-700 hover:border-slate-300 hover:bg-white"
+            ? "border-slate-400/80 bg-slate-900 text-white shadow-inner"
+            : "border-slate-200/90 bg-white/80 text-slate-700 shadow-sm hover:border-slate-300 hover:bg-white hover:text-slate-900"
         }`}
       >
-        {/* Lignes animées du Hamburger */}
-        <div className="relative flex h-3.5 w-4 flex-col justify-between">
+        {/* Animation des 3 lignes horizontales */}
+        <div className="relative flex h-4 w-4.5 flex-col justify-between">
           <span
-            className={`h-0.5 w-full rounded-full bg-current transition-all duration-300 ease-in-out ${
-              open ? "translate-y-[6px] rotate-45" : ""
+            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-in-out ${
+              open ? "translate-y-[7px] rotate-45 bg-white" : "bg-current"
             }`}
           />
           <span
-            className={`h-0.5 w-full rounded-full bg-current transition-all duration-200 ease-in-out ${
-              open ? "opacity-0" : "opacity-100"
+            className={`h-0.5 w-full rounded-full transition-all duration-200 ease-in-out ${
+              open ? "opacity-0" : "bg-current opacity-100"
             }`}
           />
           <span
-            className={`h-0.5 w-full rounded-full bg-current transition-all duration-300 ease-in-out ${
-              open ? "-translate-y-[6px] -rotate-45" : ""
+            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-in-out ${
+              open ? "-translate-y-[7px] -rotate-45 bg-white" : "bg-current"
             }`}
           />
         </div>
       </button>
 
-      {/* Menu contextuel déroulant */}
+      {/* Menu déroulant élargi (w-72) avec icônes encadrées & descriptions */}
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-56 origin-top-right rounded-xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95">
-          {/* Section 1 : Document / Création */}
-          <div className="px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-slate-400">
-            Design
+        <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+          {/* SECTION CRÉATION */}
+          <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            Création & IA
           </div>
 
-          <MenuItem
+          <MenuCardItem
             icon={FilePlus}
-            label="New design"
+            title="Nouveau design"
+            subtitle="Créer une présentation vierge"
             onClick={() => handleAction(onNewDesign)}
           />
 
-          <MenuItem
+          <MenuCardItem
             icon={Sparkles}
-            label="AI Assistant"
-            badge="Gemini"
+            iconColor="text-purple-600"
+            iconBg="bg-purple-50 group-hover:bg-purple-100"
+            title="Assistant Gemini"
+            subtitle="Critique & retouches intelligentes"
+            badge="AI"
             onClick={() => handleAction(onAssistant)}
           />
 
           {isAuthenticated && (
-            <MenuItem
+            <MenuCardItem
               icon={publishing ? Loader2 : Share2}
-              label={publishing ? "Publishing..." : "Publish & Share"}
+              title={publishing ? "Publication..." : "Publier le modèle"}
+              subtitle="Générer un lien public de partage"
               disabled={publishing}
               onClick={() => handleAction(onShare)}
             />
           )}
 
-          {/* Séparateur */}
-          <div className="my-1.5 h-px bg-slate-100" />
+          {/* SÉPARATEUR */}
+          <div className="my-2 h-px bg-slate-100" />
 
-          {/* Section 2 : Configuration & Options */}
-          <div className="px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-slate-400">
-            Workspace
+          {/* SECTION ESPACE DE TRAVAIL */}
+          <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            Espace de travail
           </div>
 
           {isAuthenticated && (
-            <MenuItem
+            <MenuCardItem
               icon={Settings}
-              label="Settings"
+              title="Paramètres"
+              subtitle="Préférences de compte et d'édition"
               onClick={() => handleAction(onSettings)}
             />
           )}
 
-          <MenuItem
+          <MenuCardItem
             icon={Info}
-            label="About DiapoLab"
+            title="À propos"
+            subtitle="Documentation, GitHub & licences"
             onClick={() => handleAction(onAbout)}
           />
 
-          {/* Option de suppression / reset (utile particulièrement hors-connexion) */}
-          <div className="my-1.5 h-px bg-slate-100" />
-          <MenuItem
+          {/* SÉPARATEUR */}
+          <div className="my-2 h-px bg-slate-100" />
+
+          {/* SECTION DANGER */}
+          <MenuCardItem
             icon={Trash2}
-            label="Clear canvas"
+            iconColor="text-red-600"
+            iconBg="bg-red-50 group-hover:bg-red-100"
+            title="Effacer le canevas"
+            subtitle="Remettre à zéro cette slide"
             variant="destructive"
             onClick={() => handleAction(onClear)}
           />
@@ -734,16 +770,25 @@ function ModernHamburgerMenu({
   );
 }
 
-function MenuItem({
+/**
+ * Bouton du menu façon card moderne avec micro-icône dans un conteneur
+ */
+function MenuCardItem({
   icon: Icon,
-  label,
+  iconColor = "text-slate-600",
+  iconBg = "bg-slate-100 group-hover:bg-slate-200/80",
+  title,
+  subtitle,
   badge,
   disabled,
   variant = "default",
   onClick,
 }: {
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  iconColor?: string;
+  iconBg?: string;
+  title: string;
+  subtitle: string;
   badge?: string;
   disabled?: boolean;
   variant?: "default" | "destructive";
@@ -755,18 +800,34 @@ function MenuItem({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-colors disabled:opacity-50 ${
+      className={`group flex w-full items-center justify-between rounded-xl p-2 text-left transition-all active:scale-[0.98] disabled:opacity-50 ${
         isDestructive
-          ? "text-red-600 hover:bg-red-50 hover:text-red-700"
-          : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+          ? "hover:bg-red-50/60"
+          : "hover:bg-slate-100/80"
       }`}
     >
-      <div className="flex items-center gap-2.5">
-        <Icon className={`h-4 w-4 ${isDestructive ? "text-red-500" : "text-slate-500"}`} />
-        <span>{label}</span>
+      <div className="flex items-center gap-3">
+        <div
+          className={`flex size-8 items-center justify-center rounded-lg transition-colors ${iconBg}`}
+        >
+          <Icon className={`size-4 ${iconColor}`} />
+        </div>
+        <div className="flex flex-col">
+          <span
+            className={`text-xs font-semibold leading-tight ${
+              isDestructive ? "text-red-700" : "text-slate-800"
+            }`}
+          >
+            {title}
+          </span>
+          <span className="font-mono text-[10px] leading-tight text-slate-400">
+            {subtitle}
+          </span>
+        </div>
       </div>
+
       {badge && (
-        <span className="rounded-full bg-purple-100 px-1.5 py-0.5 text-[9px] font-semibold text-purple-700">
+        <span className="rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 px-2 py-0.5 font-display text-[9px] font-bold text-purple-700 shadow-sm">
           {badge}
         </span>
       )}
@@ -783,48 +844,25 @@ function UserMenu({ email }: { email: string }) {
       <button
         onClick={() => setOpen((v) => !v)}
         title={email}
-        className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-white"
+        className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-white active:scale-95"
       >
         <UserIcon className="h-4 w-4" strokeWidth={2.2} />
       </button>
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-56 rounded-xl border border-slate-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95">
-          <div className="border-b border-slate-100 px-2.5 py-2">
-            <p className="text-[10px] text-slate-400 font-medium">Logged in as</p>
-            <p className="font-mono text-[11px] text-slate-700 truncate">{email}</p>
+        <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+          <div className="border-b border-slate-100 px-3 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Compte actif</p>
+            <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
           <button
             onClick={() => signOut()}
-            className="mt-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+            className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
           >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Sign out</span>
+            <LogOut className="h-4 w-4" />
+            <span>Se déconnecter</span>
           </button>
         </div>
       )}
     </div>
-  );
-}
-
-function IconBtn({
-  children,
-  onClick,
-  title,
-  className = "",
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  title: string;
-  className?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      aria-label={title}
-      className={`grid h-9 w-9 place-items-center rounded-lg border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-white active:scale-95 ${className}`}
-    >
-      {children}
-    </button>
   );
 }
