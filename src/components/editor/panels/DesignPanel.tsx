@@ -10,67 +10,66 @@ import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 
-interface DesignSectionProps {
+interface SectionConfig {
+  id: string;
   title: string;
-  icon: LucideIcon;
-  badge?: string;
-  defaultOpen?: boolean;
+  subtitle: string;
+  Icon: LucideIcon;
+  iconBg: string;
+  iconColor: string;
   children: ReactNode;
+  defaultOpen?: boolean;
 }
 
-function DesignSection({
+function SectionRow({
   title,
-  icon: Icon,
-  badge,
-  defaultOpen = false,
+  subtitle,
+  Icon,
+  iconBg,
+  iconColor,
   children,
-}: DesignSectionProps) {
+  defaultOpen = false,
+}: Omit<SectionConfig, "id">) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div
-      className={`group rounded-xl border transition-all duration-150 ${
-        open
-          ? "border-slate-300/80 bg-white shadow-xs"
-          : "border-slate-200/70 bg-white/60 hover:border-slate-300 hover:bg-white"
-      }`}
-    >
+    <div className="transition-colors duration-150">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left transition-colors select-none"
+        className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50/80 active:bg-slate-100/60"
       >
+        {/* Soft Tinted Icon Chip */}
         <div
-          className={`flex size-6 shrink-0 items-center justify-center rounded-md transition-colors ${
-            open
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-800"
-          }`}
+          className={`flex size-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 ${iconBg} ${iconColor}`}
         >
           <Icon className="size-3.5" />
         </div>
 
-        <span className="text-xs font-medium text-slate-800 tracking-tight">
-          {title}
-        </span>
-
-        <div className="ml-auto flex items-center gap-2">
-          {badge && !open && (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
-              {badge}
+        {/* Title & Micro-detail */}
+        <div className="flex flex-col min-w-0">
+          <span className="text-[12px] font-medium text-slate-850 leading-tight">
+            {title}
+          </span>
+          {!open && (
+            <span className="text-[10px] text-slate-400 font-normal leading-tight">
+              {subtitle}
             </span>
           )}
-          <ChevronRight
-            className={`size-3.5 text-slate-400 transition-transform duration-200 ease-out ${
-              open ? "rotate-90 text-slate-700" : "group-hover:text-slate-600"
-            }`}
-          />
         </div>
+
+        {/* Chevron */}
+        <ChevronRight
+          className={`ml-auto size-3.5 text-slate-300 transition-transform duration-200 ease-out group-hover:text-slate-500 ${
+            open ? "rotate-90 text-slate-700" : ""
+          }`}
+        />
       </button>
 
+      {/* Expanded Child Panel */}
       {open && (
-        <div className="border-t border-slate-100 px-3.5 py-3 animate-in fade-in-50 duration-150">
+        <div className="border-t border-slate-100/80 bg-slate-50/40 px-3.5 py-3 animate-in fade-in-50 duration-150">
           {children}
         </div>
       )}
@@ -80,38 +79,46 @@ function DesignSection({
 
 export function DesignPanel() {
   return (
-    <div className="flex flex-col gap-2 p-3 text-slate-800">
-      <div className="flex items-center justify-between px-0.5 pb-1">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Canvas & Theming
+    <div className="flex flex-col gap-3 p-2 text-slate-800">
+      {/* Section Header */}
+      <div className="flex items-center justify-between px-1">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+          Slide Attributes
         </span>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <DesignSection
-          title="Canvas size"
-          icon={Maximize2}
-          badge="16:9"
+      {/* Unified Inset Surface */}
+      <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.03)] divide-y divide-slate-100/80">
+        <SectionRow
+          title="Canvas format"
+          subtitle="16:9 Presentation (1920 × 1080)"
+          Icon={Maximize2}
+          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          iconColor="text-blue-600"
           defaultOpen
         >
           <SizePanel />
-        </DesignSection>
+        </SectionRow>
 
-        <DesignSection
+        <SectionRow
           title="Brand kit"
-          icon={Sparkles}
-          badge="Tokens"
+          subtitle="Shared typography & colors"
+          Icon={Sparkles}
+          iconBg="bg-amber-50 text-amber-600 dark:bg-amber-950/40"
+          iconColor="text-amber-600"
         >
           <BrandKitPanel />
-        </DesignSection>
+        </SectionRow>
 
-        <DesignSection
-          title="Background & color"
-          icon={Palette}
-          badge="Fill"
+        <SectionRow
+          title="Background fill"
+          subtitle="Solid, gradient, or canvas texture"
+          Icon={Palette}
+          iconBg="bg-violet-50 text-violet-600 dark:bg-violet-950/40"
+          iconColor="text-violet-600"
         >
           <ColorPanel />
-        </DesignSection>
+        </SectionRow>
       </div>
     </div>
   );
