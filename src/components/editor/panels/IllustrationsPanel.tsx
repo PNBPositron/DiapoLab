@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { Search, X, Check, Sparkles, User, Filter } from "lucide-react";
 import { newImage, useEditor } from "@/store/editor";
 import { useSettings } from "@/store/settings";
-import { PanelHeader } from "./TextPanel";
 
 const HIGHLIGHTS = [
   ...Array.from({ length: 17 }, (_, i) => `Arrow-${i + 1}.svg`),
@@ -70,8 +69,6 @@ export function IllustrationsPanel() {
 
   return (
     <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
-      <PanelHeader title="Illustrations" />
-
       {/* Segmented Control Tabs */}
       <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
         <button
