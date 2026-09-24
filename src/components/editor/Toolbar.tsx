@@ -42,7 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Hook pour fermer les menus au clic extérieur
+// Hook to close menus on outside click
 function useClickOutside<T extends HTMLElement>(handler: () => void) {
   const ref = useRef<T>(null);
   useEffect(() => {
@@ -271,7 +271,7 @@ export function Toolbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]">
-      {/* GAUCHE : Logo + Nom du projet moderne */}
+      {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
           <div className="relative overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all group-hover:shadow-indigo-500/20 group-hover:ring-indigo-500/30">
@@ -286,10 +286,10 @@ export function Toolbar() {
           </span>
         </Link>
 
-        {/* Barre verticale décorative */}
+        {/* Decorative vertical divider */}
         <div className="hidden h-5 w-px bg-slate-200 md:block" />
 
-        {/* Édition du nom de la présentation */}
+        {/* Presentation name editing */}
         <div className="hidden items-center gap-2 md:flex">
           <div className="group relative flex items-center">
             <input
@@ -309,9 +309,9 @@ export function Toolbar() {
         </div>
       </div>
 
-      {/* DROITE : Outils, IA, Enregistrement, Export et Menu Hamburger */}
+      {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
       <div className="flex items-center gap-2">
-        {/* Undo / Redo groupés façon macOS/Figma */}
+        {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl border border-slate-200/90 bg-white/70 p-0.5 shadow-sm">
           <button
             onClick={undo}
@@ -332,7 +332,7 @@ export function Toolbar() {
           </button>
         </div>
 
-        {/* Bouton IA Gemini (Accents Violet / Gradient) */}
+        {/* Gemini AI button (purple accents / gradient) */}
         <button
           onClick={() => setAssistantOpen(true)}
           title="Gemini Slide Assistant"
@@ -364,7 +364,7 @@ export function Toolbar() {
           }}
         />
 
-        {/* Bouton Save / Sign-in */}
+        {/* Save / Sign-in button */}
         {user ? (
           <button
             onClick={handleSave}
@@ -389,7 +389,7 @@ export function Toolbar() {
           </Link>
         )}
 
-        {/* Bouton Export Moderne avec dégradé */}
+        {/* Modern gradient Export button */}
         <div className="relative" ref={exportRef}>
           <button
             onClick={() => setExportOpen((v) => !v)}
@@ -411,7 +411,7 @@ export function Toolbar() {
           {exportOpen && (
             <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                Formats de document
+                Document formats
               </div>
               {(["png", "pdf", "pptx", "html", "json", "gif"] as const).map((k) => (
                 <button
@@ -422,14 +422,14 @@ export function Toolbar() {
                   <span className="font-semibold text-slate-800">.{k.toUpperCase()}</span>
                   <span className="font-mono text-[10px] text-slate-400">
                     {k === "png"
-                      ? "Slide courante"
+                      ? "Current slide"
                       : k === "gif"
-                      ? "Animé"
+                      ? "Animated"
                       : k === "html"
-                      ? "Interactif"
+                      ? "Interactive"
                       : k === "json"
-                      ? "Fichier source"
-                      : "Toutes les slides"}
+                      ? "Source file"
+                      : "All slides"}
                   </span>
                 </button>
               ))}
@@ -437,10 +437,10 @@ export function Toolbar() {
           )}
         </div>
 
-        {/* Profil utilisateur */}
+        {/* User profile */}
         {user && <UserMenu email={user.email ?? ""} />}
 
-        {/* NOUVEAU MENU HAMBURGER AGRANDI ET ULTRA-STYLÉ */}
+        {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
         <LargeModernHamburger
           onSettings={() => navigate({ to: "/settings" })}
           onNewDesign={newDesign}
@@ -453,7 +453,7 @@ export function Toolbar() {
         />
       </div>
 
-      {/* Assistant Gemini Dialog */}
+      {/* Gemini Assistant Dialog */}
       <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
         <DialogContent className="max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
           <DialogHeader>
@@ -463,7 +463,7 @@ export function Toolbar() {
             </DialogTitle>
           </DialogHeader>
           <div className="font-mono text-[11px] text-slate-400">
-            Slide courante : {pages[currentIndex]?.elements.length ?? 0} éléments · {canvasW}×{canvasH}px
+            Current slide: {pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}px
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => (
@@ -480,7 +480,7 @@ export function Toolbar() {
           <div className="mt-3 max-h-64 space-y-2.5 overflow-y-auto">
             {assistantMessages.length === 0 && (
               <p className="rounded-xl border border-dashed border-slate-200 p-4 text-center font-mono text-xs text-slate-400">
-                Demandez une analyse de votre slide, une retouche de texte ou une suggestion de mise en page.
+                Ask for a slide analysis, a text touch-up, or a layout suggestion.
               </p>
             )}
             {assistantMessages.map((m, i) => (
@@ -511,7 +511,7 @@ export function Toolbar() {
             <input
               value={assistantInput}
               onChange={(event) => setAssistantInput(event.target.value)}
-              placeholder="Que voulez-vous améliorer sur cette slide ?..."
+              placeholder="What would you like to improve on this slide?..."
               className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
             />
             <button
@@ -519,13 +519,13 @@ export function Toolbar() {
               disabled={assistantBusy}
               className="rounded-xl bg-purple-600 px-4 py-2 font-display text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-purple-700 active:scale-95 disabled:opacity-60"
             >
-              {assistantBusy ? "…" : "Envoyer"}
+              {assistantBusy ? "…" : "Send"}
             </button>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Publication */}
+      {/* Publish dialog */}
       <PublishMetaDialog
         open={publishDialogOpen}
         kind="template"
@@ -537,7 +537,7 @@ export function Toolbar() {
         onSubmit={submitPublish}
       />
 
-      {/* Dialog À Propos */}
+      {/* About dialog */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent className="max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
           <DialogHeader className="text-left">
@@ -545,7 +545,7 @@ export function Toolbar() {
               DIAPOLAB
             </DialogTitle>
             <DialogDescription className="font-mono text-xs leading-relaxed text-slate-500">
-              Studio créatif de présentations nouvelle génération.
+              A next-generation creative presentation studio.
             </DialogDescription>
           </DialogHeader>
           <nav className="mt-3 flex flex-col gap-2">
@@ -563,14 +563,14 @@ export function Toolbar() {
               onClick={() => setAboutOpen(false)}
               className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              POLITIQUE DE CONFIDENTIALITÉ →
+              PRIVACY POLICY →
             </Link>
             <Link
               to="/license"
               onClick={() => setAboutOpen(false)}
               className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
             >
-              LICENCE →
+              LICENSE →
             </Link>
             <Link
               to="/marketplace"
@@ -583,15 +583,15 @@ export function Toolbar() {
         </DialogContent>
       </Dialog>
 
-      {/* Notification lien publié */}
+      {/* Published link notification */}
       {shareLink && (
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-2 font-display text-sm tracking-wider text-emerald-600">
-              <CheckCircle2 className="size-5" /> PUBLIÉ AVEC SUCCÈS
+              <CheckCircle2 className="size-5" /> PUBLISHED SUCCESSFULLY
             </div>
             <p className="mt-2 font-mono text-xs text-slate-500">
-              Votre présentation est en ligne. N'importe qui possédant ce lien peut la consulter.
+              Your presentation is now online. Anyone with this link can view it.
             </p>
             <input
               readOnly
@@ -604,13 +604,13 @@ export function Toolbar() {
                 onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
                 className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
               >
-                Copier le lien
+                Copy link
               </button>
               <button
                 onClick={() => setShareLink(null)}
                 className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-100 active:scale-95"
               >
-                Fermer
+                Close
               </button>
             </div>
           </div>
@@ -621,7 +621,7 @@ export function Toolbar() {
 }
 
 /**
- * MENU HAMBURGER PLUS GRAND, PLUS BEAU & STRUCTURÉ
+ * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
  */
 function LargeModernHamburger({
   onSettings,
@@ -660,7 +660,7 @@ function LargeModernHamburger({
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Bouton déclencheur agrandi (42x42px) */}
+      {/* Enlarged trigger button (42x42px) */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
@@ -672,7 +672,7 @@ function LargeModernHamburger({
             : "border-slate-200/90 bg-white/80 text-slate-700 shadow-sm hover:border-slate-300 hover:bg-white hover:text-slate-900"
         }`}
       >
-        {/* Animation des 3 lignes horizontales */}
+        {/* Animated 3-line hamburger */}
         <div className="relative flex h-4 w-4.5 flex-col justify-between">
           <span
             className={`h-0.5 w-full rounded-full transition-all duration-300 ease-in-out ${
@@ -692,18 +692,18 @@ function LargeModernHamburger({
         </div>
       </button>
 
-      {/* Menu déroulant élargi (w-72) avec icônes encadrées & descriptions */}
+      {/* Expanded dropdown (w-72) with boxed icons & descriptions */}
       {open && (
         <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
-          {/* SECTION CRÉATION */}
+          {/* CREATE & AI SECTION */}
           <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-            Création & IA
+            Create & AI
           </div>
 
           <MenuCardItem
             icon={FilePlus}
-            title="Nouveau design"
-            subtitle="Créer une présentation vierge"
+            title="New design"
+            subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
           />
 
@@ -711,8 +711,8 @@ function LargeModernHamburger({
             icon={Sparkles}
             iconColor="text-purple-600"
             iconBg="bg-purple-50 group-hover:bg-purple-100"
-            title="Assistant Gemini"
-            subtitle="Critique & retouches intelligentes"
+            title="Gemini assistant"
+            subtitle="Smart critique & touch-ups"
             badge="AI"
             onClick={() => handleAction(onAssistant)}
           />
@@ -720,47 +720,47 @@ function LargeModernHamburger({
           {isAuthenticated && (
             <MenuCardItem
               icon={publishing ? Loader2 : Share2}
-              title={publishing ? "Publication..." : "Publier le modèle"}
-              subtitle="Générer un lien public de partage"
+              title={publishing ? "Publishing…" : "Publish template"}
+              subtitle="Generate a public share link"
               disabled={publishing}
               onClick={() => handleAction(onShare)}
             />
           )}
 
-          {/* SÉPARATEUR */}
+          {/* SEPARATOR */}
           <div className="my-2 h-px bg-slate-100" />
 
-          {/* SECTION ESPACE DE TRAVAIL */}
+          {/* WORKSPACE SECTION */}
           <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-            Espace de travail
+            Workspace
           </div>
 
           {isAuthenticated && (
             <MenuCardItem
               icon={Settings}
-              title="Paramètres"
-              subtitle="Préférences de compte et d'édition"
+              title="Settings"
+              subtitle="Account & editing preferences"
               onClick={() => handleAction(onSettings)}
             />
           )}
 
           <MenuCardItem
             icon={Info}
-            title="À propos"
-            subtitle="Documentation, GitHub & licences"
+            title="About"
+            subtitle="Documentation, GitHub & licenses"
             onClick={() => handleAction(onAbout)}
           />
 
-          {/* SÉPARATEUR */}
+          {/* SEPARATOR */}
           <div className="my-2 h-px bg-slate-100" />
 
-          {/* SECTION DANGER */}
+          {/* DANGER SECTION */}
           <MenuCardItem
             icon={Trash2}
             iconColor="text-red-600"
             iconBg="bg-red-50 group-hover:bg-red-100"
-            title="Effacer le canevas"
-            subtitle="Remettre à zéro cette slide"
+            title="Clear canvas"
+            subtitle="Reset this slide to zero"
             variant="destructive"
             onClick={() => handleAction(onClear)}
           />
@@ -771,7 +771,7 @@ function LargeModernHamburger({
 }
 
 /**
- * Bouton du menu façon card moderne avec micro-icône dans un conteneur
+ * Modern card-style menu button with a small icon in a container
  */
 function MenuCardItem({
   icon: Icon,
@@ -851,7 +851,7 @@ function UserMenu({ email }: { email: string }) {
       {open && (
         <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Compte actif</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
           <button
@@ -859,7 +859,7 @@ function UserMenu({ email }: { email: string }) {
             className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
           >
             <LogOut className="h-4 w-4" />
-            <span>Se déconnecter</span>
+            <span>Sign out</span>
           </button>
         </div>
       )}
