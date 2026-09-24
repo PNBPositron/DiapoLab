@@ -173,10 +173,11 @@ export function PresentationMode() {
               backgroundSize: page.bgFit ?? "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
-              transform: `scale(${scale})`,
+                           transform: `scale(${scale})`,
               transformOrigin: "top left",
               transition: morphing ? "background-color 620ms ease" : undefined,
-            }}
+              "--fit": scale,
+            } as React.CSSProperties}
           >
             {page.elements.map((el, i) =>
               morphing ? (
