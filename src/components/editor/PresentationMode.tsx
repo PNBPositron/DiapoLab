@@ -10,7 +10,7 @@ import {
   RotateCcw,
   PenTool,
   Sparkles,
-  LayoutGrid, // 👈 FIX: was `Grid`
+  LayoutGrid,
   Clock,
   Eraser,
   ExternalLink,
@@ -27,7 +27,28 @@ export interface PresentationModeProps {
 
 export function PresentationMode({ isOpen, onExit, onClose }: PresentationModeProps) {
   const editor = useEditor() as any;
-  const { pages = [], currentIndex = 0, canvasW = 1920, canvasH = 1080 } = editor;
+
+  const pages: Page[] = useMemo(() => {
+    return editor.pages || editor.slides || [];
+  }, [editor.pages, editor.slides]);
+
+  // Support multiple common store index property names
+  const storeIndex: number =
+    editor.currentIndex ??
+    editor.activePageIndex ??
+    editor.currentPageIndex ??
+    editor.selectedPageIndex ??
+    0;
+
+  // Local state fallback in case store updates don't trigger re-renders
+  const [localIndex, setLocalIndex] = useState(storeIndex);
+
+  useEffect(() => {
+    setLocalIndex(storeIndex);
+  }, [storeIndex]);
+
+  const activeIndex = Math.max(0, Math.min(pages.length - 1, localIndex));
+  const activePage: Page | undefined = pages[activeIndex];
 
   // Resolve presentation visibility
   const isPresenting = useMemo(() => {
@@ -50,22 +71,25 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     if (typeof editor.setMode === "function") editor.setMode("edit");
   }, [onExit, onClose, editor]);
 
-  const activeIndex = Math.max(0, Math.min(pages.length - 1, currentIndex ?? 0));
-  const activePage: Page | undefined = pages[activeIndex];
-
+  // Robust slide navigation checking common store method signatures
   const goToSlide = useCallback(
     (index: number) => {
       const target = Math.max(0, Math.min(pages.length - 1, index));
-      if (typeof editor.setCurrentIndex === "function") {
-        editor.setCurrentIndex(target);
-      } else if (typeof editor.selectPage === "function") {
-        editor.selectPage(target);
-      } else if (typeof editor.goToSlide === "function") {
-        editor.goToSlide(target);
-      }
+      setLocalIndex(target);
+
+      if (typeof editor.setCurrentIndex === "function") editor.setCurrentIndex(target);
+      else if (typeof editor.setCurrentPageIndex === "function") editor.setCurrentPageIndex(target);
+      else if (typeof editor.setActivePageIndex === "function") editor.setActivePageIndex(target);
+      else if (typeof editor.setPageIndex === "function") editor.setPageIndex(target);
+      else if (typeof editor.selectPage === "function") editor.selectPage(target);
+      else if (typeof editor.goToSlide === "function") editor.goToSlide(target);
+      else if (typeof editor.setCurrentPage === "function") editor.setCurrentPage(target);
     },
     [editor, pages.length]
   );
+
+  const canvasW = editor.canvasW || editor.width || 1920;
+  const canvasH = editor.canvasH || editor.height || 1080;
 
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -173,6 +197,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     }
   };
 
+  // Keyboard navigation
   useEffect(() => {
     if (!isPresenting) return;
 
@@ -235,9 +260,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPresenting, activeIndex, pages.length, goToSlide, handleExit, gridOpen, blankMode]);
 
-  if (!isPresenting) {
-    return null;
-  }
+  if (!isPresenting) return null;
 
   return (
     <div
@@ -262,8 +285,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       )}
 
+      {/* Slide viewport with transition keying */}
       {activePage && (
         <div
+          key={activePage.id || activeIndex}
           onMouseMove={handleStageMouseMove}
           style={{
             width: canvasW,
@@ -272,12 +297,13 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
             transformOrigin: "center center",
             backgroundColor: activePage.bgColor || "#ffffff",
           }}
-          className="relative shrink-0 overflow-hidden rounded-xl shadow-[0_25px_70px_rgba(0,0,0,0.65)] transition-transform duration-100 ease-out"
+          className="relative shrink-0 overflow-hidden rounded-xl shadow-[0_25px_70px_rgba(0,0,0,0.65)] transition-all duration-300 ease-out animate-in fade-in"
         >
           {activePage.elements?.map((el: any) => (
             <InteractiveElementRenderer
-              key={el.id}
+              key={`${activePage.id || activeIndex}-${el.id}`}
               element={el}
+              currentSlideIndex={activeIndex}
               onNavigate={(targetSlide) => goToSlide(targetSlide)}
             />
           ))}
@@ -307,6 +333,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       )}
 
+      {/* Control bar */}
       <div
         className={`fixed bottom-6 left-1/2 z-40 -translate-x-1/2 transition-all duration-300 ${
           controlsVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
@@ -440,6 +467,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       </div>
 
+      {/* Grid slide picker */}
       {gridOpen && (
         <div
           onClick={() => setGridOpen(false)}
@@ -507,13 +535,16 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
 
 function InteractiveElementRenderer({
   element: el,
+  currentSlideIndex,
   onNavigate,
 }: {
   element: any;
+  currentSlideIndex: number;
   onNavigate: (slideIndex: number) => void;
 }) {
   const [quizSelection, setQuizSelection] = useState<string | null>(null);
 
+  // Fallback CSS keyframe styling in case tailwindcss-animate is not installed
   const animationClass = useMemo(() => {
     switch (el.animation) {
       case "fade-up":
@@ -528,29 +559,49 @@ function InteractiveElementRenderer({
   }, [el.animation]);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (el.interaction?.moveToSlide) {
+    // 1. Check custom slide target interaction
+    if (el.interaction?.moveToSlide != null) {
       e.stopPropagation();
-      onNavigate(el.interaction.moveToSlide - 1);
+      const target = Number(el.interaction.moveToSlide) - 1;
+      onNavigate(isNaN(target) ? 0 : target);
       return;
     }
 
+    // 2. Check standard button navigation actions
     if (el.type === "button") {
       e.stopPropagation();
-      switch (el.action) {
+      const action = String(el.action || "").toLowerCase().replace(/_/g, "-");
+
+      switch (action) {
+        case "next":
         case "next-slide":
-          onNavigate(Number.MAX_SAFE_INTEGER);
-          break;
+        case "nextslide":
+          onNavigate(currentSlideIndex + 1); // ✅ Accurately goes to next slide
+          return;
+
+        case "prev":
         case "prev-slide":
+        case "prevslide":
+          onNavigate(currentSlideIndex - 1); // ✅ Accurately goes to previous slide
+          return;
+
         case "first-slide":
+        case "first":
           onNavigate(0);
-          break;
+          return;
+
+        case "last-slide":
+        case "last":
+          onNavigate(Infinity);
+          return;
+
         case "link":
           if (el.href) window.open(el.href, "_blank", "noopener,noreferrer");
-          break;
+          return;
       }
-      return;
     }
 
+    // 3. Fallback link opening
     if (el.href) {
       e.stopPropagation();
       window.open(el.href, "_blank", "noopener,noreferrer");
@@ -651,7 +702,7 @@ function InteractiveElementRenderer({
         className={`${animationClass} flex cursor-pointer items-center justify-center font-semibold shadow-md transition hover:scale-102 active:scale-98`}
       >
         <span>{el.text || "Click"}</span>
-        {el.action === "link" && <ExternalLink className="ml-1.5 size-3.5 opacity-70" />}
+        {(el.action === "link" || el.href) && <ExternalLink className="ml-1.5 size-3.5 opacity-70" />}
       </button>
     );
   }
@@ -682,7 +733,10 @@ function InteractiveElementRenderer({
               <button
                 key={opt.id}
                 type="button"
-                onClick={() => setQuizSelection(opt.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setQuizSelection(opt.id);
+                }}
                 className={`flex w-full items-center justify-between rounded-xl border p-3 text-left text-xs font-medium transition ${optStyle}`}
               >
                 <span>{opt.text}</span>
@@ -703,5 +757,4 @@ function InteractiveElementRenderer({
   return null;
 }
 
-// Support both named and default imports
 export default PresentationMode;
