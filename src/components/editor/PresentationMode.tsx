@@ -258,6 +258,32 @@ export function PresentationMode() {
     activePage?.transition && activePage.transition !== "none" && !morphing
       ? `slide-transition-${activePage.transition}`
       : "";
+
+  // Morph matching: shared elements keep the same React key across slides so
+  // they are not remounted — exact match first (same text/image), then
+  // positional by type (Nth text/shape continues into the Nth text/shape).
+  const morphKeys = (() => {
+    if (!morphing) return activePage?.elements?.map((el: any) => el.id) ?? [];
+    const seen: Record<string, number> = {};
+    const exact = (el: any): string | null => {
+      if (el.type === "image") return `i:${el.src.slice(-60)}`;
+      if (el.type === "text" && el.text?.trim()) return `t:${el.text.trim().slice(0, 60)}`;
+      return null;
+    };
+    const used = new Set<string>();
+    return (activePage?.elements ?? []).map((el: any) => {
+      const e = exact(el);
+      if (e && !used.has(e)) {
+        used.add(e);
+        return e;
+      }
+      const n = (seen[el.type] = (seen[el.type] ?? 0) + 1);
+      const key = `${el.type}#${n}`;
+      used.add(key);
+      return key;
+    });
+  })();
+
   const ratio = canvasW / canvasH;
   const tW = ratio >= 1 ? 96 : 96 * ratio;
   const tH = ratio >= 1 ? 96 / ratio : 96;
@@ -310,9 +336,15 @@ export function PresentationMode() {
             transition: morphing ? "background-color 620ms ease" : undefined,
           } as React.CSSProperties}
         >
-          {activePage.elements?.map((el: any) => (
-            <CanvasElement key={el.id} element={el} scale={scale} />
-          ))}
+          {activePage.elements?.map((el: any, i: number) =>
+            morphing ? (
+              <div key={morphKeys[i]} className="morph-item">
+                <CanvasElement element={el} scale={scale} />
+              </div>
+            ) : (
+              <CanvasElement key={el.id} element={el} scale={scale} />
+            )
+          )}
 
           {/* Drawing canvas */}
           <canvas
