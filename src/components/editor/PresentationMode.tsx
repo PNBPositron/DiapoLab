@@ -70,10 +70,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
 
   // Reset local exit when presentation opens again
   useEffect(() => {
-    if (isOpen || editor.presentMode || editor.isPresenting || editor.isPresentationMode) {
+    if (isOpen || editor.presenting || editor.presentMode || editor.isPresenting || editor.isPresentationMode) {
       setHasExitedLocally(false);
     }
-  }, [isOpen, editor.presentMode, editor.isPresenting, editor.isPresentationMode]);
+  }, [isOpen, editor.presenting, editor.presentMode, editor.isPresenting, editor.isPresentationMode]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -96,6 +96,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
 
     if (onExit) onExit();
     if (onClose) onClose();
+
+    // The real store API is `presenting` + `setPresenting` (src/store/editor.ts).
+    // Without this, the store stays stuck at presenting=true forever.
+    if (typeof editor.setPresenting === "function") editor.setPresenting(false);
 
     if (typeof editor.setPresentMode === "function") editor.setPresentMode(false);
     if (typeof editor.setIsPresenting === "function") editor.setIsPresenting(false);
@@ -775,6 +779,7 @@ function InteractiveElementRenderer({
 
   if (el.type === "shape" || el.type === "container" || el.type === "card") {
     const isGlass =
+      el.effect === "liquid_glass" ||
       el.isGlass ||
       el.glassEffect ||
       el.variant === "glass" ||
@@ -858,7 +863,6 @@ function InteractiveElementRenderer({
             const isCorrect = opt.id === el.correctId;
             let optStyle =
               "border-white/25 bg-white/30 text-slate-800 hover:bg-white/45 hover:border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]";
-
             if (quizSelection !== null) {
               if (isCorrect)
                 optStyle =
@@ -867,7 +871,6 @@ function InteractiveElementRenderer({
                 optStyle =
                   "border-rose-400 bg-rose-500/25 text-rose-950 font-semibold shadow-[0_0_15px_rgba(244,63,94,0.3)]";
             }
-
             return (
               <button
                 key={opt.id}
@@ -892,7 +895,6 @@ function InteractiveElementRenderer({
       </div>
     );
   }
-
   return null;
 }
 
