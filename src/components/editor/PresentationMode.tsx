@@ -28,11 +28,14 @@ export interface PresentationModeProps {
 export function PresentationMode({ isOpen, onExit, onClose }: PresentationModeProps) {
   const editor = useEditor() as any;
 
+  // Local override ensures Échap / Exit ALWAYS closes immediately
+  const [hasExitedLocally, setHasExitedLocally] = useState(false);
+
   const pages: Page[] = useMemo(() => {
     return editor.pages || editor.slides || [];
   }, [editor.pages, editor.slides]);
 
-  // Support multiple common store index property names
+  // Support multiple store index conventions
   const storeIndex: number =
     editor.currentIndex ??
     editor.activePageIndex ??
@@ -40,7 +43,6 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     editor.selectedPageIndex ??
     0;
 
-  // Local state fallback in case store updates don't trigger re-renders
   const [localIndex, setLocalIndex] = useState(storeIndex);
 
   useEffect(() => {
@@ -52,6 +54,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
 
   // Resolve presentation visibility
   const isPresenting = useMemo(() => {
+    if (hasExitedLocally) return false;
     if (typeof isOpen === "boolean") return isOpen;
     return Boolean(
       editor.presentMode ||
@@ -60,18 +63,51 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
       editor.presenting ||
       editor.mode === "present"
     );
-  }, [isOpen, editor.presentMode, editor.isPresenting, editor.isPresentationMode, editor.presenting, editor.mode]);
+  }, [hasExitedLocally, isOpen, editor.presentMode, editor.isPresenting, editor.isPresentationMode, editor.presenting, editor.mode]);
 
+  // Reset local exit when presentation opens again
+  useEffect(() => {
+    if (isOpen || editor.presentMode || editor.isPresenting || editor.isPresentationMode) {
+      setHasExitedLocally(false);
+    }
+  }, [isOpen, editor.presentMode, editor.isPresenting, editor.isPresentationMode]);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Sync with browser native fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  // Bulletproof Exit Handler
   const handleExit = useCallback(() => {
+    // 1. Instantly hide locally
+    setHasExitedLocally(true);
+
+    // 2. Exit native fullscreen if active
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+
+    // 3. Trigger props
     if (onExit) onExit();
     if (onClose) onClose();
+
+    // 4. Trigger all possible Zustand store exit functions
     if (typeof editor.setPresentMode === "function") editor.setPresentMode(false);
     if (typeof editor.setIsPresenting === "function") editor.setIsPresenting(false);
     if (typeof editor.setIsPresentationMode === "function") editor.setIsPresentationMode(false);
+    if (typeof editor.setPresentationMode === "function") editor.setPresentationMode(false);
+    if (typeof editor.exitPresentation === "function") editor.exitPresentation();
+    if (typeof editor.closePresentation === "function") editor.closePresentation();
     if (typeof editor.setMode === "function") editor.setMode("edit");
   }, [onExit, onClose, editor]);
 
-  // Robust slide navigation checking common store method signatures
+  // Slide navigation
   const goToSlide = useCallback(
     (index: number) => {
       const target = Math.max(0, Math.min(pages.length - 1, index));
@@ -110,7 +146,6 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     return () => window.removeEventListener("resize", updateScale);
   }, [isPresenting, updateScale]);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [tool, setTool] = useState<"pointer" | "laser" | "pen">("pointer");
   const [penColor, setPenColor] = useState("#f43f5e");
   const [blankMode, setBlankMode] = useState<"none" | "black" | "white">("none");
@@ -190,18 +225,31 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
     }
   };
 
-  // Keyboard navigation
+  // Keyboard Navigation & Escape Handler (Using capture phase so it can never be swallowed)
   useEffect(() => {
     if (!isPresenting) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle Échap / Escape key unconditionally
+      if (e.key === "Escape" || e.code === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (gridOpen) {
+          setGridOpen(false);
+        } else if (blankMode !== "none") {
+          setBlankMode("none");
+        } else {
+          handleExit();
+        }
+        return;
+      }
+
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       switch (e.key) {
@@ -248,16 +296,11 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         case "M":
           setGridOpen((prev) => !prev);
           break;
-        case "Escape":
-          if (gridOpen) setGridOpen(false);
-          else if (blankMode !== "none") setBlankMode("none");
-          else handleExit();
-          break;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
   }, [isPresenting, activeIndex, pages.length, goToSlide, handleExit, gridOpen, blankMode]);
 
   if (!isPresenting) return null;
@@ -266,26 +309,27 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="fixed inset-0 z-50 flex select-none items-center justify-center overflow-hidden bg-slate-950 font-sans"
+      className="fixed inset-0 z-50 flex select-none items-center justify-center overflow-hidden bg-slate-950/95 font-sans"
     >
+      {/* Paused Screen Overlays */}
       {blankMode === "black" && (
         <div
           onClick={() => setBlankMode("none")}
-          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-black text-xs text-white/40"
+          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/95 backdrop-blur-3xl text-sm text-white/50"
         >
-          Screen paused · Press B or click to resume
+          Screen paused · Press B, click or press Échap to resume
         </div>
       )}
       {blankMode === "white" && (
         <div
           onClick={() => setBlankMode("none")}
-          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-white text-xs text-slate-400"
+          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-white/95 backdrop-blur-3xl text-sm text-slate-500"
         >
-          Screen paused · Press W or click to resume
+          Screen paused · Press W, click or press Échap to resume
         </div>
       )}
 
-      {/* Slide viewport with transition keying */}
+      {/* Slide viewport */}
       {activePage && (
         <div
           key={activePage.id || activeIndex}
@@ -297,7 +341,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
             transformOrigin: "center center",
             backgroundColor: activePage.bgColor || "#ffffff",
           }}
-          className="relative shrink-0 overflow-hidden rounded-xl shadow-[0_25px_70px_rgba(0,0,0,0.65)] transition-all duration-300 ease-out animate-in fade-in"
+          className="relative shrink-0 overflow-hidden rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] transition-all duration-300 ease-out animate-in fade-in"
         >
           {activePage.elements?.map((el: any) => (
             <InteractiveElementRenderer
@@ -323,171 +367,188 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       )}
 
+      {/* Laser Pointer */}
       {tool === "laser" && (
         <div
           style={{ left: laserPos.x, top: laserPos.y }}
           className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
         >
-          <div className="size-3.5 rounded-full bg-rose-500 shadow-[0_0_14px_4px_rgba(244,63,94,0.95)]" />
-          <div className="absolute inset-0 size-3.5 animate-ping rounded-full bg-rose-400 opacity-75" />
+          <div className="size-3.5 rounded-full bg-rose-500 shadow-[0_0_16px_5px_rgba(244,63,94,0.95)]" />
+          <div className="absolute inset-0 size-3.5 animate-ping rounded-full bg-rose-400 opacity-80" />
         </div>
       )}
 
-      {/* Control bar */}
+      {/* LIQUID GLASS DOCK */}
       <div
-        className={`fixed bottom-6 left-1/2 z-40 -translate-x-1/2 transition-all duration-300 ${
-          controlsVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
+        className={`fixed bottom-6 left-1/2 z-40 -translate-x-1/2 transition-all duration-500 ${
+          controlsVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-8 opacity-0"
         }`}
       >
-        <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-slate-900/85 p-1.5 shadow-[0_20px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
-          <button
-            type="button"
-            disabled={activeIndex <= 0}
-            onClick={() => goToSlide(activeIndex - 1)}
-            className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
-            title="Previous slide"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
+        <div className="relative group">
+          {/* Ambient fluid glow underneath */}
+          <div className="pointer-events-none absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500/25 via-indigo-500/20 to-rose-500/25 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
 
-          <button
-            type="button"
-            onClick={() => setGridOpen(true)}
-            className="flex h-9 items-center gap-1.5 rounded-xl px-2.5 font-mono text-xs font-medium text-slate-200 transition hover:bg-white/10"
-            title="All slides (G)"
-          >
-            <span>{activeIndex + 1}</span>
-            <span className="text-slate-500">/</span>
-            <span className="text-slate-400">{pages.length}</span>
-            <LayoutGrid className="ml-1 size-3.5 text-slate-400" />
-          </button>
+          {/* Liquid Glass Shell */}
+          <div className="relative flex items-center gap-1.5 rounded-2xl border border-white/20 bg-slate-900/40 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_1px_0_rgba(255,255,255,0.35),inset_0_-1px_1px_0_rgba(255,255,255,0.05)] backdrop-blur-2xl backdrop-saturate-200">
+            {/* Previous */}
+            <button
+              type="button"
+              disabled={activeIndex <= 0}
+              onClick={() => goToSlide(activeIndex - 1)}
+              className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95 disabled:opacity-25"
+              title="Slide précédente"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
 
-          <button
-            type="button"
-            disabled={activeIndex >= pages.length - 1}
-            onClick={() => goToSlide(activeIndex + 1)}
-            className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
-            title="Next slide"
-          >
-            <ChevronRight className="size-4" />
-          </button>
+            {/* Slide Index / Matrix toggle */}
+            <button
+              type="button"
+              onClick={() => setGridOpen(true)}
+              className="flex h-9 items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 px-3 font-mono text-xs font-semibold text-slate-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
+              title="Matrice des slides (G)"
+            >
+              <span className="text-white">{activeIndex + 1}</span>
+              <span className="text-white/40">/</span>
+              <span className="text-white/60">{pages.length}</span>
+              <LayoutGrid className="ml-1 size-3.5 text-sky-400" />
+            </button>
 
-          <div className="mx-1 h-5 w-px bg-white/10" />
+            {/* Next */}
+            <button
+              type="button"
+              disabled={activeIndex >= pages.length - 1}
+              onClick={() => goToSlide(activeIndex + 1)}
+              className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95 disabled:opacity-25"
+              title="Slide suivante"
+            >
+              <ChevronRight className="size-4" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setTool((prev) => (prev === "laser" ? "pointer" : "laser"))}
-            className={`flex size-9 items-center justify-center rounded-xl transition ${
-              tool === "laser"
-                ? "bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/40"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Laser pointer (L)"
-          >
-            <Sparkles className="size-4" />
-          </button>
+            <div className="mx-1 h-5 w-px bg-white/15" />
 
-          <button
-            type="button"
-            onClick={() => setTool((prev) => (prev === "pen" ? "pointer" : "pen"))}
-            className={`flex size-9 items-center justify-center rounded-xl transition ${
-              tool === "pen"
-                ? "bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40"
-                : "text-slate-400 hover:bg-white/10 hover:text-white"
-            }`}
-            title="Annotation pen (P)"
-          >
-            <PenTool className="size-4" />
-          </button>
+            {/* Laser */}
+            <button
+              type="button"
+              onClick={() => setTool((prev) => (prev === "laser" ? "pointer" : "laser"))}
+              className={`flex size-9 items-center justify-center rounded-xl transition-all active:scale-95 ${
+                tool === "laser"
+                  ? "bg-rose-500/30 text-rose-300 border border-rose-400/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
+                  : "text-slate-300 hover:bg-white/15 hover:text-white"
+              }`}
+              title="Pointeur laser (L)"
+            >
+              <Sparkles className="size-4" />
+            </button>
 
-          {tool === "pen" && (
-            <div className="flex items-center gap-1 rounded-lg bg-white/5 px-1 py-0.5">
-              {["#f43f5e", "#0ea5e9", "#eab308", "#10b981"].map((c) => (
+            {/* Pen */}
+            <button
+              type="button"
+              onClick={() => setTool((prev) => (prev === "pen" ? "pointer" : "pen"))}
+              className={`flex size-9 items-center justify-center rounded-xl transition-all active:scale-95 ${
+                tool === "pen"
+                  ? "bg-sky-500/30 text-sky-300 border border-sky-400/40 shadow-[0_0_12px_rgba(14,165,233,0.3)]"
+                  : "text-slate-300 hover:bg-white/15 hover:text-white"
+              }`}
+              title="Annotation (P)"
+            >
+              <PenTool className="size-4" />
+            </button>
+
+            {tool === "pen" && (
+              <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-1.5 py-1 backdrop-blur-md">
+                {["#f43f5e", "#0ea5e9", "#eab308", "#10b981"].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setPenColor(c)}
+                    className={`size-4 rounded-full transition-transform ${
+                      penColor === c ? "scale-125 ring-2 ring-white shadow-md" : "opacity-75 hover:opacity-100"
+                    }`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
                 <button
-                  key={c}
                   type="button"
-                  onClick={() => setPenColor(c)}
-                  className={`size-4 rounded-full transition-transform ${
-                    penColor === c ? "scale-125 ring-2 ring-white" : "opacity-80"
-                  }`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
+                  onClick={clearDrawings}
+                  className="ml-1 rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+                  title="Effacer les dessins"
+                >
+                  <Eraser className="size-3" />
+                </button>
+              </div>
+            )}
+
+            <div className="mx-1 h-5 w-px bg-white/15" />
+
+            {/* Timer */}
+            <div className="flex items-center gap-1.5 px-2 font-mono text-xs text-slate-200">
+              <Clock className="size-3.5 text-sky-400" />
+              <span>{formattedTime}</span>
               <button
                 type="button"
-                onClick={clearDrawings}
-                className="ml-1 rounded p-1 text-slate-400 hover:text-white"
-                title="Clear drawings"
+                onClick={() => setIsTimerRunning(!isTimerRunning)}
+                className="text-slate-400 transition hover:text-white active:scale-90"
               >
-                <Eraser className="size-3" />
+                {isTimerRunning ? <Pause className="size-3" /> : <Play className="size-3" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSecondsElapsed(0)}
+                className="text-slate-400 transition hover:text-white active:scale-90"
+              >
+                <RotateCcw className="size-3" />
               </button>
             </div>
-          )}
 
-          <div className="mx-1 h-5 w-px bg-white/10" />
+            <div className="mx-1 h-5 w-px bg-white/15" />
 
-          <div className="flex items-center gap-1.5 px-2 font-mono text-xs text-slate-300">
-            <Clock className="size-3.5 text-slate-400" />
-            <span>{formattedTime}</span>
+            {/* Fullscreen */}
             <button
               type="button"
-              onClick={() => setIsTimerRunning(!isTimerRunning)}
-              className="text-slate-400 hover:text-white"
+              onClick={toggleFullscreen}
+              className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95"
+              title="Plein écran (F)"
             >
-              {isTimerRunning ? <Pause className="size-3" /> : <Play className="size-3" />}
+              {isFullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
             </button>
+
+            {/* Exit (Échap) */}
             <button
               type="button"
-              onClick={() => setSecondsElapsed(0)}
-              className="text-slate-400 hover:text-white"
+              onClick={handleExit}
+              className="flex size-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-400 transition-all hover:border-rose-500/40 hover:bg-rose-500/25 hover:text-rose-200 active:scale-95"
+              title="Quitter (Échap)"
             >
-              <RotateCcw className="size-3" />
+              <X className="size-4" />
             </button>
           </div>
-
-          <div className="mx-1 h-5 w-px bg-white/10" />
-
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="flex size-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white"
-            title="Fullscreen"
-          >
-            {isFullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleExit}
-            className="flex size-9 items-center justify-center rounded-xl text-rose-400 transition hover:bg-rose-500/20 hover:text-rose-300"
-            title="Exit"
-          >
-            <X className="size-4" />
-          </button>
         </div>
       </div>
 
-      {/* Grid slide picker */}
+      {/* LIQUID GLASS SLIDE MATRIX MODAL */}
       {gridOpen && (
         <div
           onClick={() => setGridOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-8 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-8 backdrop-blur-2xl animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex max-h-[85vh] w-full max-w-5xl flex-col rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl"
+            className="flex max-h-[85vh] w-full max-w-5xl flex-col rounded-3xl border border-white/20 bg-slate-900/50 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.25)] backdrop-blur-3xl backdrop-saturate-150"
           >
-            <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <LayoutGrid className="size-4 text-sky-400" />
-                <h3 className="text-sm font-semibold tracking-wide text-white uppercase">
-                  Slide Matrix
+            <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex size-8 items-center justify-center rounded-xl bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/30">
+                  <LayoutGrid className="size-4" />
+                </div>
+                <h3 className="text-sm font-semibold tracking-wider text-white uppercase">
+                  Matrice des Slides
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setGridOpen(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+                className="rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition-all hover:bg-white/15 hover:text-white"
               >
                 <X className="size-4" />
               </button>
@@ -504,20 +565,20 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
                       goToSlide(idx);
                       setGridOpen(false);
                     }}
-                    className={`group relative flex flex-col overflow-hidden rounded-xl border text-left transition ${
+                    className={`group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all active:scale-98 ${
                       isActive
-                        ? "border-sky-500 ring-2 ring-sky-500/40 shadow-lg shadow-sky-500/10"
-                        : "border-white/10 hover:border-white/30"
+                        ? "border-sky-400/80 bg-sky-500/10 shadow-[0_0_25px_rgba(56,189,248,0.35),inset_0_1px_1px_rgba(255,255,255,0.4)]"
+                        : "border-white/15 bg-white/5 hover:border-white/30 hover:bg-white/10"
                     }`}
                   >
                     <div
-                      className="aspect-video w-full transition-transform group-hover:scale-102"
+                      className="aspect-video w-full transition-transform duration-300 group-hover:scale-102"
                       style={{ backgroundColor: p.bgColor || "#ffffff" }}
                     />
-                    <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2 text-xs">
-                      <span className="font-mono text-slate-300">Slide {idx + 1}</span>
+                    <div className="flex items-center justify-between border-t border-white/10 bg-slate-900/60 px-3 py-2.5 text-xs backdrop-blur-md">
+                      <span className="font-mono text-slate-200">Slide {idx + 1}</span>
                       {isActive && (
-                        <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400">
+                        <span className="rounded-md border border-sky-400/30 bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">
                           Active
                         </span>
                       )}
@@ -533,6 +594,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
   );
 }
 
+// LIQUID GLASS INTERACTIVE ELEMENTS
 function InteractiveElementRenderer({
   element: el,
   currentSlideIndex,
@@ -544,22 +606,8 @@ function InteractiveElementRenderer({
 }) {
   const [quizSelection, setQuizSelection] = useState<string | null>(null);
 
-  // Fallback CSS keyframe styling in case tailwindcss-animate is not installed
-  const animationClass = useMemo(() => {
-    switch (el.animation) {
-      case "fade-up":
-        return "animate-in fade-in slide-in-from-bottom-6 duration-500 fill-mode-both";
-      case "pop":
-        return "animate-in zoom-in-75 duration-300 ease-out fill-mode-both";
-      case "glitch":
-        return "animate-pulse duration-200";
-      default:
-        return "";
-    }
-  }, [el.animation]);
-
   const handleClick = (e: React.MouseEvent) => {
-    // 1. Check custom slide target interaction
+    // 1. Custom slide navigation
     if (el.interaction?.moveToSlide != null) {
       e.stopPropagation();
       const target = Number(el.interaction.moveToSlide) - 1;
@@ -567,7 +615,7 @@ function InteractiveElementRenderer({
       return;
     }
 
-    // 2. Check standard button navigation actions
+    // 2. Button navigation
     if (el.type === "button") {
       e.stopPropagation();
       const action = String(el.action || "").toLowerCase().replace(/_/g, "-");
@@ -576,13 +624,13 @@ function InteractiveElementRenderer({
         case "next":
         case "next-slide":
         case "nextslide":
-          onNavigate(currentSlideIndex + 1); // ✅ Accurately goes to next slide
+          onNavigate(currentSlideIndex + 1);
           return;
 
         case "prev":
         case "prev-slide":
         case "prevslide":
-          onNavigate(currentSlideIndex - 1); // ✅ Accurately goes to previous slide
+          onNavigate(currentSlideIndex - 1);
           return;
 
         case "first-slide":
@@ -601,7 +649,6 @@ function InteractiveElementRenderer({
       }
     }
 
-    // 3. Fallback link opening
     if (el.href) {
       e.stopPropagation();
       window.open(el.href, "_blank", "noopener,noreferrer");
@@ -636,7 +683,7 @@ function InteractiveElementRenderer({
           cursor: el.href || el.interaction?.moveToSlide ? "pointer" : "default",
         }}
         onClick={handleClick}
-        className={`${animationClass} select-none leading-normal transition-all`}
+        className="select-none leading-normal transition-all"
       >
         {el.text}
       </div>
@@ -655,7 +702,7 @@ function InteractiveElementRenderer({
           borderStyle: el.strokeStyle || "solid",
         }}
         onClick={handleClick}
-        className={`${animationClass} transition-all`}
+        className="transition-all"
       />
     );
   }
@@ -672,61 +719,55 @@ function InteractiveElementRenderer({
           transform: `${baseStyle.transform || ""} scaleX(${el.flipX ? -1 : 1}) scaleY(${
             el.flipY ? -1 : 1
           })`,
-          filter: el.filters
-            ? `brightness(${el.filters.brightness ?? 100}%) contrast(${
-                el.filters.contrast ?? 100
-              }%) saturate(${el.filters.saturate ?? 100}%) blur(${el.filters.blur ?? 0}px)`
-            : undefined,
         }}
         onClick={handleClick}
-        className={`${animationClass} select-none`}
+        className="select-none"
       />
     );
   }
 
+  // Liquid Glass Button
   if (el.type === "button") {
     return (
       <button
         type="button"
         style={{
           ...baseStyle,
-          backgroundColor: el.bgColor || "#0284c7",
-          color: el.fgColor || "#ffffff",
-          borderColor: el.borderColor || "transparent",
-          borderWidth: `${el.borderWidth ?? 0}px`,
-          borderRadius: `${el.cornerRadius ?? 8}px`,
+          borderRadius: `${el.cornerRadius ?? 12}px`,
           fontSize: `${el.fontSize ?? 14}px`,
           fontFamily: el.fontFamily,
         }}
         onClick={handleClick}
-        className={`${animationClass} flex cursor-pointer items-center justify-center font-semibold shadow-md transition hover:scale-102 active:scale-98`}
+        className="flex cursor-pointer items-center justify-center font-semibold border border-white/20 bg-white/20 text-white shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-xl backdrop-saturate-150 transition-all hover:bg-white/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.6)] active:scale-95"
       >
         <span>{el.text || "Click"}</span>
-        {(el.action === "link" || el.href) && <ExternalLink className="ml-1.5 size-3.5 opacity-70" />}
+        {(el.action === "link" || el.href) && <ExternalLink className="ml-1.5 size-3.5 opacity-80" />}
       </button>
     );
   }
 
+  // Liquid Glass Quiz Element
   if (el.type === "quiz") {
     return (
       <div
-        style={{
-          ...baseStyle,
-          backgroundColor: el.bgColor || "#ffffff",
-          color: el.fgColor || "#0f172a",
-        }}
-        className={`${animationClass} flex flex-col justify-between rounded-2xl border border-slate-200/80 p-6 shadow-xl`}
+        style={baseStyle}
+        className="flex flex-col justify-between rounded-3xl border border-white/25 bg-white/15 p-6 text-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.5)] backdrop-blur-2xl backdrop-saturate-180"
       >
-        <h4 className="text-base font-bold tracking-tight">{el.question}</h4>
-        <div className="space-y-2">
+        <h4 className="text-base font-bold tracking-tight text-slate-900">{el.question}</h4>
+        <div className="space-y-2.5">
           {el.options?.map((opt: any) => {
             const isChosen = quizSelection === opt.id;
             const isCorrect = opt.id === el.correctId;
-            let optStyle = "border-slate-200 bg-slate-50 hover:border-slate-300";
+            let optStyle =
+              "border-white/25 bg-white/30 text-slate-800 hover:bg-white/45 hover:border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]";
 
             if (quizSelection !== null) {
-              if (isCorrect) optStyle = "border-emerald-500 bg-emerald-50 text-emerald-900";
-              else if (isChosen) optStyle = "border-rose-500 bg-rose-50 text-rose-900 animate-shake";
+              if (isCorrect)
+                optStyle =
+                  "border-emerald-400 bg-emerald-500/25 text-emerald-950 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.3)]";
+              else if (isChosen)
+                optStyle =
+                  "border-rose-400 bg-rose-500/25 text-rose-950 font-semibold shadow-[0_0_15px_rgba(244,63,94,0.3)]";
             }
 
             return (
@@ -737,14 +778,14 @@ function InteractiveElementRenderer({
                   e.stopPropagation();
                   setQuizSelection(opt.id);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl border p-3 text-left text-xs font-medium transition ${optStyle}`}
+                className={`flex w-full items-center justify-between rounded-xl border p-3.5 text-left text-xs font-medium backdrop-blur-md transition-all active:scale-98 ${optStyle}`}
               >
                 <span>{opt.text}</span>
                 {quizSelection !== null && isCorrect && (
                   <CheckCircle2 className="size-4 text-emerald-600" />
                 )}
                 {quizSelection !== null && isChosen && !isCorrect && (
-                  <XCircle className="size-4 text-rose-500" />
+                  <XCircle className="size-4 text-rose-600" />
                 )}
               </button>
             );
