@@ -20,6 +20,9 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { ShapeRender } from "./ShapeRender";
+import { UiRender } from "./UiRender";
 import { useEditor, type Page } from "@/store/editor";
 
 export interface PresentationModeProps {
@@ -679,6 +682,142 @@ function CodeElementRenderer({ element: el, baseStyle }: { element: any; baseSty
   );
 }
 
+// Lightweight chart renderer for presentation mode (bar / line / area / pie / donut)
+function ChartRenderer({ element: el }: { element: any }) {
+  const data = el.data ?? [];
+  const colors = el.colors?.length
+    ? el.colors
+    : ["#38bdf8", "#818cf8", "#f472b6", "#34d399", "#fbbf24"];
+  const W = el.width ?? 320;
+  const H = el.height ?? 200;
+  const pad = 28;
+  const max = Math.max(...data.map((d: any) => d.value ?? 0), 1);
+  const fg = el.fgColor || "#e2e8f0";
+
+  if (el.chart === "pie" || el.chart === "donut") {
+    const total = data.reduce((s: number, d: any) => s + (d.value ?? 0), 0) || 1;
+    let acc = 0;
+    const cx = W / 2;
+    const cy = H / 2;
+    const R = Math.min(W, H) / 2 - 8;
+    const inner = el.chart === "donut" ? R * 0.55 : 0;
+    const arcs = data.map((d: any, i: number) => {
+      const a0 = (acc / total) * Math.PI * 2 - Math.PI / 2;
+      acc += d.value ?? 0;
+      const a1 = (acc / total) * Math.PI * 2 - Math.PI / 2;
+      const large = a1 - a0 > Math.PI ? 1 : 0;
+      const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0);
+      const x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+      if (inner > 0) {
+        const xi1 = cx + inner * Math.cos(a1), yi1 = cy + inner * Math.sin(a1);
+        const xi0 = cx + inner * Math.cos(a0), yi0 = cy + inner * Math.sin(a0);
+        return (
+          <path
+            key={i}
+            d={`M${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} L${xi1} ${yi1} A${inner} ${inner} 0 ${large} 0 ${xi0} ${yi0} Z`}
+            fill={colors[i % colors.length]}
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth={1}
+          />
+        );
+      }
+      return (
+        <path
+          key={i}
+          d={`M${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} L${cx} ${cy} Z`}
+          fill={colors[i % colors.length]}
+          stroke="rgba(255,255,255,0.25)"
+          strokeWidth={1}
+        />
+      );
+    });
+    return (
+      <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
+        {arcs}
+        {el.chart === "donut" && el.title && (
+          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize={Math.min(16, W / 14)} fontWeight={700} fill={fg}>
+            {el.title}
+          </text>
+        )}
+      </svg>
+    );
+  }
+
+  const bw = (W - pad * 2) / Math.max(data.length, 1);
+  const yOf = (v: number) => H - pad - (v / max) * (H - pad * 2);
+  return (
+    <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
+      {el.chart === "bar" &&
+        data.map((d: any, i: number) => (
+          <rect
+            key={i}
+            x={pad + i * bw + bw * 0.15}
+            y={yOf(d.value ?? 0)}
+            width={Math.max(bw * 0.7, 2)}
+            height={Math.max(H - pad - yOf(d.value ?? 0), 1)}
+            fill={colors[i % colors.length]}
+            rx={4}
+          />
+        ))}
+      {(el.chart === "line" || el.chart === "area") &&
+        (() => {
+          const pts = data
+            .map((d: any, i: number) => `${pad + i * bw + bw / 2},${yOf(d.value ?? 0)}`)
+            .join(" ");
+          return (
+            <>
+              {el.chart === "area" && (
+                <polygon
+                  points={`${pad},${H - pad} ${pts} ${W - pad},${H - pad}`}
+                  fill={colors[0]}
+                  opacity={0.25}
+                />
+              )}
+              <polyline
+                points={pts}
+                fill="none"
+                stroke={colors[0]}
+                strokeWidth={3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {data.map((d: any, i: number) => (
+                <circle
+                  key={i}
+                  cx={pad + i * bw + bw / 2}
+                  cy={yOf(d.value ?? 0)}
+                  r={4}
+                  fill={colors[0]}
+                  stroke="rgba(255,255,255,0.8)"
+                  strokeWidth={1.5}
+                />
+              ))}
+            </>
+          );
+        })()}
+      {el.showValues !== false &&
+        data.map((d: any, i: number) => (
+          <text
+            key={i}
+            x={pad + i * bw + bw / 2}
+            y={yOf(d.value ?? 0) - 8}
+            textAnchor="middle"
+            fontSize={Math.min(12, Math.max(9, W / 40))}
+            fontWeight={600}
+            fill={fg}
+          >
+            {d.value}
+          </text>
+        ))}
+      {el.title && (
+        <text x={pad} y={18} fontSize={Math.min(15, Math.max(10, W / 28))} fontWeight={700} fill={fg}>
+          {el.title}
+        </text>
+      )}
+    </svg>
+  );
+}
+
 // Element Renderer
 function InteractiveElementRenderer({
   element: el,
@@ -777,7 +916,74 @@ function InteractiveElementRenderer({
     );
   }
 
-  if (el.type === "shape" || el.type === "container" || el.type === "card") {
+  if (el.type === "shape") {
+    // Delegate to the editor's own shape renderer: it handles all 40+ shape
+    // kinds (star, hexagon, arrow, glitch, frame_cut, dot_grid…) exactly like
+    // on the canvas.
+    const isGlassShape = el.effect === "liquid_glass";
+    const glassShapeStyle = isGlassShape ? getLiquidGlassStyle(true) : {};
+    return (
+      <div
+        style={{ ...baseStyle, ...glassShapeStyle }}
+        onClick={handleClick}
+        className="relative overflow-hidden transition-all duration-300"
+      >
+        <ShapeRender element={el as any} />
+      </div>
+    );
+  }
+
+  if (el.type === "icon") {
+    const LucideIcon = (LucideIcons as any)[el.name];
+    return (
+      <div
+        style={{ ...baseStyle, color: el.color }}
+        onClick={handleClick}
+        className="grid place-items-center"
+      >
+        {LucideIcon ? <LucideIcon className="size-full" strokeWidth={el.strokeWidth ?? 2} /> : null}
+      </div>
+    );
+  }
+
+  if (el.type === "chart") {
+    return (
+      <div style={baseStyle} onClick={handleClick}>
+        <ChartRenderer element={el} />
+      </div>
+    );
+  }
+
+  if (el.type === "embed") {
+    return (
+      <iframe
+        src={el.src}
+        title={el.title || "Embedded content"}
+        allow={
+          el.allow ||
+          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        }
+        allowFullScreen
+        style={{
+          ...baseStyle,
+          border: "none",
+          borderRadius: `${el.cornerRadius ?? 12}px`,
+          overflow: "hidden",
+        }}
+      />
+    );
+  }
+
+  if (el.type === "ui") {
+    // Delegate to the editor's UI component renderer (cards, alerts, windows…)
+    return (
+      <div style={baseStyle} onClick={handleClick}>
+        <UiRender element={el} preview />
+      </div>
+    );
+  }
+
+  if (el.type === "container" || el.type === "card") {
     const isGlass =
       el.effect === "liquid_glass" ||
       el.isGlass ||
