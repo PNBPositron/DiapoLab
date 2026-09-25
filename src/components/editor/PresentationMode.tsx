@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,6 +23,31 @@ import {
 } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
+
+// Stable keys across slides for morph matching: exact first (same image/text),
+// then positional by type (Nth text/shape continues into the Nth text/shape).
+function computeMorphKeys(page: Page | undefined): string[] {
+  const seen: Record<string, number> = {};
+  const used = new Set<string>();
+  const exact = (el: any): string | null => {
+    if (el.type === "image") return `i:${el.src.slice(-60)}`;
+    if (el.type === "text" && el.text?.trim()) return `t:${el.text.trim().slice(0, 60)}`;
+    return null;
+  };
+  return (page?.elements ?? []).map((el: any) => {
+    const e = exact(el);
+    if (e && !used.has(e)) {
+      used.add(e);
+      return e;
+    }
+    const n = (seen[el.type] = (seen[el.type] ?? 0) + 1);
+    const key = `${el.type}#${n}`;
+    used.add(key);
+    return key;
+  });
+}
+
+type Rect = { left: number; top: number; width: number; height: number };
 
 export function PresentationMode() {
   const editor = useEditor() as any;
@@ -57,6 +89,7 @@ export function PresentationMode() {
   // Fit-to-screen scale
   const [scale, setScale] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const slideRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isPresenting) return;
     const fit = () => {
@@ -258,31 +291,7 @@ export function PresentationMode() {
     activePage?.transition && activePage.transition !== "none" && !morphing
       ? `slide-transition-${activePage.transition}`
       : "";
-
-  // Morph matching: shared elements keep the same React key across slides so
-  // they are not remounted — exact match first (same text/image), then
-  // positional by type (Nth text/shape continues into the Nth text/shape).
-  const morphKeys = (() => {
-    if (!morphing) return activePage?.elements?.map((el: any) => el.id) ?? [];
-    const seen: Record<string, number> = {};
-    const exact = (el: any): string | null => {
-      if (el.type === "image") return `i:${el.src.slice(-60)}`;
-      if (el.type === "text" && el.text?.trim()) return `t:${el.text.trim().slice(0, 60)}`;
-      return null;
-    };
-    const used = new Set<string>();
-    return (activePage?.elements ?? []).map((el: any) => {
-      const e = exact(el);
-      if (e && !used.has(e)) {
-        used.add(e);
-        return e;
-      }
-      const n = (seen[el.type] = (seen[el.type] ?? 0) + 1);
-      const key = `${el.type}#${n}`;
-      used.add(key);
-      return key;
-    });
-  })();
+  const morphKeys = computeMorphKeys(activePage);
 
   const ratio = canvasW / canvasH;
   const tW = ratio >= 1 ? 96 : 96 * ratio;
@@ -314,52 +323,22 @@ export function PresentationMode() {
 
       {/* Slide — rendered with the editor's own CanvasElement (100% faithful) */}
       {activePage && (
-        <div
+        <SlideStage
           key={morphing ? "slide-morph" : `slide-${activeIndex}`}
+          ref={slideRef}
+          morphing={morphing}
+          morphKeys={morphKeys}
+          page={activePage}
+          canvasW={canvasW}
+          canvasH={canvasH}
+          scale={scale}
+          tool={tool}
+          canvasRef={canvasRef}
+          onStartDrawing={startDrawing}
+          onDraw={draw}
+          onStopDrawing={stopDrawing}
           onMouseMove={handleStageMouseMove}
-          className={`relative shrink-0 overflow-hidden rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] ${transition}`}
-          style={{
-            width: canvasW,
-            height: canvasH,
-            transform: `scale(${scale}) translateZ(0)`,
-            transformOrigin: "center center",
-            backgroundColor: activePage.bgColor?.includes("gradient(") ? "#0a0f1f" : activePage.bgColor,
-            backgroundImage: activePage.bgImage
-              ? `url(${activePage.bgImage})`
-              : activePage.bgColor?.includes("gradient(")
-                ? activePage.bgColor
-                : undefined,
-            backgroundSize: activePage.bgFit ?? "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            "--fit": scale,
-            transition: morphing ? "background-color 620ms ease" : undefined,
-          } as React.CSSProperties}
-        >
-          {activePage.elements?.map((el: any, i: number) =>
-            morphing ? (
-              <div key={morphKeys[i]} className="morph-item">
-                <CanvasElement element={el} scale={scale} />
-              </div>
-            ) : (
-              <CanvasElement key={el.id} element={el} scale={scale} />
-            )
-          )}
-
-          {/* Drawing canvas */}
-          <canvas
-            ref={canvasRef}
-            width={canvasW}
-            height={canvasH}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            className={`absolute inset-0 z-30 size-full ${
-              tool === "pen" ? "cursor-crosshair pointer-events-auto" : "pointer-events-none"
-            }`}
-          />
-        </div>
+        />
       )}
 
       {/* Laser pointer */}
@@ -618,5 +597,167 @@ export function PresentationMode() {
     </div>
   );
 }
+
+/* ---------------------------------------------------------------------------
+   SlideStage — the slide container, extracted so it can own the FLIP effect.
+   Real morph (à la PowerPoint/reveal): on every slide render we remember the
+   on-screen rect of each element (keyed by morph key). When a "morph" slide
+   renders, matched elements start at their previous rect (inverted
+   translate + scale) and animate to their new place — true geometric tween.
+   Unmatched elements simply fade in via the existing .morph-item class.
+--------------------------------------------------------------------------- */
+const SlideStage = React.forwardRef<
+  HTMLDivElement,
+  {
+    morphing: boolean;
+    morphKeys: string[];
+    page: Page;
+    canvasW: number;
+    canvasH: number;
+    scale: number;
+    tool: "pointer" | "laser" | "pen";
+    canvasRef: React.RefObject<HTMLCanvasElement | null>;
+    onStartDrawing: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+    onDraw: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+    onStopDrawing: () => void;
+    onMouseMove: (e: React.MouseEvent) => void;
+  }
+>(function SlideStage(
+  {
+    morphing,
+    morphKeys,
+    page,
+    canvasW,
+    canvasH,
+    scale,
+    tool,
+    canvasRef,
+    onStartDrawing,
+    onDraw,
+    onStopDrawing,
+    onMouseMove,
+  },
+  ref
+) {
+  const prevRects = useRef<Map<string, Rect>>(new Map());
+
+  useLayoutEffect(() => {
+    const container = ref as unknown as React.RefObject<HTMLDivElement>;
+    const root = container?.current;
+    if (!root) return;
+
+    // Direct children = one node per element (in order) + the drawing canvas.
+    const children = Array.from(root.children).filter(
+      (c) => (c as HTMLElement).tagName !== "CANVAS"
+    );
+    const nodes = children.map((c) => {
+      const el = c as HTMLElement;
+      // In morph mode elements are wrapped for the fade; FLIP targets the
+      // element root inside the wrapper (transform-origin = its own box).
+      return el.dataset.morphWrap === "true"
+        ? (el.firstElementChild as HTMLElement | null)
+        : el;
+    });
+
+    // Current rects (screen space, includes the container scale)
+    const rects = new Map<string, Rect>();
+    nodes.forEach((node, i) => {
+      if (!node) return;
+      const key = morphKeys[i] ?? `#${i}`;
+      const r = node.getBoundingClientRect();
+      rects.set(key, { left: r.left, top: r.top, width: r.width, height: r.height });
+    });
+
+    if (morphing) {
+      const animated: HTMLElement[] = [];
+      nodes.forEach((node, i) => {
+        if (!node) return;
+        const key = morphKeys[i] ?? `#${i}`;
+        const prev = prevRects.current.get(key);
+        const cur = rects.get(key);
+        if (!prev || !cur || cur.width === 0 || cur.height === 0) return; // new element → fade
+
+        // Disable the wrapper fade for matched elements: they morph, not fade.
+        const wrap = node.parentElement as HTMLElement | null;
+        if (wrap?.dataset?.morphWrap === "true") wrap.style.animation = "none";
+
+        // Inverted transform: start exactly at the previous rect.
+        // Deltas are measured in screen px but applied inside a scaled
+        // container → divide by the container scale.
+        const dx = (prev.left - cur.left) / scale;
+        const dy = (prev.top - cur.top) / scale;
+        const sx = prev.width / cur.width;
+        const sy = prev.height / cur.height;
+        node.style.transition = "none";
+        node.style.transformOrigin = "top left";
+        node.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+        animated.push(node);
+      });
+
+      // Release to the real position → 620ms geometric tween (true morph).
+      if (animated.length) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            animated.forEach((node) => {
+              node.style.transition = "transform 620ms cubic-bezier(0.22, 1, 0.36, 1)";
+              node.style.transform = "";
+            });
+          });
+        });
+      }
+    }
+
+    // Remember this slide's rects for the next morph.
+    prevRects.current = rects;
+  }, [morphing, morphKeys, page, scale, ref]);
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      className="relative shrink-0 overflow-hidden rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)]"
+      style={{
+        width: canvasW,
+        height: canvasH,
+        transform: `scale(${scale}) translateZ(0)`,
+        transformOrigin: "center center",
+        backgroundColor: page.bgColor?.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+        backgroundImage: page.bgImage
+          ? `url(${page.bgImage})`
+          : page.bgColor?.includes("gradient(")
+            ? page.bgColor
+            : undefined,
+        backgroundSize: page.bgFit ?? "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        "--fit": scale,
+        transition: morphing ? "background-color 620ms ease" : undefined,
+      } as React.CSSProperties}
+    >
+      {page.elements?.map((el: any, i: number) =>
+        morphing ? (
+          <div key={morphKeys[i] ?? el.id} data-morph-wrap="true" className="morph-item">
+            <CanvasElement element={el} scale={scale} />
+          </div>
+        ) : (
+          <CanvasElement key={el.id} element={el} scale={scale} />
+        )
+      )}
+
+      <canvas
+        ref={canvasRef}
+        width={canvasW}
+        height={canvasH}
+        onMouseDown={onStartDrawing}
+        onMouseMove={onDraw}
+        onMouseUp={onStopDrawing}
+        onMouseLeave={onStopDrawing}
+        className={`absolute inset-0 z-30 size-full ${
+          tool === "pen" ? "cursor-crosshair pointer-events-auto" : "pointer-events-none"
+        }`}
+      />
+    </div>
+  );
+});
 
 export default PresentationMode;
