@@ -13,145 +13,70 @@ import {
   LayoutGrid,
   Clock,
   Eraser,
-  ExternalLink,
-  CheckCircle2,
-  XCircle,
-  Code2,
-  Copy,
-  Check,
 } from "lucide-react";
-import * as LucideIcons from "lucide-react";
-import { ShapeRender } from "./ShapeRender";
-import { UiRender } from "./UiRender";
 import { useEditor, type Page } from "@/store/editor";
+import { CanvasElement } from "./CanvasElement";
 
-export interface PresentationModeProps {
-  isOpen?: boolean;
-  onExit?: () => void;
-  onClose?: () => void;
-}
-
-export function PresentationMode({ isOpen, onExit, onClose }: PresentationModeProps) {
+export function PresentationMode() {
   const editor = useEditor() as any;
-
-  // Local override ensures Échap / Exit ALWAYS closes immediately
+  const { pages, canvasW, canvasH } = editor;
   const [hasExitedLocally, setHasExitedLocally] = useState(false);
 
-  const pages: Page[] = useMemo(() => {
-    return editor.pages || editor.slides || [];
-  }, [editor.pages, editor.slides]);
-
-  // Support multiple store index conventions
-  const storeIndex: number =
-    editor.currentIndex ??
-    editor.activePageIndex ??
-    editor.currentPageIndex ??
-    editor.selectedPageIndex ??
-    0;
-
+  // Store index (real store API: currentIndex + setCurrentPage)
+  const storeIndex: number = editor.currentIndex ?? 0;
   const [localIndex, setLocalIndex] = useState(storeIndex);
-
-  useEffect(() => {
-    setLocalIndex(storeIndex);
-  }, [storeIndex]);
+  useEffect(() => setLocalIndex(storeIndex), [storeIndex]);
 
   const activeIndex = Math.max(0, Math.min(pages.length - 1, localIndex));
   const activePage: Page | undefined = pages[activeIndex];
 
-  // Resolve presentation visibility
-  const isPresenting = useMemo(() => {
-    if (hasExitedLocally) return false;
-    if (typeof isOpen === "boolean") return isOpen;
-    return Boolean(
-      editor.presentMode ||
-      editor.isPresenting ||
-      editor.isPresentationMode ||
-      editor.presenting ||
-      editor.mode === "present"
-    );
-  }, [hasExitedLocally, isOpen, editor.presentMode, editor.isPresenting, editor.isPresentationMode, editor.presenting, editor.mode]);
+  // Visibility: driven by the real store flag `presenting`, with a local exit override.
+  const isPresenting = !hasExitedLocally && Boolean(editor.presenting);
 
-  // Reset local exit when presentation opens again
+  // Reset local exit when the user presents again
   useEffect(() => {
-    if (isOpen || editor.presenting || editor.presentMode || editor.isPresenting || editor.isPresentationMode) {
-      setHasExitedLocally(false);
-    }
-  }, [isOpen, editor.presenting, editor.presentMode, editor.isPresenting, editor.isPresentationMode]);
+    if (editor.presenting) setHasExitedLocally(false);
+  }, [editor.presenting]);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Sync with browser native fullscreen changes
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  // Bulletproof Exit Handler
-  const handleExit = useCallback(() => {
-    setHasExitedLocally(true);
-
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
-    }
-
-    if (onExit) onExit();
-    if (onClose) onClose();
-
-    // The real store API is `presenting` + `setPresenting` (src/store/editor.ts).
-    // Without this, the store stays stuck at presenting=true forever.
-    if (typeof editor.setPresenting === "function") editor.setPresenting(false);
-
-    if (typeof editor.setPresentMode === "function") editor.setPresentMode(false);
-    if (typeof editor.setIsPresenting === "function") editor.setIsPresenting(false);
-    if (typeof editor.setIsPresentationMode === "function") editor.setIsPresentationMode(false);
-    if (typeof editor.setPresentationMode === "function") editor.setPresentationMode(false);
-    if (typeof editor.exitPresentation === "function") editor.exitPresentation();
-    if (typeof editor.closePresentation === "function") editor.closePresentation();
-    if (typeof editor.setMode === "function") editor.setMode("edit");
-  }, [onExit, onClose, editor]);
-
-  // Slide navigation
   const goToSlide = useCallback(
     (index: number) => {
       const target = Math.max(0, Math.min(pages.length - 1, index));
       setLocalIndex(target);
-
-      if (typeof editor.setCurrentIndex === "function") editor.setCurrentIndex(target);
-      else if (typeof editor.setCurrentPageIndex === "function") editor.setCurrentPageIndex(target);
-      else if (typeof editor.setActivePageIndex === "function") editor.setActivePageIndex(target);
-      else if (typeof editor.setPageIndex === "function") editor.setPageIndex(target);
-      else if (typeof editor.selectPage === "function") editor.selectPage(target);
-      else if (typeof editor.goToSlide === "function") editor.goToSlide(target);
-      else if (typeof editor.setCurrentPage === "function") editor.setCurrentPage(target);
+      if (typeof editor.setCurrentPage === "function") editor.setCurrentPage(target);
     },
     [editor, pages.length]
   );
 
-  const canvasW = editor.canvasW || editor.width || 1920;
-  const canvasH = editor.canvasH || editor.height || 1080;
+  // Exit: sync the real store API + fullscreen cleanup.
+  const handleExit = useCallback(() => {
+    setHasExitedLocally(true);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (typeof editor.setPresenting === "function") editor.setPresenting(false);
+  }, [editor]);
 
+  // Fit-to-screen scale
   const [scale, setScale] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const updateScale = useCallback(() => {
-    if (!containerRef.current) return;
-    const { clientWidth, clientHeight } = containerRef.current;
-    const padding = 28;
-    const scaleX = (clientWidth - padding * 2) / canvasW;
-    const scaleY = (clientHeight - padding * 2) / canvasH;
-    setScale(Math.min(scaleX, scaleY, 1.25));
-  }, [canvasW, canvasH]);
-
+  const wrapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isPresenting) return;
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, [isPresenting, updateScale]);
+    const fit = () => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const sx = el.clientWidth / canvasW;
+      const sy = el.clientHeight / canvasH;
+      setScale(Math.min(sx, sy));
+    };
+    fit();
+    const obs = new ResizeObserver(fit);
+    if (wrapRef.current) obs.observe(wrapRef.current);
+    window.addEventListener("resize", fit);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener("resize", fit);
+    };
+  }, [isPresenting, canvasW, canvasH]);
 
+  // Tools state
   const [tool, setTool] = useState<"pointer" | "laser" | "pen">("pointer");
   const [penColor, setPenColor] = useState("#f43f5e");
   const [blankMode, setBlankMode] = useState<"none" | "black" | "white">("none");
@@ -160,8 +85,9 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
   const [laserPos, setLaserPos] = useState({ x: -100, y: -100 });
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const hideControlsTimer = useRef<NodeJS.Timeout | null>(null);
+  const hideControlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDrawing = useRef(false);
 
@@ -174,11 +100,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
   };
 
   const handleStageMouseMove = (e: React.MouseEvent) => {
-    if (tool === "laser") {
-      setLaserPos({ x: e.clientX, y: e.clientY });
-    }
+    if (tool === "laser") setLaserPos({ x: e.clientX, y: e.clientY });
   };
 
+  // Timer
   useEffect(() => {
     if (!isPresenting || !isTimerRunning) return;
     const interval = setInterval(() => setSecondsElapsed((s) => s + 1), 1000);
@@ -191,6 +116,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, [secondsElapsed]);
 
+  // Drawing
   const clearDrawings = useCallback(() => {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext("2d");
@@ -236,22 +162,26 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
     }
   };
 
-  // Keyboard Navigation & Escape Handler (capture phase guarantees it won't be swallowed)
+  useEffect(() => {
+    const onFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+      if (!document.fullscreenElement && isPresenting) handleExit();
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, [isPresenting, handleExit]);
+
+  // Keyboard navigation (capture phase)
   useEffect(() => {
     if (!isPresenting) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.code === "Escape") {
         e.preventDefault();
         e.stopPropagation();
-
-        if (gridOpen) {
-          setGridOpen(false);
-        } else if (blankMode !== "none") {
-          setBlankMode("none");
-        } else {
-          handleExit();
-        }
+        if (gridOpen) setGridOpen(false);
+        else if (blankMode !== "none") setBlankMode("none");
+        else handleExit();
         return;
       }
 
@@ -297,76 +227,94 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
           break;
         case "g":
         case "G":
-        case "m":
-        case "M":
           setGridOpen((prev) => !prev);
           break;
       }
+      // Numeric jump 1-9
+      if (/^[1-9]$/.test(e.key)) {
+        const n = parseInt(e.key, 10) - 1;
+        if (n < pages.length) goToSlide(n);
+      }
     };
 
-    window.addEventListener("keydown", handleKeyDown, { capture: true });
-    return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
+    window.addEventListener("keydown", onKey, { capture: true });
+    return () => window.removeEventListener("keydown", onKey, { capture: true } as any);
   }, [isPresenting, activeIndex, pages.length, goToSlide, handleExit, gridOpen, blankMode]);
+
+  // Lock body scroll while presenting
+  useEffect(() => {
+    if (!isPresenting) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isPresenting]);
 
   if (!isPresenting) return null;
 
+  const morphing = activePage?.transition === "morph";
+  const transition =
+    activePage?.transition && activePage.transition !== "none" && !morphing
+      ? `slide-transition-${activePage.transition}`
+      : "";
+  const ratio = canvasW / canvasH;
+  const tW = ratio >= 1 ? 96 : 96 * ratio;
+  const tH = ratio >= 1 ? 96 / ratio : 96;
+
   return (
     <div
-      ref={containerRef}
+      ref={wrapRef}
       onMouseMove={handleMouseMove}
       className="fixed inset-0 z-50 flex select-none items-center justify-center overflow-hidden bg-slate-950/95 font-sans"
     >
-      {/* Paused Screen Overlays */}
+      {/* Paused screen overlays */}
       {blankMode === "black" && (
         <div
           onClick={() => setBlankMode("none")}
-          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/95 backdrop-blur-3xl text-sm text-white/50"
+          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-black/95 text-sm text-white/50"
         >
-          Screen paused · Press B, click or press Échap to resume
+          Screen paused · Press B or click to resume
         </div>
       )}
       {blankMode === "white" && (
         <div
           onClick={() => setBlankMode("none")}
-          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-white/95 backdrop-blur-3xl text-sm text-slate-500"
+          className="absolute inset-0 z-50 flex cursor-pointer items-center justify-center bg-white/95 text-sm text-slate-500"
         >
-          Screen paused · Press W, click or press Échap to resume
+          Screen paused · Press W or click to resume
         </div>
       )}
 
-      {/* Slide Viewport with Hardware Acceleration */}
+      {/* Slide — rendered with the editor's own CanvasElement (100% faithful) */}
       {activePage && (
         <div
-          key={activePage.id || activeIndex}
+          key={morphing ? "slide-morph" : `slide-${activeIndex}`}
           onMouseMove={handleStageMouseMove}
+          className={`relative shrink-0 overflow-hidden rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] ${transition}`}
           style={{
             width: canvasW,
             height: canvasH,
             transform: `scale(${scale}) translateZ(0)`,
             transformOrigin: "center center",
-            backgroundColor: activePage.bgColor || "#0f172a",
-            contain: "paint",
-          }}
-          className="relative shrink-0 overflow-hidden rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] transition-all duration-300 ease-out"
+            backgroundColor: activePage.bgColor?.includes("gradient(") ? "#0a0f1f" : activePage.bgColor,
+            backgroundImage: activePage.bgImage
+              ? `url(${activePage.bgImage})`
+              : activePage.bgColor?.includes("gradient(")
+                ? activePage.bgColor
+                : undefined,
+            backgroundSize: activePage.bgFit ?? "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            "--fit": scale,
+            transition: morphing ? "background-color 620ms ease" : undefined,
+          } as React.CSSProperties}
         >
-          {/* Ambient Lighting Mesh for Liquid Glass Refraction */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-60">
-            <div className="absolute -top-32 -left-32 size-[500px] rounded-full bg-sky-500/30 blur-[120px]" />
-            <div className="absolute top-1/2 -right-32 size-[600px] rounded-full bg-rose-500/25 blur-[140px]" />
-            <div className="absolute -bottom-32 left-1/3 size-[500px] rounded-full bg-indigo-500/25 blur-[130px]" />
-          </div>
-
-          {/* Slide Elements */}
           {activePage.elements?.map((el: any) => (
-            <InteractiveElementRenderer
-              key={`${activePage.id || activeIndex}-${el.id}`}
-              element={el}
-              currentSlideIndex={activeIndex}
-              onNavigate={(targetSlide) => goToSlide(targetSlide)}
-            />
+            <CanvasElement key={el.id} element={el} scale={scale} />
           ))}
 
-          {/* Drawing Canvas */}
+          {/* Drawing canvas */}
           <canvas
             ref={canvasRef}
             width={canvasW}
@@ -382,7 +330,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       )}
 
-      {/* Laser Pointer */}
+      {/* Laser pointer */}
       {tool === "laser" && (
         <div
           style={{ left: laserPos.x, top: laserPos.y }}
@@ -400,7 +348,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         }`}
       >
         <div className="relative group">
-          <div className="pointer-events-none absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500/25 via-indigo-500/20 to-rose-500/25 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="pointer-events-none absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500/25 via-indigo-500/20 to-rose-500/25 blur-xl opacity-70 transition-opacity duration-700 group-hover:opacity-100" />
 
           <div className="relative flex items-center gap-1.5 rounded-2xl border border-white/20 bg-slate-900/40 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_1px_0_rgba(255,255,255,0.35),inset_0_-1px_1px_0_rgba(255,255,255,0.05)] backdrop-blur-2xl backdrop-saturate-200">
             <button
@@ -408,7 +356,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               disabled={activeIndex <= 0}
               onClick={() => goToSlide(activeIndex - 1)}
               className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95 disabled:opacity-25"
-              title="Slide précédente"
+              title="Previous slide"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -417,7 +365,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               type="button"
               onClick={() => setGridOpen(true)}
               className="flex h-9 items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 px-3 font-mono text-xs font-semibold text-slate-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
-              title="Matrice des slides (G)"
+              title="Slide matrix (G)"
             >
               <span className="text-white">{activeIndex + 1}</span>
               <span className="text-white/40">/</span>
@@ -430,7 +378,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               disabled={activeIndex >= pages.length - 1}
               onClick={() => goToSlide(activeIndex + 1)}
               className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95 disabled:opacity-25"
-              title="Slide suivante"
+              title="Next slide"
             >
               <ChevronRight className="size-4" />
             </button>
@@ -442,10 +390,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               onClick={() => setTool((prev) => (prev === "laser" ? "pointer" : "laser"))}
               className={`flex size-9 items-center justify-center rounded-xl transition-all active:scale-95 ${
                 tool === "laser"
-                  ? "bg-rose-500/30 text-rose-300 border border-rose-400/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
+                  ? "border border-rose-400/40 bg-rose-500/30 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
                   : "text-slate-300 hover:bg-white/15 hover:text-white"
               }`}
-              title="Pointeur laser (L)"
+              title="Laser pointer (L)"
             >
               <Sparkles className="size-4" />
             </button>
@@ -455,10 +403,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               onClick={() => setTool((prev) => (prev === "pen" ? "pointer" : "pen"))}
               className={`flex size-9 items-center justify-center rounded-xl transition-all active:scale-95 ${
                 tool === "pen"
-                  ? "bg-sky-500/30 text-sky-300 border border-sky-400/40 shadow-[0_0_12px_rgba(14,165,233,0.3)]"
+                  ? "border border-sky-400/40 bg-sky-500/30 text-sky-300 shadow-[0_0_12px_rgba(14,165,233,0.3)]"
                   : "text-slate-300 hover:bg-white/15 hover:text-white"
               }`}
-              title="Annotation (P)"
+              title="Annotate (P)"
             >
               <PenTool className="size-4" />
             </button>
@@ -471,7 +419,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
                     type="button"
                     onClick={() => setPenColor(c)}
                     className={`size-4 rounded-full transition-transform ${
-                      penColor === c ? "scale-125 ring-2 ring-white shadow-md" : "opacity-75 hover:opacity-100"
+                      penColor === c ? "scale-125 shadow-md ring-2 ring-white" : "opacity-75 hover:opacity-100"
                     }`}
                     style={{ backgroundColor: c }}
                   />
@@ -480,7 +428,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
                   type="button"
                   onClick={clearDrawings}
                   className="ml-1 rounded p-1 text-slate-400 hover:bg-white/10 hover:text-white"
-                  title="Effacer les dessins"
+                  title="Clear drawings"
                 >
                   <Eraser className="size-3" />
                 </button>
@@ -514,7 +462,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               type="button"
               onClick={toggleFullscreen}
               className="flex size-9 items-center justify-center rounded-xl text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95"
-              title="Plein écran (F)"
+              title="Fullscreen (F)"
             >
               {isFullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
             </button>
@@ -523,7 +471,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
               type="button"
               onClick={handleExit}
               className="flex size-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-400 transition-all hover:border-rose-500/40 hover:bg-rose-500/25 hover:text-rose-200 active:scale-95"
-              title="Quitter (Échap)"
+              title="Exit (Esc)"
             >
               <X className="size-4" />
             </button>
@@ -531,7 +479,7 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
         </div>
       </div>
 
-      {/* Slide Matrix Modal */}
+      {/* Slide matrix modal */}
       {gridOpen && (
         <div
           onClick={() => setGridOpen(false)}
@@ -546,8 +494,8 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
                 <div className="flex size-8 items-center justify-center rounded-xl bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/30">
                   <LayoutGrid className="size-4" />
                 </div>
-                <h3 className="text-sm font-semibold tracking-wider text-white uppercase">
-                  Matrice des Slides
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
+                  Slide Matrix
                 </h3>
               </div>
               <button
@@ -578,7 +526,10 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
                   >
                     <div
                       className="aspect-video w-full transition-transform duration-300 group-hover:scale-102"
-                      style={{ backgroundColor: p.bgColor || "#ffffff" }}
+                      style={{
+                        backgroundColor: p.bgColor?.includes("gradient(") ? "#0a0f1f" : p.bgColor,
+                        backgroundImage: p.bgColor?.includes("gradient(") ? p.bgColor : undefined,
+                      }}
                     />
                     <div className="flex items-center justify-between border-t border-white/10 bg-slate-900/60 px-3 py-2.5 text-xs backdrop-blur-md">
                       <span className="font-mono text-slate-200">Slide {idx + 1}</span>
@@ -595,513 +546,45 @@ export function PresentationMode({ isOpen, onExit, onClose }: PresentationModePr
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-// Glass style generator helper
-function getLiquidGlassStyle(isDarkBackground = true): React.CSSProperties {
-  return {
-    background: isDarkBackground
-      ? "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.03) 100%)"
-      : "linear-gradient(135deg, rgba(255, 255, 255, 0.70) 0%, rgba(255, 255, 255, 0.35) 100%)",
-    backdropFilter: "blur(20px) saturate(190%) contrast(105%)",
-    WebkitBackdropFilter: "blur(20px) saturate(190%) contrast(105%)",
-    border: isDarkBackground
-      ? "1px solid rgba(255, 255, 255, 0.2)"
-      : "1px solid rgba(255, 255, 255, 0.6)",
-    boxShadow: isDarkBackground
-      ? "0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.1)"
-      : "0 20px 40px -15px rgba(0, 0, 0, 0.1), inset 0 1px 2px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05)",
-  };
-}
-
-// Subcomponent for interactive code editor (keeps hooks clean and valid)
-function CodeElementRenderer({ element: el, baseStyle }: { element: any; baseStyle: React.CSSProperties }) {
-  const [copied, setCopied] = useState(false);
-  const [codeContent, setCodeContent] = useState(
-    el.code || `// Sample Code\nexport default function App() {\n  return <h1>Hello Diapolab</h1>;\n}`
-  );
-
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(codeContent);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div
-      style={baseStyle}
-      onClick={(e) => e.stopPropagation()}
-      className="flex flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-950/70 font-mono shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)] backdrop-blur-2xl backdrop-saturate-180"
-    >
-      <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <div className="size-2.5 rounded-full bg-rose-500/80" />
-            <div className="size-2.5 rounded-full bg-amber-500/80" />
-            <div className="size-2.5 rounded-full bg-emerald-500/80" />
-          </div>
-          <span className="ml-2 flex items-center gap-1.5 text-xs font-medium text-slate-300">
-            <Code2 className="size-3.5 text-sky-400" />
-            {el.fileName || "Component.tsx"}
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] text-slate-300 transition-all hover:bg-white/15 hover:text-white active:scale-95"
-          title="Copier le code"
-        >
-          {copied ? (
-            <>
-              <Check className="size-3 text-emerald-400" />
-              <span className="text-emerald-400">Copié</span>
-            </>
-          ) : (
-            <>
-              <Copy className="size-3" />
-              <span>Copier</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      <div className="relative flex-1 overflow-auto p-4 text-xs leading-relaxed text-slate-200">
-        <textarea
-          value={codeContent}
-          onChange={(e) => setCodeContent(e.target.value)}
-          spellCheck={false}
-          className="size-full resize-none bg-transparent font-mono outline-none selection:bg-sky-500/30"
-          style={{ tabSize: 2 }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// Lightweight chart renderer for presentation mode (bar / line / area / pie / donut)
-function ChartRenderer({ element: el }: { element: any }) {
-  const data = el.data ?? [];
-  const colors = el.colors?.length
-    ? el.colors
-    : ["#38bdf8", "#818cf8", "#f472b6", "#34d399", "#fbbf24"];
-  const W = el.width ?? 320;
-  const H = el.height ?? 200;
-  const pad = 28;
-  const max = Math.max(...data.map((d: any) => d.value ?? 0), 1);
-  const fg = el.fgColor || "#e2e8f0";
-
-  if (el.chart === "pie" || el.chart === "donut") {
-    const total = data.reduce((s: number, d: any) => s + (d.value ?? 0), 0) || 1;
-    let acc = 0;
-    const cx = W / 2;
-    const cy = H / 2;
-    const R = Math.min(W, H) / 2 - 8;
-    const inner = el.chart === "donut" ? R * 0.55 : 0;
-    const arcs = data.map((d: any, i: number) => {
-      const a0 = (acc / total) * Math.PI * 2 - Math.PI / 2;
-      acc += d.value ?? 0;
-      const a1 = (acc / total) * Math.PI * 2 - Math.PI / 2;
-      const large = a1 - a0 > Math.PI ? 1 : 0;
-      const x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0);
-      const x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
-      if (inner > 0) {
-        const xi1 = cx + inner * Math.cos(a1), yi1 = cy + inner * Math.sin(a1);
-        const xi0 = cx + inner * Math.cos(a0), yi0 = cy + inner * Math.sin(a0);
-        return (
-          <path
-            key={i}
-            d={`M${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} L${xi1} ${yi1} A${inner} ${inner} 0 ${large} 0 ${xi0} ${yi0} Z`}
-            fill={colors[i % colors.length]}
-            stroke="rgba(255,255,255,0.25)"
-            strokeWidth={1}
-          />
-        );
-      }
-      return (
-        <path
-          key={i}
-          d={`M${x0} ${y0} A${R} ${R} 0 ${large} 1 ${x1} ${y1} L${cx} ${cy} Z`}
-          fill={colors[i % colors.length]}
-          stroke="rgba(255,255,255,0.25)"
-          strokeWidth={1}
-        />
-      );
-    });
-    return (
-      <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
-        {arcs}
-        {el.chart === "donut" && el.title && (
-          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize={Math.min(16, W / 14)} fontWeight={700} fill={fg}>
-            {el.title}
-          </text>
-        )}
-      </svg>
-    );
-  }
-
-  const bw = (W - pad * 2) / Math.max(data.length, 1);
-  const yOf = (v: number) => H - pad - (v / max) * (H - pad * 2);
-  return (
-    <svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: "block" }}>
-      {el.chart === "bar" &&
-        data.map((d: any, i: number) => (
-          <rect
-            key={i}
-            x={pad + i * bw + bw * 0.15}
-            y={yOf(d.value ?? 0)}
-            width={Math.max(bw * 0.7, 2)}
-            height={Math.max(H - pad - yOf(d.value ?? 0), 1)}
-            fill={colors[i % colors.length]}
-            rx={4}
-          />
-        ))}
-      {(el.chart === "line" || el.chart === "area") &&
-        (() => {
-          const pts = data
-            .map((d: any, i: number) => `${pad + i * bw + bw / 2},${yOf(d.value ?? 0)}`)
-            .join(" ");
-          return (
-            <>
-              {el.chart === "area" && (
-                <polygon
-                  points={`${pad},${H - pad} ${pts} ${W - pad},${H - pad}`}
-                  fill={colors[0]}
-                  opacity={0.25}
-                />
-              )}
-              <polyline
-                points={pts}
-                fill="none"
-                stroke={colors[0]}
-                strokeWidth={3}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {data.map((d: any, i: number) => (
-                <circle
-                  key={i}
-                  cx={pad + i * bw + bw / 2}
-                  cy={yOf(d.value ?? 0)}
-                  r={4}
-                  fill={colors[0]}
-                  stroke="rgba(255,255,255,0.8)"
-                  strokeWidth={1.5}
-                />
-              ))}
-            </>
-          );
-        })()}
-      {el.showValues !== false &&
-        data.map((d: any, i: number) => (
-          <text
-            key={i}
-            x={pad + i * bw + bw / 2}
-            y={yOf(d.value ?? 0) - 8}
-            textAnchor="middle"
-            fontSize={Math.min(12, Math.max(9, W / 40))}
-            fontWeight={600}
-            fill={fg}
-          >
-            {d.value}
-          </text>
-        ))}
-      {el.title && (
-        <text x={pad} y={18} fontSize={Math.min(15, Math.max(10, W / 28))} fontWeight={700} fill={fg}>
-          {el.title}
-        </text>
-      )}
-    </svg>
-  );
-}
-
-// Element Renderer
-function InteractiveElementRenderer({
-  element: el,
-  currentSlideIndex,
-  onNavigate,
-}: {
-  element: any;
-  currentSlideIndex: number;
-  onNavigate: (slideIndex: number) => void;
-}) {
-  const [quizSelection, setQuizSelection] = useState<string | null>(null);
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (el.interaction?.moveToSlide != null) {
-      e.stopPropagation();
-      const target = Number(el.interaction.moveToSlide) - 1;
-      onNavigate(isNaN(target) ? 0 : target);
-      return;
-    }
-
-    if (el.type === "button") {
-      e.stopPropagation();
-      const action = String(el.action || "").toLowerCase().replace(/_/g, "-");
-
-      switch (action) {
-        case "next":
-        case "next-slide":
-        case "nextslide":
-          onNavigate(currentSlideIndex + 1);
-          return;
-
-        case "prev":
-        case "prev-slide":
-        case "prevslide":
-          onNavigate(currentSlideIndex - 1);
-          return;
-
-        case "first-slide":
-        case "first":
-          onNavigate(0);
-          return;
-
-        case "last-slide":
-        case "last":
-          onNavigate(Infinity);
-          return;
-
-        case "link":
-          if (el.href) window.open(el.href, "_blank", "noopener,noreferrer");
-          return;
-      }
-    }
-
-    if (el.href) {
-      e.stopPropagation();
-      window.open(el.href, "_blank", "noopener,noreferrer");
-    }
-  };
-
-  const baseStyle: React.CSSProperties = {
-    position: "absolute",
-    left: `${el.x}px`,
-    top: `${el.y}px`,
-    width: `${el.width}px`,
-    height: `${el.height}px`,
-    transform: el.rotation ? `rotate(${el.rotation}deg)` : undefined,
-    opacity: el.opacity ?? 1,
-    zIndex: el.zIndex ?? 10,
-  };
-
-  if (el.type === "code") {
-    return <CodeElementRenderer element={el} baseStyle={baseStyle} />;
-  }
-
-  if (el.type === "text") {
-    return (
+      {/* Jump-to-slide strip (from the original version) */}
       <div
-        style={{
-          ...baseStyle,
-          color: el.color || "#000000",
-          fontFamily: el.fontFamily,
-          fontSize: `${el.fontSize}px`,
-          fontWeight: el.fontWeight,
-          lineHeight: el.lineHeight,
-          letterSpacing: `${el.letterSpacing}em`,
-          textAlign: el.align || "left",
-          fontStyle: el.italic ? "italic" : "normal",
-          textDecoration: el.underline ? "underline" : "none",
-          cursor: el.href || el.interaction?.moveToSlide ? "pointer" : "default",
-        }}
-        onClick={handleClick}
-        className="select-none leading-normal transition-all"
+        className={`pointer-events-none absolute bottom-24 left-1/2 z-20 -translate-x-1/2 transition-opacity ${
+          controlsVisible ? "opacity-100" : "opacity-0"
+        }`}
       >
-        {el.text}
-      </div>
-    );
-  }
-
-  if (el.type === "shape") {
-    // Delegate to the editor's own shape renderer: it handles all 40+ shape
-    // kinds (star, hexagon, arrow, glitch, frame_cut, dot_grid…) exactly like
-    // on the canvas.
-    const isGlassShape = el.effect === "liquid_glass";
-    const glassShapeStyle = isGlassShape ? getLiquidGlassStyle(true) : {};
-    return (
-      <div
-        style={{ ...baseStyle, ...glassShapeStyle }}
-        onClick={handleClick}
-        className="relative overflow-hidden transition-all duration-300"
-      >
-        <ShapeRender element={el as any} />
-      </div>
-    );
-  }
-
-  if (el.type === "icon") {
-    const LucideIcon = (LucideIcons as any)[el.name];
-    return (
-      <div
-        style={{ ...baseStyle, color: el.color }}
-        onClick={handleClick}
-        className="grid place-items-center"
-      >
-        {LucideIcon ? <LucideIcon className="size-full" strokeWidth={el.strokeWidth ?? 2} /> : null}
-      </div>
-    );
-  }
-
-  if (el.type === "chart") {
-    return (
-      <div style={baseStyle} onClick={handleClick}>
-        <ChartRenderer element={el} />
-      </div>
-    );
-  }
-
-  if (el.type === "embed") {
-    return (
-      <iframe
-        src={el.src}
-        title={el.title || "Embedded content"}
-        allow={
-          el.allow ||
-          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        }
-        allowFullScreen
-        style={{
-          ...baseStyle,
-          border: "none",
-          borderRadius: `${el.cornerRadius ?? 12}px`,
-          overflow: "hidden",
-        }}
-      />
-    );
-  }
-
-  if (el.type === "ui") {
-    // Delegate to the editor's UI component renderer (cards, alerts, windows…)
-    return (
-      <div style={baseStyle} onClick={handleClick}>
-        <UiRender element={el} preview />
-      </div>
-    );
-  }
-
-  if (el.type === "container" || el.type === "card") {
-    const isGlass =
-      el.effect === "liquid_glass" ||
-      el.isGlass ||
-      el.glassEffect ||
-      el.variant === "glass" ||
-      el.fill === "glass" ||
-      (typeof el.fill === "string" && el.fill.includes("rgba") && el.fill.endsWith(",0)"));
-
-    const glassStyle = isGlass ? getLiquidGlassStyle(true) : {};
-
-    return (
-      <div
-        style={{
-          ...baseStyle,
-          ...glassStyle,
-          backgroundColor: isGlass ? undefined : el.fill || "#38bdf8",
-          borderRadius: `${el.cornerRadius ?? 16}px`,
-          borderWidth: isGlass ? undefined : `${el.strokeWidth ?? 0}px`,
-          borderColor: isGlass ? undefined : el.stroke || "transparent",
-          borderStyle: el.strokeStyle || "solid",
-        }}
-        onClick={handleClick}
-        className="relative overflow-hidden transition-all duration-300"
-      >
-        {isGlass && (
-          <div
-            className="pointer-events-none absolute -inset-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-40 -rotate-45"
-            aria-hidden="true"
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (el.type === "image") {
-    return (
-      <img
-        src={el.src}
-        alt=""
-        style={{
-          ...baseStyle,
-          objectFit: el.fit || "cover",
-          borderRadius: `${el.cornerRadius ?? 0}px`,
-          transform: `${baseStyle.transform || ""} scaleX(${el.flipX ? -1 : 1}) scaleY(${
-            el.flipY ? -1 : 1
-          })`,
-        }}
-        onClick={handleClick}
-        className="select-none"
-      />
-    );
-  }
-
-  if (el.type === "button") {
-    return (
-      <button
-        type="button"
-        style={{
-          ...baseStyle,
-          borderRadius: `${el.cornerRadius ?? 12}px`,
-          fontSize: `${el.fontSize ?? 14}px`,
-          fontFamily: el.fontFamily,
-        }}
-        onClick={handleClick}
-        className="flex cursor-pointer items-center justify-center font-semibold border border-white/20 bg-white/20 text-white shadow-[0_8px_32px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-xl backdrop-saturate-150 transition-all hover:bg-white/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.6)] active:scale-95"
-      >
-        <span>{el.text || "Click"}</span>
-        {(el.action === "link" || el.href) && <ExternalLink className="ml-1.5 size-3.5 opacity-80" />}
-      </button>
-    );
-  }
-
-  if (el.type === "quiz") {
-    return (
-      <div
-        style={baseStyle}
-        className="flex flex-col justify-between rounded-3xl border border-white/25 bg-white/15 p-6 text-slate-900 shadow-[0_20px_50px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.5)] backdrop-blur-2xl backdrop-saturate-180"
-      >
-        <h4 className="text-base font-bold tracking-tight text-slate-900">{el.question}</h4>
-        <div className="space-y-2.5">
-          {el.options?.map((opt: any) => {
-            const isChosen = quizSelection === opt.id;
-            const isCorrect = opt.id === el.correctId;
-            let optStyle =
-              "border-white/25 bg-white/30 text-slate-800 hover:bg-white/45 hover:border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]";
-            if (quizSelection !== null) {
-              if (isCorrect)
-                optStyle =
-                  "border-emerald-400 bg-emerald-500/25 text-emerald-950 font-semibold shadow-[0_0_15px_rgba(16,185,129,0.3)]";
-              else if (isChosen)
-                optStyle =
-                  "border-rose-400 bg-rose-500/25 text-rose-950 font-semibold shadow-[0_0_15px_rgba(244,63,94,0.3)]";
-            }
+        <div className="pointer-events-auto hidden items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/15 bg-slate-900/50 p-2 backdrop-blur-xl">
+          {pages.map((p: any, i: number) => {
+            const active = i === activeIndex;
             return (
               <button
-                key={opt.id}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setQuizSelection(opt.id);
+                key={p.id || i}
+                onClick={() => goToSlide(i)}
+                title={`Go to slide ${i + 1}`}
+                className={`relative shrink-0 overflow-hidden rounded-lg border transition-all ${
+                  active
+                    ? "border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+                    : "border-white/20 hover:border-white/50"
+                }`}
+                style={{
+                  width: tW * 0.6,
+                  height: tH * 0.6,
+                  background: p.bgColor?.includes("gradient(") ? "#0a0f1f" : p.bgColor,
+                  backgroundImage: p.bgColor?.includes("gradient(") ? p.bgColor : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
-                className={`flex w-full items-center justify-between rounded-xl border p-3.5 text-left text-xs font-medium backdrop-blur-md transition-all active:scale-98 ${optStyle}`}
               >
-                <span>{opt.text}</span>
-                {quizSelection !== null && isCorrect && (
-                  <CheckCircle2 className="size-4 text-emerald-600" />
-                )}
-                {quizSelection !== null && isChosen && !isCorrect && (
-                  <XCircle className="size-4 text-rose-600" />
-                )}
+                <span className="absolute bottom-0.5 left-1 font-mono text-[9px] text-white mix-blend-difference">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
-    );
-  }
-  return null;
+    </div>
+  );
 }
 
 export default PresentationMode;
