@@ -266,19 +266,20 @@ function ModernColorPicker({
   onChange: (color: string) => void;
   label?: string;
 }) {
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-2">
       {label && <label className="text-[11px] font-medium text-slate-600">{label}</label>}
       <div className="flex items-center gap-2">
-        <div className="relative size-8 shrink-0 overflow-hidden rounded-lg border border-slate-200 shadow-2xs">
-          <input
-            type="color"
-            value={value || "#000000"}
-            onChange={(e) => onChange(e.target.value)}
-            className="absolute inset-0 size-full cursor-pointer opacity-0"
-          />
-          <div className="size-full" style={{ backgroundColor: value || "#000000" }} />
-        </div>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className={`size-8 shrink-0 rounded-lg border shadow-2xs transition ${
+            open ? "border-sky-500 ring-2 ring-sky-500/20" : "border-slate-200 hover:border-sky-400"
+          }`}
+          style={{ backgroundColor: value || "#000000" }}
+          title="Open color picker"
+        />
         <input
           type="text"
           value={value}
@@ -287,21 +288,26 @@ function ModernColorPicker({
           className="h-8 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs text-slate-800 uppercase shadow-2xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
         />
       </div>
-      <div className="flex flex-wrap gap-1.5 pt-0.5">
-        {SWATCHES.map((swatch) => (
-          <button
-            key={swatch}
-            type="button"
-            onClick={() => onChange(swatch)}
-            className={`size-5 rounded-full border border-slate-200/80 transition-transform hover:scale-115 ${
-              value.toLowerCase() === swatch.toLowerCase()
-                ? "scale-110 ring-2 ring-sky-500 ring-offset-1"
-                : ""
-            }`}
-            style={{ backgroundColor: swatch }}
-          />
-        ))}
-      </div>
+      {open && (
+        <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+          <ColorPicker value={value} onChange={onChange} />
+          <div className="mt-2.5 flex flex-wrap gap-1.5 border-t border-slate-100 pt-2.5">
+            {SWATCHES.map((swatch) => (
+              <button
+                key={swatch}
+                type="button"
+                onClick={() => onChange(swatch)}
+                className={`size-5 rounded-full border border-slate-200/80 transition-transform hover:scale-115 ${
+                  value.toLowerCase() === swatch.toLowerCase()
+                    ? "scale-110 ring-2 ring-sky-500 ring-offset-1"
+                    : ""
+                }`}
+                style={{ backgroundColor: swatch }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
