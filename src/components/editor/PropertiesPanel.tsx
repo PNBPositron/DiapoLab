@@ -16,6 +16,7 @@ import {
   type ButtonAction,
   type UiStyle,
 } from "@/store/editor";
+import { ColorPicker } from "./ColorPicker";
 import {
   Copy,
   Trash2,
