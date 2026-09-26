@@ -49,37 +49,32 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
     <div
       className={
         embedded
-          ? "flex min-h-full flex-col bg-paper"
-          : "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md sm:p-6 animate-in fade-in duration-300"
+          ? "flex min-h-full flex-col bg-slate-50"
+          : "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6"
       }
       onClick={onClose}
     >
       <div
         className={
           embedded
-            ? "w-full overflow-hidden bg-surface"
-            : "relative flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/15 bg-slate-900/70 shadow-[0_40px_120px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.18)] backdrop-blur-3xl backdrop-saturate-150 animate-in fade-in zoom-in-95 duration-300"
+            ? "w-full overflow-hidden bg-white"
+            : "relative my-3 flex max-h-[min(860px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/95 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:my-6"
         }
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Glow décoratif */}
-        {!embedded && (
-          <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-2/3 -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl" />
-        )}
-
         {/* Header */}
-        <div className="relative flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white/80 px-4 py-4 backdrop-blur-sm sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-xl border border-sky-400/30 bg-sky-500/15 text-sky-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
-              <HardDriveDownload className="size-4" />
+            <div className="flex size-10 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+              <HardDriveDownload className="size-4.5" />
             </div>
             <div>
-              <h2 className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-white">
+              <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-slate-800">
                 My Designs
               </h2>
               {items && (
-                <p className="mt-0.5 font-mono text-[10px] text-white/40">
-                  {items.length} saved {items.length === 1 ? "design" : "designs"} · stored locally
+                <p className="mt-0.5 text-sm text-slate-500">
+                  {items.length} saved {items.length === 1 ? "design" : "designs"} · stored on this device
                 </p>
               )}
             </div>
@@ -88,7 +83,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
             <button
               onClick={onClose}
               aria-label="Close my designs"
-              className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 transition-all hover:border-white/25 hover:bg-white/15 hover:text-white active:scale-95"
+              className="grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-800"
             >
               <X className="size-4" />
             </button>
@@ -96,30 +91,27 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
         </div>
 
         {/* Contenu */}
-        <div className={embedded ? "max-h-full overflow-y-auto p-3" : "flex-1 overflow-y-auto p-5 sm:p-6"}>
+        <div className={embedded ? "max-h-full overflow-y-auto p-3 sm:p-4" : "flex-1 overflow-y-auto p-4 sm:p-6"}>
           {error && (
-            <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 font-mono text-xs text-rose-300">
-              ! {error}
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-600">
+              {error}
             </div>
           )}
           {!items && !error && (
             <div className="flex flex-col items-center justify-center gap-3 py-20 text-slate-400">
-              <div className="relative">
-                <Loader2 className="size-6 animate-spin text-sky-400" />
-                <div className="absolute inset-0 animate-ping rounded-full bg-sky-500/20" />
-              </div>
-              <span className="font-mono text-xs tracking-wider text-slate-400">Loading your designs…</span>
+              <Loader2 className="size-6 animate-spin text-blue-500" />
+              <span className="text-sm">Loading your designs…</span>
             </div>
           )}
           {items && items.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-              <div className="flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-400">
+              <div className="flex size-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
                 <FilePlus2 className="size-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-300">No saved designs yet</p>
-                <p className="mt-1 font-mono text-[11px] text-slate-500">
-                  &gt; hit SAVE in the editor to store your first design
+                <p className="text-sm font-medium text-slate-700">No saved designs yet</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Hit SAVE in the editor to store your first design.
                 </p>
               </div>
             </div>
@@ -129,36 +121,36 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               {items.map((d) => (
                 <div
                   key={d.id}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-sky-400/50 hover:bg-white/[0.06] hover:shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_24px_rgba(56,189,248,0.15)]"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_12px_32px_rgba(37,99,235,0.12)]"
                 >
                   <button
                     onClick={() => handleOpen(d)}
-                    className="relative block w-full text-left"
+                    className="relative block w-full overflow-hidden text-left"
                   >
                     {d.pages?.[0] ? (
                       <SlideThumbnail
                         page={d.pages[0]}
                         canvasW={d.canvas_w}
                         canvasH={d.canvas_h}
-                        className="aspect-[16/10] w-full bg-ink object-cover"
+                        className="aspect-[16/10] w-full bg-slate-100 object-cover"
                       />
                     ) : (
-                      <div className="aspect-video w-full bg-ink" />
+                      <div className="aspect-video w-full bg-slate-100" />
                     )}
-                    {/* Voile + hint au hover */}
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/60 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
-                      <span className="flex items-center gap-1.5 rounded-lg border border-sky-400/40 bg-sky-500/20 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-sky-200 shadow-[0_0_16px_rgba(56,189,248,0.35)]">
+                    {/* Voile bleu au hover */}
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+                      <span className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg">
                         <Layers className="size-3.5" /> Open design
                       </span>
                     </div>
                   </button>
-                  <div className="flex items-center justify-between gap-2 border-t border-white/10 bg-slate-950/40 px-3 py-2.5 backdrop-blur-md">
+                  <div className="flex items-center justify-between gap-2 border-t border-slate-200 px-3 py-2.5">
                     <div className="min-w-0">
-                      <div className="truncate text-xs font-semibold text-slate-100" title={d.name}>
+                      <div className="truncate text-xs font-semibold text-slate-800" title={d.name}>
                         {d.name}
                       </div>
-                      <div className="font-mono text-[9px] text-slate-500">
-                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0}p
+                      <div className="mt-0.5 text-[10px] text-slate-400">
+                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0} page{(d.pages?.length ?? 0) === 1 ? "" : "s"}
                       </div>
                     </div>
                     <button
@@ -166,10 +158,10 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                       title="Delete"
                       aria-label={`Delete design ${d.name}`}
                       disabled={deletingId === d.id}
-                      className={`flex size-7 shrink-0 items-center justify-center rounded-lg border transition-all active:scale-90 ${
+                      className={`grid size-7 shrink-0 place-items-center rounded-lg border transition-all ${
                         deletingId === d.id
-                          ? "border-rose-400/50 bg-rose-500/30 text-rose-200"
-                          : "border-transparent text-slate-500 hover:border-rose-500/40 hover:bg-rose-500/20 hover:text-rose-300"
+                          ? "border-red-200 bg-red-50 text-red-500"
+                          : "border-transparent text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-500"
                       }`}
                     >
                       {deletingId === d.id ? (
