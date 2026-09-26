@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Pipette, Check } from "lucide-react";
 
 const PALETTES: { name: string; colors: string[] }[] = [
   {
@@ -51,6 +51,185 @@ const GRADIENT_PACKS = [
   },
 ];
 
+/* ---------------------------------------------------------------------------
+   ColorPicker — remplace <input type="color"> natif.
+   Zone saturation/valeur + slider de teinte + hex + pipette (EyeDropper API).
+--------------------------------------------------------------------------- */
+
+type RGB = { r: number; g: number; b: number };
+
+function hexToRgb(hex: string): RGB {
+  let h = hex.replace("#", "");
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const n = parseInt(h || "000000", 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function rgbToHex({ r, g, b }: RGB): string {
+  return "#" + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
+}
+function rgbToHsv({ r, g, b }: RGB): { h: number; s: number; v: number } {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === rn) h = ((gn - bn) / d) % 6;
+    else if (max === gn) h = (bn - rn) / d + 2;
+    else h = (rn - gn) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  return { h, s: max === 0 ? 0 : d / max, v: max };
+}
+function hsvToRgb(h: number, s: number, v: number): RGB {
+  const c = v * s;
+  const hp = h / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let rn = 0, gn = 0, bn = 0;
+  if (hp < 1) [rn, gn, bn] = [c, x, 0];
+  else if (hp < 2) [rn, gn, bn] = [x, c, 0];
+  else if (hp < 3) [rn, gn, bn] = [0, c, x];
+  else if (hp < 4) [rn, gn, bn] = [0, x, c];
+  else if (hp < 5) [rn, gn, bn] = [x, 0, c];
+  else [rn, gn, bn] = [c, 0, x];
+  const m = v - c;
+  return { r: (rn + m) * 255, g: (gn + m) * 255, b: (bn + m) * 255 };
+}
+
+export function ColorPicker({
+  value,
+  onChange,
+  compact = false,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+  compact?: boolean;
+}) {
+  const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#0a0f1f";
+  const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
+  const [hexDraft, setHexDraft] = useState(safeHex);
+  const svRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  // Sync quand la valeur change de l'extérieur
+  useEffect(() => {
+    if (/^#[0-9a-fA-F]{6}$/.test(value)) {
+      setHsv(rgbToHsv(hexToRgb(value)));
+      setHexDraft(value);
+    }
+  }, [value]);
+
+  const emit = (h: number, s: number, v: number) => {
+    setHsv({ h, s, v });
+    const hex = rgbToHex(hsvToRgb(h, s, v));
+    setHexDraft(hex);
+    onChange(hex);
+  };
+
+  const applyFromPointer = (clientX: number, clientY: number) => {
+    const el = svRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const s = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const v = 1 - Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+    emit(hsv.h, s, v);
+  };
+
+  const onSvDown = (e: React.PointerEvent) => {
+    dragging.current = true;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    applyFromPointer(e.clientX, e.clientY);
+  };
+  const onSvMove = (e: React.PointerEvent) => {
+    if (dragging.current) applyFromPointer(e.clientX, e.clientY);
+  };
+  const onSvUp = () => {
+    dragging.current = false;
+  };
+
+  const pickWithEyedropper = async () => {
+    const EyeDropper = (window as any).EyeDropper;
+    if (!EyeDropper) return;
+    try {
+      const res = await new EyeDropper().open();
+      if (res?.sRGBHex) onChange(res.sRGBHex);
+    } catch {
+      /* utilisateur a annulé */
+    }
+  };
+
+  const hasEyedropper = typeof window !== "undefined" && "EyeDropper" in window;
+
+  return (
+    <div className={compact ? "space-y-2" : "space-y-3"}>
+      {/* Zone saturation / valeur */}
+      <div
+        ref={svRef}
+        onPointerDown={onSvDown}
+        onPointerMove={onSvMove}
+        onPointerUp={onSvUp}
+        onPointerCancel={onSvUp}
+        className="relative h-28 w-full cursor-crosshair touch-none rounded-xl border border-slate-200"
+        style={{
+          background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h} 100% 50%))`,
+        }}
+      >
+        <div
+          className="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_4px_rgba(0,0,0,0.4)]"
+          style={{
+            left: `${hsv.s * 100}%`,
+            top: `${(1 - hsv.v) * 100}%`,
+            background: safeHex,
+          }}
+        />
+      </div>
+
+      {/* Slider de teinte */}
+      <input
+        type="range"
+        min={0}
+        max={360}
+        value={Math.round(hsv.h)}
+        onChange={(e) => emit(+e.target.value, hsv.s, hsv.v)}
+        className="h-2.5 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]\:size-4 [&::-webkit-slider-thumb]\:appearance-none [&::-webkit-slider-thumb]\:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]\:border-white [&::-webkit-slider-thumb]\:shadow-md"
+        style={{
+          background:
+            "linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)",
+        }}
+      />
+
+      {/* Hex + pipette */}
+      <div className="flex items-center gap-2">
+        <div
+          className="size-8 shrink-0 rounded-lg border border-slate-200"
+          style={{ background: safeHex }}
+        />
+        <input
+          value={hexDraft}
+          onChange={(e) => {
+            const v = e.target.value.startsWith("#") ? e.target.value : "#" + e.target.value;
+            setHexDraft(v);
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v.toLowerCase());
+          }}
+          spellCheck={false}
+          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-800 outline-none transition focus\:border-blue-500 focus\:bg-white focus\:ring-4 focus:ring-blue-500/10"
+        />
+        {hasEyedropper && (
+          <button
+            onClick={pickWithEyedropper}
+            title="Pick color from screen"
+            className="grid size-8 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover\:border-blue-300 hover\:text-blue-600"
+          >
+            <Pipette className="size-3.5" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------------------- */
+
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
@@ -61,6 +240,7 @@ export function ColorPanel() {
   const [gradientTo, setGradientTo] = useState("#ff0080");
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
+  const [openPicker, setOpenPicker] = useState<"from" | "to" | "bg" | null>(null);
 
   const customGradient = gradientType === "radial"
     ? `radial-gradient(circle at center, ${gradientFrom}, ${gradientTo})`
@@ -80,27 +260,38 @@ export function ColorPanel() {
     <div className="space-y-4">
       <PanelHeader title="Background" />
 
-      <div className="brutal-border-2 space-y-2 bg-surface p-3">
-        <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-          ▸ Background image
+      {openPicker === "bg" && (
+        <div className="mx-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom color</span>
+            <button onClick={() => setOpenPicker(null)} className="grid size-6 place-items-center rounded-md text-slate-400 transition hover\:bg-slate-100 hover\:text-slate-700" title="Done">
+              <Check className="size-3.5" />
+            </button>
+          </div>
+          <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
         </div>
+      )}
+
+      {/* Image de fond */}
+      <div className="mx-4 space-y-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Background image</div>
         {bgImage ? (
           <div className="relative">
-            <img src={bgImage} alt="Background image preview" className="h-20 w-full border border-teal/40 object-cover" />
+            <img src={bgImage} alt="Background image preview" className="h-20 w-full rounded-lg border border-slate-200 object-cover" />
             <button
               onClick={() => setBgImage(undefined)}
-              className="absolute right-1 top-1 grid h-5 w-5 place-items-center bg-ink/90 text-teal hover:text-[#ff0080]"
+              className="absolute right-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm backdrop-blur transition hover\:bg-red-50 hover\:text-red-500"
               title="Remove"
             >
-              <X className="h-3 w-3" />
+              <X className="size-3" />
             </button>
           </div>
         ) : (
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex w-full items-center justify-center gap-2 border border-dashed border-teal/40 bg-ink px-2 py-2 font-mono text-[10px] text-teal/70 hover:border-teal hover:text-teal"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-2 py-2.5 text-[11px] text-slate-500 transition hover\:border-blue-400 hover\:bg-blue-50/50 hover\:text-blue-600"
           >
-            <ImagePlus className="h-3.5 w-3.5" /> upload image
+            <ImagePlus className="size-3.5" /> Upload image
           </button>
         )}
         <input
@@ -122,16 +313,16 @@ export function ColorPanel() {
             const v = e.target.value.trim();
             if (v) setBgImage(v, bgFit);
           }}
-          className="w-full border border-teal/40 bg-ink px-2 py-1.5 font-mono text-[10px] text-teal placeholder:text-teal/30 focus:border-teal focus:outline-none"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-800 outline-none transition placeholder\:text-slate-400 focus\:border-blue-500 focus\:bg-white focus\:ring-4 focus\:ring-blue-500/10"
         />
         {bgImage && (
-          <div className="flex gap-1">
+          <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1">
             {(["cover", "contain"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setBgImage(bgImage, f)}
-                className={`brutal-border-2 flex-1 py-1 font-mono text-[10px] uppercase ${
-                  bgFit === f ? "bg-blue text-ink border-teal" : "bg-surface text-teal hover:border-teal"
+                className={`flex-1 rounded-md py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+                  bgFit === f ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover\:text-slate-700"
                 }`}
               >
                 {f}
@@ -141,76 +332,8 @@ export function ColorPanel() {
         )}
       </div>
 
-      <div className="space-y-3">
-        <label className="block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Gradient packs</label>
+      {/* Dégradés prédéfinis */}
+      <div className="space-y-3 px-4">
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Gradient packs</div>
         {GRADIENT_PACKS.map((pack) => (
-          <div key={pack.name} className="space-y-1.5">
-            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-teal/50">{pack.name}</div>
-            <div className="grid grid-cols-2 gap-2">
-              {pack.gradients.map((wallpaper) => (
-                <button key={wallpaper.name} onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }} className="brutal-border-2 h-16 hover:border-teal" style={{ background: wallpaper.value }} aria-label={`Apply ${wallpaper.name} wallpaper`} title={wallpaper.name} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="brutal-border-2 space-y-3 bg-surface p-3">
-        <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Custom gradient</div>
-        <button className="brutal-border-2 h-16 w-full hover:border-teal" style={{ background: customGradient }} onClick={() => { setBgImage(undefined); setBg(customGradient); }} aria-label="Apply custom gradient" />
-        <div className="grid grid-cols-2 gap-2 font-mono text-[10px] text-teal/80">
-          <label className="flex items-center justify-between gap-2">From <input type="color" value={gradientFrom} onChange={(e) => setGradientFrom(e.target.value)} className="h-7 w-9 bg-transparent" /></label>
-          <label className="flex items-center justify-between gap-2">To <input type="color" value={gradientTo} onChange={(e) => setGradientTo(e.target.value)} className="h-7 w-9 bg-transparent" /></label>
-        </div>
-        <div className="grid grid-cols-2 gap-1">
-          {(["linear", "radial"] as const).map((type) => (
-            <button key={type} onClick={() => setGradientType(type)} className={`brutal-border-2 py-1 font-mono text-[10px] uppercase ${gradientType === type ? "border-teal bg-blue text-ink" : "bg-ink text-teal"}`}>{type}</button>
-          ))}
-        </div>
-        {gradientType === "linear" && <label className="flex items-center gap-2 font-mono text-[10px] text-teal/80">Angle <input type="range" min={0} max={360} value={gradientAngle} onChange={(e) => setGradientAngle(+e.target.value)} className="w-full accent-teal" /><span className="w-8 text-right">{gradientAngle}°</span></label>}
-        <p className="font-mono text-[9px] text-teal/50">click the preview above to apply it to this slide</p>
-      </div>
-
-      {PALETTES.map((p) => (
-        <div key={p.name}>
-          <label className="mb-1.5 block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-            ▸ {p.name}
-          </label>
-          <div className="grid grid-cols-6 gap-1.5">
-            {p.colors.map((c) => (
-              <button
-                key={c}
-                onClick={() => setBg(c)}
-                title={c}
-                className={`brutal-border-2 h-9 transition-all ${
-                  bgColor === c ? "border-teal scale-110 glow-teal" : "hover:border-teal"
-                }`}
-                style={{ background: c }}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-
-      <div>
-        <label className="mb-1.5 block font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
-          ▸ Custom
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="color"
-            value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"}
-            onChange={(e) => setBg(e.target.value)}
-            className="brutal-border-2 h-12 w-16 bg-surface"
-          />
-          <input
-            type="text"
-            value={bgColor}
-            onChange={(e) => setBg(e.target.value)}
-            className="brutal-border-2 h-12 flex-1 bg-surface px-2 font-mono text-xs text-teal focus:border-teal focus:outline-none"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+          <div key={pack
