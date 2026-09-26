@@ -291,9 +291,7 @@ export function PresentationMode() {
     activePage?.transition && activePage.transition !== "none" && !morphing
       ? `slide-transition-${activePage.transition}`
       : "";
-  // Memoized so the FLIP effect doesn't re-run on unrelated re-renders
-  // (timer ticks, controls visibility, etc.) — that was the replay bug.
-  const morphKeys = useMemo(() => computeMorphKeys(activePage), [activePage]);
+  const morphKeys = computeMorphKeys(activePage);
 
   const ratio = canvasW / canvasH;
   const tW = ratio >= 1 ? 96 : 96 * ratio;
@@ -329,7 +327,6 @@ export function PresentationMode() {
           key={morphing ? "slide-morph" : `slide-${activeIndex}`}
           ref={slideRef}
           morphing={morphing}
-          slideId={activeIndex}
           morphKeys={morphKeys}
           page={activePage}
           canvasW={canvasW}
@@ -613,7 +610,6 @@ const SlideStage = React.forwardRef<
   HTMLDivElement,
   {
     morphing: boolean;
-    slideId: number;
     morphKeys: string[];
     page: Page;
     canvasW: number;
@@ -629,7 +625,6 @@ const SlideStage = React.forwardRef<
 >(function SlideStage(
   {
     morphing,
-    slideId,
     morphKeys,
     page,
     canvasW,
@@ -645,10 +640,6 @@ const SlideStage = React.forwardRef<
   ref
 ) {
   const prevRects = useRef<Map<string, Rect>>(new Map());
-  // FLIP must play exactly once per slide. Unrelated re-renders (timer tick
-  // every second, controls autohide, etc.) used to re-run the effect and
-  // replay the morph — this guard pins it to one run per slideId.
-  const morphDoneFor = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     const container = ref as unknown as React.RefObject<HTMLDivElement>;
@@ -668,24 +659,16 @@ const SlideStage = React.forwardRef<
         : el;
     });
 
-    // Current rects in LOCAL layout coordinates (offsetLeft/Top + offset
-    // sizes), NOT getBoundingClientRect: offset* ignores transforms, so a
-    // mid-animation re-run can never measure a "moving" element and restart
-    // the tween from a wrong position. No /scale division needed either.
+    // Current rects (screen space, includes the container scale)
     const rects = new Map<string, Rect>();
     nodes.forEach((node, i) => {
       if (!node) return;
       const key = morphKeys[i] ?? `#${i}`;
-      rects.set(key, {
-        left: node.offsetLeft,
-        top: node.offsetTop,
-        width: node.offsetWidth,
-        height: node.offsetHeight,
-      });
+      const r = node.getBoundingClientRect();
+      rects.set(key, { left: r.left, top: r.top, width: r.width, height: r.height });
     });
 
-    if (morphing && morphDoneFor.current !== slideId) {
-      morphDoneFor.current = slideId;
+    if (morphing) {
       const animated: HTMLElement[] = [];
       nodes.forEach((node, i) => {
         if (!node) return;
@@ -698,9 +681,11 @@ const SlideStage = React.forwardRef<
         const wrap = node.parentElement as HTMLElement | null;
         if (wrap?.dataset?.morphWrap === "true") wrap.style.animation = "none";
 
-        // Inverted transform: start exactly at the previous rect (local px).
-        const dx = prev.left - cur.left;
-        const dy = prev.top - cur.top;
+        // Inverted transform: start exactly at the previous rect.
+        // Deltas are measured in screen px but applied inside a scaled
+        // container → divide by the container scale.
+        const dx = (prev.left - cur.left) / scale;
+        const dy = (prev.top - cur.top) / scale;
         const sx = prev.width / cur.width;
         const sy = prev.height / cur.height;
         node.style.transition = "none";
@@ -724,7 +709,7 @@ const SlideStage = React.forwardRef<
 
     // Remember this slide's rects for the next morph.
     prevRects.current = rects;
-  }, [morphing, slideId, morphKeys, page, ref]);
+  }, [morphing, morphKeys, page, scale, ref]);
 
   return (
     <div
