@@ -191,7 +191,7 @@ export function ColorPicker({
         max={360}
         value={Math.round(hsv.h)}
         onChange={(e) => emit(+e.target.value, hsv.s, hsv.v)}
-        className="h-2.5 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]\:size-4 [&::-webkit-slider-thumb]\:appearance-none [&::-webkit-slider-thumb]\:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]\:border-white [&::-webkit-slider-thumb]\:shadow-md"
+        className="h-2.5 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
         style={{
           background:
             "linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)",
@@ -212,13 +212,13 @@ export function ColorPicker({
             if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v.toLowerCase());
           }}
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-800 outline-none transition focus\:border-blue-500 focus\:bg-white focus\:ring-4 focus:ring-blue-500/10"
+          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
         />
         {hasEyedropper && (
           <button
             onClick={pickWithEyedropper}
             title="Pick color from screen"
-            className="grid size-8 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover\:border-blue-300 hover\:text-blue-600"
+            className="grid size-8 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
           >
             <Pipette className="size-3.5" />
           </button>
@@ -264,7 +264,7 @@ export function ColorPanel() {
         <div className="mx-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom color</span>
-            <button onClick={() => setOpenPicker(null)} className="grid size-6 place-items-center rounded-md text-slate-400 transition hover\:bg-slate-100 hover\:text-slate-700" title="Done">
+            <button onClick={() => setOpenPicker(null)} className="grid size-6 place-items-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" title="Done">
               <Check className="size-3.5" />
             </button>
           </div>
@@ -280,7 +280,7 @@ export function ColorPanel() {
             <img src={bgImage} alt="Background image preview" className="h-20 w-full rounded-lg border border-slate-200 object-cover" />
             <button
               onClick={() => setBgImage(undefined)}
-              className="absolute right-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm backdrop-blur transition hover\:bg-red-50 hover\:text-red-500"
+              className="absolute right-1.5 top-1.5 grid size-5 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm backdrop-blur transition hover:bg-red-50 hover:text-red-500"
               title="Remove"
             >
               <X className="size-3" />
@@ -289,7 +289,7 @@ export function ColorPanel() {
         ) : (
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-2 py-2.5 text-[11px] text-slate-500 transition hover\:border-blue-400 hover\:bg-blue-50/50 hover\:text-blue-600"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-2 py-2.5 text-[11px] text-slate-500 transition hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600"
           >
             <ImagePlus className="size-3.5" /> Upload image
           </button>
@@ -313,7 +313,7 @@ export function ColorPanel() {
             const v = e.target.value.trim();
             if (v) setBgImage(v, bgFit);
           }}
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-800 outline-none transition placeholder\:text-slate-400 focus\:border-blue-500 focus\:bg-white focus\:ring-4 focus\:ring-blue-500/10"
+          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
         />
         {bgImage && (
           <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1">
@@ -322,7 +322,7 @@ export function ColorPanel() {
                 key={f}
                 onClick={() => setBgImage(bgImage, f)}
                 className={`flex-1 rounded-md py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-                  bgFit === f ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover\:text-slate-700"
+                  bgFit === f ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
                 }`}
               >
                 {f}
@@ -336,4 +336,145 @@ export function ColorPanel() {
       <div className="space-y-3 px-4">
         <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Gradient packs</div>
         {GRADIENT_PACKS.map((pack) => (
-          <div key={pack
+          <div key={pack.name} className="space-y-1.5">
+            <div className="text-[10px] uppercase tracking-wider text-slate-400">{pack.name}</div>
+            <div className="grid grid-cols-2 gap-2">
+              {pack.gradients.map((wallpaper) => (
+                <button
+                  key={wallpaper.name}
+                  onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }}
+                  className="h-16 rounded-xl border border-slate-200 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
+                  style={{ background: wallpaper.value }}
+                  aria-label={`Apply ${wallpaper.name} wallpaper`}
+                  title={wallpaper.name}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dégradé custom */}
+      <div className="mx-4 space-y-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom gradient</div>
+        <button
+          className="h-16 w-full rounded-xl border border-slate-200 transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
+          style={{ background: customGradient }}
+          onClick={() => { setBgImage(undefined); setBg(customGradient); }}
+          aria-label="Apply custom gradient"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
+            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+              openPicker === "from"
+                ? "border-blue-500 bg-blue-50 text-blue-600"
+                : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
+            }`}
+          >
+            <span className="size-4 rounded-full border border-slate-200" style={{ background: gradientFrom }} />
+            From
+          </button>
+          <button
+            onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
+            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+              openPicker === "to"
+                ? "border-blue-500 bg-blue-50 text-blue-600"
+                : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
+            }`}
+          >
+            <span className="size-4 rounded-full border border-slate-200" style={{ background: gradientTo }} />
+            To
+          </button>
+        </div>
+
+        {openPicker === "from" && (
+          <ColorPicker compact value={gradientFrom} onChange={setGradientFrom} />
+        )}
+        {openPicker === "to" && (
+          <ColorPicker compact value={gradientTo} onChange={setGradientTo} />
+        )}
+
+        <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1">
+          {(["linear", "radial"] as const).map((type) => (
+            <button
+              key={type}
+              onClick={() => setGradientType(type)}
+              className={`flex-1 rounded-md py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+                gradientType === type ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+        {gradientType === "linear" && (
+          <label className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-slate-500">
+            Angle
+            <input
+              type="range"
+              min={0}
+              max={360}
+              value={gradientAngle}
+              onChange={(e) => setGradientAngle(+e.target.value)}
+              className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-600 [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:shadow"
+            />
+            <span className="w-8 text-right font-mono text-slate-600">{gradientAngle}°</span>
+          </label>
+        )}
+        <p className="text-[10px] text-slate-400">Click the preview above to apply it to this slide.</p>
+      </div>
+
+      {/* Palettes */}
+      {PALETTES.map((p) => (
+        <div key={p.name} className="px-4">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">{p.name}</div>
+          <div className="grid grid-cols-6 gap-1.5">
+            {p.colors.map((c) => (
+              <button
+                key={c}
+                onClick={() => setBg(c)}
+                title={c}
+                className={`h-9 rounded-lg border transition-all duration-200 ${
+                  bgColor === c
+                    ? "scale-110 border-blue-500 shadow-[0_0_0_3px_rgba(37,99,235,0.15)]"
+                    : "border-slate-200 hover:scale-105 hover:border-slate-300"
+                }`}
+                style={{ background: c }}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* Couleur custom */}
+      <div className="px-4 pb-4">
+        <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom</div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setOpenPicker(openPicker === "bg" ? null : "bg")}
+            className={`grid size-12 shrink-0 place-items-center rounded-xl border transition ${
+              openPicker === "bg"
+                ? "border-blue-500 ring-4 ring-blue-500/10"
+                : "border-slate-200 hover:border-blue-300"
+            }`}
+            style={{ background: bgColor.startsWith("#") ? bgColor : "#0a0f1f" }}
+            title="Open color picker"
+          />
+          <input
+            type="text"
+            value={bgColor}
+            onChange={(e) => setBg(e.target.value)}
+            spellCheck={false}
+            className="h-12 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 font-mono text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+          />
+        </div>
+        {openPicker === "bg" && (
+          <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+            <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
