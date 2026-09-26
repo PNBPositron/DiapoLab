@@ -161,22 +161,30 @@ export function PresentationMode() {
           <div
             key={morphing ? "slide-morph" : `slide-${currentIndex}`}
             className={`absolute left-0 top-0 overflow-hidden border border-teal ${transition}`}
-            style={{
-              width: canvasW,
-              height: canvasH,
-              backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
-              backgroundImage: page.bgImage
-                ? `url(${page.bgImage})`
-                : page.bgColor.includes("gradient(")
-                  ? page.bgColor
-                  : undefined,
-              backgroundSize: page.bgFit ?? "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-              transition: morphing ? "background-color 620ms ease" : undefined,
-            }}
+            style={
+              {
+                width: canvasW,
+                height: canvasH,
+                backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+                backgroundImage: page.bgImage
+                  ? `url(${page.bgImage})`
+                  : page.bgColor.includes("gradient(")
+                    ? page.bgColor
+                    : undefined,
+                backgroundSize: page.bgFit ?? "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                // --- FIX transitions "too zoomed" ---
+                // Les keyframes slide-transition-* utilisent scale(var(--fit, 1)),
+                // ce qui ÉCRASE le transform inline pendant l'animation. Sans --fit
+                // défini, la slide retombait à scale(1) (pleine taille) pendant
+                // slide/zoom/flip/glitch puis sautait à la bonne taille à la fin.
+                "--fit": scale,
+                transition: morphing ? "background-color 620ms ease" : undefined,
+              } as React.CSSProperties
+            }
           >
             {page.elements.map((el, i) =>
               morphing ? (
