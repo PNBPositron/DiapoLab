@@ -46,7 +46,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-6 flex flex-wrap justify-content gap-2">
           <button
             onClick={() => {
               router.invalidate();
@@ -92,6 +92,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap",
+      },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bungee&family=Caveat:wght@500;700&family=Cinzel:wght@600;800&family=Cormorant+Garamond:wght@500;700&family=DM+Serif+Display&family=Fira+Code:wght@500;700&family=Fraunces:wght@500;700;900&family=Inter:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&family=Lobster&family=Major+Mono+Display&family=Montserrat:wght@500;700;900&family=Orbitron:wght@500;700;900&family=Pacifico&family=Permanent+Marker&family=Quicksand:wght@500;700&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@600;800&family=Press+Start+2P&family=Rampart+One&family=Righteous&family=Russo+One&family=Shrikhand&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&family=Syne:wght@600;800&family=Tilt+Prism&family=Unbounded:wght@600;800&family=VT323&family=Zen+Dots&display=swap",
