@@ -31,8 +31,8 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-grid: var(--grid);
-  --font-display: "Inter", system-ui, sans-serif;
-  --font-mono: "Inter", system-ui, sans-serif;
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist", system-ui, monospace;
 }
 
 :root {
@@ -101,8 +101,8 @@
 
 @layer base {
   * { border-color: color-mix(in oklab, var(--teal) 30%, transparent); }
-  html, body { background-color: var(--paper); color: var(--teal); font-family: "Inter", system-ui, sans-serif; background-image: radial-gradient(circle at 8% 12%, rgba(93, 143, 255, 0.18), transparent 28%), radial-gradient(circle at 92% 86%, rgba(124, 91, 214, 0.16), transparent 30%), linear-gradient(135deg, #0b1020 0%, #121b32 50%, #0c1325 100%); background-attachment: fixed; }
-  h1, h2, h3, h4 { font-family: "Inter", system-ui, sans-serif; letter-spacing: -0.02em; text-transform: none; }
+  html, body { background-color: var(--paper); color: var(--teal); font-family: "Geist", system-ui, sans-serif; background-image: radial-gradient(circle at 8% 12%, rgba(93, 143, 255, 0.18), transparent 28%), radial-gradient(circle at 92% 86%, rgba(124, 91, 214, 0.16), transparent 30%), linear-gradient(135deg, #0b1020 0%, #121b32 50%, #0c1325 100%); background-attachment: fixed; }
+  h1, h2, h3, h4 { font-family: "Geist", system-ui, sans-serif; letter-spacing: -0.02em; text-transform: none; }
   button, input, textarea, select { font: inherit; }
   ::selection { background: var(--teal); color: var(--ink); }
 }
