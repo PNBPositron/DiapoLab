@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Heart, Grid3x3, Search } from "lucide-react";
+import { Loader2, Heart, LayoutGrid, Search, SlidersHorizontal, Users } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -45,7 +45,12 @@ export function TemplatesPanel() {
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
-  const filteredCommunity = filterTemplates(community, { query, style: styleFilter, creator: creatorFilter, license: licenseFilter });
+  const filteredCommunity = filterTemplates(community, {
+    query,
+    style: styleFilter,
+    creator: creatorFilter,
+    license: licenseFilter,
+  });
 
   const toggleLike = async (id: string) => {
     if (!user) {
@@ -56,10 +61,14 @@ export function TemplatesPanel() {
     // optimistic update
     setLikedIds((prev) => {
       const next = new Set(prev);
-      if (isLiked) next.delete(id); else next.add(id);
+      if (isLiked) next.delete(id);
+      else next.add(id);
       return next;
     });
-    setLikeCounts((prev) => ({ ...prev, [id]: Math.max(0, (prev[id] ?? 0) + (isLiked ? -1 : 1)) }));
+    setLikeCounts((prev) => ({
+      ...prev,
+      [id]: Math.max(0, (prev[id] ?? 0) + (isLiked ? -1 : 1)),
+    }));
     try {
       if (isLiked) await unlikeTemplate(id);
       else await likeTemplate(id);
@@ -67,10 +76,14 @@ export function TemplatesPanel() {
       // revert
       setLikedIds((prev) => {
         const next = new Set(prev);
-        if (isLiked) next.add(id); else next.delete(id);
+        if (isLiked) next.add(id);
+        else next.delete(id);
         return next;
       });
-      setLikeCounts((prev) => ({ ...prev, [id]: Math.max(0, (prev[id] ?? 0) + (isLiked ? 1 : -1)) }));
+      setLikeCounts((prev) => ({
+        ...prev,
+        [id]: Math.max(0, (prev[id] ?? 0) + (isLiked ? 1 : -1)),
+      }));
       setError(e instanceof Error ? e.message : "Like failed");
     }
   };
@@ -79,93 +92,110 @@ export function TemplatesPanel() {
     <div className="space-y-4">
       <PanelHeader title="Templates" />
 
-      {error && <p className="font-mono text-[10px] text-[#ff0080]">! {error}</p>}
-
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Community templates</div>
-      <div className="space-y-2">
-        <label className="flex items-center gap-2 brutal-border-2 bg-ink px-2 text-teal/70"><Search className="size-3.5" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or creator" className="min-w-0 flex-1 bg-transparent py-2 font-mono text-[10px] text-teal outline-none placeholder:text-teal/35" /></label>
-        <div className="grid grid-cols-3 gap-1.5">
-          {[['style', styleFilter, setStyleFilter, ['all', 'editorial', 'bold', 'minimal']], ['creator', creatorFilter, setCreatorFilter, ['all', 'community']], ['license', licenseFilter, setLicenseFilter, ['all', 'CC0', 'community']]].map(([label, value, setter, options]) => <label key={label as string} className="font-mono text-[9px] uppercase text-teal/60">{label as string}<select value={value as string} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 w-full brutal-border bg-surface px-1 py-1 text-[9px] text-teal">{(options as string[]).map((option) => <option key={option}>{option}</option>)}</select></label>)}
-        </div>
-      </div>
-
-      {communityLoading ? (
-        <div className="flex items-center gap-2 font-mono text-[11px] text-teal/70">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> loading…
-        </div>
-      ) : community.length === 0 ? (
-        <p className="font-mono text-[10px] text-teal/50">
-          &gt; no community templates yet. Be the first — sign in and click the share icon in the toolbar.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-3">
-          {sortTemplates(filteredCommunity, likeCounts, "likes").slice(0, 8).map((c) => (
-            <div
-              key={c.id}
-              className="brutal-border-2 group relative overflow-hidden bg-surface text-left hover:border-teal"
-            >
-              <button
-                onClick={() => {
-                  if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
-                  useEditor.getState().loadPages(c.pages as Page[]);
-                  useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
-                }}
-                className="block w-full text-left"
-                title={`Load ${c.name}`}
-              >
-                <div className="w-full border-b border-teal/30">
-                  {c.pages?.[0] ? (
-                    <SlideThumbnail
-                      page={c.pages[0] as Page}
-                      canvasW={c.canvas_w}
-                      canvasH={c.canvas_h}
-                      className="w-full min-h-[150px]"
-                    />
-                  ) : (
-                    <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#0a0f1f" }} />
-                  )}
-                </div>
-                <div className="bg-ink px-2 py-1 font-display text-[10px] uppercase tracking-[0.15em] text-teal truncate">
-                  {c.name}
-                </div>
-                <div className="bg-ink px-2 pb-1 font-mono text-[9px] text-teal/50">
-                  {c.pages?.length ?? 0} slides
-                </div>
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleLike(c.id); }}
-                disabled={!user}
-                title={user ? (likedIds.has(c.id) ? "Unlike" : "Like") : "Sign in to like"}
-                className={`absolute right-1.5 top-1.5 flex items-center gap-1 border bg-ink/85 px-1.5 py-0.5 font-mono text-[10px] backdrop-blur transition ${
-                  likedIds.has(c.id)
-                    ? "border-[#ff0080] text-[#ff0080]"
-                    : "border-teal/40 text-teal/80 hover:border-teal hover:text-teal"
-                } ${!user ? "opacity-60" : ""}`}
-              >
-                <Heart
-                  className="h-3 w-3"
-                  fill={likedIds.has(c.id) ? "currentColor" : "none"}
-                  strokeWidth={2}
-                />
-                {likeCounts[c.id] ?? 0}
-              </button>
-            </div>
-          ))}
+      {error && (
+        <div className="mx-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-600">
+          {error}
         </div>
       )}
 
-      <button
-        onClick={() => setShowAll(true)}
-        disabled={community.length === 0}
-        className="brutal-border-2 brutal-press flex w-full items-center justify-center gap-2 bg-surface px-3 py-2 font-display text-[11px] tracking-[0.2em] text-teal hover:border-teal disabled:opacity-40"
-      >
-        <Grid3x3 className="h-3.5 w-3.5" /> SHOW ALL TEMPLATES
-      </button>
+      {/* Search + filtres */}
+      <div className="space-y-3 px-4">
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
+          <Search className="size-3.5 shrink-0 text-slate-400" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search name or creator"
+            className="min-w-0 flex-1 bg-transparent py-2 text-xs text-slate-800 outline-none placeholder:text-slate-400"
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {(
+            [
+              ["Style", styleFilter, setStyleFilter, ["all", "editorial", "bold", "minimal"]],
+              ["Creator", creatorFilter, setCreatorFilter, ["all", "community"]],
+              ["License", licenseFilter, setLicenseFilter, ["all", "CC0", "community"]],
+            ] as const
+          ).map(([label, value, setter, options]) => (
+            <label key={label} className="block">
+              <span className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                {label === "Style" && <SlidersHorizontal className="size-2.5" />}
+                {label === "Creator" && <Users className="size-2.5" />}
+                {label}
+              </span>
+              <select
+                value={value}
+                onChange={(event) => (setter as (v: string) => void)(event.target.value)}
+                className="w-full cursor-pointer rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-500"
+              >
+                {(options as readonly string[]).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Liste */}
+      <div className="space-y-3 px-4">
+        {communityLoading ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-12 text-slate-400">
+            <Loader2 className="size-5 animate-spin text-blue-500" />
+            <span className="text-xs">Loading templates…</span>
+          </div>
+        ) : community.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-12 text-center">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+              <LayoutGrid className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-600">No community templates yet</p>
+              <p className="mt-1 text-[11px] text-slate-400">
+                Be the first — sign in and hit the share icon in the toolbar.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3">
+            {sortTemplates(filteredCommunity, likeCounts, "likes")
+              .slice(0, 8)
+              .map((c) => (
+                <TemplateCard
+                  key={c.id}
+                  template={c}
+                  likeCount={likeCounts[c.id] ?? 0}
+                  liked={likedIds.has(c.id)}
+                  canLike={!!user}
+                  onLike={() => toggleLike(c.id)}
+                  onLoad={() => {
+                    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
+                    useEditor.getState().loadPages(c.pages as Page[]);
+                    useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
+                  }}
+                />
+              ))}
+          </div>
+        )}
+      </div>
+
+      <div className="px-4">
+        <button
+          onClick={() => setShowAll(true)}
+          disabled={community.length === 0}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+        >
+          <LayoutGrid className="size-3.5" /> Show all templates
+        </button>
+      </div>
 
       <AllTemplatesDialog
         open={showAll}
         onOpenChange={setShowAll}
-        templates={community}
+        templates={filteredCommunity}
         likeCounts={likeCounts}
         likedIds={likedIds}
         toggleLike={toggleLike}
@@ -177,6 +207,67 @@ export function TemplatesPanel() {
   );
 }
 
+/* ------------ Carte de template, style clair moderne ------------ */
+function TemplateCard({
+  template: c,
+  likeCount,
+  liked,
+  canLike,
+  onLike,
+  onLoad,
+}: {
+  template: PublicTemplate;
+  likeCount: number;
+  liked: boolean;
+  canLike: boolean;
+  onLike: () => void;
+  onLoad: () => void;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_28px_rgba(37,99,235,0.12)]">
+      <button onClick={onLoad} className="block w-full text-left" title={`Load ${c.name}`}>
+        <div className="w-full overflow-hidden border-b border-slate-100">
+          {c.pages?.[0] ? (
+            <SlideThumbnail
+              page={c.pages[0] as Page}
+              canvasW={c.canvas_w}
+              canvasH={c.canvas_h}
+              className="w-full min-h-[130px] transition-transform duration-300 group-hover:scale-[1.03]"
+            />
+          ) : (
+            <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#f1f5f9" }} />
+          )}
+        </div>
+        <div className="px-3 py-2.5">
+          <div className="truncate text-xs font-semibold text-slate-800" title={c.name}>
+            {c.name}
+          </div>
+          <div className="mt-0.5 text-[10px] text-slate-400">
+            {c.pages?.length ?? 0} slides
+          </div>
+        </div>
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onLike();
+        }}
+        disabled={!canLike}
+        title={canLike ? (liked ? "Unlike" : "Like") : "Sign in to like"}
+        className={`absolute right-2 top-2 flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold backdrop-blur transition-all active:scale-95 ${
+          liked
+            ? "border-rose-200 bg-rose-50 text-rose-500"
+            : "border-slate-200 bg-white/90 text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
+        } ${!canLike ? "opacity-60" : ""}`}
+      >
+        <Heart className="size-3" fill={liked ? "currentColor" : "none"} strokeWidth={2} />
+        {likeCount}
+      </button>
+    </div>
+  );
+}
+
+/* ------------ Logique de filtrage / tri (inchangée) ------------ */
 function filterTemplates(
   templates: PublicTemplate[],
   filters: { query: string; style: string; creator: string; license: string },
@@ -186,10 +277,12 @@ function filterTemplates(
     const creator = template.creator ?? (template.user_id === "builtin" ? "builtin" : "community");
     const style = template.style ?? inferTemplateStyle(template);
     const license = template.license ?? (template.user_id === "builtin" ? "CC0" : "community");
-    return (!query || `${template.name} ${creator} ${style} ${license}`.toLowerCase().includes(query))
-      && (filters.style === "all" || style === filters.style)
-      && (filters.creator === "all" || creator === filters.creator)
-      && (filters.license === "all" || license === filters.license);
+    return (
+      (!query || `${template.name} ${creator} ${style} ${license}`.toLowerCase().includes(query)) &&
+      (filters.style === "all" || style === filters.style) &&
+      (filters.creator === "all" || creator === filters.creator) &&
+      (filters.license === "all" || license === filters.license)
+    );
   });
 }
 
@@ -214,6 +307,7 @@ function sortTemplates(
   return arr;
 }
 
+/* ------------ Dialog "Show all" modernisée ------------ */
 function AllTemplatesDialog({
   open,
   onOpenChange,
@@ -238,80 +332,52 @@ function AllTemplatesDialog({
   const sorted = sortTemplates(templates, likeCounts, sortBy);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[88vh] overflow-hidden border-teal bg-paper p-0 flex flex-col">
-        <DialogHeader className="border-b border-teal/30 bg-ink px-5 py-3">
-          <DialogTitle className="font-display text-sm uppercase tracking-[0.25em] text-teal">
-            ▌ All community templates · {templates.length}
+      <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden border-slate-200 bg-slate-50 p-0">
+        <DialogHeader className="border-b border-slate-200 bg-white px-5 py-4">
+          <DialogTitle className="text-sm font-semibold uppercase tracking-wide text-slate-800">
+            All templates
+            <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
+              {templates.length}
+            </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="flex items-center gap-2 border-b border-teal/20 bg-surface px-5 py-2">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-teal/60">Sort by:</span>
-          {(["likes", "recent"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSortBy(s)}
-              className={`brutal-border-2 px-3 py-1 font-mono text-[10px] uppercase tracking-wider ${
-                sortBy === s ? "bg-blue text-ink border-teal" : "bg-ink text-teal hover:border-teal"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
+        <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-5 py-2.5">
+          <div className="flex items-center gap-1.5 rounded-lg bg-slate-100 p-1">
+            {(["likes", "recent"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setSortBy(s)}
+                className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                  sortBy === s
+                    ? "bg-white text-slate-800 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <span className="text-[10px] text-sslate-400">
+            {templates.length} template{templates.length === 1 ? "" : "s"}
+          </span>
         </div>
         <div className="flex-1 overflow-y-auto p-5">
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {sorted.map((c) => (
-              <div
+              <TemplateCard
                 key={c.id}
-                className="brutal-border-2 group relative overflow-hidden bg-surface hover:border-teal"
-              >
-                <button
-                  onClick={() => {
-                    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
-                    useEditor.getState().loadPages(c.pages as Page[]);
-                    useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
-                    onOpenChange(false);
-                  }}
-                  className="block w-full text-left"
-                  title={`Load ${c.name}`}
-                >
-                  <div className="w-full border-b border-teal/30">
-                    {c.pages?.[0] ? (
-                      <SlideThumbnail
-                        page={c.pages[0] as Page}
-                        canvasW={c.canvas_w}
-                        canvasH={c.canvas_h}
-                        className="w-full"
-                      />
-                    ) : (
-                      <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#0a0f1f" }} />
-                    )}
-                  </div>
-                  <div className="bg-ink px-2 py-1 font-display text-[10px] uppercase tracking-[0.15em] text-teal truncate">
-                    {c.name}
-                  </div>
-                  <div className="bg-ink px-2 pb-1 font-mono text-[9px] text-teal/50">
-                    {c.pages?.length ?? 0} slides
-                  </div>
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleLike(c.id); }}
-                  disabled={!canLike}
-                  title={canLike ? (likedIds.has(c.id) ? "Unlike" : "Like") : "Sign in to like"}
-                  className={`absolute right-1.5 top-1.5 flex items-center gap-1 border bg-ink/85 px-1.5 py-0.5 font-mono text-[10px] backdrop-blur transition ${
-                    likedIds.has(c.id)
-                      ? "border-[#ff0080] text-[#ff0080]"
-                      : "border-teal/40 text-teal/80 hover:border-teal hover:text-teal"
-                  } ${!canLike ? "opacity-60" : ""}`}
-                >
-                  <Heart
-                    className="h-3 w-3"
-                    fill={likedIds.has(c.id) ? "currentColor" : "none"}
-                    strokeWidth={2}
-                  />
-                  {likeCounts[c.id] ?? 0}
-                </button>
-              </div>
+                template={c}
+                likeCount={likeCounts[c.id] ?? 0}
+                liked={likedIds.has(c.id)}
+                canLike={canLike}
+                onLike={() => toggleLike(c.id)}
+                onLoad={() => {
+                  if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
+                  useEditor.getState().loadPages(c.pages as Page[]);
+                  useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
+                  onOpenChange(false);
+                }}
+              />
             ))}
           </div>
         </div>
