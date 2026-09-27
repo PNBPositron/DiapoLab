@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, X, Check, Sparkles, User, Filter } from "lucide-react";
+import { Search, X, Check, Sparkles, User, Filter, Boxes } from "lucide-react";
 import { newImage, useEditor } from "@/store/editor";
 import { useSettings } from "@/store/settings";
 
@@ -27,7 +27,41 @@ const TRANSHUMANS = [
   "roboto.png", "rogue.png", "runner.png", "waiting.png", "walking-contradiction.png", "whoa.png", "wont-stop.png",
 ];
 
-type Collection = "Highlights" | "Transhumans";
+const ICONS = [
+  "3dicons-bag-dynamic-color.png",
+  "3dicons-bulb-dynamic-color.png",
+  "3dicons-calender-dynamic-color.png",
+  "3dicons-camera-dynamic-color.png",
+  "3dicons-chart-dynamic-color.png",
+  "3dicons-chat-bubble-dynamic-color.png",
+  "3dicons-chat-text-dynamic-color.png",
+  "3dicons-computer-dynamic-color.png",
+  "3dicons-credit-card-dynamic-color.png",
+  "3dicons-file-text-dynamic-color.png",
+  "3dicons-flash-dynamic-color.png",
+  "3dicons-folder-dynamic-color.png",
+  "3dicons-gift-box-dynamic-color.png",
+  "3dicons-headphone-dynamic-color.png",
+  "3dicons-heart-dynamic-color.png",
+  "3dicons-lab-dynamic-color.png",
+  "3dicons-megaphone-dynamic-color.png",
+  "3dicons-mobile-dynamic-color.png",
+  "3dicons-notebook-dynamic-color.png",
+  "3dicons-puzzle-dynamic-color.png",
+  "3dicons-rocket-dynamic-color.png",
+  "3dicons-setting-dynamic-color.png",
+  "3dicons-shield-dynamic-color.png",
+  "3dicons-star-dynamic-color.png",
+  "3dicons-sun-dynamic-color.png",
+  "3dicons-target-dynamic-color.png",
+  "3dicons-tick-dynamic-color.png",
+  "3dicons-tools-dynamic-color.png",
+  "3dicons-travel-dynamic-color.png",
+  "3dicons-wifi-dynamic-color.png",
+  "3dicons-zoom-dynamic-color.png",
+];
+
+type Collection = "Highlights" | "Transhumans" | "Icons";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
@@ -40,7 +74,8 @@ export function IllustrationsPanel() {
 
   // Filter items by search query
   const filteredFiles = useMemo(() => {
-    const pool = activeTab === "Highlights" ? HIGHLIGHTS : TRANSHUMANS;
+    const pool =
+      activeTab === "Highlights" ? HIGHLIGHTS : activeTab === "Transhumans" ? TRANSHUMANS : ICONS;
     if (!searchQuery.trim()) return pool;
 
     const query = searchQuery.trim().toLowerCase();
@@ -52,7 +87,8 @@ export function IllustrationsPanel() {
 
   const handleInsert = (file: string) => {
     const isHighlight = activeTab === "Highlights";
-    const src = `/illustrations/${isHighlight ? "" : "transhumans/"}${file}`;
+    const isIcon = activeTab === "Icons";
+    const src = `/illustrations/${isHighlight ? "" : isIcon ? "icons/" : "transhumans/"}${file}`;
 
     add(
       newImage(src, {
@@ -68,111 +104,15 @@ export function IllustrationsPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
+    <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark\:text-slate-100">
       {/* Segmented Control Tabs */}
-      <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
+      <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark\:bg-slate-850">
         <button
           type="button"
           onClick={() => setActiveTab("Highlights")}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
             activeTab === "Highlights"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+              ? "bg-white text-slate-900 shadow-sm dark\:bg-slate-750 dark\:text-white"
+              : "text-slate-500 hover\:text-slate-800 dark\:text-slate-400 dark\:hover\:text-slate-200"
           }`}
         >
-          <Sparkles className="size-3.5" />
-          <span>Highlights</span>
-          <span className="text-[10px] opacity-50">({HIGHLIGHTS.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("Transhumans")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "Transhumans"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <User className="size-3.5" />
-          <span>Transhumans</span>
-          <span className="text-[10px] opacity-50">({TRANSHUMANS.length})</span>
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Search ${activeTab.toLowerCase()}...`}
-          className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
-        />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-          >
-            <X className="size-3.5" />
-          </button>
-        )}
-      </div>
-
-      {/* Visual Tile Grid */}
-      <div className="relative min-h-[220px] flex-1">
-        {filteredFiles.length === 0 ? (
-          <div className="flex h-44 flex-col items-center justify-center gap-1.5 text-center text-slate-400">
-            <Filter className="size-5 opacity-40" />
-            <p className="text-xs">No illustrations found</p>
-            <span className="text-[11px] opacity-70">Try searching for something else</span>
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-240px)]">
-            {filteredFiles.map((file) => {
-              const src = `/illustrations/${activeTab === "Transhumans" ? "transhumans/" : ""}${file}`;
-              const name = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ");
-              const isAdded = recentlyAdded === file;
-
-              return (
-                <button
-                  key={file}
-                  type="button"
-                  onClick={() => handleInsert(file)}
-                  title={name}
-                  className="group relative flex aspect-square flex-col items-center justify-center rounded-xl border border-slate-200/80 bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md active:translate-y-0 active:scale-95 dark:border-slate-800 dark:bg-slate-850 dark:hover:border-indigo-500/50 dark:hover:shadow-slate-950/30"
-                >
-                  <div className="flex size-full items-center justify-center">
-                    <img
-                      src={src}
-                      alt={name}
-                      loading="lazy"
-                      decoding="async"
-                      className={`max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-110 ${
-                        activeTab === "Highlights" && isDark ? "invert" : ""
-                      }`}
-                    />
-                  </div>
-
-                  {/* Added Indicator */}
-                  {isAdded && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-indigo-600/90 text-white backdrop-blur-[1px] animate-in fade-in zoom-in-75 duration-150">
-                      <Check className="size-4 stroke-[3]" />
-                    </div>
-                  )}
-
-                  {/* Clean Hover Label */}
-                  <span className="pointer-events-none absolute bottom-1 truncate px-1 text-[9px] font-medium text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
-                    {name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
