@@ -833,6 +833,61 @@ export function PropertiesPanel() {
               </Section>
             )}
 
+                        {/* INTERACTION — HOVER & CLICK */}
+            <Section title="Interaction (Hover & Click)">
+              <Field label="Hover Effect">
+                <select
+                  value={el.interaction?.hoverEffect ?? "none"}
+                  onChange={(e) =>
+                    update(el.id, {
+                      interaction: {
+                        ...el.interaction,
+                        hoverEffect: e.target.value as HoverEffect,
+                      },
+                    })
+                  }
+                  className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="none">None</option>
+                  <option value="color">Color Shift</option>
+                  <option value="gradient">Gradient Glow</option>
+                  <option value="glitch">Glitch</option>
+                </select>
+              </Field>
+
+              {(el.interaction?.hoverEffect === "color" ||
+                el.interaction?.hoverEffect === "gradient") && (
+                <ModernColorPicker
+                  label="Hover Color"
+                  value={el.interaction?.hoverColor ?? "#0ea5e9"}
+                  onChange={(c) =>
+                    update(el.id, {
+                      interaction: { ...el.interaction, hoverColor: c },
+                    })
+                  }
+                />
+              )}
+
+              <Field label="On Click — Jump to Slide">
+                <input
+                  type="number"
+                  min={1}
+                  value={el.interaction?.moveToSlide ?? 0}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    update(el.id, {
+                      interaction: {
+                        ...el.interaction,
+                        moveToSlide: val > 0 ? Math.floor(val) : undefined,
+                      },
+                    });
+                  }}
+                  placeholder="None — leave empty"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                />
+              </Field>
+            </Section>
+
             {/* PRESENTATION & TRANSITIONS */}
             <Section title="Animation & Interaction">
               <Field label="Entrance Animation">
