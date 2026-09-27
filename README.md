@@ -1,14 +1,10 @@
 #  DiapoLab
 
-> Build modern decks, faster. Open-source presentation editing with templates, AI assistance, cloud saves, and polished export workflows.
-
-A modern, open-source presentation editor for creating beautiful slides with speed, flexibility, and creative control.
-
 <div align="center">
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-✨ A creative slide editor with templates, AI-assisted slide ideas, theme controls, secure cloud saves, and export options for real-world presentations.
+✨ A next generation slide editor with templates, AI-assistance, presets, interactive features and more.
 
 </div>
 
