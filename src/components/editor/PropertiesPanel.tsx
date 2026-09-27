@@ -37,6 +37,7 @@ import {
   AlignRight,
   Italic,
   Underline,
+  Bold,
   List,
   Sparkles,
   Link2,
@@ -331,25 +332,29 @@ export function PropertiesPanel() {
 
   if (!el) return null;
 
-  // Floating Mini-HUD (Always clean, contextual & immediate)
+  // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
-    <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2">
+    <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
       <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200/90 bg-white/90 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.12)] backdrop-blur-xl">
-        <div className="flex items-center gap-1.5 border-r border-slate-200/70 px-2 py-1 pr-2.5">
+        {/* Type badge */}
+        <div className="flex items-center gap-1.5 rounded-xl bg-slate-100/80 px-2.5 py-1.5">
           <Layers className="size-3.5 text-sky-600" />
-          <span className="text-[10px] font-bold tracking-wider text-slate-700 uppercase">
+          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
             {el.type}
           </span>
         </div>
 
         {el.type === "text" && (
           <>
+            {/* Color */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setColorPaletteOpen(!colorPaletteOpen)}
-                className="flex items-center gap-1.5 rounded-lg p-1.5 text-slate-600 transition hover:bg-slate-100"
-                title="Color"
+                className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${
+                  colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""
+                }`}
+                title="Text color"
               >
                 <div
                   className="size-4 rounded-full border border-slate-300 shadow-xs"
@@ -357,13 +362,72 @@ export function PropertiesPanel() {
                 />
               </button>
               {colorPaletteOpen && (
-                <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+                <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl animate-in slide-in-from-top-2 duration-150">
                   <ModernColorPicker value={el.color} onChange={(c) => update(el.id, { color: c })} />
                 </div>
               )}
             </div>
 
-            <div className="flex h-8 items-center rounded-lg border border-slate-200 bg-slate-50 px-1">
+            {/* Bold / Italic */}
+            <div className="flex h-8 items-center gap-0.5 rounded-lg bg-slate-100/80 p-0.5">
+              <button
+                type="button"
+                onClick={() => update(el.id, { fontWeight: (el.fontWeight ?? 400) >= 700 ? 400 : 700 })}
+                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                  (el.fontWeight ?? 400) >= 700 ? "bg-white text-slate-900 shadow-sm" : ""
+                }`}
+                title="Bold"
+              >
+                <Bold className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => update(el.id, { italic: !el.italic })}
+                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                  el.italic ? "bg-white text-slate-900 shadow-sm" : ""
+                }`}
+                title="Italic"
+              >
+                <Italic className="size-3.5" />
+              </button>
+            </div>
+
+            {/* Align */}
+            <div className="flex h-8 items-center gap-0.5 rounded-lg bg-slate-100/80 p-0.5">
+              <button
+                type="button"
+                onClick={() => update(el.id, { align: "left" })}
+                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "left" ? "bg-white text-slate-900 shadow-sm" : ""
+                }`}
+                title="Align left"
+              >
+                <AlignLeft className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => update(el.id, { align: "center" })}
+                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "center" ? "bg-white text-slate-900 shadow-sm" : ""
+                }`}
+                title="Align center"
+              >
+                <AlignCenter className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => update(el.id, { align: "right" })}
+                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "right" ? "bg-white text-slate-900 shadow-sm" : ""
+                }`}
+                title="Align right"
+              >
+                <AlignRight className="size-3.5" />
+              </button>
+            </div>
+
+            {/* Font size stepper */}
+            <div className="flex h-8 items-center rounded-lg bg-slate-100/80 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })}
@@ -380,7 +444,7 @@ export function PropertiesPanel() {
                   const val = Number(e.target.value);
                   if (Number.isFinite(val)) update(el.id, { fontSize: Math.min(240, Math.max(12, val)) });
                 }}
-                className="w-10 appearance-none border-0 bg-transparent text-center font-mono text-xs font-semibold text-slate-800 outline-none"
+                className="w-9 appearance-none border-0 bg-transparent text-center font-mono text-xs font-semibold text-slate-800 outline-none"
               />
               <button
                 type="button"
@@ -393,9 +457,10 @@ export function PropertiesPanel() {
           </>
         )}
 
+        {/* Universal actions */}
         <button
           onClick={() => duplicate(el.id)}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           title="Duplicate"
         >
           <Copy className="size-3.5" />
@@ -403,7 +468,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           title="Rotate 90°"
         >
           <RotateCcw className="size-3.5" />
@@ -411,7 +476,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => remove(el.id)}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
+          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 active:scale-90"
           title="Delete"
         >
           <Trash2 className="size-3.5" />
