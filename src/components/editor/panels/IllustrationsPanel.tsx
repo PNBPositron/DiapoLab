@@ -112,26 +112,27 @@ export function IllustrationsPanel() {
 
   return (
     <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
-      {/* Tabs */}
+      {/* Tabs — single row */}
       <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
         <button
           type="button"
           onClick={() => setActiveTab("Highlights")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+          title="Highlights"
+          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
             activeTab === "Highlights"
               ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
               : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
           <Sparkles className="size-3.5" />
-          <span>Highlights</span>
-          <span className="text-[10px] opacity-50">({HIGHLIGHTS.length})</span>
+          <span>Highl.</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("Transhumans")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+          title="Transhumans"
+          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
             activeTab === "Transhumans"
               ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
               : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
@@ -139,24 +140,22 @@ export function IllustrationsPanel() {
         >
           <User className="size-3.5" />
           <span>Transhumans</span>
-          <span className="text-[10px] opacity-50">({TRANSHUMANS.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("Icons")}
+          title="3D Icons"
+          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
+            activeTab === "Icons"
+              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          <Boxes className="size-3.5" />
+          <span>3D</span>
         </button>
       </div>
-
-      {/* 3D Icons — full-width second row */}
-      <button
-        type="button"
-        onClick={() => setActiveTab("Icons")}
-        className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-medium transition-all ${
-          activeTab === "Icons"
-            ? "bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900"
-            : "bg-slate-100/90 text-slate-500 hover:text-slate-800 dark:bg-slate-850 dark:text-slate-400 dark:hover:text-slate-200"
-        }`}
-      >
-        <Boxes className="size-3.5" />
-        <span>3D Icons</span>
-        <span className="text-[10px] opacity-50">({ICONS.length})</span>
-      </button>
 
       {/* Search */}
       <div className="relative">
@@ -165,7 +164,9 @@ export function IllustrationsPanel() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Search ${activeTab === "Icons" ? "3d icons" : activeTab.toLowerCase()}...`}
+          placeholder={`Search ${
+            activeTab === "Icons" ? "3d icons" : activeTab === "Transhumans" ? "transhumans" : "highlights"
+          }...`}
           className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
         />
         {searchQuery && (
@@ -188,7 +189,7 @@ export function IllustrationsPanel() {
             <span className="text-[11px] opacity-70">Try searching for something else</span>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-280px)]">
+          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-240px)]">
             {filteredFiles.map((file) => {
               const src = `/illustrations/${
                 activeTab === "Transhumans" ? "transhumans/" : activeTab === "Icons" ? "icons/" : ""
