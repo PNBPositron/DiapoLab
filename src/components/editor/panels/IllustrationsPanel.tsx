@@ -104,15 +104,127 @@ export function IllustrationsPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark\:text-slate-100">
+    <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
       {/* Segmented Control Tabs */}
-      <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark\:bg-slate-850">
+      <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
         <button
           type="button"
           onClick={() => setActiveTab("Highlights")}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
             activeTab === "Highlights"
-              ? "bg-white text-slate-900 shadow-sm dark\:bg-slate-750 dark\:text-white"
-              : "text-slate-500 hover\:text-slate-800 dark\:text-slate-400 dark\:hover\:text-slate-200"
+              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
           }`}
         >
+          <Sparkles className="size-3.5" />
+          <span>Highlights</span>
+          <span className="text-[10px] opacity-50">({HIGHLIGHTS.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("Transhumans")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+            activeTab === "Transhumans"
+              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          <User className="size-3.5" />
+          <span>Transhumans</span>
+          <span className="text-[10px] opacity-50">({TRANSHUMANS.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("Icons")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
+            activeTab === "Icons"
+              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          }`}
+        >
+          <Boxes className="size-3.5" />
+          <span>Icons</span>
+          <span className="text-[10px] opacity-50">({ICONS.length})</span>
+        </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={`Search ${activeTab.toLowerCase()}...`}
+          className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Visual Tile Grid */}
+      <div className="relative min-h-[220px] flex-1">
+        {filteredFiles.length === 0 ? (
+          <div className="flex h-44 flex-col items-center justify-center gap-1.5 text-center text-slate-400">
+            <Filter className="size-5 opacity-40" />
+            <p className="text-xs">No illustrations found</p>
+            <span className="text-[11px] opacity-70">Try searching for something else</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-240px)]">
+            {filteredFiles.map((file) => {
+              const src = `/illustrations/${
+                activeTab === "Transhumans" ? "transhumans/" : activeTab === "Icons" ? "icons/" : ""
+              }${file}`;
+              const name = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ");
+              const isAdded = recentlyAdded === file;
+
+              return (
+                <button
+                  key={file}
+                  type="button"
+                  onClick={() => handleInsert(file)}
+                  title={name}
+                  className="group relative flex aspect-square flex-col items-center justify-center rounded-xl border border-slate-200/80 bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md active:translate-y-0 active:scale-95 dark:border-slate-800 dark:bg-slate-850 dark:hover:border-indigo-500/50 dark:hover:shadow-slate-950/30"
+                >
+                  <div className="flex size-full items-center justify-center">
+                    <img
+                      src={src}
+                      alt={name}
+                      loading="lazy"
+                      decoding="async"
+                      className={`max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-110 ${
+                        activeTab === "Highlights" && isDark ? "invert" : ""
+                      }`}
+                    />
+                  </div>
+
+                  {/* Added Indicator */}
+                  {isAdded && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-indigo-600/90 text-white backdrop-blur-[1px] animate-in fade-in zoom-in-75 duration-150">
+                      <Check className="size-4 stroke-[3]" />
+                    </div>
+                  )}
+
+                  {/* Clean Hover Label */}
+                  <span className="pointer-events-none absolute bottom-1 truncate px-1 text-[9px] font-medium text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
+                    {name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
