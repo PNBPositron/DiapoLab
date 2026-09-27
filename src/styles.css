@@ -31,8 +31,8 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-grid: var(--grid);
-  --font-display: "Geist", system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist", system-ui, monospace;
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Manrope", system-ui, monospace;
 }
 
 :root {
