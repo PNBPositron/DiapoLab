@@ -61,6 +61,15 @@ const ICONS = [
   "3dicons-zoom-dynamic-color.png",
 ];
 
+// "3dicons-rocket-dynamic-color.png" → "rocket"
+function displayName(file: string): string {
+  return file
+    .replace(/\.(svg|png)$/i, "")
+    .replace(/^3dicons-/, "")
+    .replace(/-dynamic-color$/, "")
+    .replaceAll("-", " ");
+}
+
 type Collection = "Highlights" | "Transhumans" | "Icons";
 
 export function IllustrationsPanel() {
@@ -72,7 +81,6 @@ export function IllustrationsPanel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [recentlyAdded, setRecentlyAdded] = useState<string | null>(null);
 
-  // Filter items by search query
   const filteredFiles = useMemo(() => {
     const pool =
       activeTab === "Highlights" ? HIGHLIGHTS : activeTab === "Transhumans" ? TRANSHUMANS : ICONS;
@@ -80,7 +88,7 @@ export function IllustrationsPanel() {
 
     const query = searchQuery.trim().toLowerCase();
     return pool.filter((file) => {
-      const readableName = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ").toLowerCase();
+      const readableName = displayName(file).toLowerCase();
       return readableName.includes(query);
     });
   }, [activeTab, searchQuery]);
@@ -98,14 +106,13 @@ export function IllustrationsPanel() {
       })
     );
 
-    // Tactile confirmation animation
     setRecentlyAdded(file);
     setTimeout(() => setRecentlyAdded(null), 1200);
   };
 
   return (
     <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
-      {/* Segmented Control Tabs */}
+      {/* Tabs */}
       <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
         <button
           type="button"
@@ -134,30 +141,31 @@ export function IllustrationsPanel() {
           <span>Transhumans</span>
           <span className="text-[10px] opacity-50">({TRANSHUMANS.length})</span>
         </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("Icons")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "Icons"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <Boxes className="size-3.5" />
-          <span>Icons</span>
-          <span className="text-[10px] opacity-50">({ICONS.length})</span>
-        </button>
       </div>
 
-      {/* Search Bar */}
+      {/* 3D Icons — full-width second row */}
+      <button
+        type="button"
+        onClick={() => setActiveTab("Icons")}
+        className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-1.5 text-xs font-medium transition-all ${
+          activeTab === "Icons"
+            ? "bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900"
+            : "bg-slate-100/90 text-slate-500 hover:text-slate-800 dark:bg-slate-850 dark:text-slate-400 dark:hover:text-slate-200"
+        }`}
+      >
+        <Boxes className="size-3.5" />
+        <span>3D Icons</span>
+        <span className="text-[10px] opacity-50">({ICONS.length})</span>
+      </button>
+
+      {/* Search */}
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={`Search ${activeTab.toLowerCase()}...`}
+          placeholder={`Search ${activeTab === "Icons" ? "3d icons" : activeTab.toLowerCase()}...`}
           className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
         />
         {searchQuery && (
@@ -171,7 +179,7 @@ export function IllustrationsPanel() {
         )}
       </div>
 
-      {/* Visual Tile Grid */}
+      {/* Grid */}
       <div className="relative min-h-[220px] flex-1">
         {filteredFiles.length === 0 ? (
           <div className="flex h-44 flex-col items-center justify-center gap-1.5 text-center text-slate-400">
@@ -180,12 +188,12 @@ export function IllustrationsPanel() {
             <span className="text-[11px] opacity-70">Try searching for something else</span>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-240px)]">
+          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-280px)]">
             {filteredFiles.map((file) => {
               const src = `/illustrations/${
                 activeTab === "Transhumans" ? "transhumans/" : activeTab === "Icons" ? "icons/" : ""
               }${file}`;
-              const name = file.replace(/\.(svg|png)$/i, "").replaceAll("-", " ");
+              const name = displayName(file);
               const isAdded = recentlyAdded === file;
 
               return (
@@ -208,14 +216,12 @@ export function IllustrationsPanel() {
                     />
                   </div>
 
-                  {/* Added Indicator */}
                   {isAdded && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-indigo-600/90 text-white backdrop-blur-[1px] animate-in fade-in zoom-in-75 duration-150">
                       <Check className="size-4 stroke-[3]" />
                     </div>
                   )}
 
-                  {/* Clean Hover Label */}
                   <span className="pointer-events-none absolute bottom-1 truncate px-1 text-[9px] font-medium text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
                     {name}
                   </span>
