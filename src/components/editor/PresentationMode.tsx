@@ -116,27 +116,17 @@ export function PresentationMode() {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-ink scanlines">
-      <div
-        className={`absolute inset-x-0 top-0 z-30 flex items-center justify-between border-b border-teal/40 bg-ink/70 px-5 py-2 backdrop-blur transition-opacity ${
+      {/* Discreet exit — appears with the strip, Échap also exits */}
+      <button
+        onClick={() => setPresenting(false)}
+        aria-label="Exit presentation"
+        className={`absolute right-4 top-4 z-30 grid h-10 w-10 place-items-center rounded-full bg-ink/70 text-teal/80 backdrop-blur transition-all hover:bg-ink hover:text-teal ${
           strip ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-teal to-transparent" />
-        <div className="font-display text-sm uppercase tracking-[0.25em] text-teal text-glow">
-          ▶ presenting · <span className="font-mono text-xs text-teal/70">{canvasW}×{canvasH}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-teal/80">
-            {currentIndex + 1} / {pages.length}
-          </span>
-          <button
-            onClick={() => setPresenting(false)}
-            className="brutal-border brutal-press flex items-center gap-2 bg-blue px-3 py-1.5 font-display text-xs uppercase tracking-[0.2em] text-ink"
-          >
-            <X className="h-4 w-4" strokeWidth={3} /> Exit · Esc
-          </button>
-        </div>
-      </div>
+        <X className="h-4.5 w-4.5" strokeWidth={2.5} />
+      </button>
+
       <div ref={wrapRef} className="relative flex flex-1 items-center justify-center overflow-hidden">
         <button
           onClick={() => setCurrentPage(currentIndex - 1)}
