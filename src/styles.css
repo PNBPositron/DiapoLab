@@ -32,7 +32,7 @@
   --color-surface-2: var(--surface-2);
   --color-grid: var(--grid);
   --font-display: "Manrope", system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Manrope", system-ui, monospace;
+  --font-mono: "JetBrains Mono", "Manrope", system-ui, monospace;
 }
 
 :root {
