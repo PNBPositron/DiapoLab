@@ -212,7 +212,7 @@ export function ComponentsPanel() {
       label: "Interactive Quiz",
       description: "Engagement widget",
       Icon: ListChecks,
-      create: () => newQuiz(),
+      create: () => newQuiz(quizStylePatch(style)),
     },
   ];
 
