@@ -39,6 +39,7 @@ import {
   newUi,
   UI_STYLE_THEMES,
   useEditor,
+  chartStylePatch,
   type UiKind,
   type UiStyle,
 } from "@/store/editor";
@@ -155,27 +156,6 @@ const UI_PRESETS: Array<{
   },
 ];
 
-const ELEMENT_PRESETS = [
-  {
-    label: "Bar Chart",
-    description: "Categorical comparison",
-    Icon: TrendingUp,
-    create: () => newChart("bar"),
-  },
-  {
-    label: "Line Graph",
-    description: "Trend over time",
-    Icon: TrendingUp,
-    create: () => newChart("line"),
-  },
-  {
-    label: "Interactive Quiz",
-    description: "Engagement widget",
-    Icon: ListChecks,
-    create: () => newQuiz(),
-  },
-];
-
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 
 export function ComponentsPanel() {
@@ -186,6 +166,45 @@ export function ComponentsPanel() {
 
   const selected = elements.find((element) => element.id === selectedId);
 
+  const ELEMENT_PRESETS = [
+    {
+      label: "Bar Chart",
+      description: "Categorical comparison",
+      Icon: TrendingUp,
+      create: () => newChart("bar", chartStylePatch(style)),
+    },
+    {
+      label: "Line Graph",
+      description: "Trend over time",
+      Icon: TrendingUp,
+      create: () => newChart("line", chartStylePatch(style)),
+    },
+    {
+      label: "Area Chart",
+      description: "Cumulative trend",
+      Icon: TrendingUp,
+      create: () => newChart("area", chartStylePatch(style)),
+    },
+    {
+      label: "Pie Chart",
+      description: "Share of a whole",
+      Icon: TrendingUp,
+      create: () => newChart("pie", chartStylePatch(style)),
+    },
+    {
+      label: "Donut Chart",
+      description: "Modern proportions",
+      Icon: TrendingUp,
+      create: () => newChart("donut", chartStylePatch(style)),
+    },
+    {
+      label: "Interactive Quiz",
+      description: "Engagement widget",
+      Icon: ListChecks,
+      create: () => newQuiz(),
+    },
+  ];
+
   const pickStyle = (nextStyle: UiStyle) => {
     setStyle(nextStyle);
     if (selected?.type === "ui") {
@@ -193,6 +212,9 @@ export function ComponentsPanel() {
         uiStyle: nextStyle,
         accentColor: UI_STYLE_THEMES[nextStyle].accent,
       });
+    }
+    if (selected?.type === "chart") {
+      update(selected.id, chartStylePatch(nextStyle));
     }
   };
 
@@ -212,13 +234,9 @@ export function ComponentsPanel() {
     );
   }, [rawPresets, search]);
 
-  const filteredElements = useMemo(() => {
-    if (!search.trim()) return ELEMENT_PRESETS;
-    const query = search.toLowerCase();
-    return ELEMENT_PRESETS.filter((e) =>
-      e.label.toLowerCase().includes(query)
-    );
-  }, [search]);
+  const filteredElements = search.trim()
+    ? ELEMENT_PRESETS.filter((e) => e.label.toLowerCase().includes(search.toLowerCase()))
+    : ELEMENT_PRESETS;
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
@@ -271,47 +289,50 @@ export function ComponentsPanel() {
         />
       </div>
 
-      {/* Style Palette (for interfaces and UI widgets) */}
-      {section !== "elements" && (
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              Visual Theme
-            </span>
-            <span className="text-[10px] text-slate-400">
-              {UI_STYLE_THEMES[style]?.label}
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-1.5">
-            {STYLES.map((item) => {
-              const theme = UI_STYLE_THEMES[item];
-              const isSelected = style === item;
-              return (
-                <button
-                  key={item}
-                  onClick={() => pickStyle(item)}
-                  className={`relative flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-left text-[11px] font-medium transition-all ${
-                    isSelected
-                      ? "border-slate-800 bg-slate-900 text-white shadow-xs"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  <span
-                    className="size-2 rounded-full ring-1 ring-black/10 shrink-0"
-                    style={{ background: theme.accent }}
-                  />
-                  <span className="truncate">{theme.label}</span>
-                  {isSelected && <Check className="ml-auto size-3 shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
+      {/* Style Palette */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+            Visual Theme
+          </span>
+          <span className="text-[10px] text-slate-400">
+            {UI_STYLE_THEMES[style]?.label}
+          </span>
         </div>
-      )}
+        <div className="grid grid-cols-3 gap-1.5">
+          {STYLES.map((item) => {
+            const theme = UI_STYLE_THEMES[item];
+            const isSelected = style === item;
+            return (
+              <button
+                key={item}
+                onClick={() => pickStyle(item)}
+                className={`relative flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-left text-[11px] font-medium transition-all ${
+                  isSelected
+                    ? "border-slate-800 bg-slate-900 text-white shadow-xs"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                <span
+                  className="size-2 rounded-full ring-1 ring-black/10 shrink-0"
+                  style={{ background: theme.accent }}
+                />
+                <span className="truncate">{theme.label}</span>
+                {isSelected && <Check className="ml-auto size-3 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Elements Section */}
       {section === "elements" && (
         <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Blocks ({filteredElements.length})
+            </span>
+          </div>
           {filteredElements.map(({ label, description, Icon, create }) => (
             <button
               key={label}
