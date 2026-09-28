@@ -40,6 +40,17 @@ import {
   UI_STYLE_THEMES,
   useEditor,
   chartStylePatch,
+  quizStylePatch,
+  type UiKind,
+  type UiStyle,
+} from "@/store/editor";
+import {
+  newChart,
+  newQuiz,
+  newUi,
+  UI_STYLE_THEMES,
+  useEditor,
+  chartStylePatch,
   type UiKind,
   type UiStyle,
 } from "@/store/editor";
