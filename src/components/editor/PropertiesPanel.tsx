@@ -888,6 +888,137 @@ export function PropertiesPanel() {
               </Field>
             </Section>
 
+                        {/* CHART */}
+            {el.type === "chart" && (
+              <Section title="Chart">
+                <Field label="Chart Type">
+                  <select
+                    value={el.chart}
+                    onChange={(e) => update(el.id, { chart: e.target.value as any })}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                  >
+                    <option value="bar">Bar</option>
+                    <option value="line">Line</option>
+                    <option value="area">Area</option>
+                    <option value="pie">Pie</option>
+                    <option value="donut">Donut</option>
+                  </select>
+                </Field>
+                <Field label="Title">
+                  <input
+                    type="text"
+                    value={el.title ?? ""}
+                    onChange={(e) => update(el.id, { title: e.target.value })}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                  />
+                </Field>
+                <Field label="Data">
+                  <div className="space-y-1.5">
+                    {el.data.map((point, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={point.label}
+                          onChange={(e) => {
+                            const data = el.data.map((p, j) =>
+                              j === i ? { ...p, label: e.target.value } : p
+                            );
+                            update(el.id, { data });
+                          }}
+                          className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                        />
+                        <input
+                          type="number"
+                          value={point.value}
+                          onChange={(e) => {
+                            const data = el.data.map((p, j) =>
+                              j === i ? { ...p, value: Number(e.target.value) } : p
+                            );
+                            update(el.id, { data });
+                          }}
+                          className="w-16 rounded-lg border border-slate-200 px-2 py-1 font-mono text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            update(el.id, { data: el.data.filter((_, j) => j !== i) })
+                          }
+                          className="grid size-6 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        update(el.id, {
+                          data: [...el.data, { label: `Item ${el.data.length + 1}`, value: 50 }],
+                        })
+                      }
+                      className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-sky-400 hover:text-sky-600"
+                    >
+                      + Add data point
+                    </button>
+                  </div>
+                </Field>
+                <ModernColorPicker
+                  label="Background"
+                  value={el.bgColor}
+                  onChange={(c) => update(el.id, { bgColor: c })}
+                />
+                <ModernColorPicker
+                  label="Text Color"
+                  value={el.fgColor}
+                  onChange={(c) => update(el.id, { fgColor: c })}
+                />
+                <Field label="Series Colors">
+                  <div className="flex flex-wrap gap-1.5">
+                    {el.colors.map((c, i) => (
+                      <input
+                        key={i}
+                        type="color"
+                        value={c}
+                        onChange={(e) => {
+                          const colors = el.colors.map((x, j) =>
+                            j === i ? e.target.value : x
+                          );
+                          update(el.id, { colors });
+                        }}
+                        className="size-7 cursor-pointer rounded border border-slate-200 bg-transparent"
+                      />
+                    ))}
+                  </div>
+                </Field>
+                <Field label="Display">
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => update(el.id, { showValues: !el.showValues })}
+                      className={`flex-1 rounded-lg border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+                        el.showValues
+                          ? "border-sky-500 bg-sky-50 text-sky-600"
+                          : "border-slate-200 bg-slate-50 text-slate-500"
+                      }`}
+                    >
+                      Values
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => update(el.id, { showAxes: !el.showAxes })}
+                      className={`flex-1 rounded-lg border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+                        el.showAxes
+                          ? "border-sky-500 bg-sky-50 text-sky-600"
+                          : "border-slate-200 bg-slate-50 text-slate-500"
+                      }`}
+                    >
+                      Axes
+                    </button>
+                  </div>
+                </Field>
+              </Section>
+            )}
+
             {/* PRESENTATION & TRANSITIONS */}
             <Section title="Animation & Interaction">
               <Field label="Entrance Animation">
