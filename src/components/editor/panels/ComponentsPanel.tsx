@@ -224,6 +224,9 @@ export function ComponentsPanel() {
         accentColor: UI_STYLE_THEMES[nextStyle].accent,
       });
     }
+    if (selected?.type === "quiz") {
+      update(selected.id, quizStylePatch(nextStyle));
+    }
     if (selected?.type === "chart") {
       update(selected.id, chartStylePatch(nextStyle));
     }
