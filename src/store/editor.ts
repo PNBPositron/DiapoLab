@@ -79,7 +79,26 @@ export type ShapeKind =
   | "diagonal_stripes"
   | "dot_grid"
   | "dotted_triangle"
-  | "accent_slash";
+  | "accent_slash"
+  | "octagon"
+  | "capsule"
+  | "semicircle"
+  | "quarter_circle"
+  | "chevron"
+  | "starburst"
+  | "flower"
+  | "gear"
+  | "shield"
+  | "drop"
+  | "pin"
+  | "flag"
+  | "ticket"
+  | "bookmark"
+  | "blob"
+  | "moon"
+  | "wave"
+  | "leaf"
+  | "ribbon";
 export type ShapeEffect = "none" | "liquid_glass" | "neon" | "soft_shadow" | "inner_glow" | "holographic" | "glitch" | "honeycomb";
 export type BlendMode = "normal" | "screen" | "overlay" | "multiply" | "color-dodge";
 export type ElementShadow = {
