@@ -55,7 +55,7 @@ const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string
       { kind: "circuit", label: "Circuit Traces" },
       { kind: "cyber_frame", label: "Panel Frame" },
       { kind: "data_shard", label: "Data Shard" },
-      { tout: undefined, kind: "tech_chevron", label: "Tech Chevron" },
+      { kind: "tech_chevron", label: "Tech Chevron" },
       { kind: "scanner", label: "Scanner Reticle" },
       { kind: "ring", label: "Neon Ring" },
       { kind: "hex_ring", label: "Hex Ring" },
