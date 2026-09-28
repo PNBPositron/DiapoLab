@@ -775,7 +775,7 @@ export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
   const palettes: Record<UiStyle, string[]> = {
     cyber: ["#7df9ff", "#ff0080", "#ffd84a", "#4d7cff", "#00ff88", "#b16bff"],
     glass: ["#7df9ff", "#ffffff", "#a5b4fc", "#fca5a5", "#86efac", "#fcd34d"],
-    neobrutalist: ["#ff0080", "#0a0a0a", "#2b6cff", "#00c853", "#ff6d00", "#8e24aa"],
+    neobrutalist: ["#ff0080", "#0a0a0a", "#2b6bff", "#00c853", "#ff6d00", "#8e24aa"],
     sketch: ["#2b6cff", "#1b1b1b", "#e8534f", "#3aa76d", "#f2a33c", "#7b5ea7"],
     xp: ["#245edb", "#3ec53e", "#e8a33d", "#c0392b", "#7f9db9", "#8e44ad"],
     aqua: ["#0a84ff", "#30d158", "#ff9f0a", "#ff375f", "#5e5ce6", "#64d2ff"],
@@ -786,7 +786,16 @@ export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
     matrix: ["#37ff7f", "#a6ff00", "#1c8c3f", "#7dffb0", "#00c853", "#d4ff4d"],
     swiss: ["#e2231a", "#111111", "#0057b7", "#f2b705", "#767676", "#3d8361"],
   };
-    return { uiStyle, bgColor: t.bg, fgColor: t.fg, colors: palettes[uiStyle] };
+  return { uiStyle, bgColor: t.bg, fgColor: t.fg, colors: palettes[uiStyle] };
+};
+
+export const quizStylePatch = (uiStyle: UiStyle): Partial<QuizElement> => {
+  const t = UI_STYLE_THEMES[uiStyle];
+  return {
+    bgColor: solidThemeBg(uiStyle),
+    fgColor: t.dark ? "#ffffff" : t.fg,
+    accentColor: t.accent,
+  };
 };
 
 export const newButton = (overrides: Partial<ButtonElement> = {}): ButtonElement => ({
