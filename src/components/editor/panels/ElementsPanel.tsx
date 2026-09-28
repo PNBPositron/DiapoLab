@@ -4,14 +4,12 @@ import {
   Upload,
   Shapes,
   Star,
-  BarChart3,
-  TrendingUp,
-  HelpCircle,
   Search,
   ImagePlus,
 } from "lucide-react";
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newChart, newIcon, newImage, newQuiz, useEditor } from "@/store/editor";
+import { newIcon, newImage, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 
 type ElementSection = "shapes" | "icons" | null;
@@ -111,10 +109,6 @@ export function ElementsPanel() {
           label="Icons"
           active={section === "icons"}
           onClick={() => setSection(section === "icons" ? null : "icons")}
-        />
-        <ActionTile Icon={BarChart3} label="Chart" onClick={() => add(newChart("bar"))} />
-        <ActionTile Icon={TrendingUp} label="Graph" onClick={() => add(newChart("line"))} />
-        <ActionTile Icon={HelpCircle} label="Quiz" onClick={() => add(newQuiz())} />
       </div>
 
       {section === "shapes" && <ShapesPanel embedded />}
