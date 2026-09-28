@@ -764,6 +764,16 @@ function ChartRender({ element }: { element: ChartElement }) {
   const { chart, data, colors, bgColor, fgColor, title, showValues, showAxes } = element;
   const theme = element.uiStyle ? UI_STYLE_THEMES[element.uiStyle] : null;
   const fontFamily = theme ? theme.font : "Inter, sans-serif";
+  const themeStyle: React.CSSProperties = theme
+    ? {
+        background: theme.bg,
+        backdropFilter: theme.backdrop,
+        WebkitBackdropFilter: theme.backdrop,
+        border: `${theme.borderWidth}px solid ${theme.border}`,
+        borderRadius: theme.radius,
+        boxShadow: theme.shadow,
+      }
+    : { background: bgColor };
   const W = 400,
     H = 300;
   const padL = 50,
