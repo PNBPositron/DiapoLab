@@ -753,7 +753,6 @@ export const solidThemeBg = (uiStyle: UiStyle): string => {
 
 export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
   const t = UI_STYLE_THEMES[uiStyle];
-  const solidBg = solidThemeBg(uiStyle);
   const palettes: Record<UiStyle, string[]> = {
     cyber: ["#7df9ff", "#ff0080", "#ffd84a", "#4d7cff", "#00ff88", "#b16bff"],
     glass: ["#7df9ff", "#ffffff", "#a5b4fc", "#fca5a5", "#86efac", "#fcd34d"],
