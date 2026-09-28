@@ -3,43 +3,96 @@ import { useEditor, newShape, type ShapeKind } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { shapePathD } from "../ShapeRender";
 
-const SHAPES: { kind: ShapeKind; label: string }[] = [
-  { kind: "rect", label: "Rectangle" },
-  { kind: "holographic_grid", label: "Holographic Grid" },
-  { kind: "glitch", label: "Glitch" },
-  { kind: "honeycomb", label: "Honeycomb" },
-  { kind: "circuit", label: "Circuit Traces" },
-  { kind: "cyber_frame", label: "Cyber Frame" },
-  { kind: "data_shard", label: "Data Shard" },
-  { kind: "tech_chevron", label: "Tech Chevron" },
-  { kind: "scanner", label: "Scanner Reticle" },
-  { kind: "ring", label: "Neon Ring" },
-  { kind: "hex_ring", label: "Hex Ring" },
-  { kind: "angular_frame", label: "Angular Frame" },
-  { kind: "corner_bracket", label: "Corner Bracket" },
-  { kind: "circle", label: "Circle" },
-  { kind: "triangle", label: "Triangle" },
-  { kind: "star", label: "Star" },
-  { kind: "arrow", label: "Arrow" },
-  { kind: "heart", label: "Heart" },
-  { kind: "diamond", label: "Diamond" },
-  { kind: "hexagon", label: "Hexagon" },
-  { kind: "pentagon", label: "Pentagon" },
-  { kind: "parallelogram", label: "Parallelogram" },
-  { kind: "trapezoid", label: "Trapezoid" },
-  { kind: "cross", label: "Cross" },
-  { kind: "lightning", label: "Lightning" },
-  { kind: "cloud", label: "Cloud" },
-  { kind: "speech", label: "Speech" },
+const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string }[] }[] = [
+  {
+    name: "Basics",
+    shapes: [
+      { kind: "rect", label: "Rectangle" },
+      { kind: "circle", label: "Circle" },
+      { kind: "triangle", label: "Triangle" },
+      { kind: "diamond", label: "Diamond" },
+      { kind: "hexagon", label: "Hexagon" },
+      { kind: "pentagon", label: "Pentagon" },
+      { kind: "octagon", label: "Octagon" },
+      { kind: "parallelogram", label: "Parallelogram" },
+      { kind: "trapezoid", label: "Trapezoid" },
+      { kind: "capsule", label: "Capsule" },
+      { kind: "semicircle", label: "Semicircle" },
+      { kind: "quarter_circle", label: "Quarter circle" },
+      { kind: "cross", label: "Cross" },
+    ],
+  },
+  {
+    name: "Arrows",
+    shapes: [
+      { kind: "arrow", label: "Arrow" },
+      { kind: "chevron", label: "Chevron" },
+      { kind: "pin", label: "Location pin" },
+    ],
+  },
+  {
+    name: "Stars & Nature",
+    shapes: [
+      { kind: "star", label: "Star" },
+      { kind: "starburst", label: "Starburst" },
+      { kind: "flower", label: "Flower" },
+      { kind: "gear", label: "Gear" },
+      { kind: "heart", label: "Heart" },
+      { kind: "lightning", label: "Lightning" },
+      { kind: "drop", label: "Drop" },
+      { kind: "moon", label: "Moon" },
+      { kind: "leaf", label: "Leaf" },
+      { kind: "blob", label: "Blob" },
+      { kind: "cloud", label: "Cloud" },
+    ],
+  },
+  {
+    name: "Cyber",
+    shapes: [
+      { kind: "holographic_grid", label: "Holographic Grid" },
+      { kind: "glitch", label: "Glitch" },
+      { kind: "honeycomb", label: "Honeycomb" },
+      { kind: "circuit", label: "Circuit Traces" },
+      { kind: "cyber_frame", label: "Panel Frame" },
+      { kind: "data_shard", label: "Data Shard" },
+      { tout: undefined, kind: "tech_chevron", label: "Tech Chevron" },
+      { kind: "scanner", label: "Scanner Reticle" },
+      { kind: "ring", label: "Neon Ring" },
+      { kind: "hex_ring", label: "Hex Ring" },
+      { kind: "angular_frame", label: "Angular Frame" },
+      { kind: "corner_bracket", label: "Corner Bracket" },
+    ],
+  },
+  { name: "Bubbles & Badges", shapes: [
+      { kind: "speech", label: "Speech" },
+      { kind: "shield", label: "Shield" },
+      { kind: "ticket", label: "Ticket" },
+      { kind: "bookmark", label: "Bookmark" },
+      { kind: "flag", label: "Flag" },
+      { kind: "ribbon", label: "Ribbon" },
+    ],
+  },
+  {
+    name: "Decorative",
+    shapes: [
+      { kind: "frame_cut", label: "Cut Frame" },
+      { kind: "diagonal_stripes", label: "Diagonal Stripes" },
+      { kind: "dot_grid", label: "Dot Grid" },
+      { kind: "dotted_triangle", label: "Dotted Triangle" },
+      { kind: "accent_slash", label: "Accent Slash" },
+      { kind: "wave", label: "Wave" },
+    ],
+  },
 ];
-
 
 export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
   const { add } = useEditor();
   const [customFrom, setCustomFrom] = useState("#7df9ff");
   const [customTo, setCustomTo] = useState("#ff0080");
   const [customAngle, setCustomAngle] = useState(45);
-  const [customKind, setCustomKind] = useState<"rect" | "circle">("rect");
+  const [customKind, setCustomKind] = useState<ShapeKind>("rect");
+  const [category, setCategory] = useState(SHAPE_CATEGORIES[0].name);
+  const activeShapes = SHAPE_CATEGORIES.find((c) => c.name === category)?.shapes ?? [];
 
   const addCustomGradient = () => {
     add(
@@ -57,9 +110,23 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
     <div className="space-y-4">
       {!embedded && <PanelHeader title="Shapes" />}
 
-      <div className="font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Shapes</div>
+      <div className="flex flex-wrap gap-1.5">
+        {SHAPE_CATEGORIES.map((c) => (
+          <button
+            key={c.name}
+            type="button"
+            onClick={() => setCategory(c.name)}
+            className={`rounded-md px-2 py-1 font-mono text-[9px] uppercase tracking-wide transition ${
+              category === c.name ? "bg-teal text-ink" : "bg-ink/60 text-teal/70 hover:bg-ink"
+            }`}
+          >
+            {c.name} ({c.shapes.length})
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
-        {SHAPES.map((s) => {
+        {activeShapes.map((s) => {
           const fill = "#9ca3af";
           return (
             <button
@@ -96,9 +163,10 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
             ANGLE · {customAngle}°
             <input aria-label="Gradient angle" type="range" min="0" max="360" value={customAngle} onChange={(e) => setCustomAngle(Number(e.target.value))} className="accent-teal" />
           </label>
-          <select aria-label="Custom gradient shape" value={customKind} onChange={(e) => setCustomKind(e.target.value as "rect" | "circle")} className="h-8 border-2 border-teal/40 bg-ink px-2 font-mono text-[10px] text-teal">
-            <option value="rect">RECT</option>
-            <option value="circle">CIRCLE</option>
+          <select aria-label="Custom gradient shape" value={customKind} onChange={(e) => setCustomKind(e.target.value as ShapeKind)} className="h-8 border-2 border-teal/40 bg-ink px-2 font-mono text-[10px] text-teal">
+            {["rect", "circle", "triangle", "star", "heart", "hexagon", "diamond", "shield", "blob"].map((k) => (
+              <option key={k} value={k}>{k.toUpperCase()}</option>
+            ))}
           </select>
           <button type="button" onClick={addCustomGradient} className="brutal-border brutal-press h-8 bg-blue px-3 font-display text-[10px] tracking-[0.12em] text-ink">
             ADD
