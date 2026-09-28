@@ -4,15 +4,6 @@ import { PanelHeader } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { ImagePlus, X, Link2 } from "lucide-react";
 
-const PALETTES: { name: string; colors: string[] }[] = [
-  { name: "Cyber Ink", colors: ["#0a0f1f", "#101a2e", "#1a2742", "#0f3460", "#16213e", "#1b1b2f"] },
-  { name: "Neon", colors: ["#7df9ff", "#00d9ff", "#0ea5e9", "#4d7cff", "#1f3fb8", "#a855f7"] },
-  { name: "Hot", colors: ["#ff0080", "#ff4081", "#ff6b35", "#ffd84a", "#fbbf24", "#f97316"] },
-  { name: "Acid", colors: ["#39ff14", "#84cc16", "#22c55e", "#10b981", "#06b6d4", "#14b8a6"] },
-  { name: "Pastel", colors: ["#fef3c7", "#fce7f3", "#dbeafe", "#dcfce7", "#ede9fe", "#ffe4e6"] },
-  { name: "Mono", colors: ["#000000", "#1f1f1f", "#404040", "#737373", "#d4d4d4", "#ffffff"] },
-];
-
 const GRADIENT_PACKS: { name: string; gradients: { name: string; value: string }[] }[] = [
   {
     name: "Neon pack",
@@ -186,6 +177,35 @@ export function ColorPanel() {
         )}
       </div>
 
+      {/* ------- Couleur de fond (palette) ------- */}
+      <div className="space-y-2.5 px-4">
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Background color</div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setOpenPicker(openPicker === "bg" ? null : "bg")}
+            className={`grid size-11 shrink-0 place-items-center rounded-xl border transition ${
+              openPicker === "bg"
+                ? "border-blue-500 ring-4 ring-blue-500/10"
+                : "border-slate-200 hover:border-blue-300"
+            }`}
+            style={{ background: bgColor.startsWith("#") ? bgColor : "#0a0f1f" }}
+            title="Open color picker"
+          />
+          <input
+            type="text"
+            value={bgColor}
+            onChange={(e) => setBg(e.target.value)}
+            spellCheck={false}
+            className="h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 font-mono text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+          />
+        </div>
+        {openPicker === "bg" && (
+          <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+            <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
+          </div>
+        )}
+      </div>
+
       {/* ------- Dégradés prédéfinis ------- */}
       <div className="space-y-3 px-4">
         <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Gradient packs</div>
@@ -281,57 +301,6 @@ export function ColorPanel() {
           </label>
         )}
         <p className="text-[10px] text-slate-400">Click the preview above to apply it to this slide.</p>
-      </div>
-
-      {/* ------- Palettes de couleurs ------- */}
-      {PALETTES.map((p) => (
-        <div key={p.name} className="px-4">
-          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">{p.name}</div>
-          <div className="grid grid-cols-6 gap-1.5">
-            {p.colors.map((c) => (
-              <button
-                key={c}
-                onClick={() => setBg(c)}
-                title={c}
-                className={`h-9 rounded-lg border transition-all duration-200 ${
-                  bgColor === c
-                    ? "scale-110 border-blue-500 shadow-[0_0_0_3px_rgba(37,99,235,0.15)]"
-                    : "border-slate-200 hover:scale-105 hover:border-slate-300"
-                }`}
-                style={{ background: c }}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-
-      {/* ------- Couleur custom ------- */}
-      <div className="px-4 pb-2">
-        <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom</div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setOpenPicker(openPicker === "bg" ? null : "bg")}
-            className={`grid size-11 shrink-0 place-items-center rounded-xl border transition ${
-              openPicker === "bg"
-                ? "border-blue-500 ring-4 ring-blue-500/10"
-                : "border-slate-200 hover:border-blue-300"
-            }`}
-            style={{ background: bgColor.startsWith("#") ? bgColor : "#0a0f1f" }}
-            title="Open color picker"
-          />
-          <input
-            type="text"
-            value={bgColor}
-            onChange={(e) => setBg(e.target.value)}
-            spellCheck={false}
-            className="h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 font-mono text-xs text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-          />
-        </div>
-        {openPicker === "bg" && (
-          <div className="mt-2 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-            <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
-          </div>
-        )}
       </div>
     </div>
   );
