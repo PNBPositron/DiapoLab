@@ -767,7 +767,7 @@ export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
     matrix: ["#37ff7f", "#a6ff00", "#1c8c3f", "#7dffb0", "#00c853", "#d4ff4d"],
     swiss: ["#e2231a", "#111111", "#0057b7", "#f2b705", "#767676", "#3d8361"],
   };
-   return { uiStyle, bgColor: t.bg, fgColor: t.fg, colors: palettes[uiStyle] };
+    return { uiStyle, bgColor: t.bg, fgColor: t.fg, colors: palettes[uiStyle] };
 };
 
 export const newButton = (overrides: Partial<ButtonElement> = {}): ButtonElement => ({
