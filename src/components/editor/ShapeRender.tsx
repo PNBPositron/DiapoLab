@@ -87,13 +87,51 @@ function pathFor(kind: ShapeKind): string | null {
     case "trapezoid":
       return "M22 8 L 78 8 L 96 92 L 4 92 Z";
     case "cross":
-      return "M38 4 L 62 4 L 62 38 L 96 38 L 96 62 L 62 62 L 62 96 L 38 96 L 38 62 L 4 62 L 4 38 L 38 38 Z";
+      return "M38 4 L62 4 L62 38 L96 38 L96 62 L62 62 L62 96 L38 96 L38 62 L4 62 L4 38 L38 38 Z";
     case "lightning":
       return "M58 4 L 18 56 L 44 56 L 36 96 L 82 40 L 54 40 L 64 4 Z";
     case "cloud":
       return "M22 72 C 4 72, 4 46, 22 46 C 22 28, 48 22, 54 38 C 64 26, 84 32, 84 50 C 96 50, 96 72, 84 72 Z";
     case "speech":
       return "M8 14 L 92 14 L 92 70 L 50 70 L 30 92 L 32 70 L 8 70 Z";
+    case "octagon":
+      return "M33 3 H67 L97 33 V67 L67 97 H33 L3 67 V33 Z";
+    case "capsule":
+      return "M25 3 H75 A47 47 0 0 1 75 97 H25 A47 47 0 0 1 25 3 Z";
+    case "semicircle":
+      return "M5 92 A45 45 0 0 1 95 92 Z";
+    case "quarter_circle":
+      return "M5 95 H95 A90 90 0 0 0 5 5 Z";
+    case "chevron":
+      return "M6 8 L50 50 L6 92 L26 92 L70 50 L26 8 Z";
+    case "starburst":
+      return "M50 3 L62.2 20.4 L83.2 16.8 L79.6 37.8 L97 50 L79.6 62.2 L83.2 83.2 L62.2 79.6 L50 97 L37.8 79.6 L16.8 83.2 L20.4 62.2 L3 50 L20.4 37.8 L16.8 16.8 L37.8 20.4 Z";
+    case "flower":
+      return "M50 4 L64.1 30.6 L93.7 35.8 L72.8 57.4 L77 87.2 L50 74 L23 87.2 L27.2 57.4 L6.3 35.8 L35.9 30.6 Z";
+    case "gear":
+      return "M86 50 L84.4 60.6 L94.3 68.4 L87 80.6 L75.5 75.5 L66.8 81.8 L68.4 94.3 L54.5 97.8 L50 86 L39.4 84.4 L31.6 94.3 L19.4 87 L24.5 75.5 L18.2 66.8 L5.7 68.4 L2.2 54.5 L14 50 L15.6 39.4 L5.7 31.6 L13 19.4 L24.5 24.5 L33.2 18.2 L31.6 5.7 L45.5 2.2 L50 14 L60.6 15.6 L68.4 5.7 L80.6 13 L75.5 24.5 L81.8 33.2 L94.3 31.6 L97.8 45.5 Z";
+    case "shield":
+      return "M50 4 L92 18 V52 C92 76 72 90 50 96 C28 90 8 76 8 52 V18 Z";
+    case "drop":
+      return "M50 4 C50 4 88 46 88 66 A38 38 0 0 1 12 66 C12 46 50 4 50 4 Z";
+    case "pin":
+      return "M50 4 C28 4 12 20 12 42 C12 66 50 96 50 96 C50 96 88 66 88 42 C88 20 72 4 50 4 Z";
+    case "flag":
+      return "M18 4 H82 L68 26 L82 48 H18 Z";
+    case "ticket":
+      return "M8 25 H92 V42 A8 8 0 0 0 92 58 V75 H8 V58 A8 8 0 0 0 8 42 Z";
+    case "bookmark":
+      return "M25 4 H75 V96 L50 74 L25 96 Z";
+    case "blob":
+      return "M37 6 C62 -2 92 16 94 42 C96 66 78 92 52 95 C26 98 6 80 5 54 C4 30 14 12 37 6 Z";
+    case "moon":
+      return "M62 6 A44 44 0 1 0 62 94 A36 36 0 1 1 62 6 Z";
+    case "wave":
+      return "M4 62 C22 38 40 38 50 50 C60 62 78 62 96 38 V96 H4 Z";
+    case "leaf":
+      return "M8 92 C8 40 40 8 92 8 C92 60 60 92 8 92 Z";
+    case "ribbon":
+      return "M8 6 H92 L76 26 L92 46 H8 L24 26 Z";
     default:
       return null;
   }
@@ -149,7 +187,7 @@ export function ShapeRender({ element }: { element: ShapeElement }) {
               <stop offset="100%" stopColor={gradient.to} />
             </linearGradient>
           ))}
-      </defs>
+        </defs>
     ) : null;
   const dash =
     element.strokeStyle === "dashed"
