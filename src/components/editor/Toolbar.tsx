@@ -623,6 +623,9 @@ export function Toolbar() {
 /**
  * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
  */
+/**
+ * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
+ */
 function LargeModernHamburger({
   onSettings,
   onNewDesign,
@@ -660,7 +663,7 @@ function LargeModernHamburger({
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Enlarged trigger button (42x42px) */}
+      {/* Trigger button — soft ring on hover, filled slate when open */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
@@ -668,36 +671,39 @@ function LargeModernHamburger({
         title="Menu"
         className={`group relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-200 active:scale-95 ${
           open
-            ? "border-slate-400/80 bg-slate-900 text-white shadow-inner"
-            : "border-slate-200/90 bg-white/80 text-slate-700 shadow-sm hover:border-slate-300 hover:bg-white hover:text-slate-900"
+            ? "border-slate-800 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
+            : "border-slate-200/90 bg-white/80 text-slate-600 shadow-sm hover:bg-white hover:text-slate-900 hover:ring-4 hover:ring-slate-900/[0.06]"
         }`}
       >
-        {/* Animated 3-line hamburger */}
+        {/* Animated 3-line hamburger → X */}
         <div className="relative flex h-4 w-4.5 flex-col justify-between">
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-in-out ${
+            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               open ? "translate-y-[7px] rotate-45 bg-white" : "bg-current"
             }`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-200 ease-in-out ${
-              open ? "opacity-0" : "bg-current opacity-100"
-            }`}
+            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+              open ? "scale-x-0 opacity-0" : "opacity-100"
+            } bg-current`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-in-out ${
+            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
               open ? "-translate-y-[7px] -rotate-45 bg-white" : "bg-current"
             }`}
           />
         </div>
       </button>
 
-      {/* Expanded dropdown (w-72) with boxed icons & descriptions */}
+      {/* Expanded dropdown — fully opaque, wider, spring entrance */}
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+        <div className="absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_24px_56px_-12px_rgba(15,23,42,0.24)] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
           {/* CREATE & AI SECTION */}
-          <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-            Create & AI
+          <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
+            <span className="size-1.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+              Create & AI
+            </span>
           </div>
 
           <MenuCardItem
@@ -710,7 +716,7 @@ function LargeModernHamburger({
           <MenuCardItem
             icon={Sparkles}
             iconColor="text-purple-600"
-            iconBg="bg-purple-50 group-hover:bg-purple-100"
+            iconBg="bg-gradient-to-br from-purple-50 to-indigo-50 group-hover:from-purple-100 group-hover:to-indigo-100"
             title="Gemini assistant"
             subtitle="Smart critique & touch-ups"
             badge="AI"
@@ -726,6 +732,128 @@ function LargeModernHamburger({
               onClick={() => handleAction(onShare)}
             />
           )}
+
+          {/* SEPARATOR */}
+          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+          {/* WORKSPACE SECTION */}
+          <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
+            <span className="size-1.5 rounded-full bg-slate-300" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+              Workspace
+            </span>
+          </div>
+
+          {isAuthenticated && (
+            <MenuCardItem
+              icon={Settings}
+              title="Settings"
+              subtitle="Account & editing preferences"
+              onClick={() => handleAction(onSettings)}
+            />
+          )}
+
+          <MenuCardItem
+            icon={Info}
+            title="About"
+            subtitle="Documentation, GitHub & licenses"
+            onClick={() => handleAction(onAbout)}
+          />
+
+          {/* SEPARATOR */}
+          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+          {/* DANGER SECTION */}
+          <MenuCardItem
+            icon={Trash2}
+            iconColor="text-red-600"
+            iconBg="bg-red-50 group-hover:bg-red-100"
+            title="Clear canvas"
+            subtitle="Reset this slide to zero"
+            variant="destructive"
+            onClick={() => handleAction(onClear)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Modern card-style menu button — icon chip, arrow reveal on hover
+ */
+function MenuCardItem({
+  icon: Icon,
+  iconColor = "text-slate-600",
+  iconBg = "bg-slate-100 group-hover:bg-slate-200/80",
+  title,
+  subtitle,
+  badge,
+  disabled,
+  variant = "default",
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  iconColor?: string;
+  iconBg?: string;
+  title: string;
+  subtitle: string;
+  badge?: string;
+  disabled?: boolean;
+  variant?: "default" | "destructive";
+  onClick: () => void;
+}) {
+  const isDestructive = variant === "destructive";
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`group flex w-full items-center justify-between rounded-xl p-2 text-left transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
+        isDestructive ? "hover:bg-red-50/70" : "hover:bg-slate-100/90"
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`flex size-8 items-center justify-center rounded-lg transition-all duration-150 group-hover:scale-105 ${iconBg}`}
+        >
+          <Icon className={`size-4 ${iconColor}`} />
+        </div>
+        <div className="flex flex-col">
+          <span
+            className={`text-xs font-semibold leading-tight ${
+              isDestructive ? "text-red-700" : "text-slate-800"
+            }`}
+          >
+            {title}
+          </span>
+          <span className="text-[10px] leading-tight text-slate-400">
+            {subtitle}
+          </span>
+        </div>
+      </div>
+
+      {badge ? (
+        <span className="rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 px-2 py-0.5 text-[9px] font-bold text-purple-700 shadow-sm ring-1 ring-purple-200/60">
+          {badge}
+        </span>
+      ) : (
+        <svg
+          className="size-3.5 -translate-x-1 text-slate-300 opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M6 3.5 10.5 8 6 12.5" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-slate-100" />
