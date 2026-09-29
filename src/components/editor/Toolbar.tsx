@@ -623,9 +623,6 @@ export function Toolbar() {
 /**
  * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
  */
-/**
- * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
- */
 function LargeModernHamburger({
   onSettings,
   onNewDesign,
@@ -850,114 +847,6 @@ function MenuCardItem({
         >
           <path d="M6 3.5 10.5 8 6 12.5" />
         </svg>
-      )}
-    </button>
-  );
-}
-
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-slate-100" />
-
-          {/* WORKSPACE SECTION */}
-          <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
-            Workspace
-          </div>
-
-          {isAuthenticated && (
-            <MenuCardItem
-              icon={Settings}
-              title="Settings"
-              subtitle="Account & editing preferences"
-              onClick={() => handleAction(onSettings)}
-            />
-          )}
-
-          <MenuCardItem
-            icon={Info}
-            title="About"
-            subtitle="Documentation, GitHub & licenses"
-            onClick={() => handleAction(onAbout)}
-          />
-
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-slate-100" />
-
-          {/* DANGER SECTION */}
-          <MenuCardItem
-            icon={Trash2}
-            iconColor="text-red-600"
-            iconBg="bg-red-50 group-hover:bg-red-100"
-            title="Clear canvas"
-            subtitle="Reset this slide to zero"
-            variant="destructive"
-            onClick={() => handleAction(onClear)}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
- * Modern card-style menu button with a small icon in a container
- */
-function MenuCardItem({
-  icon: Icon,
-  iconColor = "text-slate-600",
-  iconBg = "bg-slate-100 group-hover:bg-slate-200/80",
-  title,
-  subtitle,
-  badge,
-  disabled,
-  variant = "default",
-  onClick,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  iconColor?: string;
-  iconBg?: string;
-  title: string;
-  subtitle: string;
-  badge?: string;
-  disabled?: boolean;
-  variant?: "default" | "destructive";
-  onClick: () => void;
-}) {
-  const isDestructive = variant === "destructive";
-
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`group flex w-full items-center justify-between rounded-xl p-2 text-left transition-all active:scale-[0.98] disabled:opacity-50 ${
-        isDestructive
-          ? "hover:bg-red-50/60"
-          : "hover:bg-slate-100/80"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className={`flex size-8 items-center justify-center rounded-lg transition-colors ${iconBg}`}
-        >
-          <Icon className={`size-4 ${iconColor}`} />
-        </div>
-        <div className="flex flex-col">
-          <span
-            className={`text-xs font-semibold leading-tight ${
-              isDestructive ? "text-red-700" : "text-slate-800"
-            }`}
-          >
-            {title}
-          </span>
-          <span className="font-mono text-[10px] leading-tight text-slate-400">
-            {subtitle}
-          </span>
-        </div>
-      </div>
-
-      {badge && (
-        <span className="rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 px-2 py-0.5 font-display text-[9px] font-bold text-purple-700 shadow-sm">
-          {badge}
-        </span>
       )}
     </button>
   );
