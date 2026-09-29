@@ -108,7 +108,10 @@ export function ElementsPanel() {
           label="Icons"
           active={section === "icons"}
           onClick={() => setSection(section === "icons" ? null : "icons")}
+        />
       </div>
+
+      {section === "shapes" && <ShapesPanel embedded />}
 
       {section === "shapes" && <ShapesPanel embedded />}
 
