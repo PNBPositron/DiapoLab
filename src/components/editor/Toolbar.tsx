@@ -409,7 +409,7 @@ export function Toolbar() {
           </button>
 
           {exportOpen && (
-            <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+            <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in zoom-in-95">
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
@@ -849,7 +849,7 @@ function UserMenu({ email }: { email: string }) {
         <UserIcon className="h-4 w-4" strokeWidth={2.2} />
       </button>
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200/90 bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
+        <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
