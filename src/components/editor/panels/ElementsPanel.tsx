@@ -7,7 +7,6 @@ import {
   Search,
   ImagePlus,
 } from "lucide-react";
-} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
