@@ -38,7 +38,7 @@ function dottedTrianglePath(perSide = 7, r = 3): string {
 }
 
 // Reusable path generators (normalized 0-100 viewBox) so previews and canvas share geometry.
-function pathFor(kind: ShapeKind): string | null {
+export function pathFor(kind: ShapeKind): string | null {
   switch (kind) {
     case "frame_cut":
       return "M3 3 H70 L97 30 V97 H30 L3 70 Z M12 12 L12 66 L34 88 L88 88 L88 34 L66 12 Z";
