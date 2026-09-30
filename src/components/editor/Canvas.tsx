@@ -25,8 +25,8 @@ export function Canvas() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const t = e.target as HTMLElement;
+      if (t?.tagName === "INPUT" || t?.tagName === "TEXTAREA" || t?.isContentEditable) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         const st = useEditor.getState();
         if (st.selectedIds.length > 0 || st.selectedId) {
@@ -55,6 +55,20 @@ export function Canvas() {
         if (st.selectedIds.length > 0 || st.selectedId) {
           e.preventDefault();
           st.duplicateSelected();
+        }
+      }
+      // Nudge: arrows = 1px, Shift+arrows = 10px
+      if (e.key.startsWith("Arrow") && !e.altKey) {
+        const st = useEditor.getState();
+        const ids = st.selectedIds.length ? st.selectedIds : st.selectedId ? [st.selectedId] : [];
+        if (!ids.length) return;
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        const dx = e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0;
+        const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+        for (const id of ids) {
+          const el = st.elements.find((o) => o.id === id);
+          if (el) st.update(id, { x: el.x + dx, y: el.y + dy });
         }
       }
     };
