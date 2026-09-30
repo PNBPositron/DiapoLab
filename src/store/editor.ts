@@ -7,6 +7,10 @@ export type ElementBase = {
   width: number;
   height: number;
   rotation: number;
+  rotateX?: number; // deg — CSS 3D tilt
+  rotateY?: number; // deg — CSS 3D tilt
+  perspective?: number; // px — 0/undefined = flat (2D), 400..1200 = typical 3D depth
+  hoverTilt?: boolean; // tilt toward the cursor while presenting
   animation?: ElementAnimation;
   interaction?: ElementInteraction;
 };
