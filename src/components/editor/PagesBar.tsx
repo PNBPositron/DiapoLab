@@ -59,7 +59,7 @@ export function PagesBar() {
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">Transition</span>
           <div className="flex items-center gap-1" role="group" aria-label="Slide transition">
-            {(["none", "fade", "slide", "zoom", "flip", "morph"] as SlideTransition[]).map((transition) => (
+            {(["none", "fade", "slide", "zoom", "flip", "morph", "glitch", "parallax-left", "parallax-up", "parallax-depth"] as SlideTransition[]).map((transition) => (
               <button
                 key={transition}
                 type="button"
