@@ -768,6 +768,25 @@ export function PropertiesPanel() {
             {/* IMAGE ELEMENT */}
             {el.type === "image" && (
               <Section title="Image Filters & Adjustments">
+                <Field label="Shape Mask">
+                  <select
+                    value={el.maskShape ?? ""}
+                    onChange={(e) => update(el.id, { maskShape: e.target.value || undefined })}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
+                  >
+                    <option value="">None (rectangle)</option>
+                    <option value="circle">Circle</option>
+                    <option value="hexagon">Hexagon</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="star">Star</option>
+                    <option value="heart">Heart</option>
+                    <option value="blob">Blob</option>
+                    <option value="moon">Moon</option>
+                    <option value="frame_cut">Frame Cut</option>
+                    <option value="ticket">Ticket</option>
+                  </select>
+                </Field>
                 <Field label="Presets">
                   <div className="grid grid-cols-4 gap-1.5">
                     {IMAGE_FILTER_PRESETS.map((preset) => (
