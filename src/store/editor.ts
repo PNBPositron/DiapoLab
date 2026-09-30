@@ -342,9 +342,9 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
   glass: {
     label: "Glass",
     bg: "rgba(255,255,255,0.24)",
-  fg: "#172033",
-  muted: "rgba(23,32,51,0.68)",
-  accent: "#72a7ff",
+    fg: "#172033",
+    muted: "rgba(23,32,51,0.68)",
+    accent: "#72a7ff",
     border: "rgba(205,226,255,0.68)",
     borderWidth: 1,
     radius: 22,
@@ -557,6 +557,7 @@ type State = {
   elements: AnyElement[];
   bgColor: string;
   selectedId: string | null;
+  selectedIds: string[];
   tool: Tool;
   canvasW: number;
   canvasH: number;
@@ -572,6 +573,9 @@ type State = {
   clipboard: AnyElement | null;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
+  toggleSelect: (id: string) => void;
+  removeSelected: () => void;
+  duplicateSelected: () => void;
   add: (el: AnyElement) => void;
   update: (id: string, patch: Partial<AnyElement>) => void;
   remove: (id: string) => void;
@@ -762,7 +766,6 @@ export const newChart = (
   ...overrides,
 });
 
-// Map a UI style pack onto chart colors so charts match UI components.
 /** A guaranteed-opaque background for a style pack (charts, quizzes, buttons). */
 export const solidThemeBg = (uiStyle: UiStyle): string => {
   const t = UI_STYLE_THEMES[uiStyle];
@@ -770,6 +773,7 @@ export const solidThemeBg = (uiStyle: UiStyle): string => {
   return t.dark ? "#1b2233" : "#ffffff";
 };
 
+// Map a UI style pack onto chart colors so charts match UI components.
 export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
   const t = UI_STYLE_THEMES[uiStyle];
   const palettes: Record<UiStyle, string[]> = {
@@ -1103,6 +1107,7 @@ export const useEditor = create<State>((set, get) => {
     elements: initialPage.elements,
     bgColor: initialPage.bgColor,
     selectedId: null,
+    selectedIds: [],
     tool: "home",
     canvasW: DEFAULT_W,
     canvasH: DEFAULT_H,
@@ -1146,7 +1151,7 @@ export const useEditor = create<State>((set, get) => {
           return scaled;
         }),
       }));
-      set({ ...syncCurrent(next, currentIndex), canvasW: w, canvasH: h, selectedId: null });
+      set({ ...syncCurrent(next, currentIndex), canvasW: w, canvasH: h, selectedId: null, selectedIds: [] });
     },
 
     applyBrandKit: (kit, scope) => {
@@ -1187,7 +1192,7 @@ export const useEditor = create<State>((set, get) => {
         scope === "deck"
           ? pages.map(paint)
           : pages.map((p, i) => (i === currentIndex ? paint(p) : p));
-      set({ ...syncCurrent(next, currentIndex), selectedId: null });
+      set({ ...syncCurrent(next, currentIndex), selectedId: null, selectedIds: [] });
     },
     setPresenting: (presenting) => set({ presenting }),
     setGuides: (guides) => set({ guides }),
@@ -1208,14 +1213,45 @@ export const useEditor = create<State>((set, get) => {
         y: clipboard.y + 30,
       } as AnyElement;
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
-      set({ selectedId: clone.id });
+      set({ selectedId: clone.id, selectedIds: [clone.id] });
     },
-    select: (selectedId) => set({ selectedId }),
+    select: (selectedId) => set({ selectedId, selectedIds: selectedId ? [selectedId] : [] }),
+    toggleSelect: (id) => {
+      const { selectedIds } = get();
+      const next = selectedIds.includes(id)
+        ? selectedIds.filter((x) => x !== id)
+        : [...selectedIds, id];
+      set({ selectedIds: next, selectedId: next.length ? next[next.length - 1] : null });
+    },
+    removeSelected: () => {
+      const { selectedIds, selectedId } = get();
+      const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
+      if (!ids.length) return;
+      pushHistory();
+      updateCurrentPage((p) => ({ ...p, elements: p.elements.filter((e) => !ids.includes(e.id)) }));
+      set({ selectedId: null, selectedIds: [] });
+    },
+    duplicateSelected: () => {
+      const { selectedIds, selectedId, elements } = get();
+      const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
+      if (!ids.length) return;
+      pushHistory();
+      const clones = elements
+        .filter((e) => ids.includes(e.id))
+        .map((e) => ({
+          ...(JSON.parse(JSON.stringify(e)) as AnyElement),
+          id: uid(),
+          x: e.x + 30,
+          y: e.y + 30,
+        }));
+      updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...clones] }));
+      set({ selectedIds: clones.map((c) => c.id), selectedId: clones[clones.length - 1]?.id ?? null });
+    },
 
     add: (el) => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, el] }));
-      set({ selectedId: el.id });
+      set({ selectedId: el.id, selectedIds: [el.id] });
     },
     update: (id, patch) =>
       updateCurrentPage((p) => ({
@@ -1225,7 +1261,10 @@ export const useEditor = create<State>((set, get) => {
     remove: (id) => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, elements: p.elements.filter((e) => e.id !== id) }));
-      if (get().selectedId === id) set({ selectedId: null });
+      set({
+        selectedId: get().selectedId === id ? null : get().selectedId,
+        selectedIds: get().selectedIds.filter((x) => x !== id),
+      });
     },
     duplicate: (id) => {
       const el = get().elements.find((e) => e.id === id);
@@ -1233,7 +1272,7 @@ export const useEditor = create<State>((set, get) => {
       pushHistory();
       const clone = { ...el, id: uid(), x: el.x + 30, y: el.y + 30 } as AnyElement;
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
-      set({ selectedId: clone.id });
+      set({ selectedId: clone.id, selectedIds: [clone.id] });
     },
     bringForward: (id) => {
       updateCurrentPage((p) => {
@@ -1274,6 +1313,7 @@ export const useEditor = create<State>((set, get) => {
         history: history.slice(0, -1),
         future: [snap(), ...future].slice(0, 50),
         selectedId: null,
+        selectedIds: [],
       });
     },
     redo: () => {
@@ -1285,17 +1325,18 @@ export const useEditor = create<State>((set, get) => {
         future: rest,
         history: [...history, snap()].slice(-50),
         selectedId: null,
+        selectedIds: [],
       });
     },
     clear: () => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, elements: [] }));
-      set({ selectedId: null });
+      set({ selectedId: null, selectedIds: [] });
     },
     loadTemplate: (els, bg) => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, elements: els, bgColor: bg ?? p.bgColor }));
-      set({ selectedId: null });
+      set({ selectedId: null, selectedIds: [] });
     },
     loadPages: (incoming) => {
       if (!incoming || incoming.length === 0) return;
@@ -1306,7 +1347,7 @@ export const useEditor = create<State>((set, get) => {
         duration: p.duration ?? DEFAULT_PAGE_DURATION,
         elements: p.elements.map((element) => element.type === "image" && element.assetKind === "icon" ? { ...element, type: "icon" as const, name: ("name" in element && typeof element.name === "string" ? element.name : element.src.split("/").pop()?.replace(/\.svg$/i, "") ?? "Icon"), color: element.tint ?? "#111827", strokeWidth: 2, src: element.src } : element),
       }));
-      set({ ...syncCurrent(safe, 0), selectedId: null });
+      set({ ...syncCurrent(safe, 0), selectedId: null, selectedIds: [] });
     },
 
     addPage: () => {
@@ -1314,7 +1355,7 @@ export const useEditor = create<State>((set, get) => {
       const { pages, currentIndex, bgColor } = get();
       const created = newPage({ bgColor });
       const next = [...pages.slice(0, currentIndex + 1), created, ...pages.slice(currentIndex + 1)];
-      set({ ...syncCurrent(next, currentIndex + 1), selectedId: null });
+      set({ ...syncCurrent(next, currentIndex + 1), selectedId: null, selectedIds: [] });
     },
     removePage: (index) => {
       const { pages, currentIndex } = get();
@@ -1325,7 +1366,7 @@ export const useEditor = create<State>((set, get) => {
         currentIndex > index ? currentIndex - 1 : currentIndex,
         next.length - 1,
       );
-      set({ ...syncCurrent(next, newIdx), selectedId: null });
+      set({ ...syncCurrent(next, newIdx), selectedId: null, selectedIds: [] });
     },
     duplicatePage: (index) => {
       pushHistory();
@@ -1338,12 +1379,12 @@ export const useEditor = create<State>((set, get) => {
         elements: src.elements.map((e) => ({ ...e, id: uid() })),
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
-      set({ ...syncCurrent(next, index + 1), selectedId: null });
+      set({ ...syncCurrent(next, index + 1), selectedId: null, selectedIds: [] });
     },
     setCurrentPage: (index) => {
       const { pages } = get();
       if (index < 0 || index >= pages.length) return;
-      set({ ...syncCurrent(pages, index), selectedId: null });
+      set({ ...syncCurrent(pages, index), selectedId: null, selectedIds: [] });
     },
     movePage: (from, to) => {
       const { pages, currentIndex } = get();
@@ -1380,6 +1421,7 @@ export const useEditor = create<State>((set, get) => {
         history: [],
         future: [],
         selectedId: null,
+        selectedIds: [],
       });
     },
     newDesign: () => {
@@ -1393,6 +1435,7 @@ export const useEditor = create<State>((set, get) => {
         history: [],
         future: [],
         selectedId: null,
+        selectedIds: [],
       });
     },
   };
