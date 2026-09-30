@@ -73,8 +73,8 @@ export function CanvasElement({
   /** when true the node tweens position/size between slides (morph transition) */
   morph?: boolean;
 }) {
-  const { selectedId, select, update, setCurrentPage } = useEditor();
-  const selected = selectedId === element.id;
+  const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
+  const selected = selectedIds.includes(element.id);
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -91,13 +91,21 @@ export function CanvasElement({
     if (editing) return;
     if (useEditor.getState().presenting) return; // no selection/drag while presenting
     if (linkActive && !e.shiftKey) return; // let the <a> handle the click; shift+click selects
-    e.stopPropagation();
-    select(element.id);
+     e.stopPropagation();
+    if (e.shiftKey) {
+      toggleSelect(element.id);
+      return;
+    }
+    if (!useEditor.getState().selectedIds.includes(element.id)) select(element.id);
     const startX = e.clientX;
     const startY = e.clientY;
     const ox = element.x;
     const oy = element.y;
     const st = useEditor.getState();
+    const groupIds = st.selectedIds.includes(element.id) ? st.selectedIds : [element.id];
+    const startPos = new Map(
+      st.elements.filter((o) => groupIds.includes(o.id)).map((o) => [o.id, { x: o.x, y: o.y }]),
+    );
     const W = st.canvasW;
     const H = st.canvasH;
     const w = element.width;
@@ -179,7 +187,9 @@ export function CanvasElement({
         }
       }
       useEditor.getState().setGuides({ v: [...vHits], h: [...hHits] });
-      update(element.id, { x: nx, y: ny });
+      const dx = nx - ox;
+      const dy = ny - oy;
+      for (const [id, pos] of startPos) update(id, { x: pos.x + dx, y: pos.y + dy });
     };
     const onUp = () => {
       window.removeEventListener("mousemove", onMove);
