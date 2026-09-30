@@ -13,6 +13,7 @@ import {
   type ShapeGradient,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
+import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import * as LucideIcons from "lucide-react";
 import { HelpCircle, Check, X as XIcon } from "lucide-react";
@@ -117,6 +118,9 @@ export function CanvasElement({
     : allow3d
       ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
       : `rotate(${element.rotation}deg)`;
+
+  // Vector mask for images (clipped by a shape path, 0-100 viewBox scaled to the box).
+  const maskPath = element.type === "image" && element.maskShape ? pathFor(element.maskShape) : null;
 
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
@@ -443,16 +447,27 @@ export function CanvasElement({
             position: "relative",
             width: "100%",
             height: "100%",
-            borderRadius: element.cornerRadius ?? 0,
+            borderRadius: maskPath ? 0 : (element.cornerRadius ?? 0),
             overflow: "hidden",
+            clipPath: maskPath ? `url("#img-mask-${element.id}")` : undefined,
             border:
-              element.borderWidth && element.borderWidth > 0
+              !maskPath && element.borderWidth && element.borderWidth > 0
                 ? `${element.borderWidth}px solid ${element.borderColor ?? "#000000"}`
                 : undefined,
             boxSizing: "border-box",
             opacity: element.opacity ?? 1,
           }}
         >
+          {/* SVG clip definition for the shape mask */}
+          {maskPath && (
+            <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
+              <defs>
+                <clipPath id={`img-mask-${element.id}`} clipPathUnits="objectBoundingBox">
+                  <path d={maskPath} transform="scale(0.01)" />
+                </clipPath>
+              </defs>
+            </svg>
+          )}
           {element.illustrationFormat === "svg" && element.tint ? (
             <div
               aria-hidden="true"
@@ -655,7 +670,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   const castVote = (optionId: string) => {
     if (!interactive || picked) return;
     setPicked(optionId);
-    setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
+    setVotes((v) => ({ ...v, [optionId]: (v[optionId!] ?? 0) + 1 }));
     chanRef.current?.postMessage({ type: "vote", optionId });
   };
   const resetPoll = () => {
@@ -810,16 +825,6 @@ function ChartRender({ element }: { element: ChartElement }) {
   const { chart, data, colors, bgColor, fgColor, title, showValues, showAxes } = element;
   const theme = element.uiStyle ? UI_STYLE_THEMES[element.uiStyle] : null;
   const fontFamily = theme ? theme.font : "Inter, sans-serif";
-  const themeStyle: React.CSSProperties = theme
-    ? {
-        background: theme.bg,
-        backdropFilter: theme.backdrop,
-        WebkitBackdropFilter: theme.backdrop,
-        border: `${theme.borderWidth}px solid ${theme.border}`,
-        borderRadius: theme.radius,
-        boxShadow: theme.shadow,
-      }
-    : { background: bgColor };
   const W = 400,
     H = 300;
   const padL = 50,
