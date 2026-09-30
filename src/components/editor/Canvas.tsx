@@ -3,7 +3,7 @@ import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
 
 export function Canvas() {
-  const { elements, bgColor, select, selectedId, remove, canvasW, canvasH, guides, pages, currentIndex } = useEditor();
+  const { elements, bgColor, select, guides, canvasW, canvasH, pages, currentIndex } = useEditor();
   const page = pages[currentIndex];
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
@@ -27,9 +27,12 @@ export function Canvas() {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
-        e.preventDefault();
-        remove(selectedId);
+      if (e.key === "Delete" || e.key === "Backspace") {
+        const st = useEditor.getState();
+        if (st.selectedIds.length > 0 || st.selectedId) {
+          e.preventDefault();
+          st.removeSelected();
+        }
       }
       if ((e.metaKey || e.ctrlKey) && e.key === "z") {
         e.preventDefault();
@@ -37,9 +40,10 @@ export function Canvas() {
         else useEditor.getState().undo();
       }
       if ((e.metaKey || e.ctrlKey) && (e.key === "c" || e.key === "C")) {
-        if (selectedId) {
+        const st = useEditor.getState();
+        if (st.selectedId) {
           e.preventDefault();
-          useEditor.getState().copySelected();
+          st.copySelected();
         }
       }
       if ((e.metaKey || e.ctrlKey) && (e.key === "v" || e.key === "V")) {
@@ -47,15 +51,16 @@ export function Canvas() {
         useEditor.getState().paste();
       }
       if ((e.metaKey || e.ctrlKey) && (e.key === "d" || e.key === "D")) {
-        if (selectedId) {
+        const st = useEditor.getState();
+        if (st.selectedIds.length > 0 || st.selectedId) {
           e.preventDefault();
-          useEditor.getState().duplicate(selectedId);
+          st.duplicateSelected();
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, remove]);
+  }, []);
 
   return (
     <div
