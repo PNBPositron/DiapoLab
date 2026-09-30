@@ -74,24 +74,55 @@ export function CanvasElement({
   morph?: boolean;
 }) {
   const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
+  const presenting = useEditor((s) => s.presenting);
   const selected = selectedIds.includes(element.id);
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  // Live 3D tilt toward the cursor (presenting + hoverTilt enabled)
+  const [tilt, setTilt] = useState<{ rx: number; ry: number } | null>(null);
+  useEffect(() => {
+    if (!element.hoverTilt || !presenting) return;
+    const node = ref.current;
+    if (!node) return;
+    const onMove = (ev: MouseEvent) => {
+      const r = node.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width - 0.5; // -0.5..0.5
+      const py = (ev.clientY - r.top) / r.height - 0.5;
+      setTilt({ rx: -py * 24, ry: px * 24 }); // ±12deg max each way
+    };
+    const onLeave = () => setTilt(null);
+    node.addEventListener("mousemove", onMove);
+    node.addEventListener("mouseleave", onLeave);
+    return () => {
+      node.removeEventListener("mousemove", onMove);
+      node.removeEventListener("mouseleave", onLeave);
+    };
+  }, [element.hoverTilt, presenting]);
+
   const interaction = element.interaction;
-  const presenting = useEditor.getState().presenting;
   const activateInteraction = () => {
     if (!presenting || !interaction?.moveToSlide) return;
     setCurrentPage(Math.max(0, interaction.moveToSlide - 1));
   };
 
-  const linkActive = element.type === "text" && !!element.href && useEditor.getState().presenting;
+  const linkActive = element.type === "text" && !!element.href && presenting;
+
+  // 3D transform chain: interactive tilt > static 3D angles > flat rotation.
+  // Embeds (iframes) ignore 3D — tilting an iframe is unreliable across browsers.
+  const allow3d = element.type !== "embed" && (element.perspective ?? 0) > 0;
+  const transform = tilt
+    ? `perspective(${element.perspective ?? 800}px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotate(${element.rotation}deg)`
+    : allow3d
+      ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
+      : `rotate(${element.rotation}deg)`;
 
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
-    if (useEditor.getState().presenting) return; // no selection/drag while presenting
+    if (presenting) return; // no selection/drag while presenting
     if (linkActive && !e.shiftKey) return; // let the <a> handle the click; shift+click selects
-     e.stopPropagation();
+    e.stopPropagation();
     if (e.shiftKey) {
       toggleSelect(element.id);
       return;
@@ -276,12 +307,17 @@ export function CanvasElement({
         top: element.y,
         width: element.width,
         height: element.height,
-        transform: `rotate(${element.rotation}deg)`,
+        transform,
+        transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
         transition: morph
           ? "left 620ms cubic-bezier(0.22,1,0.36,1), top 620ms cubic-bezier(0.22,1,0.36,1), width 620ms cubic-bezier(0.22,1,0.36,1), height 620ms cubic-bezier(0.22,1,0.36,1), transform 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease"
-          : undefined,
+          : element.hoverTilt && presenting
+            ? tilt === null
+              ? "transform 420ms cubic-bezier(0.22,1,0.36,1)"
+              : "transform 60ms linear"
+            : undefined,
         cursor: editing ? "text" : "move",
-        outline: selected ? "3px solid #2b6bff" : "none",
+        outline: selected ? "3px solid #2b6cff" : "none",
         outlineOffset: "2px",
         mixBlendMode: "blendMode" in element ? (element.blendMode ?? "normal") : "normal",
       }}
