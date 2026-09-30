@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import * as LucideIcons from "lucide-react";
 import {
-  Upload,
+  Link2,
   Shapes,
   Star,
   Search,
@@ -18,11 +18,7 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.e
     const isLucideComponent = typeof icon === "object" && icon !== null && "render" in icon;
     return name !== "createLucideIcon" && isLucideComponent && /^[A-Z]/.test(name);
   })
-  .map(([name, Icon]) => ({
-    name,
-    label: name.replace(/([a-z])([A-Z])/g, "$1 $2"),
-    Icon: Icon as LucideIcon,
-  }))
+  .map(([name, Icon]) => ({ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon: Icon as LucideIcon }))
   .sort((a, b) => a.label.localeCompare(b.label))
   .slice(0, 500);
 
@@ -48,14 +44,14 @@ function ActionTile({
     ? "border-blue-500/50 bg-blue-50/80 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.35),0_8px_20px_-8px_rgba(59,130,246,0.45)]"
     : "border-slate-200/80 bg-white/80 shadow-[0_1px_2px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-[0_10px_24px_-8px_rgba(15,23,42,0.18)]";
   const chip = active
-    ? "bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-[0_4px_10px_-2px_rgba(59,130,246,0.5)]"
-    : "bg-gradient-to-br from-slate-100 to-slate-50 text-slate-600 group-hover:from-blue-50 group-hover:to-indigo-50 group-hover:text-blue-600";
+    ? "bg-linear-to-tr from-blue-500 to-indigo-600 text-white shadow-xs"
+    : "bg-slate-100/80 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600";
   const inner = (
     <>
       <span className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}>
-        <Icon className="size-[18px]" strokeWidth={2.2} />
+        <Icon className="size-4" />
       </span>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-600">
+      <span className="text-[10px] font-semibold tracking-wide text-slate-600 uppercase group-hover:text-slate-800">
         {label}
       </span>
       {children}
@@ -79,13 +75,22 @@ export function ElementsPanel() {
   const { add } = useEditor();
   const [section, setSection] = useState<ElementSection>(null);
   const [iconQuery, setIconQuery] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [urlError, setUrlError] = useState<string | null>(null);
   const filteredIcons = ICONS.filter(({ label }) =>
     label.toLowerCase().includes(iconQuery.trim().toLowerCase()),
   );
-  const onFile = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files ?? []);
-    event.target.value = "";
-    files.forEach((file) => add(newImage(URL.createObjectURL(file))));
+
+  const addByUrl = () => {
+    const trimmed = imageUrl.trim();
+    setUrlError(null);
+    if (!trimmed) return;
+    if (!/^https?:\/\//i.test(trimmed)) {
+      setUrlError("Lien invalide — doit commencer par http:// ou https://");
+      return;
+    }
+    add(newImage(trimmed));
+    setImageUrl("");
   };
 
   return (
@@ -93,10 +98,33 @@ export function ElementsPanel() {
       {/* No panel header — the panel starts directly with its content. */}
       <div className="panel-intro">Drop in visual building blocks for your slide.</div>
 
+      {/* Add image by URL — permanent, survives refresh & design sharing. */}
+      <div className="space-y-1.5">
+        <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.14)]">
+          <Link2 className="size-4 shrink-0 text-slate-400" />
+          <input
+            type="url"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addByUrl()}
+            placeholder="Coller le lien d'une image…"
+            aria-label="Image URL"
+            className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
+          />
+          <button
+            type="button"
+            onClick={addByUrl}
+            className="shrink-0 rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+          >
+            Ajouter
+          </button>
+        </label>
+        {urlError && (
+          <p className="px-1 text-[10px] font-medium text-rose-500">{urlError}</p>
+        )}
+      </div>
+
       <div className="panel-action-grid">
-        <ActionTile asLabel Icon={Upload} label="Upload">
-          <input type="file" accept="image/*" multiple onChange={onFile} className="hidden" />
-        </ActionTile>
         <ActionTile
           Icon={Shapes}
           label="Shapes"
@@ -110,8 +138,6 @@ export function ElementsPanel() {
           onClick={() => setSection(section === "icons" ? null : "icons")}
         />
       </div>
-
-      {section === "shapes" && <ShapesPanel embedded />}
 
       {section === "shapes" && <ShapesPanel embedded />}
 
@@ -143,12 +169,6 @@ export function ElementsPanel() {
               </button>
             ))}
           </div>
-        </div>
-      )}
-
-      {section === null && (
-        <div className="flex items-center gap-2.5 rounded-xl border border-dashed border-slate-300/80 bg-slate-50/60 px-3.5 py-3 text-[10px] font-medium text-slate-400">
-          <ImagePlus className="size-4" /> Choose a category above
         </div>
       )}
     </div>
