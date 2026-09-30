@@ -160,7 +160,7 @@ export function AiPanel() {
               <h2 className="text-xs font-semibold tracking-wide text-slate-900 uppercase">
                 AI Studio
               </h2>
-              <p className="text-[10px] text-slate-400">Powered by Gemini Vision & Layout</p>
+              <p className="text-[10px] text-slate-400">Powered by Groq</p>
             </div>
           </div>
         </div>
