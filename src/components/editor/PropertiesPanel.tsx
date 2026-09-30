@@ -1019,6 +1019,76 @@ export function PropertiesPanel() {
               </Section>
             )}
 
+            {/* 3D TRANSFORM */}
+            {el.type !== "embed" && (
+              <Section
+                title="3D Transform"
+                badge={
+                  (el.perspective ?? 0) > 0 ? (
+                    <span className="rounded-full bg-sky-100 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-sky-700">
+                      3D
+                    </span>
+                  ) : undefined
+                }
+              >
+                <SliderWithInput
+                  label="Perspective (0 = off)"
+                  min={0}
+                  max={1200}
+                  step={20}
+                  value={el.perspective ?? 0}
+                  unit="px"
+                  onChange={(val) =>
+                    update(el.id, { perspective: val > 0 ? val : undefined })
+                  }
+                />
+                {(el.perspective ?? 0) > 0 && (
+                  <>
+                    <SliderWithInput
+                      label="Rotate X (tilt)"
+                      min={-80}
+                      max={80}
+                      value={el.rotateX ?? 0}
+                      unit="°"
+                      onChange={(val) => update(el.id, { rotateX: val })}
+                    />
+                    <SliderWithInput
+                      label="Rotate Y (pan)"
+                      min={-80}
+                      max={80}
+                      value={el.rotateY ?? 0}
+                      unit="°"
+                      onChange={(val) => update(el.id, { rotateY: val })}
+                    />
+                    <Field label="Interactive Tilt (while presenting)">
+                      <SegmentedControl
+                        value={el.hoverTilt ? "on" : "off"}
+                        onChange={(v) => update(el.id, { hoverTilt: v === "on" || undefined })}
+                        options={[
+                          { value: "off", label: "Off" },
+                          { value: "on", label: "Tilt to cursor" },
+                        ]}
+                      />
+                    </Field>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        update(el.id, {
+                          perspective: undefined,
+                          rotateX: undefined,
+                          rotateY: undefined,
+                          hoverTilt: undefined,
+                        })
+                      }
+                      className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
+                    >
+                      Reset to flat (2D)
+                    </button>
+                  </>
+                )}
+              </Section>
+            )}
+
             {/* PRESENTATION & TRANSITIONS */}
             <Section title="Animation & Interaction">
               <Field label="Entrance Animation">
