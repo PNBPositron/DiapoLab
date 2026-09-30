@@ -158,6 +158,59 @@
 .slide-transition-zoom { animation: slide-zoom-in 700ms ease both; will-change: transform; }
 .slide-transition-flip { animation: slide-flip-in 700ms ease both; will-change: transform; }
 .slide-transition-glitch { animation: slide-glitch-in 620ms steps(8, end) both; }
+/* ============================================================
+   PARALLAX TRANSITIONS — layers move at different speeds.
+   Depth driven by nth-child so every layer lags differently.
+   ============================================================ */
+
+.slide-transition-parallax-left,
+.slide-transition-parallax-up,
+.slide-transition-parallax-depth {
+  animation: slide-parallax-base 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.slide-transition-parallax-left > *,
+.slide-transition-parallax-up > *,
+.slide-transition-parallax-depth > * {
+  will-change: transform, opacity;
+}
+
+/* ---- Horizontal parallax: deeper elements lag behind ---- */
+.slide-transition-parallax-left > * {
+  animation: px-left-1 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-transition-parallax-left > *:nth-child(2n) { animation-name: px-left-2; }
+.slide-transition-parallax-left > *:nth-child(3n) { animation-name: px-left-3; }
+.slide-transition-parallax-left > *:nth-child(4n) { animation-name: px-left-4; }
+
+/* ---- Vertical parallax ---- */
+.slide-transition-parallax-up > * {
+  animation: px-up-1 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-transition-parallax-up > *:nth-child(2n) { animation-name: px-up-2; }
+.slide-transition-parallax-up > *:nth-child(3n) { animation-name: px-up-3; }
+
+/* ---- Depth parallax: camera dolly — scale + blur ---- */
+.slide-transition-parallax-depth > * {
+  animation: px-depth-1 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-transition-parallax-depth > *:nth-child(2n) { animation-name: px-depth-2; }
+.slide-transition-parallax-depth > *:nth-child(3n) { animation-name: px-depth-3; }
+
+@keyframes slide-parallax-base {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+@keyframes px-left-1 { from { transform: translateX(-40px);  opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-left-2 { from { transform: translateX(-90px);  opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-left-3 { from { transform: translateX(-150px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-left-4 { from { transform: translateX(-220px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-up-1    { from { transform: translateY(30px);   opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-up-2    { from { transform: translateY(70px);   opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-up-3    { from { transform: translateY(120px);  opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes px-depth-1 { from { transform: scale(1.06) translateY(-12px); opacity: 0; filter: blur(2px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes px-depth-2 { from { transform: scale(1.12) translateY(24px);  opacity: 0; filter: blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes px-depth-3 { from { transform: scale(1.2)  translateY(48px);  opacity: 0; filter: blur(6px); } to { transform: none; opacity: 1; filter: none; } }
 
 @keyframes el-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes el-pop { 0% { opacity: 0; transform: scale(0.6); } 70% { opacity: 1; transform: scale(1.08); } 100% { transform: scale(1); } }
