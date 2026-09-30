@@ -1,65 +1,68 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const GEMINI_MODEL = "gemini-3.6-flash";
-const pickModel = () => GEMINI_MODEL;
+const GROQ_TEXT_MODEL = "openai/gpt-oss-120b";
+const GROQ_VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+// Groq has no multimodal on gpt-oss; use the vision model when an image is attached.
+const pickModel = (hasImage = false) => (hasImage ? GROQ_VISION_MODEL : GROQ_TEXT_MODEL);
 
 type CohereMessage = {
   role: "system" | "user" | "assistant";
   content: string | Array<Record<string, unknown>>;
 };
 
-/** Text generation through Gemini. The API key is server-only. */
+/** Chat generation through Groq (OpenAI-compatible). The API key is server-only. */
 async function chatComplete(
   model: string,
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  const apiKey = process.env.GEMINI_KEY?.trim().replace(/^['"]|['"]$/g, "");
-  if (!apiKey) throw new Error("Gemini is not configured. Set GEMINI_KEY.");
+  const apiKey = process.env.GROQ_KEY?.trim().replace(/^['"]|['\"]$/g, "");
+  if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY.");
 
-  const system = messages.find((entry) => entry.role === "system")?.content;
-  const contents = messages
-    .filter((entry) => entry.role !== "system")
-    .map((entry) => {
-      const parts: Array<Record<string, unknown>> = typeof entry.content === "string" ? [{ text: entry.content }] : entry.content.flatMap((part): Array<Record<string, unknown>> => {
-        if (part.type === "text" && typeof part.text === "string") return [{ text: part.text }];
-        if (part.type === "image_url" && typeof part.image_url === "object" && part.image_url !== null) {
-          const url = (part.image_url as { url?: unknown }).url;
-          if (typeof url === "string" && url.startsWith("data:image/")) {
-            const [header, data] = url.split(",", 2);
-            const mimeType = header.slice(5, header.indexOf(";"));
-            return [{ inlineData: { mimeType, data } }];
-          }
-        }
-        return [];
-      });
-      return { role: entry.role === "assistant" ? "model" : "user", parts };
-    });
-
-  const generationConfig: Record<string, unknown> = {
-    temperature: extra.temperature ?? 0.4,
-    maxOutputTokens: Math.min(8192, Math.max(256, Number(extra.max_tokens ?? 8192))),
-  };
-  if (extra.response_format) generationConfig.responseMimeType = "application/json";
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model || GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...(system ? { systemInstruction: { parts: [{ text: typeof system === "string" ? system : JSON.stringify(system) }] } } : {}),
-        contents,
-        generationConfig,
-      }),
-    },
+  // Detect an attached image to pick a multimodal model (gpt-oss is text-only).
+  const hasImage = messages.some(
+    (m) =>
+      Array.isArray(m.content) &&
+      m.content.some(
+        (p) => p.type === "image_url" && typeof (p as { url?: string }).url === "string",
+      ),
   );
+  const resolvedModel = hasImage ? GROQ_VISION_MODEL : model || GROQ_TEXT_MODEL;
+
+  // Map to OpenAI message format: string content stays, array content keeps
+  // {type:"text"} and {type:"image_url"} parts — Groq understands both.
+  const openaiMessages = messages.map((entry) => ({
+    role: entry.role,
+    content: Array.isArray(entry.content)
+      ? entry.content
+          .map((part): Record<string, unknown> | null => {
+            if (part.type === "text" && typeof part.text === "string")
+              return { type: "text", text: part.text };
+            if (part.type === "image_url" && typeof part.image_url === "object")
+              return { type: "image_url", image_url: part.image_url };
+            return null;
+          })
+          .filter((p): p is Record<string, unknown> => p !== null)
+      : entry.content,
+  }));
+
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: resolvedModel,
+      temperature: extra.temperature ?? 0.4,
+      max_completion_tokens: Math.min(16384, Math.max(256, Number(extra.max_tokens ?? 16384))),
+      ...(extra.response_format ? { response_format: { type: "json_object" } } : {}),
+      messages: openaiMessages,
+    }),
+  });
   if (res.status === 429) throw new Error("AI rate limit hit. Try again in a moment.");
-  if (res.status === 401 || res.status === 403) throw new Error("Gemini authentication failed. Check GEMINI_KEY.");
+  if (res.status === 401 || res.status === 403) throw new Error("AI authentication failed. Check GROQ_KEY.");
   if (!res.ok) throw new Error(`AI error ${res.status}: ${await res.text()}`);
-  const json = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
-  const content = json.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim();
+  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const content = json.choices?.[0]?.message?.content?.trim();
   if (!content) throw new Error("AI returned an empty response");
   return content;
 }
