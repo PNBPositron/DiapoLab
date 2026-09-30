@@ -787,6 +787,46 @@ export function PropertiesPanel() {
                     <option value="ticket">Ticket</option>
                   </select>
                 </Field>
+
+                <Field label="Fit (containance)">
+                  <SegmentedControl
+                    value={el.fit ?? "cover"}
+                    onChange={(fit) => update(el.id, { fit })}
+                    options={[
+                      { value: "cover", label: "Cover", title: "Remplit la zone, rogne l'excédent" },
+                      { value: "contain", label: "Contain", title: "Image entière visible, letterbox" },
+                      { value: "fill", label: "Fill", title: "Étirée pour remplir (peut déformer)" },
+                    ]}
+                  />
+                </Field>
+
+                <Field label="Transform">
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => update(el.id, { flipX: !el.flipX })}
+                      className={`rounded-lg border py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                        el.flipX
+                          ? "border-sky-500 bg-sky-50 text-sky-600"
+                          : "border-slate-200 bg-slate-50 text-slate-500"
+                      }`}
+                    >
+                      Flip H
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => update(el.id, { flipY: !el.flipY })}
+                      className={`rounded-lg border py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                        el.flipY
+                          ? "border-sky-500 bg-sky-50 text-sky-600"
+                          : "border-slate-200 bg-slate-50 text-slate-500"
+                      }`}
+                    >
+                      Flip V
+                    </button>
+                  </div>
+                </Field>
+
                 <Field label="Presets">
                   <div className="grid grid-cols-4 gap-1.5">
                     {IMAGE_FILTER_PRESETS.map((preset) => (
@@ -808,6 +848,7 @@ export function PropertiesPanel() {
                     ))}
                   </div>
                 </Field>
+
                 <SliderWithInput
                   label="Brightness"
                   min={0}
@@ -839,6 +880,16 @@ export function PropertiesPanel() {
                   }
                 />
                 <SliderWithInput
+                  label="Hue Rotate"
+                  min={0}
+                  max={360}
+                  value={el.filters?.hueRotate ?? 0}
+                  unit="°"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, hueRotate: val } })
+                  }
+                />
+                <SliderWithInput
                   label="Blur"
                   min={0}
                   max={20}
@@ -849,6 +900,60 @@ export function PropertiesPanel() {
                     update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, blur: val } })
                   }
                 />
+                <SliderWithInput
+                  label="Grayscale"
+                  min={0}
+                  max={100}
+                  value={el.filters?.grayscale ?? 0}
+                  unit="%"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, grayscale: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Sepia"
+                  min={0}
+                  max={100}
+                  value={el.filters?.sepia ?? 0}
+                  unit="%"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, sepia: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Invert"
+                  min={0}
+                  max={100}
+                  value={el.filters?.invert ?? 0}
+                  unit="%"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, invert: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Corner Radius"
+                  min={0}
+                  max={Math.floor(Math.min(el.width, el.height) / 2)}
+                  value={el.cornerRadius ?? 0}
+                  unit="px"
+                  onChange={(val) => update(el.id, { cornerRadius: val })}
+                />
+                <SliderWithInput
+                  label="Opacity"
+                  min={0}
+                  max={100}
+                  value={Math.round((el.opacity ?? 1) * 100)}
+                  unit="%"
+                  onChange={(val) => update(el.id, { opacity: val / 100 })}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
+                  className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
+                >
+                  Reset filters
+                </button>
               </Section>
             )}
 
