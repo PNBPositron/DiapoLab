@@ -16,7 +16,17 @@ export type ElementBase = {
 };
 
 export type ElementAnimation = "none" | "fade-up" | "pop" | "glitch";
-export type SlideTransition = "none" | "fade" | "slide" | "glitch" | "zoom" | "flip" | "morph";
+export type SlideTransition =
+  | "none"
+  | "fade"
+  | "slide"
+  | "glitch"
+  | "zoom"
+  | "flip"
+  | "morph"
+  | "parallax-left"
+  | "parallax-up"
+  | "parallax-depth";
 export type BgFit = "cover" | "contain";
 
 export type TextElement = ElementBase & {
@@ -158,6 +168,8 @@ export const DEFAULT_FILTERS: ImageFilters = {
 export type ImageElement = ElementBase & {
   type: "image";
   src: string;
+  /** clip the image with a vector shape (mask); undefined = no mask */
+  maskShape?: ShapeKind;
   illustrationFormat?: "svg" | "png";
   assetKind?: "image" | "icon";
   tint?: string;
