@@ -771,7 +771,7 @@ export function PropertiesPanel() {
                 <Field label="Shape Mask">
                   <select
                     value={el.maskShape ?? ""}
-                    onChange={(e) => update(el.id, { maskShape: e.target.value || undefined })}
+                    onChange={(e) => update(el.id, { maskShape: (e.target.value || undefined) as typeof el.maskShape })}
                     className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
                   >
                     <option value="">None (rectangle)</option>

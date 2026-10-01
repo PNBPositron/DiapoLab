@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEditor } from "@/store/editor";
+import { newText, useEditor } from "@/store/editor";
 import {
   Undo2,
   Redo2,
@@ -171,22 +171,16 @@ export function Toolbar() {
                   }),
                   ...activeEdits
                     .filter((edit) => edit.type === "addText" && typeof edit.text === "string")
-                    .map((edit) => ({
-                      id: crypto.randomUUID(),
-                      type: "text" as const,
-                      text: edit.text!,
-                      x: edit.x ?? 120,
-                      y: edit.y ?? 120,
-                      fontSize: 48,
-                      color: "#0b1736",
-                      rotation: 0,
-                      opacity: 1,
-                      width: 420,
-                      height: 100,
-                      align: "left" as const,
-                      weight: 700,
-                      shadow: "none",
-                    })),
+                     .map((edit) => newText({
+                       text: edit.text ?? "",
+                       x: edit.x ?? 120,
+                       y: edit.y ?? 120,
+                       fontSize: 48,
+                       color: "#0b1736",
+                       width: 420,
+                       height: 100,
+                       fontWeight: 700,
+                     })),
                 ],
               }
         );
