@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Page } from "@/store/editor";
-import { stripEmbeddedImages } from "@/lib/image-assets";
 
 export type SavedDesign = {
   id: string;
@@ -109,7 +108,7 @@ export async function publishAsTemplate(input: {
       name: input.name,
       canvas_w: input.canvas_w,
       canvas_h: input.canvas_h,
-    pages: stripEmbeddedImages(input.pages) as unknown as never,
+      pages: input.pages as unknown as never,
       thumbnail: input.thumbnail ?? null,
     })
     .select()

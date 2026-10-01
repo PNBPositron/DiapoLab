@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import { useState } from "react";
 import * as LucideIcons from "lucide-react";
 import {
   Link2,
@@ -10,6 +10,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
+import { prepareImage } from "@/lib/image-assets";
 
 type ElementSection = "shapes" | "icons" | null;
 
@@ -77,6 +78,7 @@ export function ElementsPanel() {
   const [iconQuery, setIconQuery] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const filteredIcons = ICONS.filter(({ label }) =>
     label.toLowerCase().includes(iconQuery.trim().toLowerCase()),
   );
@@ -93,10 +95,31 @@ export function ElementsPanel() {
     setImageUrl("");
   };
 
+  const addFile = async (file: File) => {
+    setUploading(true);
+    setUrlError(null);
+    try {
+      add(newImage(await prepareImage(file)));
+    } catch (error) {
+      setUrlError(error instanceof Error ? error.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="panel-content">
       {/* No panel header — the panel starts directly with its content. */}
       <div className="panel-intro">Drop in visual building blocks for your slide.</div>
+
+      <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-3 text-xs font-semibold text-card-foreground transition-colors hover:bg-accent">
+        <ImagePlus className="size-4" /> {uploading ? "Preparing image…" : "Upload image"}
+        <input type="file" accept="image/*" className="sr-only" disabled={uploading} onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) void addFile(file);
+          event.target.value = "";
+        }} />
+      </label>
 
       {/* Add image by URL — permanent, survives refresh & design sharing. */}
       <div className="space-y-1.5">

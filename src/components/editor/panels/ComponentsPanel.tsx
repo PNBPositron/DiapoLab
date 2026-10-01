@@ -44,16 +44,6 @@ import {
   type UiKind,
   type UiStyle,
 } from "@/store/editor";
-import {
-  newChart,
-  newQuiz,
-  newUi,
-  UI_STYLE_THEMES,
-  useEditor,
-  chartStylePatch,
-  type UiKind,
-  type UiStyle,
-} from "@/store/editor";
 import { UiRender } from "../UiRender";
 
 type PresetSection = "interfaces" | "ui" | "elements";
@@ -378,16 +368,15 @@ export function ComponentsPanel() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 pb-6">
-            {filteredPresets.map(({ kind, label, Icon, overrides }, index) => {
+            {filteredPresets.map(({ kind, label, Icon }, index) => {
               const previewElement = newUi(kind, style, {
-                ...overrides,
                 id: `preview-${kind}-${index}`,
               });
 
               return (
                 <button
                   key={`${kind}-${label}-${index}`}
-                  onClick={() => add(newUi(kind, style, overrides))}
+                  onClick={() => add(newUi(kind, style))}
                   className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-2 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-sm"
                 >
                   {/* Miniature live canvas render preview */}
