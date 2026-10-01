@@ -3,6 +3,7 @@ import { useEditor } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { ImagePlus, X, Link2 } from "lucide-react";
+import { prepareImage } from "@/lib/image-assets";
 
 const GRADIENT_PACKS: { name: string; gradients: { name: string; value: string }[] }[] = [
   {
@@ -90,19 +91,23 @@ export function ColorPanel() {
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
   const [openPicker, setOpenPicker] = useState<"from" | "to" | "bg" | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const customGradient = gradientType === "radial"
     ? `radial-gradient(circle at center, ${gradientFrom}, ${gradientTo})`
     : `linear-gradient(${gradientAngle}deg, ${gradientFrom}, ${gradientTo})`;
 
-  const onPickImage = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image too large (max 5MB)");
-      return;
+  const onPickImage = async (file: File) => {
+    setUploading(true);
+    setUploadError(null);
+    try {
+      setBgImage(await prepareImage(file), bgFit);
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Upload failed.");
+    } finally {
+      setUploading(false);
     }
-    const r = new FileReader();
-    r.onload = () => setBgImage(r.result as string, bgFit);
-    r.readAsDataURL(file);
   };
 
   return (
@@ -133,7 +138,7 @@ export function ColorPanel() {
             onClick={() => fileRef.current?.click()}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-2 py-2.5 text-[11px] text-slate-500 transition hover:border-blue-400 hover:bg-blue-50/50 hover:text-blue-600"
           >
-            <ImagePlus className="size-3.5" /> Upload image
+            <ImagePlus className="size-3.5" /> {uploading ? "Preparing image…" : "Upload image"}
           </button>
         )}
         <input
@@ -143,10 +148,11 @@ export function ColorPanel() {
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) onPickImage(f);
+            if (f) void onPickImage(f);
             e.target.value = "";
           }}
         />
+        {uploadError && <p role="alert" className="text-xs text-destructive">{uploadError}</p>}
         <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Link2 className="size-3.5 shrink-0 text-slate-400" />
           <input

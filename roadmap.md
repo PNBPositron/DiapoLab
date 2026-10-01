@@ -1,0 +1,3 @@
+- [ ] Center and modernize the publish-template popup.
+- [ ] Compress uploaded images and preserve them in saved designs, templates, and JSON exports.
+- [ ] Verify the popup and image workflows in the preview.

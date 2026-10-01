@@ -1,0 +1,1 @@
+- Store user-uploaded images as size-limited compressed data URLs in design pages rather than ephemeral object URLs, so saved designs and public templates remain self-contained without requiring public file hosting.

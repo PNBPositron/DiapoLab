@@ -1,6 +1,5 @@
 import { toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
-import { stripEmbeddedImages } from "@/lib/image-assets";
 import { buildInteractiveHTML } from "@/lib/export-html";
 
 export function exportJSON(name: string) {
@@ -11,7 +10,7 @@ export function exportJSON(name: string) {
     name: designName,
     canvas_w: canvasW,
     canvas_h: canvasH,
-    pages: stripEmbeddedImages(pages),
+    pages,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
