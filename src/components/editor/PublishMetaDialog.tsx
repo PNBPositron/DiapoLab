@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload, Globe2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export type PublishMeta = {
   name: string;
@@ -58,8 +60,6 @@ export function PublishMetaDialog({
     }
   }, [open, defaultName, defaultAuthor]);
 
-  if (!open) return null;
-
   const submit = () =>
     onSubmit({
       name: name.trim() || (kind === "theme" ? "Untitled theme" : "Untitled template"),
@@ -74,114 +74,48 @@ export function PublishMetaDialog({
       license,
     });
 
+  const field = "mt-1.5 w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
+  const label = "block text-xs font-semibold text-foreground";
+
   return (
-    <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-ink/85 p-6"
-      onClick={onCancel}
-    >
-      <div
-        className="brutal-border-2 relative w-full max-w-md bg-ink p-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onCancel}
-          aria-label="Cancel publishing"
-          className="absolute right-3 top-3 grid h-7 w-7 place-items-center border border-teal/40 text-teal hover:border-teal"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-        <h2 className="mb-1 font-display text-sm tracking-[0.2em] text-teal">
-          ▸ PUBLISH {kind === "theme" ? "THEME" : "TEMPLATE"}
-        </h2>
-        <p className="mb-4 font-mono text-[10px] text-teal/60">
-          &gt; this info shows up in the marketplace listing
-        </p>
-
-        <div className="space-y-3">
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">name *</span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal outline-none focus:border-teal"
-            />
-          </label>
-
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">style</span>
-            <select
-              value={style}
-              onChange={(e) => setStyle(e.target.value)}
-              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal outline-none focus:border-teal"
-            >
-              {PUBLISH_STYLES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">license</span>
-            <select
-              value={license}
-              onChange={(e) => setLicense(e.target.value)}
-              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal outline-none focus:border-teal"
-            >
-              {PUBLISH_LICENSES.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">author name</span>
-            <input
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              placeholder="how you want to be credited"
-              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal placeholder:text-teal/30 outline-none focus:border-teal"
-            />
-          </label>
-
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">description</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="what is it for, what makes it good"
-              className="mt-1 w-full resize-none border border-teal/40 bg-surface p-2 font-mono text-[11px] text-teal placeholder:text-teal/30 outline-none focus:border-teal"
-            />
-          </label>
-
-          <label className="block">
-            <span className="font-mono text-[10px] text-teal/70">tags (comma separated)</span>
-            <input
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="pitch, startup, dark"
-              className="mt-1 w-full border border-teal/40 bg-surface px-2 py-1.5 font-mono text-[11px] text-teal placeholder:text-teal/30 outline-none focus:border-teal"
-            />
-          </label>
+    <Dialog open={open} onOpenChange={(next) => { if (!next && !busy) onCancel(); }}>
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-lg max-h-[min(90vh,760px)] overflow-y-auto rounded-lg border-border bg-card p-0 text-card-foreground shadow-2xl" onInteractOutside={(event) => { if (busy) event.preventDefault(); }} onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }}>
+        <div className="border-b border-border px-6 pb-5 pt-6">
+          <div className="mb-4 flex size-10 items-center justify-center rounded-md bg-primary/15 text-primary"><Globe2 className="size-5" /></div>
+          <DialogHeader>
+            <DialogTitle className="text-left font-display text-xl font-semibold text-card-foreground">Publish {kind === "theme" ? "theme" : "template"}</DialogTitle>
+            <DialogDescription className="text-left text-sm text-muted-foreground">Add the details people will see in the marketplace.</DialogDescription>
+          </DialogHeader>
         </div>
-
-        {error && <p className="mt-3 font-mono text-[10px] text-[#ff0080]">! {error}</p>}
-
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={submit}
-            disabled={busy || !name.trim()}
-            className="brutal-border brutal-press flex flex-1 items-center justify-center gap-2 bg-blue px-3 py-2 font-display text-[11px] tracking-[0.2em] text-ink disabled:opacity-50"
-          >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-            PUBLISH
-          </button>
-          <button
-            onClick={onCancel}
-            className="brutal-border brutal-press bg-surface-2 px-3 py-2 font-display text-[11px] tracking-[0.2em] text-teal"
-          >
-            CANCEL
-          </button>
-        </div>
-      </div>
-    </div>
+        <form onSubmit={(event) => { event.preventDefault(); submit(); }} className="space-y-4 px-6 pb-6">
+          <label className={label}>Name <span className="text-primary">*</span>
+            <input autoFocus required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} placeholder="Give it a name" className={field} />
+          </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label className={label}>Style
+              <select value={style} onChange={(event) => setStyle(event.target.value)} className={field}>{PUBLISH_STYLES.map((item) => <option key={item}>{item}</option>)}</select>
+            </label>
+            <label className={label}>License
+              <select value={license} onChange={(event) => setLicense(event.target.value)} className={field}>{PUBLISH_LICENSES.map((item) => <option key={item}>{item}</option>)}</select>
+            </label>
+          </div>
+          <label className={label}>Author name
+            <input maxLength={100} value={author} onChange={(event) => setAuthor(event.target.value)} placeholder="How you want to be credited" className={field} />
+          </label>
+          <label className={label}>Description
+            <textarea maxLength={500} rows={3} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="What makes this useful?" className={`${field} resize-none`} />
+          </label>
+          <label className={label}>Tags
+            <input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="pitch, startup, dark" className={field} />
+            <span className="mt-1 block text-[11px] font-normal text-muted-foreground">Separate tags with commas</span>
+          </label>
+          {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
+          <div className="flex justify-end gap-2 border-t border-border pt-5">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : <Upload />}Publish</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
