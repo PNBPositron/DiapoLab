@@ -16,7 +16,23 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const { pages, loadPages } = useEditor();
   const [motionOpen, setMotionOpen] = useState(false);
   const [developerOpen, setDeveloperOpen] = useState(false);
-  const [jsonDraft, setJsonDraft] = useState(() => JSON.stringify(pages, null, 2));
+  // Embedded images are swapped for short placeholders so the JSON stays readable.
+  const imageMap = useRef<Map<string, string>>(new Map());
+  const toDraft = () => {
+    const map = new Map<string, string>();
+    const byValue = new Map<string, string>();
+    const text = JSON.stringify(pages, (_k, v) => {
+      if (typeof v === "string" && v.startsWith("data:")) {
+        let key = byValue.get(v);
+        if (!key) { key = `[embedded-image-${map.size + 1}]`; map.set(key, v); byValue.set(v, key); }
+        return key;
+      }
+      return v;
+    }, 2);
+    imageMap.current = map;
+    return text;
+  };
+  const [jsonDraft, setJsonDraft] = useState(toDraft);
   const [jsonStatus, setJsonStatus] = useState<string | null>(null);
   const [templates, setTemplates] = useState<PublicTemplate[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -29,7 +45,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
 
   const applyJson = () => {
     try {
-      const parsed = JSON.parse(jsonDraft);
+      const parsed = JSON.parse(jsonDraft, (_k, v) => (typeof v === "string" && imageMap.current.has(v) ? imageMap.current.get(v) : v));
       if (!Array.isArray(parsed) || parsed.some((page) => !page || !Array.isArray(page.elements))) throw new Error("Expected an array of slides with elements.");
       loadPages(parsed); setJsonStatus("Slideshow updated");
     } catch (e) { setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON"); }

@@ -507,8 +507,10 @@ export function CanvasElement({
                 width: "100%",
                 height: "100%",
                 objectFit: element.fit ?? "cover",
+                objectPosition: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
                 display: "block",
-                transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
+                transformOrigin: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
+                transform: `scale(${(element.flipX ? -1 : 1) * (element.cropZoom ?? 1)}, ${(element.flipY ? -1 : 1) * (element.cropZoom ?? 1)})`,
                 filter: [
                   element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
                   filterCss(element.filters),
