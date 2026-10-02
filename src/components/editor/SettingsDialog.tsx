@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Loader2, Pencil, Trash2, X } from "lucide-react";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId } from "@/store/settings";
@@ -16,7 +16,23 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const { pages, loadPages } = useEditor();
   const [motionOpen, setMotionOpen] = useState(false);
   const [developerOpen, setDeveloperOpen] = useState(false);
-  const [jsonDraft, setJsonDraft] = useState(() => JSON.stringify(pages, null, 2));
+  // Embedded images are swapped for short placeholders so the JSON stays readable.
+  const imageMap = useRef<Map<string, string>>(new Map());
+  const toDraft = () => {
+    const map = new Map<string, string>();
+    const byValue = new Map<string, string>();
+    const text = JSON.stringify(pages, (_k, v) => {
+      if (typeof v === "string" && v.startsWith("data:")) {
+        let key = byValue.get(v);
+        if (!key) { key = `[embedded-image-${map.size + 1}]`; map.set(key, v); byValue.set(v, key); }
+        return key;
+      }
+      return v;
+    }, 2);
+    imageMap.current = map;
+    return text;
+  };
+  const [jsonDraft, setJsonDraft] = useState(toDraft);
   const [jsonStatus, setJsonStatus] = useState<string | null>(null);
   const [templates, setTemplates] = useState<PublicTemplate[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -29,7 +45,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
 
   const applyJson = () => {
     try {
-      const parsed = JSON.parse(jsonDraft);
+      const parsed = JSON.parse(jsonDraft, (_k, v) => (typeof v === "string" && imageMap.current.has(v) ? imageMap.current.get(v) : v));
       if (!Array.isArray(parsed) || parsed.some((page) => !page || !Array.isArray(page.elements))) throw new Error("Expected an array of slides with elements.");
       loadPages(parsed); setJsonStatus("Slideshow updated");
     } catch (e) { setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON"); }
@@ -56,7 +72,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         <button onClick={onClose} aria-label="Close settings" className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-slate-50 hover:text-slate-800"><X className="size-4" /></button>
         <header className="mb-6 pr-12"><h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-slate-800">Settings</h2><p className="mt-1 text-sm text-slate-500">Preferences are stored on this device.</p></header>
 
-        <section className={card}><div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5"><div><div className={title}>Developer mode</div><p className={help}>Inspect and edit the active slideshow JSON.</p></div><button onClick={() => { setJsonDraft(JSON.stringify(pages, null, 2)); setJsonStatus(null); setDeveloperOpen((open) => !open); }} className="rounded-lg bg-blue-600 px-3.5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-blue-700">{developerOpen ? "Close developer mode" : "Open developer mode"}</button></div></section>
+        <section className={card}><div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5"><div><div className={title}>Developer mode</div><p className={help}>Inspect and edit the active slideshow JSON.</p></div><button onClick={() => { setJsonDraft(toDraft()); setJsonStatus(null); setDeveloperOpen((open) => !open); }} className="rounded-lg bg-blue-600 px-3.5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-blue-700">{developerOpen ? "Close developer mode" : "Open developer mode"}</button></div></section>
         {developerOpen && <section className={`${card} bg-slate-900`}><div className="p-4 sm:p-5"><textarea value={jsonDraft} onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }} spellCheck={false} className="h-72 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none focus:border-blue-500" /><div className="mt-3 flex items-center justify-between gap-3"><span className="font-mono text-[10px] text-slate-400">{jsonStatus ?? `${pages.length} slides loaded`}</span><button onClick={applyJson} className="rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-blue-700">Apply changes</button></div></div></section>}
 
         <section className={card}><div className="p-4 sm:p-5"><div className="mb-3 flex items-center justify-between"><div><div className={title}>Visible panels</div><p className={help}>Choose which tools appear in the editor sidebar.</p></div><button onClick={resetPanels} className="text-[10px] text-slate-400 underline hover:text-slate-700">Reset</button></div><div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{(Object.keys(PANEL_LABELS) as PanelId[]).map((id) => { const on = panels[id]; return <button key={id} onClick={() => togglePanel(id)} className={`rounded-lg border px-3 py-2.5 text-left text-xs font-medium transition ${on ? "border-blue-200 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50"}`}><span className={`mr-2 inline-block size-2 rounded-full ${on ? "bg-blue-500" : "bg-slate-300"}`} />{PANEL_LABELS[id]}</button>; })}</div></div></section>

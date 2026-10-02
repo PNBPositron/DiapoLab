@@ -176,6 +176,10 @@ export type ImageElement = ElementBase & {
   filters?: ImageFilters;
   shadow?: ElementShadow;
   fit?: "cover" | "contain" | "fill";
+  /** crop: zoom factor (1 = none) and focal point in % */
+  cropZoom?: number;
+  cropX?: number;
+  cropY?: number;
   cornerRadius?: number;
   opacity?: number; // 0..1
   borderWidth?: number;
