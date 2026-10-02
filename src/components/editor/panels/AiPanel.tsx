@@ -37,7 +37,7 @@ const PROMPT_SUGGESTIONS = [
 export function AiPanel() {
   const { canvasW, canvasH, loadPages, pages, currentIndex } = useEditor();
   const [activeTab, setActiveTab] = useState<"generate" | "copilot">("generate");
-  const [redesigning, setRedesigning] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<AiStyle>("auto");
   const [slideCount, setSlideCount] = useState(3);
@@ -46,9 +46,9 @@ export function AiPanel() {
 
   const activePage = pages[currentIndex];
 
-  const redesignSlide = async () => {
-    if (!activePage || redesigning) return;
-    setRedesigning(true);
+  const editSlide = async () => {
+    if (!activePage || editing) return;
+    setEditing(true);
     setStatus(null);
     try {
       const response = await fetch("/api/slide-analysis", {
@@ -59,7 +59,7 @@ export function AiPanel() {
           slideshow: pages,
           canEdit: true,
           question:
-            "Redesign this slide to improve hierarchy, spacing, typography, and visual impact. Return safe edit operations.",
+            "Edit this slide to improve hierarchy, spacing, typography, and visual impact. Return safe edit operations.",
         }),
       });
 
@@ -79,7 +79,7 @@ export function AiPanel() {
       };
 
       if (!response.ok || !payload.text) {
-        throw new Error(payload.error || "Could not redesign the slide");
+        throw new Error(payload.error || "Could not edit the slide");
       }
 
       if (payload.edits?.length) {
@@ -107,10 +107,10 @@ export function AiPanel() {
     } catch (err) {
       setStatus({
         type: "error",
-        message: err instanceof Error ? err.message : "Failed to redesign slide",
+        message: err instanceof Error ? err.message : "Failed to edit slide",
       });
     } finally {
-      setRedesigning(false);
+      setEditing(false);
     }
   };
 
@@ -323,7 +323,7 @@ export function AiPanel() {
             type="button"
             onClick={generate}
             disabled={busy || !prompt.trim()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-sky-600 via-indigo-600 to-sky-600 bg-[length:200%_auto] py-2.5 text-xs font-semibold text-white shadow-md shadow-sky-500/20 transition-all hover:bg-right hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-sky-600 via-indigo-600 to-sky-600 bg-[length:200%_auto] py-2.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-right disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {busy ? (
               <>
@@ -340,7 +340,7 @@ export function AiPanel() {
         </div>
       )}
 
-      {/* TAB 2: SLIDE COPILOT / REDESIGN */}
+      {/* TAB 2: SLIDE COPILOT / EDIT */}
       {activeTab === "copilot" && (
         <div className="space-y-4">
           <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 space-y-2">
@@ -374,11 +374,11 @@ export function AiPanel() {
 
           <button
             type="button"
-            onClick={redesignSlide}
-            disabled={redesigning || busy || !activePage}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-800 shadow-2xs transition hover:bg-slate-50 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={editSlide}
+            disabled={editing || busy || !activePage}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-800 shadow-2xs transition hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {redesigning ? (
+            {editing ? (
               <>
                 <Loader2 className="size-4 animate-spin text-sky-600" />
                 <span>Analyzing and adjusting layout...</span>
@@ -386,7 +386,7 @@ export function AiPanel() {
             ) : (
               <>
                 <RefreshCw className="size-4 text-sky-600" />
-                <span>Redesign Current Slide</span>
+                <span>Edit Current Slide</span>
               </>
             )}
           </button>
