@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/auth/callback")({ component: AuthCallback });
+export const Route = createFileRoute("/auth/callback")({
+  component: AuthCallback,
+  head: () => ({ meta: [
+    { title: "Completing sign-in — DiapoLab" },
+    { name: "description", content: "Complete your DiapoLab sign-in and return to your projects." },
+    { property: "og:title", content: "Completing sign-in — DiapoLab" },
+    { property: "og:description", content: "Complete your DiapoLab sign-in and return to your projects." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function AuthCallback() {
   useEffect(() => {
