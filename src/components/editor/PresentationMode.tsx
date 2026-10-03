@@ -145,10 +145,10 @@ export function PresentationMode() {
           <ChevronRight className="h-5 w-5" strokeWidth={3} />
         </button>
         <div
-          style={{ width: canvasW * scale, height: canvasH * scale }}
           key={`frame-${currentIndex}`}
           className={`brutal-shadow-lg relative shrink-0 ${page.transition === "zoom" ? "slide-transition-zoom" : ""}`}
           style={{ width: canvasW * scale, height: canvasH * scale, "--zoom-start": page.transitionZoom ?? 0.5 } as React.CSSProperties}
+        >
           <div
             key={morphing ? "slide-morph" : `slide-${currentIndex}`}
             className={`absolute left-0 top-0 overflow-hidden border border-teal ${transition}`}
@@ -167,11 +167,7 @@ export function PresentationMode() {
                 backgroundRepeat: "no-repeat",
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
-                // --- FIX transitions "too zoomed" ---
-                // Les keyframes slide-transition-* utilisent scale(var(--fit, 1)),
-                // ce qui ÉCRASE le transform inline pendant l'animation. Sans --fit
-                // défini, la slide retombait à scale(1) (pleine taille) pendant
-                // slide/zoom/flip/glitch puis sautait à la bonne taille à la fin.
+                // Non-zoom transitions replace this transform during animation.
                 "--fit": scale,
                 transition: morphing ? "background-color 620ms ease" : undefined,
               } as React.CSSProperties
