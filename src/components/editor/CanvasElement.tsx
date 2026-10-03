@@ -639,6 +639,7 @@ export function CanvasElement({
 
 function QuizRender({ element, interactive }: { element: QuizElement; interactive: boolean }) {
   const [picked, setPicked] = useState<string | null>(null);
+  const theme = element.uiStyle ? UI_STYLE_THEMES[element.uiStyle] : undefined;
   const isPoll = element.mode === "poll";
   const [votes, setVotes] = useState<Record<string, number>>({});
   const chanRef = useRef<BroadcastChannel | null>(null);
@@ -695,15 +696,16 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         ...glassStyle,
         width: "100%",
         height: "100%",
-        background: element.effect === "liquid_glass" ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : element.bgColor,
+        background: element.effect === "liquid_glass" && !theme ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : element.bgColor,
         color: element.fgColor,
         padding: "5%",
         display: "flex",
         flexDirection: "column",
         gap: "4%",
-        border: `3px solid ${element.accentColor}`,
-        borderRadius: 18,
-        fontFamily: "Inter, system-ui, sans-serif",
+        border: `${theme?.borderWidth ?? 3}px solid ${theme?.border ?? element.accentColor}`,
+        borderRadius: theme?.radius ?? 18,
+        boxShadow: theme?.shadow,
+        fontFamily: theme?.font ?? "Inter, system-ui, sans-serif",
         overflow: "hidden",
       }}
     >
@@ -725,10 +727,10 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                   position: "relative",
                   flex: 1,
                   overflow: "hidden",
-                  background: "rgba(255,255,255,0.06)",
+                  background: theme?.bg ?? "rgba(255,255,255,0.06)",
                   color: element.fgColor,
-                  border: `2px solid ${mine ? element.accentColor : "rgba(255,255,255,0.18)"}`,
-                  borderRadius: 12,
+                  border: `2px solid ${mine ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(15px, 3%)",
                   fontWeight: 600,
@@ -783,12 +785,12 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             const isCorrect = opt.id === element.correctId;
             const showResult = picked !== null;
             const bg = !showResult
-              ? "rgba(255,255,255,0.06)"
+              ? theme?.bg ?? "rgba(255,255,255,0.06)"
               : isCorrect
                 ? "#16a34a"
                 : isPicked
                   ? "#dc2626"
-                  : "rgba(255,255,255,0.04)";
+                  : theme?.bg ?? "rgba(255,255,255,0.04)";
             return (
               <button
                 key={opt.id}
@@ -796,9 +798,9 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                 onClick={() => interactive && setPicked(opt.id)}
                 style={{
                   background: bg,
-                  color: element.fgColor,
-                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : "rgba(255,255,255,0.18)"}`,
-                  borderRadius: 12,
+                  color: showResult && (isCorrect || isPicked) ? "#ffffff" : element.fgColor,
+                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(16px, 3.2%)",
                   fontWeight: 600,

@@ -13,6 +13,7 @@ export const Route = createFileRoute("/settings")({
       { property: "og:title", content: "Settings — DiapoLab" },
       { property: "og:description", content: "Customize your DiapoLab design editor experience." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://diapolab.lovable.app/settings" }],
   }),

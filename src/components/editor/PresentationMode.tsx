@@ -83,7 +83,7 @@ export function PresentationMode() {
   if (!presenting) return null;
 
   const morphing = page.transition === "morph";
-  const transition = page.transition && page.transition !== "none" && !morphing
+  const transition = page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
     ? `slide-transition-${page.transition}`
     : "";
   // Morph matches elements across slides so shared shapes/text tween instead of cutting.
@@ -145,8 +145,9 @@ export function PresentationMode() {
           <ChevronRight className="h-5 w-5" strokeWidth={3} />
         </button>
         <div
-          style={{ width: canvasW * scale, height: canvasH * scale }}
-          className="brutal-shadow-lg relative shrink-0"
+          key={`frame-${currentIndex}`}
+          className={`brutal-shadow-lg relative shrink-0 ${page.transition === "zoom" ? "slide-transition-zoom" : ""}`}
+          style={{ width: canvasW * scale, height: canvasH * scale, "--zoom-start": page.transitionZoom ?? 0.5 } as React.CSSProperties}
         >
           <div
             key={morphing ? "slide-morph" : `slide-${currentIndex}`}
@@ -166,11 +167,7 @@ export function PresentationMode() {
                 backgroundRepeat: "no-repeat",
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
-                // --- FIX transitions "too zoomed" ---
-                // Les keyframes slide-transition-* utilisent scale(var(--fit, 1)),
-                // ce qui ÉCRASE le transform inline pendant l'animation. Sans --fit
-                // défini, la slide retombait à scale(1) (pleine taille) pendant
-                // slide/zoom/flip/glitch puis sautait à la bonne taille à la fin.
+                // Non-zoom transitions replace this transform during animation.
                 "--fit": scale,
                 transition: morphing ? "background-color 620ms ease" : undefined,
               } as React.CSSProperties

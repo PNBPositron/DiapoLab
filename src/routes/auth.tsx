@@ -16,6 +16,10 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in — DiapoLab" },
       { name: "description", content: "Sign in to DiapoLab to save and sync your designs." },
+      { property: "og:title", content: "Sign in — DiapoLab" },
+      { property: "og:description", content: "Sign in to save and sync your DiapoLab projects." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [
       { rel: "canonical", href: "https://diapolab.lovable.app/auth" },

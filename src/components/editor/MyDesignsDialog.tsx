@@ -70,7 +70,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-slate-800">
-                My Designs
+                Projects
               </h2>
               {items && (
                 <p className="mt-0.5 text-sm text-slate-500">
@@ -82,7 +82,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
           {!embedded && (
             <button
               onClick={onClose}
-              aria-label="Close my designs"
+              aria-label="Close projects"
               className="grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-800"
             >
               <X className="size-4" />

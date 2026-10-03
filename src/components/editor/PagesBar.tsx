@@ -31,7 +31,7 @@ export function PagesBar() {
     setPresenting,
   } = useEditor();
   const currentTransition: SlideTransition = pages[currentIndex]?.transition ?? "none";
-  const currentZoom = pages[currentIndex]?.transitionZoom ?? 1;
+  const currentZoom = pages[currentIndex]?.transitionZoom ?? 0.5;
   const ratio = canvasW / canvasH;
   const thumbW = ratio >= 1 ? 116 : 116 * ratio;
   const thumbH = ratio >= 1 ? 116 / ratio : 116;
@@ -87,7 +87,7 @@ export function PagesBar() {
               ))}
             </select>
           </label>
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">
+          {currentTransition === "zoom" && <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">Zoom</span>
             <input
               aria-label="Transition zoom"
@@ -102,7 +102,7 @@ export function PagesBar() {
             <span className="min-w-[2.75rem] text-center text-[9px] font-medium text-slate-700">
               {Math.round(currentZoom * 100)}%
             </span>
-          </div>
+          </div>}
         </div>
         <span className="text-[10px] text-slate-400">{currentIndex + 1} / {pages.length}</span>
         <button onClick={() => setPresenting(true)} className="flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]" type="button">

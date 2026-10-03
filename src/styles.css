@@ -132,11 +132,10 @@
   to { transform: translateX(0) scale(var(--fit, 1)); opacity: 1; }
 }
 
-/* --- zoom : démarre à 20% de sa taille, façon reveal.js --- */
+/* Zoom the fitted frame, not the original full-size slide, so it stays centered. */
 @keyframes slide-zoom-in {
-  from { transform: scale(calc(var(--fit, 1) * 0.2)); opacity: 1; }
-  40% { opacity: 1; }
-  to { transform: scale(var(--fit, 1)); opacity: 1; }
+  from { transform: scale(var(--zoom-start, 0.5)); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 /* --- flip : retournement 3D avec perspective, esprit "convex" de reveal.js --- */
@@ -155,7 +154,7 @@
 
 .slide-transition-fade { animation: slide-fade-in 350ms ease-out both; }
 .slide-transition-slide { animation: slide-slide-in 700ms ease both; will-change: transform; }
-.slide-transition-zoom { animation: slide-zoom-in 700ms ease both; will-change: transform; }
+.slide-transition-zoom { animation: slide-zoom-in 700ms ease both; transform-origin: center center; will-change: transform; }
 .slide-transition-flip { animation: slide-flip-in 700ms ease both; will-change: transform; }
 .slide-transition-glitch { animation: slide-glitch-in 620ms steps(8, end) both; }
 /* ============================================================

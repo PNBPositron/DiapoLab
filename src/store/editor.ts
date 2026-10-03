@@ -201,6 +201,7 @@ export type IconElement = ElementBase & {
 export type QuizOption = { id: string; text: string };
 export type QuizElement = ElementBase & {
   type: "quiz";
+  uiStyle?: UiStyle;
   effect?: ShapeEffect;
   question: string;
   options: QuizOption[];
@@ -550,6 +551,7 @@ export type Page = {
   bgImage?: string; // data URL or http URL
   bgFit?: BgFit;
   transition?: SlideTransition;
+  transitionZoom?: number; // starting scale of the zoom transition (0.5–2)
 };
 
 export const DEFAULT_W = 1920;
@@ -605,6 +607,7 @@ type State = {
   setBg: (c: string) => void;
   setBgImage: (src: string | undefined, fit?: BgFit) => void;
   setTransition: (t: SlideTransition) => void;
+  setTransitionZoom: (zoom: number) => void;
   setCanvasSize: (w: number, h: number) => void;
   magicResize: (w: number, h: number) => void;
   applyBrandKit: (
@@ -816,6 +819,7 @@ export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
 export const quizStylePatch = (uiStyle: UiStyle): Partial<QuizElement> => {
   const t = UI_STYLE_THEMES[uiStyle];
   return {
+    uiStyle,
     bgColor: solidThemeBg(uiStyle),
     fgColor: t.dark ? "#ffffff" : t.fg,
     accentColor: t.accent,
@@ -1322,7 +1326,12 @@ export const useEditor = create<State>((set, get) => {
     },
     setTransition: (t) => {
       pushHistory();
-      updateCurrentPage((p) => ({ ...p, transition: t }));
+      updateCurrentPage((p) => ({ ...p, transition: t, transitionZoom: t === "zoom" ? p.transitionZoom ?? 0.5 : p.transitionZoom }));
+    },
+    setTransitionZoom: (zoom) => {
+      if (!Number.isFinite(zoom)) return;
+      pushHistory();
+      updateCurrentPage((p) => ({ ...p, transitionZoom: Math.max(0.5, Math.min(2, zoom)) }));
     },
     undo: () => {
       const { history, future } = get();

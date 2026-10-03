@@ -14,6 +14,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
       { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
       { property: "og:description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://diapolab.lovable.app/" },
     ],
     links: [{ rel: "canonical", href: "https://diapolab.lovable.app/" }],

@@ -1,3 +1,6 @@
 - [ ] Center and modernize the publish-template popup.
 - [ ] Compress uploaded images and preserve them in saved designs, templates, and JSON exports.
 - [ ] Verify the popup and image workflows in the preview.
+- [ ] Rename the Designs panel to Projects in the sidebar, settings, and dialog.
+- [ ] Apply visual themes to quiz appearance and make the slide zoom transition adjustable.
+- [ ] Verify the quiz theme and slide zoom in the preview.
