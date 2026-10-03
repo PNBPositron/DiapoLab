@@ -23,7 +23,7 @@ const TOOLS = [
   { id: "components", label: "Presets", icon: Blocks },
   { id: "design", label: "Design", icon: SlidersHorizontal },
   { id: "ai", label: "AI", icon: Sparkles },
-  { id: "my-designs", label: "Designs", icon: FolderHeart },
+  { id: "my-designs", label: "Projects", icon: FolderHeart },
 ] as const;
 
 export function Sidebar() {

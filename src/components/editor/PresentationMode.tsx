@@ -83,7 +83,7 @@ export function PresentationMode() {
   if (!presenting) return null;
 
   const morphing = page.transition === "morph";
-  const transition = page.transition && page.transition !== "none" && !morphing
+  const transition = page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
     ? `slide-transition-${page.transition}`
     : "";
   // Morph matches elements across slides so shared shapes/text tween instead of cutting.
@@ -146,8 +146,9 @@ export function PresentationMode() {
         </button>
         <div
           style={{ width: canvasW * scale, height: canvasH * scale }}
-          className="brutal-shadow-lg relative shrink-0"
-        >
+          key={`frame-${currentIndex}`}
+          className={`brutal-shadow-lg relative shrink-0 ${page.transition === "zoom" ? "slide-transition-zoom" : ""}`}
+          style={{ width: canvasW * scale, height: canvasH * scale, "--zoom-start": page.transitionZoom ?? 0.5 } as React.CSSProperties}
           <div
             key={morphing ? "slide-morph" : `slide-${currentIndex}`}
             className={`absolute left-0 top-0 overflow-hidden border border-teal ${transition}`}

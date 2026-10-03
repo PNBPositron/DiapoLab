@@ -20,7 +20,7 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   illustrations: "Illus.",
   design: "Design",
   ai: "AI",
-  "my-designs": "My Designs",
+  "my-designs": "Projects",
 };
 
 export type BrandKit = {
