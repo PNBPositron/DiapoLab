@@ -16,22 +16,19 @@ import { CanvasElement } from "./CanvasElement";
  * PowerPoint's Morph, for matching shapes/text/images.
  */
 
-function morphKeyFor(el: (typeof useEditor.getState().pages)[number]["elements"][number]): string {
-  if (el.type === "image") return `i:${el.src.slice(-60)}`;
-  if (el.type === "text" && el.text.trim()) return `t:${el.text.trim().slice(0, 60)}`;
-  return null as unknown as string; // handled by caller
-}
-
-/** Compute the stable morph keys for a page's elements (exact match first, then per-type index). */
+/** Compute stable morph keys for a page's elements:
+ *  exact match first (image src / text content), then per-type index. */
 function computeMorphKeys(elements: readonly any[]): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const seen: Record<string, number> = {};
   const used = new Set<string>();
   return elements.map((el) => {
-    const e = el.type === "image"
-      ? `i:${el.src.slice(-60)}`
-      : el.type === "text" && el.text.trim()
-        ? `t:${el.text.trim().slice(0, 60)}`
-        : null;
+    const e =
+      el.type === "image"
+        ? `i:${el.src.slice(-60)}`
+        : el.type === "text" && el.text.trim()
+          ? `t:${el.text.trim().slice(0, 60)}`
+          : null;
     if (e && !used.has(e)) {
       used.add(e);
       return e;
@@ -44,20 +41,15 @@ function computeMorphKeys(elements: readonly any[]): string[] {
 }
 
 export function PresentationMode() {
-  const {
-    presenting,
-    setPresenting,
-    pages,
-    currentIndex,
-    setCurrentPage,
-    canvasW,
-    canvasH,
-  } = useEditor();
+  const { presenting, setPresenting, pages, currentIndex, setCurrentPage, canvasW, canvasH } =
+    useEditor();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [strip, setStrip] = useState(false);
   const idleRef = useRef<number | null>(null);
-  const prevPositionsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(new Map());
+  const prevPositionsRef = useRef<Map<string, { x: number; y: number; w: number; h: number }>>(
+    new Map(),
+  );
   const slideRef = useRef<HTMLDivElement>(null);
 
   const page = pages[currentIndex];
@@ -75,9 +67,12 @@ export function PresentationMode() {
     const obs = new ResizeObserver(fit);
     if (wrapRef.current) obs.observe(wrapRef.current);
 
+    // Enter native fullscreen so the slide truly fills the screen.
     const root = document.documentElement;
     if (root.requestFullscreen && !document.fullscreenElement) {
-      root.requestFullscreen().catch(() => {});
+      root.requestFullscreen().catch(() => {
+        /* user gesture missing — ignore */
+      });
     }
     const onFsChange = () => {
       if (!document.fullscreenElement) setPresenting(false);
@@ -96,6 +91,7 @@ export function PresentationMode() {
         const { currentIndex: i, setCurrentPage: go } = useEditor.getState();
         if (i > 0) go(i - 1);
       }
+      // numeric jump 1-9
       if (/^[1-9]$/.test(e.key)) {
         const n = parseInt(e.key, 10) - 1;
         const st = useEditor.getState();
@@ -120,18 +116,19 @@ export function PresentationMode() {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("fullscreenchange", onFsChange);
       if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => {
+          /* noop */
+        });
       }
       if (idleRef.current) window.clearTimeout(idleRef.current);
       document.body.style.overflow = prev;
     };
   }, [presenting, canvasW, canvasH, setPresenting]);
 
-  // --- FLIP step 1: before the slide changes, snapshot element rects (morph only).
+  // Intercept page changes to snapshot element rects BEFORE React swaps the DOM.
   const snapshotOutgoing = () => {
     const p = pages[currentIndex];
     if (!p || p.transition !== "morph") return;
-    const keys = computeMorphKeys(p.elements);
     const container = slideRef.current;
     if (!container) return;
     const cRect = container.getBoundingClientRect();
@@ -140,51 +137,41 @@ export function PresentationMode() {
     nodes.forEach((node) => {
       const key = node.dataset.morphKey!;
       const r = node.getBoundingClientRect();
-      map.set(key, { x: (r.left - cRect.left) / scale, y: (r.top - cRect.top) / scale, w: r.width / scale, h: r.height / scale });
+      map.set(key, {
+        x: (r.left - cRect.left) / scale,
+        y: (r.top - cRect.top) / scale,
+        w: r.width / scale,
+        h: r.height / scale,
+      });
     });
-    void keys;
     prevPositionsRef.current = map;
   };
 
-  // Intercept page changes to snapshot before React swaps the DOM.
   const goTo = (n: number) => {
     snapshotOutgoing();
     setCurrentPage(n);
   };
 
-  useEffect(() => {
-    if (!presenting) return;
-    const onKey = (e: KeyboardEvent) => {
-      // reroute nav keys through goTo so morph snapshots fire on keyboard nav too
-      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
-        const { currentIndex: i, pages: ps } = useEditor.getState();
-        if (i < ps.length - 1) goTo(i + 1);
-      }
-      if (e.key === "ArrowLeft" || e.key === "PageUp") {
-        const { currentIndex: i } = useEditor.getState();
-        if (i > 0) goTo(i - 1);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [presenting]); // eslint-disable-line react-hooks/exhaustive-deps
-
   if (!presenting) return null;
 
   const morphing = page.transition === "morph";
   const transition =
-    page.transition && page.transition !== "none" && page.transition !== "morph" && page.transition !== "zoom"
+    page.transition &&
+    page.transition !== "none" &&
+    !morphing &&
+    page.transition !== "zoom"
       ? `slide-transition-${page.transition}`
       : "";
 
   const ratio = canvasW / canvasH;
   const tW = ratio >= 1 ? 96 : 96 * ratio;
-  const tH = ratio >= 1 ? 96 / ratio;
+  const tH = ratio >= 1 ? 96 / ratio : 96;
 
   const morphKeys = morphing ? computeMorphKeys(page.elements) : null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-ink scanlines">
+      {/* Discreet exit — appears with the strip, Échap also exits */}
       <button
         onClick={() => setPresenting(false)}
         aria-label="Exit presentation"
@@ -215,8 +202,16 @@ export function PresentationMode() {
 
         <div
           key={`frame-${currentIndex}`}
-          className={`brutal-shadow-lg relative shrink-0 ${page.transition === "zoom" ? "slide-transition-zoom" : ""}`}
-          style={{ width: canvasW * scale, height: canvasH * scale, "--zoom-start": page.transitionZoom ?? 0.5 } as React.CSSProperties}
+          className={`brutal-shadow-lg relative shrink-0 ${
+            page.transition === "zoom" ? "slide-transition-zoom" : ""
+          }`}
+          style={
+            {
+              width: canvasW * scale,
+              height: canvasH * scale,
+              "--zoom-start": page.transitionZoom ?? 0.5,
+            } as React.CSSProperties
+          }
         >
           <div
             ref={slideRef}
@@ -237,6 +232,7 @@ export function PresentationMode() {
                 backgroundRepeat: "no-repeat",
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
+                // Non-zoom transitions replace this transform during animation.
                 "--fit": scale,
               } as React.CSSProperties
             }
@@ -267,13 +263,17 @@ export function PresentationMode() {
               onClick={() => goTo(i)}
               title={`Go to slide ${i + 1}`}
               className={`brutal-border-2 relative shrink-0 overflow-hidden transition-all ${
-                active(p, i, currentIndex) ? "border-teal glow-teal" : "border-teal/30 hover:border-teal"
+                i === currentIndex ? "border-teal glow-teal" : "border-teal/30 hover:border-teal"
               }`}
               style={{
                 width: tW,
                 height: tH,
-                background: p.bgColor.includes("gradient(") ? "#0a0f1f" : p.bgColor,
-                backgroundImage: p.bgImage ? `url(${p.bgImage})` : p.bgColor.includes("gradient(") ? p.bgColor : undefined,
+                background: p.bgColor.includes("gradient(") ? "#0aa0f1f" : p.bgColor,
+                backgroundImage: p.bgImage
+                  ? `url(${p.bgImage})`
+                  : p.bgColor.includes("gradient(")
+                    ? p.bgColor
+                    : undefined,
                 backgroundSize: p.bgFit ?? "cover",
                 backgroundPosition: "center",
               }}
@@ -287,10 +287,6 @@ export function PresentationMode() {
       </div>
     </div>
   );
-}
-
-function active(p: any, i: number, currentIndex: number) {
-  return i === currentIndex;
 }
 
 /** FLIP wrapper: reads the recorded source rect, inverts the delta,
@@ -307,16 +303,16 @@ function MorphItem({
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [style, setStyle] = React.useState<React.CSSProperties>({});
 
-  React.useLayoutEffect(() => {
+  useEffect(() => {
     const node = ref.current;
     const prev = prevPositions.current?.get(morphKey);
     if (!node) return;
     if (prev) {
       // FLIP: move from previous rect to the new natural position.
-      const cRect = node.offsetParent?.getBoundingClientRect();
-      if (!cRect) return;
+      const parent = node.offsetParent as HTMLElement | null;
+      if (!parent) return;
+      const cRect = parent.getBoundingClientRect();
       const r = node.getBoundingClientRect();
       const dx = prev.x - (r.left - cRect.left) / scale;
       const dy = prev.y - (r.top - cRect.top) / scale;
@@ -328,29 +324,30 @@ function MorphItem({
       node.style.opacity = "1";
       // Force reflow then animate to identity.
       void node.offsetWidth;
-      node.style.transition = "transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease";
+      node.style.transition =
+        "transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease";
       node.style.transform = "none";
-      void node.offsetWidth;
     } else {
       // No counterpart — fade/scale in like a new element.
-      node.style.transition = "transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease";
       node.style.transformOrigin = "center";
+      node.style.transition = "none";
       node.style.transform = "scale(0.6)";
       node.style.opacity = "0";
       void node.offsetWidth;
       requestAnimationFrame(() => {
-        node.style.opacity = "1";
+        node.style.transition =
+          "transform 620ms cubic-bezier(0.22, 1, 0.36, 1), opacity 620ms ease";
         node.style.transform = "none";
+        node.style.opacity = "1";
       });
     }
-    setStyle({});
   }, [morphKey, scale, prevPositions]);
 
   return (
     <div
       ref={ref}
       data-morph-key={morphKey}
-      style={{ position: "absolute", willChange: "transform, opacity", ...style }}
+      style={{ position: "absolute", willChange: "transform, opacity" }}
     >
       {children}
     </div>
