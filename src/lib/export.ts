@@ -1,6 +1,6 @@
 import { toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
-import { buildInteractiveHTML } from "@/lib/export-html";
+import { buildInteractiveHTML, buildPrintHTML } from "@/lib/export-html";
 
 export function exportJSON(name: string) {
   const { pages, canvasW, canvasH, designName } = useEditor.getState();
@@ -98,6 +98,47 @@ export async function exportPDF(name: string) {
     pdf.addImage(src, "PNG", 0, 0, canvasW, canvasH);
   });
   pdf.save(`${name || "positron"}-${Date.now()}.pdf`);
+}
+
+/**
+ * Native print-to-PDF: renders all slides into a hidden iframe with print
+ * CSS (@page size, one slide per page) and lets the browser compose the PDF.
+ * Result: real vector text (selectable & searchable), real fonts, real CSS —
+ * no rasterization. The user picks "Save as PDF" in the print dialog.
+ */
+export function exportPDFPrint(name: string) {
+  const { pages, canvasW, canvasH } = useEditor.getState();
+  if (pages.length === 0) return;
+  const html = buildPrintHTML({ pages, canvasW, canvasH, name: name || "positron" });
+
+  // Hidden iframe → let the browser compose the PDF natively.
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.cssText =
+    "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+  document.body.appendChild(iframe);
+
+  const cleanup = () => setTimeout(() => iframe.remove(), 500);
+
+  iframe.onload = async () => {
+    const win = iframe.contentWindow;
+    if (!win) return cleanup();
+    // Give images and fonts a moment to load inside the iframe before printing.
+    await new Promise((r) => setTimeout(r, 800));
+    win.addEventListener("afterprint", () => {
+      cleanup();
+      document.body.style.overflow = "";
+    });
+    document.body.style.overflow = "hidden";
+    win.focus();
+    win.print();
+  };
+
+  const doc = iframe.contentDocument;
+  if (!doc) return cleanup();
+  doc.open();
+  doc.write(html);
+  doc.close();
 }
 
 export async function exportPPTX(name: string) {
