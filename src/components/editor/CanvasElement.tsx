@@ -324,6 +324,10 @@ export function CanvasElement({
         outline: selected ? "3px solid #2b6cff" : "none",
         outlineOffset: "2px",
         mixBlendMode: "blendMode" in element ? (element.blendMode ?? "normal") : "normal",
+        filter:
+          element.shadow && !["text", "shape", "image", "button"].includes(element.type)
+            ? shadowFilter(element.shadow)
+            : undefined,
       }}
     >
       {element.type === "text" &&
