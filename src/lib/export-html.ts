@@ -422,3 +422,55 @@ export function buildInteractiveHTML(design: InteractiveDesign): string {
     '</html>',
   ].join('\n');
 }
+
+// ------------------------------------------------------------
+// PRINT VARIANT — same DOM renderers as buildInteractiveHTML,
+// but laid out for the browser's native print-to-PDF: every
+// slide visible in normal flow, one page per slide, exact page
+// size via @page, no viewport/controls/JS.
+// ------------------------------------------------------------
+
+const PRINT_CSS = [
+  '@page { size: __W__px __H__px; margin: 0 }',
+  'html,body{margin:0;padding:0;background:#fff}',
+  '.slide{position:relative;overflow:hidden;break-after:page;page-break-after:always}',
+  '.slide:last-child{break-after:auto;page-break-after:auto}',
+].join('\n');
+
+export function buildPrintHTML(design: InteractiveDesign): string {
+  const { pages, canvasW, canvasH, name } = design;
+  const css = PRINT_CSS.replace(/__W__/g, String(canvasW)).replace(/__H__/g, String(canvasH));
+  const slides = pages
+    .map((p) => {
+      const style = [
+        'width:' + canvasW + 'px',
+        'height:' + canvasH + 'px',
+        'background:' + (p.bgColor || '#fff'),
+      ];
+      if (p.bgImage) {
+        style.push('background-image:url(' + JSON.stringify(p.bgImage) + ')');
+        style.push('background-size:' + (p.bgFit || 'cover'));
+        style.push('background-position:center');
+        style.push('background-repeat:no-repeat');
+      }
+      const els = (p.elements || []).map((e) => renderElement(e as AnyEl)).join('\n');
+      return '<section class="slide" style="' + style.join(';') + '">' + els + '</section>';
+    })
+    .join('\n');
+
+  return [
+    '<!doctype html>',
+    '<html lang="en">',
+    '<head>',
+    '<meta charset="utf-8" />',
+    '<title>' + esc(name) + '</title>',
+    '<link rel="preconnect" href="https://fonts.googleapis.com" />',
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Archivo+Black&family=Orbitron:wght@400..900&family=JetBrains+Mono:wght@100..800&display=swap" />',
+    '<style>' + css + '</style>',
+    '</head>',
+    '<body>',
+    slides,
+    '</body>',
+    '</html>',
+  ].join('\n');
+}
