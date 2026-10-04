@@ -13,6 +13,7 @@ export type ElementBase = {
   hoverTilt?: boolean; // tilt toward the cursor while presenting
   animation?: ElementAnimation;
   interaction?: ElementInteraction;
+  shadow?: ElementShadow;
 };
 
 export type ElementAnimation = "none" | "fade-up" | "pop" | "glitch";

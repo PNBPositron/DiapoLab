@@ -586,6 +586,88 @@ export function PropertiesPanel() {
               </Section>
             )}
 
+            {/* QUIZ ELEMENT */}
+            {el.type === "quiz" && (() => {
+              const q = el as QuizElement;
+              const setOpts = (options: QuizElement["options"], correctId = q.correctId) =>
+                update(q.id, { options, correctId } as never);
+              return (
+                <Section title="Quiz">
+                  <Field label="Mode">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {(["quiz", "poll"] as const).map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => update(q.id, { mode: m } as never)}
+                          className={`rounded-lg border px-2 py-1.5 text-[11px] font-semibold capitalize ${
+                            (q.mode ?? "quiz") === m ? "border-sky-500 bg-sky-50 text-sky-700" : "border-slate-200"
+                          }`}
+                        >
+                          {m === "quiz" ? "Quiz" : "Live poll"}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  <Field label="Question">
+                    <textarea
+                      rows={2}
+                      value={q.question}
+                      onChange={(e) => update(q.id, { question: e.target.value } as never)}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                    />
+                  </Field>
+                  <Field label={(q.mode ?? "quiz") === "quiz" ? "Answers (pick the correct one)" : "Options"}>
+                    <div className="space-y-1.5">
+                      {q.options.map((o) => (
+                        <div key={o.id} className="flex items-center gap-1.5">
+                          {(q.mode ?? "quiz") === "quiz" && (
+                            <input
+                              type="radio"
+                              aria-label="Correct answer"
+                              checked={q.correctId === o.id}
+                              onChange={() => update(q.id, { correctId: o.id } as never)}
+                            />
+                          )}
+                          <input
+                            type="text"
+                            value={o.text}
+                            onChange={(e) =>
+                              setOpts(q.options.map((x) => (x.id === o.id ? { ...x, text: e.target.value } : x)))
+                            }
+                            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
+                          />
+                          <button
+                            aria-label="Remove option"
+                            disabled={q.options.length <= 2}
+                            onClick={() => {
+                              const rest = q.options.filter((x) => x.id !== o.id);
+                              setOpts(rest, q.correctId === o.id ? rest[0].id : q.correctId);
+                            }}
+                            className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      {q.options.length < 6 && (
+                        <button
+                          onClick={() =>
+                            setOpts([...q.options, { id: crypto.randomUUID(), text: `Option ${q.options.length + 1}` }])
+                          }
+                          className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                        >
+                          + Add option
+                        </button>
+                      )}
+                    </div>
+                  </Field>
+                  <ModernColorPicker label="Background" value={q.bgColor} onChange={(c) => update(q.id, { bgColor: c } as never)} />
+                  <ModernColorPicker label="Text" value={q.fgColor} onChange={(c) => update(q.id, { fgColor: c } as never)} />
+                  <ModernColorPicker label="Accent" value={q.accentColor} onChange={(c) => update(q.id, { accentColor: c } as never)} />
+                </Section>
+              );
+            })()}
+
             {/* TEXT ELEMENT */}
             {el.type === "text" && (
               <>
@@ -1244,6 +1326,36 @@ export function PropertiesPanel() {
                 unit="°"
                 onChange={(val) => update(el.id, { rotation: val })}
               />
+            </Section>
+
+            {/* SHADOW (all elements) */}
+            <Section title="Shadow" defaultOpen={!!el.shadow}>
+              <label className="flex items-center justify-between text-xs font-medium">
+                Enable shadow
+                <input
+                  type="checkbox"
+                  checked={!!el.shadow}
+                  onChange={(e) =>
+                    update(el.id, {
+                      shadow: e.target.checked
+                        ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" }
+                        : undefined,
+                    } as never)
+                  }
+                />
+              </label>
+              {el.shadow && (() => {
+                const s = el.shadow as ElementShadow;
+                const set = (p: Partial<ElementShadow>) => update(el.id, { shadow: { ...s, ...p } } as never);
+                return (
+                  <>
+                    <SliderWithInput label="Offset X" min={-60} max={60} value={s.x} unit="px" onChange={(v) => set({ x: v })} />
+                    <SliderWithInput label="Offset Y" min={-60} max={60} value={s.y} unit="px" onChange={(v) => set({ y: v })} />
+                    <SliderWithInput label="Blur" min={0} max={100} value={s.blur} unit="px" onChange={(v) => set({ blur: v })} />
+                    <ModernColorPicker label="Color" value={s.color.startsWith("#") ? s.color : "#000000"} onChange={(c) => set({ color: c })} />
+                  </>
+                );
+              })()}
             </Section>
 
             {/* LAYER ORDER ACTIONS */}
