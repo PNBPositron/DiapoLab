@@ -11,8 +11,8 @@ describe("morph matching", () => {
     expect(matches.get("b")?.x).toBe(300);
   });
   test("matches duplicated slides with new IDs one-to-one", () => {
-    const a = newShape({ id: "a", x: 40 });
-    const b = newShape({ id: "b", x: 80 });
+    const a = newShape("rect", { id: "a", x: 40 });
+    const b = newShape("rect", { id: "b", x: 80 });
     const matches = matchMorphElements([a, b], [{ ...a, id: "c" }, { ...b, id: "d" }]);
     expect(matches.get("c")?.x).toBe(40);
     expect(matches.get("d")?.x).toBe(80);
@@ -25,6 +25,6 @@ describe("morph matching", () => {
     expect(matches.get("new")?.x).toBe(10);
   });
   test("new unmatched element fades in rather than matching another type", () => {
-    expect(matchMorphElements([newText()], [newShape({ id: "new" })]).has("new")).toBe(false);
+    expect(matchMorphElements([newText()], [newShape("rect", { id: "new" })]).has("new")).toBe(false);
   });
 });
