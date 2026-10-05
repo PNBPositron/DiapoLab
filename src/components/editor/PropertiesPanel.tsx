@@ -611,6 +611,7 @@ export function PropertiesPanel() {
                   <Field label="Question">
                     <textarea
                       rows={2}
+                      aria-label="Quiz question"
                       value={q.question}
                       onChange={(e) => update(q.id, { question: e.target.value } as never)}
                       className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
@@ -618,18 +619,19 @@ export function PropertiesPanel() {
                   </Field>
                   <Field label={(q.mode ?? "quiz") === "quiz" ? "Answers (pick the correct one)" : "Options"}>
                     <div className="space-y-1.5">
-                      {q.options.map((o) => (
+                      {q.options.map((o, index) => (
                         <div key={o.id} className="flex items-center gap-1.5">
                           {(q.mode ?? "quiz") === "quiz" && (
                             <input
                               type="radio"
-                              aria-label="Correct answer"
+                              aria-label={`Correct answer ${index + 1}`}
                               checked={q.correctId === o.id}
                               onChange={() => update(q.id, { correctId: o.id } as never)}
                             />
                           )}
                           <input
                             type="text"
+                             aria-label={`Answer ${index + 1}`}
                             value={o.text}
                             onChange={(e) =>
                               setOpts(q.options.map((x) => (x.id === o.id ? { ...x, text: e.target.value } : x)))

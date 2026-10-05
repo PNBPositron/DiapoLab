@@ -76,7 +76,7 @@ export function CanvasElement({
 }) {
   const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
   const presenting = useEditor((s) => s.presenting);
-  const selected = selectedIds.includes(element.id);
+  const selected = !presenting && selectedIds.includes(element.id);
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -288,7 +288,12 @@ export function CanvasElement({
       onMouseDown={onDragStart}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={activateInteraction}
+      onClick={(event) => {
+        if (presenting && interaction?.moveToSlide) {
+          event.stopPropagation();
+          activateInteraction();
+        }
+      }}
       onDoubleClick={(e) => {
         if (element.type === "text") {
           e.stopPropagation();
@@ -297,7 +302,7 @@ export function CanvasElement({
       }}
       className={
         [
-          presenting && element.animation && element.animation !== "none"
+          presenting && !morph && element.animation && element.animation !== "none"
             ? `el-anim-${element.animation}`
             : "",
           hovered && interaction?.hoverEffect === "glitch" ? "el-hover-glitch" : "",
@@ -307,14 +312,14 @@ export function CanvasElement({
       }
       style={{
         position: "absolute",
-        left: element.x,
-        top: element.y,
+        left: morph ? 0 : element.x,
+        top: morph ? 0 : element.y,
         width: element.width,
         height: element.height,
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
         transition: morph
-          ? "left 620ms cubic-bezier(0.22,1,0.36,1), top 620ms cubic-bezier(0.22,1,0.36,1), width 620ms cubic-bezier(0.22,1,0.36,1), height 620ms cubic-bezier(0.22,1,0.36,1), transform 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease"
+          ? undefined
           : element.hoverTilt && presenting
             ? tilt === null
               ? "transform 420ms cubic-bezier(0.22,1,0.36,1)"
@@ -325,7 +330,7 @@ export function CanvasElement({
         outlineOffset: "2px",
         mixBlendMode: "blendMode" in element ? (element.blendMode ?? "normal") : "normal",
         filter:
-          element.shadow && !["text", "shape", "image", "button"].includes(element.type)
+          element.shadow && !["text", "shape", "button"].includes(element.type)
             ? shadowFilter(element.shadow)
             : undefined,
       }}
@@ -488,7 +493,7 @@ export function CanvasElement({
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-                filter: [filterCss(element.filters), shadowFilter(element.shadow)]
+                filter: [filterCss(element.filters)]
                   .filter(Boolean)
                   .join(" "),
                 opacity: element.opacity ?? 1,
@@ -518,7 +523,6 @@ export function CanvasElement({
                 filter: [
                   element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
                   filterCss(element.filters),
-                  shadowFilter(element.shadow),
                 ]
                   .filter(Boolean)
                   .join(" "),
@@ -656,7 +660,8 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     ch.onmessage = (ev: MessageEvent) => {
       const d = ev.data as { type: string; optionId?: string };
       if (d?.type === "vote" && d.optionId) {
-        setVotes((v) => ({ ...v, [d.optionId!]: (v[d.optionId!] ?? 0) + 1 }));
+        const optionId = d.optionId;
+        setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
       }
       if (d?.type === "reset") setVotes({});
     };
@@ -677,7 +682,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   const castVote = (optionId: string) => {
     if (!interactive || picked) return;
     setPicked(optionId);
-    setVotes((v) => ({ ...v, [optionId]: (v[optionId!] ?? 0) + 1 }));
+    setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
     chanRef.current?.postMessage({ type: "vote", optionId });
   };
   const resetPoll = () => {
@@ -696,6 +701,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   return (
     <div
       onMouseDown={(e) => interactive && e.stopPropagation()}
+      onClick={(e) => interactive && e.stopPropagation()}
       style={{
         ...glassStyle,
         width: "100%",
@@ -1085,7 +1091,7 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
   return (
     <button
       onMouseDown={(e) => interactive && e.stopPropagation()}
-      onClick={onClick}
+      onClick={(event) => { if (interactive) event.stopPropagation(); onClick(); }}
       style={{
         width: "100%",
         height: "100%",

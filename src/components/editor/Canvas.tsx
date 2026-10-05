@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, Scan } from "lucide-react";
 
 export function Canvas() {
   const { elements, bgColor, select, guides, canvasW, canvasH, pages, currentIndex } = useEditor();
   const page = pages[currentIndex];
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.5);
+  const [fitScale, setFitScale] = useState(0.5);
+  const [zoom, setZoom] = useState<number | null>(null);
+  const scale = zoom ?? fitScale;
+  const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
 
   useEffect(() => {
     const fit = () => {
@@ -15,7 +20,7 @@ export function Canvas() {
       const padding = 80;
       const sx = (el.clientWidth - padding) / canvasW;
       const sy = (el.clientHeight - padding) / canvasH;
-      setScale(Math.min(sx, sy, 1));
+      setFitScale(Math.max(0.1, Math.min(sx, sy, 1)));
     };
     fit();
     const obs = new ResizeObserver(fit);
@@ -24,8 +29,22 @@ export function Canvas() {
   }, [canvasW, canvasH]);
 
   useEffect(() => {
+    const node = wrapRef.current;
+    if (!node) return;
+    const onWheel = (event: WheelEvent) => {
+      if ((event.target as HTMLElement).closest('[contenteditable="true"]')) return;
+      event.preventDefault();
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? node.clientHeight : 1);
+      setZoom((value) => Math.max(0.1, Math.min(3, (value ?? fitScale) * Math.exp(-delta * 0.002))));
+    };
+    node.addEventListener("wheel", onWheel, { passive: false });
+    return () => node.removeEventListener("wheel", onWheel);
+  }, [fitScale]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
+      if (useEditor.getState().presenting) return;
       if (t?.tagName === "INPUT" || t?.tagName === "TEXTAREA" || t?.isContentEditable) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         const st = useEditor.getState();
@@ -79,11 +98,14 @@ export function Canvas() {
   return (
     <div
       ref={wrapRef}
-      className="relative flex h-full w-full items-center justify-center overflow-hidden"
+      className="relative h-full w-full overflow-hidden"
+      aria-label="Slide preview"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) select(null);
       }}
     >
+      <div className="absolute inset-0 overflow-auto pb-16">
+      <div className="flex min-h-full min-w-full w-max items-center justify-center p-10">
       <div
         className="brutal-shadow-lg relative shrink-0"
         style={{ width: canvasW * scale, height: canvasH * scale }}
@@ -147,9 +169,15 @@ export function Canvas() {
           )}
         </div>
       </div>
+      </div>
+      </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 brutal-border-2 bg-ink px-3 py-1.5 font-mono text-[10px] tracking-wider text-teal glow-teal">
-        ◆ {Math.round(scale * 100)}% · {canvasW}×{canvasH}
+      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-border bg-card p-1 text-card-foreground shadow-sm">
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom out" aria-label="Zoom out" disabled={scale <= 0.1} onClick={() => changeZoom(scale - 0.1)}><Minus /></Button>
+        <output aria-label="Preview zoom" className="min-w-12 text-center font-mono text-xs">{Math.round(scale * 100)}%</output>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom in" aria-label="Zoom in" disabled={scale >= 3} onClick={() => changeZoom(scale + 0.1)}><Plus /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Fit slide" aria-label="Fit slide" onClick={() => setZoom(null)}><Scan /></Button>
+        <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">{canvasW}×{canvasH}</span>
       </div>
     </div>
   );

@@ -3,4 +3,7 @@
 - [x] Rename the Designs panel to Projects in the sidebar, settings, and dialog.
 - [x] Apply visual themes to quiz appearance and make the slide zoom transition adjustable.
 - [x] Verify the quiz theme and slide zoom in the preview.
+- [x] Add adjustable preview zoom and verify it in the editor.
+- [x] Verify shadows and quiz editing, correcting clipped image shadows.
+- [x] Fix and verify morph transitions across keyboard and slide buttons; regression tests pass.
 - [ ] Verify the publish popup end-to-end in the preview (blocked: needs a signed-in account; no test user exists yet — sign in once in the preview, then re-test).
