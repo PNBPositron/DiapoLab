@@ -44,6 +44,7 @@ export function Canvas() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
+      if (useEditor.getState().presenting) return;
       if (t?.tagName === "INPUT" || t?.tagName === "TEXTAREA" || t?.isContentEditable) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         const st = useEditor.getState();

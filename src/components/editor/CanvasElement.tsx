@@ -319,7 +319,7 @@ export function CanvasElement({
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
         transition: morph
-          ? "left 620ms cubic-bezier(0.22,1,0.36,1), top 620ms cubic-bezier(0.22,1,0.36,1), width 620ms cubic-bezier(0.22,1,0.36,1), height 620ms cubic-bezier(0.22,1,0.36,1), transform 620ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease"
+          ? undefined
           : element.hoverTilt && presenting
             ? tilt === null
               ? "transform 420ms cubic-bezier(0.22,1,0.36,1)"
@@ -523,7 +523,6 @@ export function CanvasElement({
                 filter: [
                   element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
                   filterCss(element.filters),
-                  shadowFilter(element.shadow),
                 ]
                   .filter(Boolean)
                   .join(" "),
@@ -702,6 +701,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   return (
     <div
       onMouseDown={(e) => interactive && e.stopPropagation()}
+      onClick={(e) => interactive && e.stopPropagation()}
       style={{
         ...glassStyle,
         width: "100%",
