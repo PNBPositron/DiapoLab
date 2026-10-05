@@ -1,39 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
 
-/**
- * TRUE MORPH (geometry-based)
- * ---------------------------
- * No DOM measurement. Outgoing elements' geometry (x/y/w/h) is recorded
- * by morph key before the slide changes; each incoming element then starts
- * at its counterpart's geometry (translate + scale, transform-origin top
- * left) and CSS-transitions to its natural position. Deterministic FLIP
- * from design data — immune to wrapper/DOM layout quirks.
- */
-
-function computeMorphKeys(elements: readonly any[]): string[] {
-  const seen: Record<string, number> = {};
-  const used = new Set<string>();
-  return elements.map((el) => {
-    const e =
-      el.type === "image"
-        ? `i:${el.src.slice(-60)}`
-        : el.type === "text" && el.text.trim()
-          ? `t:${el.text.trim().slice(0, 60)}`
-          : null;
-    if (e && !used.has(e)) {
-      used.add(e);
-      return e;
-    }
-    const n = (seen[el.type] = (seen[el.type] ?? 0) + 1);
-    const key = `${el.type}#${n}`;
-    used.add(key);
-    return key;
-  });
-}
-
-type Geom = { x: number; y: number; w: number; h: number };
+import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
+import type { AnyElement } from "@/store/editor";
 
 export function PresentationMode() {
   const { presenting, setPresenting, pages, currentIndex, setCurrentPage, canvasW, canvasH } =
@@ -41,9 +11,22 @@ export function PresentationMode() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   // key -> geometry of the element on the OUTGOING slide
-  const prevGeomRef = useRef<Map<string, Geom>>(new Map());
+  const prevGeomRef = useRef<Map<string, MorphGeometry>>(new Map());
 
   const page = pages[currentIndex];
+
+  useEffect(() => useEditor.subscribe((next, previous) => {
+    if (!next.presenting || !previous.presenting) {
+      prevGeomRef.current = new Map();
+      return;
+    }
+    if (next.currentIndex === previous.currentIndex) return;
+    const outgoing = previous.pages[previous.currentIndex];
+    const incoming = next.pages[next.currentIndex];
+    prevGeomRef.current = outgoing && incoming?.transition === "morph"
+      ? matchMorphElements(outgoing.elements, incoming.elements)
+      : new Map();
+  }), []);
 
   useEffect(() => {
     if (!presenting) return;
@@ -70,16 +53,16 @@ export function PresentationMode() {
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
         e.preventDefault();
         const { currentIndex: i, pages: ps } = useEditor.getState();
-        if (i < ps.length - 1) snapshotAndGo(i + 1);
+        if (i < ps.length - 1) setCurrentPage(i + 1);
       }
       if (e.key === "ArrowLeft" || e.key === "PageUp") {
         e.preventDefault();
         const { currentIndex: i } = useEditor.getState();
-        if (i > 0) snapshotAndGo(i - 1);
+        if (i > 0) setCurrentPage(i - 1);
       }
       if (/^[1-9]$/.test(e.key)) {
         const n = parseInt(e.key, 10) - 1;
-        if (n < useEditor.getState().pages.length) snapshotAndGo(n);
+        if (n < useEditor.getState().pages.length) setCurrentPage(n);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -99,30 +82,13 @@ export function PresentationMode() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenting, canvasW, canvasH]);
 
-  if (!presenting) return null;
-
-  /** Record outgoing geometry BY KEY (only needed when navigating INTO a morph slide). */
-  function snapshotAndGo(next: number) {
-    const st = useEditor.getState();
-    const outgoing = st.pages[st.currentIndex];
-    const incoming = st.pages[next];
-    if (incoming && incoming.transition === "morph") {
-      const keys = computeMorphKeys(outgoing.elements);
-      const map = new Map<string, Geom>();
-      outgoing.elements.forEach((el, i) => {
-        map.set(keys[i], { x: el.x, y: el.y, w: el.width, h: el.height });
-      });
-      prevGeomRef.current = map;
-    }
-    setCurrentPage(next);
-  }
+  if (!presenting || !page) return null;
 
   const morphing = page.transition === "morph";
   const transition =
     page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
       ? `slide-transition-${page.transition}`
       : "";
-  const morphKeys = morphing ? computeMorphKeys(page.elements) : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
@@ -142,7 +108,7 @@ export function PresentationMode() {
         >
           <div
             key={`slide-${currentIndex}`}
-            onClick={() => currentIndex < pages.length - 1 && snapshotAndGo(currentIndex + 1)}
+            onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
             className={`absolute left-0 top-0 cursor-pointer overflow-hidden border border-teal ${transition}`}
             style={
               {
@@ -164,9 +130,9 @@ export function PresentationMode() {
               } as React.CSSProperties
             }
           >
-            {page.elements.map((el, i) =>
+            {page.elements.map((el) =>
               morphing ? (
-                <MorphItem key={morphKeys[i]} element={el} prevGeom={prevGeomRef.current.get(morphKeys[i])}>
+                <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
                   <CanvasElement element={el} scale={scale} morph />
                 </MorphItem>
               ) : (
@@ -190,40 +156,24 @@ function MorphItem({
   prevGeom,
   children,
 }: {
-  element: any;
-  prevGeom?: Geom;
+  element: AnyElement;
+  prevGeom?: MorphGeometry;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const node = ref.current;
-    if (!node) return;
-    node.style.transition = "none";
-    if (prevGeom) {
-      // FLIP from the outgoing element's box → incoming natural position.
-      const dx = prevGeom.x - el.x;
-      const dy = prevGeom.y - el.y;
-      const sx = prevGeom.w / (el.width || 1);
-      const sy = prevGeom.h / (el.height || 1);
-      node.style.transformOrigin = "top left";
-      node.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
-      node.style.opacity = "1";
-      void node.offsetWidth; // reflow
-      node.style.transition = "transform 620ms cubic-bezier(0.22,1,0.36,1)";
-      node.style.transform = "translate(0px, 0px) scale(1, 1)";
-    } else {
-      // New element — fade/scale in.
-      node.style.transformOrigin = "center";
-      node.style.transform = "scale(0.7)";
-      node.style.opacity = "0";
-      void node.offsetWidth;
-      node.style.transition =
-        "transform 620ms cubic-bezier(0.22,1,0.36,1), opacity 400ms ease";
-      node.style.transform = "none";
-      node.style.opacity = "1";
-    }
-  }, [el.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!node || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const from = prevGeom
+      ? `translate(${prevGeom.x - el.x}px, ${prevGeom.y - el.y}px) scale(${prevGeom.w / (el.width || 1)}, ${prevGeom.h / (el.height || 1)}) rotate(${prevGeom.rotation - el.rotation}deg)`
+      : "scale(0.92)";
+    const animation = node.animate([
+      { transform: from, opacity: prevGeom ? 1 : 0 },
+      { transform: "none", opacity: 1 },
+    ], { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" });
+    return () => animation.cancel();
+  }, [el.id, el.x, el.y, el.width, el.height, el.rotation, prevGeom]);
 
   return (
     <div
@@ -235,6 +185,7 @@ function MorphItem({
         top: el.y,
         width: el.width,
         height: el.height,
+        transformOrigin: "top left",
         willChange: "transform, opacity",
       }}
     >
