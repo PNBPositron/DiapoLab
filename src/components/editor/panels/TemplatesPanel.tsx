@@ -13,6 +13,7 @@ import {
 } from "@/lib/designs";
 import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
+import { Dropdown } from "../ui/Dropdown";
 
 export function TemplatesPanel() {
   const [error, setError] = useState<string | null>(null);
@@ -124,17 +125,12 @@ export function TemplatesPanel() {
                 {label === "Creator" && <Users className="size-2.5" />}
                 {label}
               </span>
-              <select
+              <Dropdown
                 value={value}
-                onChange={(event) => (setter as (v: string) => void)(event.target.value)}
-                className="w-full cursor-pointer rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-500"
-              >
-                {(options as readonly string[]).map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+                options={options}
+                onChange={(v) => (setter as (v: string) => void)(v)}
+                className="px-2 py-1 text-[10px]"
+              />
             </label>
           ))}
         </div>
@@ -357,7 +353,7 @@ function AllTemplatesDialog({
               </button>
             ))}
           </div>
-          <span className="text-[10px] text-sslate-400">
+          <span className="text-[10px] text-slate-400">
             {templates.length} template{templates.length === 1 ? "" : "s"}
           </span>
         </div>
