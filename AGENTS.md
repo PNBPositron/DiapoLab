@@ -1,3 +1,4 @@
 - Store user-uploaded images as size-limited compressed data URLs in design pages rather than ephemeral object URLs, so saved designs and public templates remain self-contained without requiring public file hosting.
 - Keep preview zoom local to the canvas and separate from presentation transition zoom, so editing never changes slide playback.
 - Match morph elements one-to-one using identity, content, then type order, and observe presentation page changes centrally so all navigation paths animate consistently.
+- Keep option selection UI in the shared editor selectors module, with scoped semantic CSS tokens; this preserves slide styling and existing selection callbacks during visual updates.
