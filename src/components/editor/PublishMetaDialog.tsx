@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Loader2, Upload, Globe2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Dropdown } from "./ui/Dropdown";
 
 export type PublishMeta = {
   name: string;
@@ -93,10 +94,14 @@ export function PublishMetaDialog({
           </label>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className={label}>Style
-              <select value={style} onChange={(event) => setStyle(event.target.value)} className={field}>{PUBLISH_STYLES.map((item) => <option key={item}>{item}</option>)}</select>
+              <span className="mt-1.5 block">
+                <Dropdown value={style} options={PUBLISH_STYLES} onChange={setStyle} />
+              </span>
             </label>
             <label className={label}>License
-              <select value={license} onChange={(event) => setLicense(event.target.value)} className={field}>{PUBLISH_LICENSES.map((item) => <option key={item}>{item}</option>)}</select>
+              <span className="mt-1.5 block">
+                <Dropdown value={license} options={PUBLISH_LICENSES} onChange={setLicense} />
+              </span>
             </label>
           </div>
           <label className={label}>Author name
