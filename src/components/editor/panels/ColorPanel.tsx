@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
-import { PanelHeader } from "./TextPanel";
+import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
 import { ColorPicker } from "../ColorPicker";
 import { ImagePlus, X, Link2 } from "lucide-react";
 import { prepareImage } from "@/lib/image-assets";
@@ -91,6 +91,8 @@ export function ColorPanel() {
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
   const [openPicker, setOpenPicker] = useState<"from" | "to" | "bg" | null>(null);
+  const [search, setSearch] = useState("");
+  const [packCategory, setPackCategory] = useState("All");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -167,19 +169,7 @@ export function ColorPanel() {
           />
         </div>
         {bgImage && (
-          <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1">
-            {(["cover", "contain"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setBgImage(bgImage, f)}
-                className={`flex-1 rounded-md py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-                  bgFit === f ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl label="Background image fit" value={bgFit} onChange={fit => setBgImage(bgImage, fit)} options={[{ value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} />
         )}
       </div>
 
@@ -215,27 +205,9 @@ export function ColorPanel() {
       {/* ------- Dégradés prédéfinis ------- */}
       <div className="space-y-3 px-4">
         <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Gradient packs</div>
-        {GRADIENT_PACKS.map((pack) => (
-          <div key={pack.name} className="space-y-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-slate-400">{pack.name}</div>
-            <div className="grid grid-cols-2 gap-2">
-              {pack.gradients.map((wallpaper) => (
-                <button
-                  key={wallpaper.name}
-                  onClick={() => { setBgImage(undefined); setBg(wallpaper.value); }}
-                  className={`h-16 rounded-xl border transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_8px_20px_rgba(37,99,235,0.15)] ${
-                    bgColor === wallpaper.value
-                      ? "border-blue-500 ring-2 ring-blue-500/30"
-                      : "border-slate-200"
-                  }`}
-                  style={{ background: wallpaper.value }}
-                  aria-label={`Apply ${wallpaper.name} wallpaper`}
-                  title={wallpaper.name}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+        <SearchField value={search} onChange={setSearch} placeholder="Search gradients..." />
+        <ChipGroup value={packCategory} options={["All", ...GRADIENT_PACKS.map(p => p.name)]} onChange={setPackCategory} label="Gradient categories" />
+        <OptionGrid label="Gradient wallpapers" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={GRADIENT_PACKS.filter(p => packCategory === "All" || p.name === packCategory).flatMap(p => p.gradients).filter(g => g.name.toLowerCase().includes(search.toLowerCase())).map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
       </div>
 
       {/* ------- Dégradé custom ------- */}
@@ -279,19 +251,7 @@ export function ColorPanel() {
           <ColorPicker value={gradientTo} onChange={setGradientTo} />
         )}
 
-        <div className="flex gap-1.5 rounded-lg bg-slate-100 p-1">
-          {(["linear", "radial"] as const).map((type) => (
-            <button
-              key={type}
-              onClick={() => setGradientType(type)}
-              className={`flex-1 rounded-md py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-                gradientType === type ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl label="Gradient type" value={gradientType} onChange={setGradientType} options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]} />
         {gradientType === "linear" && (
           <label className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-slate-500">
             Angle

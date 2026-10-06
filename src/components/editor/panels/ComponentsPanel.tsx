@@ -30,6 +30,7 @@ import {
   TerminalSquare,
   ToggleRight,
   TrendingUp,
+  ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
   User,
   type LucideIcon,
 } from "lucide-react";
@@ -45,6 +46,7 @@ import {
   type UiStyle,
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
+import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
 
 type PresetSection = "interfaces" | "ui" | "elements";
 
@@ -171,31 +173,31 @@ export function ComponentsPanel() {
     {
       label: "Bar Chart",
       description: "Categorical comparison",
-      Icon: TrendingUp,
+      Icon: ChartColumn,
       create: () => newChart("bar", chartStylePatch(style)),
     },
     {
       label: "Line Graph",
       description: "Trend over time",
-      Icon: TrendingUp,
+      Icon: ChartLine,
       create: () => newChart("line", chartStylePatch(style)),
     },
     {
       label: "Area Chart",
       description: "Cumulative trend",
-      Icon: TrendingUp,
+      Icon: ChartArea,
       create: () => newChart("area", chartStylePatch(style)),
     },
     {
       label: "Pie Chart",
       description: "Share of a whole",
-      Icon: TrendingUp,
+      Icon: ChartPie,
       create: () => newChart("pie", chartStylePatch(style)),
     },
     {
       label: "Donut Chart",
       description: "Modern proportions",
-      Icon: TrendingUp,
+      Icon: Circle,
       create: () => newChart("donut", chartStylePatch(style)),
     },
     {
@@ -244,89 +246,16 @@ export function ComponentsPanel() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
-      {/* Segmented Section Switcher */}
-      <div className="grid grid-cols-3 rounded-lg bg-slate-100 p-1 text-xs font-medium text-slate-600">
-        <button
-          onClick={() => setSection("interfaces")}
-          className={`flex items-center justify-center gap-1.5 rounded-md py-1.5 transition-all ${
-            section === "interfaces"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "hover:text-slate-900"
-          }`}
-        >
-          <MonitorCog className="size-3.5" />
-          <span>Frames</span>
-        </button>
-        <button
-          onClick={() => setSection("ui")}
-          className={`flex items-center justify-center gap-1.5 rounded-md py-1.5 transition-all ${
-            section === "ui"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "hover:text-slate-900"
-          }`}
-        >
-          <Blocks className="size-3.5" />
-          <span>Widgets</span>
-        </button>
-        <button
-          onClick={() => setSection("elements")}
-          className={`flex items-center justify-center gap-1.5 rounded-md py-1.5 transition-all ${
-            section === "elements"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "hover:text-slate-900"
-          }`}
-        >
-          <Sparkles className="size-3.5" />
-          <span>Blocks</span>
-        </button>
-      </div>
-
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={`Search ${section}...`}
-          className="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-800 placeholder-slate-400 shadow-xs transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-        />
-      </div>
-
-      {/* Style Palette */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-            Visual Theme
-          </span>
-          <span className="text-[10px] text-slate-400">
-            {UI_STYLE_THEMES[style]?.label}
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-1.5">
-          {STYLES.map((item) => {
-            const theme = UI_STYLE_THEMES[item];
-            const isSelected = style === item;
-            return (
-              <button
-                key={item}
-                onClick={() => pickStyle(item)}
-                className={`relative flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-left text-[11px] font-medium transition-all ${
-                  isSelected
-                    ? "border-slate-800 bg-slate-900 text-white shadow-xs"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                }`}
-              >
-                <span
-                  className="size-2 rounded-full ring-1 ring-black/10 shrink-0"
-                  style={{ background: theme.accent }}
-                />
-                <span className="truncate">{theme.label}</span>
-                {isSelected && <Check className="ml-auto size-3 shrink-0" />}
-              </button>
-            );
-          })}
-        </div>
+      <PanelHeader title="Components" />
+      <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
+        { value: "interfaces", label: "Frames", icon: MonitorCog },
+        { value: "ui", label: "Widgets", icon: Blocks },
+        { value: "elements", label: "Blocks", icon: Sparkles },
+      ]} />
+      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section}...`} />
+      <div className="space-y-2">
+        <span className="text-xs text-selector-subtle">Visual theme</span>
+        <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
       </div>
 
       {/* Elements Section */}
@@ -337,24 +266,7 @@ export function ComponentsPanel() {
               Blocks ({filteredElements.length})
             </span>
           </div>
-          {filteredElements.map(({ label, description, Icon, create }) => (
-            <button
-              key={label}
-              onClick={() => add(create())}
-              className="group flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-left shadow-xs transition-all hover:border-indigo-200 hover:bg-indigo-50/30 hover:shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition group-hover:bg-indigo-600 group-hover:text-white">
-                  <Icon className="size-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-medium text-slate-800">{label}</h4>
-                  <p className="text-[11px] text-slate-400">{description}</p>
-                </div>
-              </div>
-              <Plus className="size-4 text-slate-400 opacity-0 transition group-hover:opacity-100" />
-            </button>
-          ))}
+          <OptionGrid label="Charts and quiz" options={filteredElements.map(e => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))} onChange={label => { const preset = filteredElements.find(e => e.label === label); if (preset) add(preset.create()); }} />
         </div>
       )}
 

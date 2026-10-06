@@ -1,6 +1,13 @@
 import { useEditor, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
+import { useState } from "react";
+import { Ban, Blend, ArrowRight, ZoomIn, FlipHorizontal, Shapes, Zap, MoveLeft, MoveUp, Layers, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { OptionGrid, PanelHeader } from "./ui/selectors";
+
+const transitionIcons = { none: Ban, fade: Blend, slide: ArrowRight, zoom: ZoomIn, flip: FlipHorizontal, morph: Shapes, glitch: Zap, "parallax-left": MoveLeft, "parallax-up": MoveUp, "parallax-depth": Layers };
 
 const transitionOptions: SlideTransition[] = [
   "none",
@@ -16,6 +23,7 @@ const transitionOptions: SlideTransition[] = [
 ];
 
 export function PagesBar() {
+  const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
   const {
     pages,
     currentIndex,
@@ -74,18 +82,20 @@ export function PagesBar() {
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
             <span>Transition</span>
-            <select
-              aria-label="Slide transition"
-              value={currentTransition}
-              onChange={(event) => setTransition(event.target.value as SlideTransition)}
-              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium capitalize text-slate-700 outline-none transition-colors hover:border-slate-300 focus:border-blue-500"
-            >
-              {transitionOptions.map((transition) => (
-                <option key={transition} value={transition}>
-                  {transition}
-                </option>
-              ))}
-            </select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button type="button" variant="ghost" aria-label="Slide transition" className="h-7 gap-2 bg-selector-muted px-2 text-[11px] capitalize text-selector-ink">{currentTransition.replaceAll("-", " ")}<ChevronDown className="size-3" /></Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="end" className="selector-panel space-y-3 rounded-xl p-3">
+                <PanelHeader title="Slide transition" />
+                <div className="transition-mini" role="img" aria-label={`${hoveredTransition ?? currentTransition} transition preview`}>
+                  <div key={hoveredTransition ?? currentTransition} className="transition-mini-stage" data-transition={hoveredTransition ?? currentTransition}>
+                    <span className="transition-mini-mark" /><span className="transition-mini-line" /><span className="transition-mini-line" />
+                  </div>
+                </div>
+                <OptionGrid columns={3} label="Slide transitions" value={currentTransition} onChange={setTransition} onPreview={setHoveredTransition} options={transitionOptions.map(value => ({ value, label: value.replaceAll("-", " "), icon: transitionIcons[value] }))} />
+              </PopoverContent>
+            </Popover>
           </label>
           {currentTransition === "zoom" && <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">Zoom</span>

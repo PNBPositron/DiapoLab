@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useEditor, newShape, type ShapeKind } from "@/store/editor";
-import { PanelHeader } from "./TextPanel";
+import { PanelHeader, ChipGroup, OptionGrid } from "../ui/selectors";
 import { shapePathD } from "../ShapeRender";
 
 const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string }[] }[] = [
@@ -110,43 +110,8 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
     <div className="space-y-4">
       {!embedded && <PanelHeader title="Shapes" />}
 
-      <div className="flex flex-wrap gap-1.5">
-        {SHAPE_CATEGORIES.map((c) => (
-          <button
-            key={c.name}
-            type="button"
-            onClick={() => setCategory(c.name)}
-            className={`rounded-md px-2 py-1 font-mono text-[9px] uppercase tracking-wide transition ${
-              category === c.name ? "bg-teal text-ink" : "bg-ink/60 text-teal/70 hover:bg-ink"
-            }`}
-          >
-            {c.name} ({c.shapes.length})
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        {activeShapes.map((s) => {
-          const fill = "#9ca3af";
-          return (
-            <button
-              key={s.kind}
-              onClick={() =>
-                add(
-                  newShape(s.kind, {
-                    fill,
-                    stroke: "#0a0f1f",
-                  }),
-                )
-              }
-              className="brutal-border-2 brutal-press grid h-20 place-items-center bg-surface hover:border-teal"
-              title={s.label}
-            >
-              <ShapePreview kind={s.kind} fill={fill} />
-            </button>
-          );
-        })}
-      </div>
+      <ChipGroup value={category} options={SHAPE_CATEGORIES.map(c => ({ value: c.name, label: `${c.name} (${c.shapes.length})` }))} onChange={setCategory} label="Shape categories" />
+      <OptionGrid columns={3} label="Shapes" options={activeShapes.map(s => ({ value: s.kind, label: s.label, preview: <ShapePreview kind={s.kind} fill="#9ca3af" /> }))} onChange={kind => add(newShape(kind, { fill: "#9ca3af", stroke: "#0a0f1f" }))} />
 
       <div className="brutal-border-2 bg-surface p-3">
         <div className="mb-3 font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Custom gradient</div>
@@ -163,14 +128,12 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
             ANGLE · {customAngle}°
             <input aria-label="Gradient angle" type="range" min="0" max="360" value={customAngle} onChange={(e) => setCustomAngle(Number(e.target.value))} className="accent-teal" />
           </label>
-          <select aria-label="Custom gradient shape" value={customKind} onChange={(e) => setCustomKind(e.target.value as ShapeKind)} className="h-8 border-2 border-teal/40 bg-ink px-2 font-mono text-[10px] text-teal">
-            {["rect", "circle", "triangle", "star", "heart", "hexagon", "diamond", "shield", "blob"].map((k) => (
-              <option key={k} value={k}>{k.toUpperCase()}</option>
-            ))}
-          </select>
           <button type="button" onClick={addCustomGradient} className="brutal-border brutal-press h-8 bg-blue px-3 font-display text-[10px] tracking-[0.12em] text-ink">
             ADD
           </button>
+        </div>
+        <div className="my-3">
+          <OptionGrid columns={3} label="Custom gradient shape" value={customKind} onChange={setCustomKind} options={(["rect", "circle", "triangle", "star", "heart", "hexagon", "diamond", "shield", "blob"] as ShapeKind[]).map(kind => ({ value: kind, label: kind === "rect" ? "Rectangle" : kind, preview: <ShapePreview kind={kind} fill="#9ca3af" /> }))} />
         </div>
         <div className="mt-3 h-5 border border-teal/30" style={{ background: `linear-gradient(${customAngle}deg, ${customFrom}, ${customTo})` }} aria-label="Custom gradient preview" />
       </div>
