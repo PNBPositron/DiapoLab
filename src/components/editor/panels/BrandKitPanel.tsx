@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useSettings, DEFAULT_BRAND_KIT, type BrandKit } from "@/store/settings";
-import { WandSparkles, Check, Layers, Copy, RotateCcw } from "lucide-react";
+import { WandSparkles, Check, Layers, RotateCcw } from "lucide-react";
 import { useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
+import { Dropdown } from "../ui/Dropdown";
 
 const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
   { key: "primary", label: "Primary", hint: "Main brand color — buttons, highlights" },
@@ -121,17 +122,12 @@ export function BrandKitPanel() {
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
               {key === "headingFont" ? "Heading font" : "Body font"}
             </span>
-            <select
+            <Dropdown
               value={brandKit[key]}
-              onChange={(e) => setBrandKit({ [key]: e.target.value })}
-              className="w-full cursor-pointer rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-500"
-            >
-              {FONTS.map((f) => (
-                <option key={f.family} value={f.family}>
-                  {f.family}
-                </option>
-              ))}
-            </select>
+              options={FONTS.map((f) => f.family)}
+              onChange={(v) => setBrandKit({ [key]: v })}
+              className="text-[11px]"
+            />
           </label>
         ))}
       </div>
