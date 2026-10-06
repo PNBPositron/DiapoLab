@@ -47,8 +47,11 @@ import {
   Eye,
   EyeOff,
   X,
+  ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash,
 } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
+import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
+import { Button } from "@/components/ui/button";
 
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
@@ -136,7 +139,7 @@ function Section({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white/70 shadow-xs backdrop-blur-sm transition-all duration-200">
+    <div className="inspector-section border-b border-selector-border pb-2">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -180,39 +183,6 @@ function Field({
     <div className="space-y-1.5">
       <label className="text-[11px] font-medium text-slate-600">{label}</label>
       <div>{children}</div>
-    </div>
-  );
-}
-
-function SegmentedControl<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T;
-  options: Array<{ value: T; label: React.ReactNode; title?: string }>;
-  onChange: (val: T) => void;
-}) {
-  return (
-    <div className="grid w-full auto-cols-fr grid-flow-col gap-0.5 rounded-lg border border-slate-200/80 bg-slate-100/80 p-0.5 shadow-inner">
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            title={opt.title}
-            onClick={() => onChange(opt.value)}
-            className={`flex items-center justify-center rounded-md py-1.5 text-xs font-medium transition-all ${
-              active
-                ? "bg-white text-slate-900 shadow-xs"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -504,26 +474,11 @@ export function PropertiesPanel() {
       {floatingHUD}
 
       {advancedOpen && (
-        <aside className="fixed right-4 top-4 bottom-4 z-40 flex w-80 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-300">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5">
-            <div className="flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
-                <Layers className="size-3.5" />
-              </span>
-              <div>
-                <h3 className="text-xs font-semibold tracking-wide text-slate-900 uppercase">
-                  {el.type} Properties
-                </h3>
-                <p className="text-[10px] text-slate-400">DiapoLab Inspector</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setAdvancedOpen(false)}
-              className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-            >
-              <X className="size-4" />
-            </button>
+        <aside className="editor-inspector fixed right-4 top-4 bottom-4 z-40 flex w-[280px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-300">
+          <div className="px-3 pt-3">
+            <PanelHeader title={`${el.type} properties`}>
+              <Button type="button" variant="ghost" size="icon" className="size-7 text-selector-subtle" aria-label="Close inspector" title="Close inspector" onClick={() => setAdvancedOpen(false)}><X /></Button>
+            </PanelHeader>
           </div>
 
           {/* Body */}
@@ -594,19 +549,7 @@ export function PropertiesPanel() {
               return (
                 <Section title="Quiz">
                   <Field label="Mode">
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {(["quiz", "poll"] as const).map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => update(q.id, { mode: m } as never)}
-                          className={`rounded-lg border px-2 py-1.5 text-[11px] font-semibold capitalize ${
-                            (q.mode ?? "quiz") === m ? "border-sky-500 bg-sky-50 text-sky-700" : "border-slate-200"
-                          }`}
-                        >
-                          {m === "quiz" ? "Quiz" : "Live poll"}
-                        </button>
-                      ))}
-                    </div>
+                    <SegmentedControl label="Quiz mode" value={q.mode ?? "quiz"} onChange={mode => update(q.id, { mode } as never)} options={[{ value: "quiz", label: "Quiz" }, { value: "poll", label: "Live poll" }]} />
                   </Field>
                   <Field label="Question">
                     <textarea
@@ -742,41 +685,11 @@ export function PropertiesPanel() {
                     />
                   </Field>
                   <Field label="Formatting">
-                    <div className="grid grid-cols-3 gap-1">
-                      <button
-                        type="button"
-                        onClick={() => update(el.id, { italic: !el.italic })}
-                        className={`flex items-center justify-center rounded-lg border py-1.5 transition ${
-                          el.italic
-                            ? "border-sky-500 bg-sky-50 text-sky-700"
-                            : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Italic className="size-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => update(el.id, { underline: !el.underline })}
-                        className={`flex items-center justify-center rounded-lg border py-1.5 transition ${
-                          el.underline
-                            ? "border-sky-500 bg-sky-50 text-sky-700"
-                            : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Underline className="size-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => update(el.id, { bullet: !el.bullet })}
-                        className={`flex items-center justify-center rounded-lg border py-1.5 transition ${
-                          el.bullet
-                            ? "border-sky-500 bg-sky-50 text-sky-700"
-                            : "border-slate-200 text-slate-600 hover:bg-slate-50"
-                        }`}
-                      >
-                        <List className="size-3.5" />
-                      </button>
-                    </div>
+                    <ToggleGrid columns={3} label="Text formatting" options={[
+                      { id: "italic", label: "Italic", icon: Italic, checked: !!el.italic, onChange: () => update(el.id, { italic: !el.italic }) },
+                      { id: "underline", label: "Underline", icon: Underline, checked: !!el.underline, onChange: () => update(el.id, { underline: !el.underline }) },
+                      { id: "bullet", label: "Bullets", icon: List, checked: !!el.bullet, onChange: () => update(el.id, { bullet: !el.bullet }) },
+                    ]} />
                   </Field>
                   <ModernColorPicker
                     label="Text Color"
@@ -894,30 +807,10 @@ export function PropertiesPanel() {
                 </Field>
 
                 <Field label="Transform">
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => update(el.id, { flipX: !el.flipX })}
-                      className={`rounded-lg border py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
-                        el.flipX
-                          ? "border-sky-500 bg-sky-50 text-sky-600"
-                          : "border-slate-200 bg-slate-50 text-slate-500"
-                      }`}
-                    >
-                      Flip H
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => update(el.id, { flipY: !el.flipY })}
-                      className={`rounded-lg border py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
-                        el.flipY
-                          ? "border-sky-500 bg-sky-50 text-sky-600"
-                          : "border-slate-200 bg-slate-50 text-slate-500"
-                      }`}
-                    >
-                      Flip V
-                    </button>
-                  </div>
+                  <ToggleGrid label="Image transforms" options={[
+                    { id: "flipX", label: "Flip H", icon: FlipHorizontal, checked: !!el.flipX, onChange: () => update(el.id, { flipX: !el.flipX }) },
+                    { id: "flipY", label: "Flip V", icon: FlipVertical, checked: !!el.flipY, onChange: () => update(el.id, { flipY: !el.flipY }) },
+                  ]} />
                 </Field>
 
                 <Field label="Presets">
@@ -1109,17 +1002,13 @@ export function PropertiesPanel() {
             {el.type === "chart" && (
               <Section title="Chart">
                 <Field label="Chart Type">
-                  <select
-                    value={el.chart}
-                    onChange={(e) => update(el.id, { chart: e.target.value as any })}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"
-                  >
-                    <option value="bar">Bar</option>
-                    <option value="line">Line</option>
-                    <option value="area">Area</option>
-                    <option value="pie">Pie</option>
-                    <option value="donut">Donut</option>
-                  </select>
+                  <OptionGrid label="Chart type" columns={3} value={el.chart} onChange={chart => update(el.id, { chart })} options={[
+                    { value: "bar", label: "Bar", icon: ChartColumn },
+                    { value: "line", label: "Line", icon: ChartLine },
+                    { value: "area", label: "Area", icon: ChartArea },
+                    { value: "pie", label: "Pie", icon: ChartPie },
+                    { value: "donut", label: "Donut", icon: Circle },
+                  ]} />
                 </Field>
                 <Field label="Title">
                   <input
@@ -1208,30 +1097,10 @@ export function PropertiesPanel() {
                   </div>
                 </Field>
                 <Field label="Display">
-                  <div className="flex gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => update(el.id, { showValues: !el.showValues })}
-                      className={`flex-1 rounded-lg border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-                        el.showValues
-                          ? "border-sky-500 bg-sky-50 text-sky-600"
-                          : "border-slate-200 bg-slate-50 text-slate-500"
-                      }`}
-                    >
-                      Values
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => update(el.id, { showAxes: !el.showAxes })}
-                      className={`flex-1 rounded-lg border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-                        el.showAxes
-                          ? "border-sky-500 bg-sky-50 text-sky-600"
-                          : "border-slate-200 bg-slate-50 text-slate-500"
-                      }`}
-                    >
-                      Axes
-                    </button>
-                  </div>
+                  <ToggleGrid label="Chart display" options={[
+                    { id: "values", label: "Values", icon: Hash, checked: !!el.showValues, onChange: () => update(el.id, { showValues: !el.showValues }) },
+                    { id: "axes", label: "Axes", icon: ChartLine, checked: !!el.showAxes, onChange: () => update(el.id, { showAxes: !el.showAxes }) },
+                  ]} />
                 </Field>
               </Section>
             )}
@@ -1278,14 +1147,7 @@ export function PropertiesPanel() {
                       onChange={(val) => update(el.id, { rotateY: val })}
                     />
                     <Field label="Interactive Tilt (while presenting)">
-                      <SegmentedControl
-                        value={el.hoverTilt ? "on" : "off"}
-                        onChange={(v) => update(el.id, { hoverTilt: v === "on" || undefined })}
-                        options={[
-                          { value: "off", label: "Off" },
-                          { value: "on", label: "Tilt to cursor" },
-                        ]}
-                      />
+                      <ToggleGrid label="Interactive tilt" options={[{ id: "tilt", label: "Tilt to cursor", icon: MousePointer2, checked: !!el.hoverTilt, onChange: checked => update(el.id, { hoverTilt: checked || undefined }) }]} />
                     </Field>
                     <button
                       type="button"
@@ -1332,20 +1194,7 @@ export function PropertiesPanel() {
 
             {/* SHADOW (all elements) */}
             <Section title="Shadow" defaultOpen={!!el.shadow}>
-              <label className="flex items-center justify-between text-xs font-medium">
-                Enable shadow
-                <input
-                  type="checkbox"
-                  checked={!!el.shadow}
-                  onChange={(e) =>
-                    update(el.id, {
-                      shadow: e.target.checked
-                        ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" }
-                        : undefined,
-                    } as never)
-                  }
-                />
-              </label>
+              <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
               {el.shadow && (() => {
                 const s = el.shadow as ElementShadow;
                 const set = (p: Partial<ElementShadow>) => update(el.id, { shadow: { ...s, ...p } } as never);
