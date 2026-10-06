@@ -233,3 +233,39 @@
 .editor-ui * {
   font-family: Inter, system-ui, sans-serif !important;
 }
+
+/* The selector kit owns its color and interaction states, rather than the
+   legacy broad side-panel button/input rules above. */
+.editor-side-panel {
+  width: 280px;
+  padding: 12px;
+  background: var(--selector-surface);
+  color: var(--selector-ink);
+  border-color: var(--selector-border);
+  box-shadow: var(--selector-panel-shadow);
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+.editor-side-panel > div { padding-left: 0; padding-right: 0; }
+.editor-side-panel .selector-grid > .selector-option { border-radius: 12px; }
+.editor-side-panel .selector-chips > .selector-chip { border-radius: 999px; }
+.editor-side-panel .selector-grid > .selector-option-art { transform: none; }
+.editor-side-panel .selector-option-art > svg { width: 36px; height: 36px; }
+.editor-inspector {
+  color: var(--selector-ink);
+  background: var(--selector-surface);
+  border-color: var(--selector-border);
+  box-shadow: var(--selector-panel-shadow);
+}
+.editor-inspector input:not([type="color"]):not([type="radio"]):not([type="range"]),
+.editor-inspector textarea, .editor-inspector select {
+  min-width: 0;
+  max-width: 100%;
+  background: var(--selector-muted);
+  border-color: var(--selector-border);
+  color: var(--selector-ink);
+}
+.editor-inspector .inspector-section { border-color: var(--selector-border); }
+.editor-inspector .inspector-section > button { padding: 10px 2px; }
+.editor-inspector .inspector-section > div { padding: 10px 2px; border: 0; }
+.editor-side-panel .selector-search input { border: 0; box-shadow: none; }
