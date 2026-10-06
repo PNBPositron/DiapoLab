@@ -7,3 +7,5 @@
 - [x] Verify shadows and quiz editing, correcting clipped image shadows.
 - [x] Fix and verify morph transitions across keyboard and slide buttons; regression tests pass.
 - [ ] Verify the publish popup end-to-end in the preview (blocked: needs a signed-in account; no test user exists yet — sign in once in the preview, then re-test).
+- [ ] Build shared selectors and modernize transitions, shapes, charts, inspector, fonts, and colors without changing behavior.
+- [ ] Verify panel controls, transition previews, and fixed 280px scrolling sidebar.
