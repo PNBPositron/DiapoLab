@@ -664,6 +664,21 @@ export function PropertiesPanel() {
                     value={Math.round((el.letterSpacing ?? -0.02) * 100)}
                     unit="em"
                     onChange={(val) => update(el.id, { letterSpacing: val / 100 })}
+                                      <Field label="Shape Mask">
+               <Dropdown
+                  value={el.maskShape ?? ""}
+                  options={[
+                 { value: "", label: "None" },
+                 { value: "circle", label: "Circle" },
+                 { value: "hexagon", label: "Hexagon" },
+                 { value: "triangle", label: "Triangle" },
+                 { value: "diamond", label: "Diamond" },
+                 { value: "star", label: "Star" },
+                 // …mêmes valeurs que la liste image
+                 ]}
+                 onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
+                />
+               </Field>
                   />
                 </Section>
 
