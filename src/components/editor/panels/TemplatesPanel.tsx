@@ -100,7 +100,7 @@ export function TemplatesPanel() {
       )}
 
       {/* Search + filtres */}
-      <div className="space-y-3 px-4">
+        <div className="relative z-30 space-y-3 px-4">
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
