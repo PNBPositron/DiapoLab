@@ -52,6 +52,10 @@ export type TextElement = ElementBase & {
   blendMode?: BlendMode;
   imageOverlay?: string;
   interaction?: ElementInteraction;
+    /** clip the element's silhouette by a shape (works like image masks) */
+  maskShape?: ShapeKind;
+  /** fill source: own color, or the slide's background (knockout) */
+  fillSource?: "color" | "slide-bg";
 };
 
 export type HoverEffect = "none" | "glitch" | "color" | "gradient";
@@ -142,6 +146,10 @@ export type ShapeElement = ElementBase & {
   blendMode?: BlendMode;
   imageOverlay?: string;
   strokeStyle?: "solid" | "dashed" | "dotted";
+  /** clip the element's silhouette by a shape (works like image masks) */
+  maskShape?: ShapeKind;
+  /** fill source: own color, or the slide's background (knockout) */
+  fillSource?: "color" | "slide-bg";
 };
 
 export type ImageFilters = {
