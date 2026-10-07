@@ -58,6 +58,19 @@ const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
 ).sort();
 
+const MASK_OPTIONS = [
+  { value: "", label: "None" },
+  { value: "circle", label: "Circle" },
+  { value: "hexagon", label: "Hexagon" },
+  { value: "triangle", label: "Triangle" },
+  { value: "diamond", label: "Diamond" },
+  { value: "star", label: "Star" },
+  { value: "heart", label: "Heart" },
+  { value: "pentagon", label: "Pentagon" },
+  { value: "octagon", label: "Octagon" },
+  { value: "blob", label: "Blob" },
+] as const;
+
 const IMAGE_FILTER_PRESETS: Array<{
   name: string;
   description: string;
@@ -575,7 +588,7 @@ export function PropertiesPanel() {
                           )}
                           <input
                             type="text"
-                             aria-label={`Answer ${index + 1}`}
+                            aria-label={`Answer ${index + 1}`}
                             value={o.text}
                             onChange={(e) =>
                               setOpts(q.options.map((x) => (x.id === o.id ? { ...x, text: e.target.value } : x)))
@@ -628,9 +641,9 @@ export function PropertiesPanel() {
                   </Field>
                   <Field label="Font Family">
                     <Dropdown
-                     value={el.fontFamily}
-                     options={FONT_FAMILIES}
-                     onChange={(v) => update(el.id, { fontFamily: v })}
+                      value={el.fontFamily}
+                      options={FONT_FAMILIES}
+                      onChange={(v) => update(el.id, { fontFamily: v })}
                     />
                   </Field>
                   <SliderWithInput
@@ -664,21 +677,6 @@ export function PropertiesPanel() {
                     value={Math.round((el.letterSpacing ?? -0.02) * 100)}
                     unit="em"
                     onChange={(val) => update(el.id, { letterSpacing: val / 100 })}
-                                      <Field label="Shape Mask">
-               <Dropdown
-                  value={el.maskShape ?? ""}
-                  options={[
-                 { value: "", label: "None" },
-                 { value: "circle", label: "Circle" },
-                 { value: "hexagon", label: "Hexagon" },
-                 { value: "triangle", label: "Triangle" },
-                 { value: "diamond", label: "Diamond" },
-                 { value: "star", label: "Star" },
-                 // …mêmes valeurs que la liste image
-                 ]}
-                 onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
-                />
-               </Field>
                   />
                 </Section>
 
@@ -701,11 +699,23 @@ export function PropertiesPanel() {
                       { id: "bullet", label: "Bullets", icon: List, checked: !!el.bullet, onChange: () => update(el.id, { bullet: !el.bullet }) },
                     ]} />
                   </Field>
-                  <ModernColorPicker
-                    label="Text Color"
-                    value={el.color}
-                    onChange={(c) => update(el.id, { color: c })}
-                  />
+                  <Field label="Fill">
+                    <SegmentedControl
+                      value={el.fillSource ?? "color"}
+                      onChange={(fillSource) => update(el.id, { fillSource })}
+                      options={[
+                        { value: "color", label: "Solid" },
+                        { value: "slide-bg", label: "Slide BG" },
+                      ]}
+                    />
+                  </Field>
+                  {(el.fillSource ?? "color") === "color" && (
+                    <ModernColorPicker
+                      label="Text Color"
+                      value={el.color}
+                      onChange={(c) => update(el.id, { color: c })}
+                    />
+                  )}
                   <SliderWithInput
                     label="Opacity"
                     min={5}
@@ -714,6 +724,13 @@ export function PropertiesPanel() {
                     unit="%"
                     onChange={(val) => update(el.id, { opacity: val / 100 })}
                   />
+                  <Field label="Shape Mask">
+                    <Dropdown
+                      value={el.maskShape ?? ""}
+                      options={MASK_OPTIONS}
+                      onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
+                    />
+                  </Field>
                   <Field label="Hyperlink URL">
                     <div className="flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
                       <Link2 className="mr-1.5 size-3.5 text-slate-400" />
@@ -733,11 +750,23 @@ export function PropertiesPanel() {
             {/* SHAPES */}
             {el.type === "shape" && (
               <Section title="Shape Appearance">
-                <ModernColorPicker
-                  label="Fill Color"
-                  value={el.fill}
-                  onChange={(c) => update(el.id, { fill: c })}
-                />
+                <Field label="Fill">
+                  <SegmentedControl
+                    value={el.fillSource ?? "color"}
+                    onChange={(fillSource) => update(el.id, { fillSource })}
+                    options={[
+                      { value: "color", label: "Solid" },
+                      { value: "slide-bg", label: "Slide BG" },
+                    ]}
+                  />
+                </Field>
+                {(el.fillSource ?? "color") === "color" && (
+                  <ModernColorPicker
+                    label="Fill Color"
+                    value={el.fill}
+                    onChange={(c) => update(el.id, { fill: c })}
+                  />
+                )}
                 <ModernColorPicker
                   label="Stroke Color"
                   value={el.stroke}
@@ -750,22 +779,14 @@ export function PropertiesPanel() {
                   value={el.strokeWidth}
                   unit="px"
                   onChange={(val) => update(el.id, { strokeWidth: val })}
-                  <Field label="Shape Mask">
-               <Dropdown
-                  value={el.maskShape ?? ""}
-                  options={[
-                 { value: "", label: "None" },
-                 { value: "circle", label: "Circle" },
-                 { value: "hexagon", label: "Hexagon" },
-                 { value: "triangle", label: "Triangle" },
-                 { value: "diamond", label: "Diamond" },
-                 { value: "star", label: "Star" },
-                 // …mêmes valeurs que la liste image
-                 ]}
-                 onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
                 />
-               </Field>
-                />
+                <Field label="Shape Mask">
+                  <Dropdown
+                    value={el.maskShape ?? ""}
+                    options={MASK_OPTIONS}
+                    onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
+                  />
+                </Field>
                 {el.shape === "rect" && (
                   <SliderWithInput
                     label="Corner Radius"
@@ -793,14 +814,7 @@ export function PropertiesPanel() {
                 <Field label="Shape Mask">
                   <Dropdown
                     value={el.maskShape ?? ""}
-                    options={[
-                    { value: "", label: "None (rectangle)" },
-                    { value: "circle", label: "Circle" },
-                    { value: "hexagon", label: "Hexagon" },
-                    { value: "triangle", label: "Triangle" },
-                    { value: "diamond", label: "Diamond" },
-                    // …reprends les valeurs restantes de ta liste actuelle à l'identique
-                    ]}
+                    options={MASK_OPTIONS}
                     onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
                   />
                 </Field>
@@ -963,24 +977,24 @@ export function PropertiesPanel() {
               </Section>
             )}
 
-                        {/* INTERACTION — HOVER & CLICK */}
+            {/* INTERACTION — HOVER & CLICK */}
             <Section title="Interaction (Hover & Click)">
               <Field label="Hover Effect">
-               <Dropdown
-                 value={el.interaction?.hoverEffect ?? "none"}
-                 options={[
-                 { value: "none", label: "None" },
-                 { value: "color", label: "Color Shift" },
-                 { value: "gradient", label: "Gradient Glow" },
-                 { value: "glitch", label: "Glitch" },
+                <Dropdown
+                  value={el.interaction?.hoverEffect ?? "none"}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "color", label: "Color Shift" },
+                    { value: "gradient", label: "Gradient Glow" },
+                    { value: "glitch", label: "Glitch" },
                   ]}
-                onChange={(v) =>
-                  update(el.id, {
-                    interaction: { ...el.interaction, hoverEffect: v as HoverEffect },
-                  })
-                }
-              />
-            </Field>
+                  onChange={(v) =>
+                    update(el.id, {
+                      interaction: { ...el.interaction, hoverEffect: v as HoverEffect },
+                    })
+                  }
+                />
+              </Field>
 
               {(el.interaction?.hoverEffect === "color" ||
                 el.interaction?.hoverEffect === "gradient") && (
@@ -1015,7 +1029,7 @@ export function PropertiesPanel() {
               </Field>
             </Section>
 
-                        {/* CHART */}
+            {/* CHART */}
             {el.type === "chart" && (
               <Section title="Chart">
                 <Field label="Chart Type">
@@ -1189,15 +1203,15 @@ export function PropertiesPanel() {
             <Section title="Animation & Interaction">
               <Field label="Entrance Animation">
                 <Dropdown
-                 value={el.animation ?? "none"}
-                 options={[
-                 { value: "none", label: "None" },
-                 { value: "fade-up", label: "Fade Up" },
-                 { value: "pop", label: "Pop Spring" },
-                 { value: "glitch", label: "Digital Glitch" },
-                ]}
-                   onChange={(v) => update(el.id, { animation: v as any })}
-              />
+                  value={el.animation ?? "none"}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "fade-up", label: "Fade Up" },
+                    { value: "pop", label: "Pop Spring" },
+                    { value: "glitch", label: "Digital Glitch" },
+                  ]}
+                  onChange={(v) => update(el.id, { animation: v as any })}
+                />
               </Field>
               <SliderWithInput
                 label="Rotation"
