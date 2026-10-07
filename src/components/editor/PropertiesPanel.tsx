@@ -255,12 +255,17 @@ function ModernColorPicker({
   value,
   onChange,
   label,
+  opacity,
+  onOpacityChange,
 }: {
   value: string;
   onChange: (color: string) => void;
   label?: string;
+  opacity?: number;
+  onOpacityChange?: (v: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const hasOpacity = opacity !== undefined && !!onOpacityChange;
   return (
     <div className="space-y-2">
       {label && <label className="text-[11px] font-medium text-slate-600">{label}</label>}
@@ -271,7 +276,7 @@ function ModernColorPicker({
           className={`size-8 shrink-0 rounded-lg border shadow-2xs transition ${
             open ? "border-sky-500 ring-2 ring-sky-500/20" : "border-slate-200 hover:border-sky-400"
           }`}
-          style={{ backgroundColor: value || "#000000" }}
+          style={{ backgroundColor: value || "#000000", opacity: opacity ?? 1 }}
           title="Open color picker"
         />
         <input
@@ -281,10 +286,32 @@ function ModernColorPicker({
           placeholder="#000000"
           className="h-8 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs text-slate-800 uppercase shadow-2xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
         />
+        {hasOpacity && (
+          <div className="flex items-center rounded-md border border-slate-200 bg-white px-1.5 py-1 font-mono text-[10px] text-slate-700 shadow-2xs">
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={Math.round((opacity ?? 1) * 100)}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                if (Number.isFinite(val))
+                  onOpacityChange!(Math.min(1, Math.max(0, val / 100)));
+              }}
+              className="w-9 border-0 bg-transparent text-center outline-none"
+            />
+            <span className="text-slate-400">%</span>
+          </div>
+        )}
       </div>
       {open && (
         <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-          <ColorPicker value={value} onChange={onChange} />
+          <ColorPicker
+            value={value}
+            onChange={onChange}
+            opacity={opacity}
+            onOpacityChange={onOpacityChange}
+          />
           <div className="mt-2.5 flex flex-wrap gap-1.5 border-t border-slate-100 pt-2.5">
             {SWATCHES.map((swatch) => (
               <button
@@ -351,12 +378,17 @@ export function PropertiesPanel() {
               >
                 <div
                   className="size-4 rounded-full border border-slate-300 shadow-xs"
-                  style={{ backgroundColor: el.color }}
+                  style={{ backgroundColor: el.color, opacity: el.opacity ?? 1 }}
                 />
               </button>
               {colorPaletteOpen && (
                 <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl animate-in slide-in-from-top-2 duration-150">
-                  <ModernColorPicker value={el.color} onChange={(c) => update(el.id, { color: c })} />
+                  <ModernColorPicker
+                    value={el.color}
+                    onChange={(c) => update(el.id, { color: c })}
+                    opacity={el.opacity ?? 1}
+                    onOpacityChange={(v) => update(el.id, { opacity: v })}
+                  />
                 </div>
               )}
             </div>
@@ -739,16 +771,10 @@ export function PropertiesPanel() {
                       label="Text Color"
                       value={el.color}
                       onChange={(c) => update(el.id, { color: c })}
+                      opacity={el.opacity ?? 1}
+                      onOpacityChange={(v) => update(el.id, { opacity: v })}
                     />
                   )}
-                  <SliderWithInput
-                    label="Opacity"
-                    min={5}
-                    max={100}
-                    value={Math.round((el.opacity ?? 1) * 100)}
-                    unit="%"
-                    onChange={(val) => update(el.id, { opacity: val / 100 })}
-                  />
                   <Field label="Shape Mask">
                     <Dropdown
                       value={el.maskShape ?? ""}
@@ -797,6 +823,8 @@ export function PropertiesPanel() {
                     label="Fill Color"
                     value={el.fill}
                     onChange={(c) => update(el.id, { fill: c })}
+                    opacity={el.opacity ?? 1}
+                    onOpacityChange={(v) => update(el.id, { opacity: v })}
                   />
                 )}
                 <ModernColorPicker
@@ -829,14 +857,6 @@ export function PropertiesPanel() {
                     onChange={(val) => update(el.id, { cornerRadius: val })}
                   />
                 )}
-                <SliderWithInput
-                  label="Opacity"
-                  min={0}
-                  max={100}
-                  value={Math.round((el.opacity ?? 1) * 100)}
-                  unit="%"
-                  onChange={(val) => update(el.id, { opacity: val / 100 })}
-                />
               </Section>
             )}
 
@@ -989,14 +1009,6 @@ export function PropertiesPanel() {
                   value={el.cornerRadius ?? 0}
                   unit="px"
                   onChange={(val) => update(el.id, { cornerRadius: val })}
-                />
-                <SliderWithInput
-                  label="Opacity"
-                  min={0}
-                  max={100}
-                  value={Math.round((el.opacity ?? 1) * 100)}
-                  unit="%"
-                  onChange={(val) => update(el.id, { opacity: val / 100 })}
                 />
 
                 <button
