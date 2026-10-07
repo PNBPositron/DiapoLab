@@ -490,7 +490,13 @@ export function PropertiesPanel() {
       {advancedOpen && (
         <aside className="editor-inspector fixed right-4 top-4 bottom-4 z-40 flex w-[280px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-300">
           <div className="px-3 pt-3">
-            <PanelHeader title={`${el.type} properties`}>
+            <PanelHeader
+                title={
+                 el.type === "ui"
+                   ? "UI Properties"
+                   : `${el.type.charAt(0).toUpperCase()}${el.type.slice(1)} Properties`
+                  }
+                >
               <Button type="button" variant="ghost" size="icon" className="size-7 text-selector-subtle" aria-label="Close inspector" title="Close inspector" onClick={() => setAdvancedOpen(false)}><X /></Button>
             </PanelHeader>
           </div>
