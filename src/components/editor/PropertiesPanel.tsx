@@ -6,6 +6,7 @@ import {
   chartStylePatch,
   type ImageFilters,
   type ElementShadow,
+  type ShapeElement,
   type ShapeGradient,
   type HoverEffect,
   type QuizElement,
@@ -70,6 +71,14 @@ const MASK_OPTIONS = [
   { value: "octagon", label: "Octagon" },
   { value: "blob", label: "Blob" },
 ] as const;
+
+const SHAPE_EFFECTS: Array<{ value: ShapeElement["effect"]; label: string }> = [
+  { value: "none", label: "None" },
+  { value: "liquid_glass", label: "Liquid Glass" },
+  { value: "neon", label: "Neon" },
+  { value: "soft_shadow", label: "Soft Shadow" },
+  { value: "inner_glow", label: "Inner Glow" },
+];
 
 const IMAGE_FILTER_PRESETS: Array<{
   name: string;
@@ -491,13 +500,23 @@ export function PropertiesPanel() {
         <aside className="editor-inspector fixed right-4 top-4 bottom-4 z-40 flex w-[280px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-300">
           <div className="px-3 pt-3">
             <PanelHeader
-                title={
-                 el.type === "ui"
-                   ? "UI Properties"
-                   : `${el.type.charAt(0).toUpperCase()}${el.type.slice(1)} Properties`
-                  }
-                >
-              <Button type="button" variant="ghost" size="icon" className="size-7 text-selector-subtle" aria-label="Close inspector" title="Close inspector" onClick={() => setAdvancedOpen(false)}><X /></Button>
+              title={
+                el.type === "ui"
+                  ? "UI Properties"
+                  : `${el.type.charAt(0).toUpperCase()}${el.type.slice(1)} Properties`
+              }
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-7 text-selector-subtle"
+                aria-label="Close inspector"
+                title="Close inspector"
+                onClick={() => setAdvancedOpen(false)}
+              >
+                <X />
+              </Button>
             </PanelHeader>
           </div>
 
@@ -756,6 +775,13 @@ export function PropertiesPanel() {
             {/* SHAPES */}
             {el.type === "shape" && (
               <Section title="Shape Appearance">
+                <Field label="Effect">
+                  <Dropdown
+                    value={el.effect ?? "none"}
+                    options={SHAPE_EFFECTS}
+                    onChange={(v) => update(el.id, { effect: v })}
+                  />
+                </Field>
                 <Field label="Fill">
                   <SegmentedControl
                     value={el.fillSource ?? "color"}
