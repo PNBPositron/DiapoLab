@@ -44,19 +44,26 @@ function hsvToRgb(h: number, s: number, v: number): RGB {
 /**
  * ColorPicker maison — remplace <input type="color"> natif.
  * Zone saturation/valeur + slider de teinte + hex + pipette (EyeDropper API).
+ * Slider d'opacité optionnel : ne s'affiche que si `opacity` + `onOpacityChange` sont fournis.
  */
 export function ColorPicker({
   value,
   onChange,
+  opacity,
+  onOpacityChange,
 }: {
   value: string;
   onChange: (hex: string) => void;
+  /** 0..1 — affiche le slider d'opacité si fourni */
+  opacity?: number;
+  onOpacityChange?: (v: number) => void;
 }) {
   const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
   const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
   const [hexDraft, setHexDraft] = useState(safeHex);
   const svRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+  const showOpacity = opacity !== undefined && !!onOpacityChange;
 
   // Sync quand la valeur change de l'extérieur
   useEffect(() => {
@@ -145,11 +152,36 @@ export function ColorPicker({
         }}
       />
 
+      {/* Slider d'opacité (optionnel) */}
+      {showOpacity && (
+        <div className="flex items-center gap-2">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round((opacity ?? 1) * 100)}
+            onChange={(e) => onOpacityChange!(Math.round(+e.target.value) / 100)}
+            className="h-2.5 w-full min-w-0 flex-1 cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
+            style={{
+              background: `linear-gradient(to right, transparent, ${safeHex})`,
+            }}
+            title="Opacity"
+          />
+          <div className="flex items-center rounded-md border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-700 shadow-2xs">
+            <span>{Math.round((opacity ?? 1) * 100)}</span>
+            <span className="ml-0.5 text-slate-400">%</span>
+          </div>
+        </div>
+      )}
+
       {/* Hex + pipette */}
       <div className="flex items-center gap-2">
         <div
           className="size-7 shrink-0 rounded-lg border border-slate-200"
-          style={{ background: safeHex }}
+          style={{
+            background: safeHex,
+            opacity: showOpacity ? (opacity ?? 1) : 1,
+          }}
         />
         <input
           value={hexDraft}
