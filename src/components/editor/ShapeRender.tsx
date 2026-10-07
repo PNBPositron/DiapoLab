@@ -141,14 +141,23 @@ export function shapePathD(kind: ShapeKind): string | null {
   return pathFor(kind);
 }
 
-export function ShapeRender({ element }: { element: ShapeElement }) {
+export function ShapeRender({
+  element,
+  fillOverride,
+}: {
+  element: ShapeElement;
+  /** replaces the shape's own fill/gradient/image overlay (used for slide-bg knockout) */
+  fillOverride?: string;
+}) {
   const { shape, fill, stroke, strokeWidth, width, height, gradient, cornerRadius, imageOverlay } =
     element;
   const gradId = `g-${element.id}`;
   const imageId = `image-${element.id}`;
-  const fillRef = imageOverlay ? `url(#${imageId})` : gradient ? `url(#${gradId})` : fill;
+  const fillRef = fillOverride ?? (imageOverlay ? `url(#${imageId})` : gradient ? `url(#${gradId})` : fill);
   const defs =
-    gradient || imageOverlay ? (
+    fillOverride
+      ? null
+      : gradient || imageOverlay ? (
       <defs>
         {imageOverlay && (
           <pattern id={imageId} patternUnits="objectBoundingBox" width="1" height="1">
