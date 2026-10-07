@@ -76,6 +76,9 @@ export function CanvasElement({
 }) {
   const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
   const presenting = useEditor((s) => s.presenting);
+  const page = useEditor((s) => s.pages[s.currentIndex]);
+  const canvasW = useEditor((s) => s.canvasW);
+  const canvasH = useEditor((s) => s.canvasH);
   const selected = !presenting && selectedIds.includes(element.id);
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
@@ -119,8 +122,26 @@ export function CanvasElement({
       ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
       : `rotate(${element.rotation}deg)`;
 
-  // Vector mask for images (clipped by a shape path, 0-100 viewBox scaled to the box).
-  const maskPath = element.type === "image" && element.maskShape ? pathFor(element.maskShape) : null;
+  // Vector mask (clipped by a shape path, 0-100 viewBox scaled to the box).
+  // Works for images (existing) and now text/shapes (clip on the root node).
+  const maskPath = "maskShape" in element && element.maskShape ? pathFor(element.maskShape) : null;
+
+  // Slide-background knockout fill — the element acts as a window on the page
+  // background. backgroundPosition is offset by the element's own position so
+  // the background "continues" the slide underneath (frosted-window effect).
+  const useSlideBg = "fillSource" in element && element.fillSource === "slide-bg";
+  const bgFill: React.CSSProperties | undefined = useSlideBg
+    ? {
+        backgroundImage: page.bgImage
+          ? `url("${page.bgImage}")`
+          : page.bgColor.includes("gradient(")
+            ? page.bgColor
+            : `linear-gradient(${page.bgColor}, ${page.bgColor})`,
+        backgroundSize: `${canvasW}px ${canvasH}px`,
+        backgroundPosition: `-${element.x}px -${element.y}px`,
+        backgroundRepeat: "no-repeat",
+      }
+    : undefined;
 
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
@@ -333,8 +354,21 @@ export function CanvasElement({
           element.shadow && !["text", "shape", "button"].includes(element.type)
             ? shadowFilter(element.shadow)
             : undefined,
+        // Text/shape masks clip the whole element box (images keep their own clip)
+        clipPath:
+          maskPath && element.type !== "image" ? `url("#el-mask-${element.id}")` : undefined,
       }}
     >
+      {/* Shared SVG clip definition for text/shape masks */}
+      {maskPath && element.type !== "image" && (
+        <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
+          <defs>
+            <clipPath id={`el-mask-${element.id}`} clipPathUnits="objectBoundingBox">
+              <path d={maskPath} transform="scale(0.01)" />
+            </clipPath>
+          </defs>
+        </svg>
+      )}
       {element.type === "text" &&
         (() => {
           const presenting = useEditor.getState().presenting;
@@ -346,43 +380,57 @@ export function CanvasElement({
                   .join("\n")
               : element.text;
           const isLink = !!element.href && presenting;
+          // Slide-bg knockout: text becomes a window on the page background.
+          // Disabled while editing so the caret and typed text stay visible.
+          const knockout = useSlideBg && !editing;
           const textStyle: React.CSSProperties = {
             width: "100%",
             height: "100%",
             fontSize: element.fontSize,
-            color:
-              element.gradient ||
-              element.imageOverlay ||
-              (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
+            color: knockout
+              ? "transparent"
+              : element.gradient ||
+                  element.imageOverlay ||
+                  (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
                 ? "transparent"
                 : hovered && interaction?.hoverEffect === "color"
                   ? (interaction.hoverColor ?? element.color)
                   : element.color,
-            backgroundImage: element.imageOverlay
-              ? `url("${element.imageOverlay}")`
-              : element.gradient
-                ? gradientCss(element.gradient)
-                : hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient
-                  ? gradientCss(interaction.hoverGradient)
-                  : undefined,
-            backgroundSize: element.imageOverlay ? "cover" : undefined,
-            backgroundPosition: element.imageOverlay ? "center" : undefined,
-            backgroundClip:
-              element.gradient ||
-              element.imageOverlay ||
-              (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
+            backgroundImage: knockout
+              ? bgFill!.backgroundImage
+              : element.imageOverlay
+                ? `url("${element.imageOverlay}")`
+                : element.gradient
+                  ? gradientCss(element.gradient)
+                  : hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient
+                    ? gradientCss(interaction.hoverGradient)
+                    : undefined,
+            backgroundSize: knockout ? bgFill!.backgroundSize : element.imageOverlay ? "cover" : undefined,
+            backgroundPosition: knockout
+              ? bgFill!.backgroundPosition
+              : element.imageOverlay
+                ? "center"
+                : undefined,
+            backgroundRepeat: knockout ? "no-repeat" : undefined,
+            backgroundClip: knockout
+              ? "text"
+              : element.gradient ||
+                  element.imageOverlay ||
+                  (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
                 ? "text"
                 : undefined,
-            WebkitBackgroundClip:
-              element.gradient ||
-              element.imageOverlay ||
-              (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
+            WebkitBackgroundClip: knockout
+              ? "text"
+              : element.gradient ||
+                  element.imageOverlay ||
+                  (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
                 ? "text"
                 : undefined,
-            WebkitTextFillColor:
-              element.gradient ||
-              element.imageOverlay ||
-              (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
+            WebkitTextFillColor: knockout
+              ? "transparent"
+              : element.gradient ||
+                  element.imageOverlay ||
+                  (hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient)
                 ? "transparent"
                 : undefined,
             fontWeight: element.fontWeight,
@@ -446,10 +494,30 @@ export function CanvasElement({
                 filter: [fx.filter, sFilter].filter(Boolean).join(" ") || undefined,
               }}
             >
-              {!isOverlay && <ShapeRender element={element} />}
+              {/* Slide-bg knockout: an overlay clipped by the shape's own
+                  silhouette, painted with the page background (aligned). */}
+              {useSlideBg && (
+                <div aria-hidden="true" style={{ position: "absolute", inset: 0, ...bgFill, clipPath: `url("#shape-silhouette-${element.id}")` }} />
+              )}
+              {!isOverlay && (
+                <ShapeRender
+                  element={element}
+                  fillOverride={useSlideBg ? "transparent" : undefined}
+                />
+              )}
             </div>
           );
         })()}
+      {/* Silhouette clip for the slide-bg shape fill */}
+      {element.type === "shape" && useSlideBg && (
+        <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
+          <defs>
+            <clipPath id={`shape-silhouette-${element.id}`} clipPathUnits="objectBoundingBox">
+              <path d={pathFor(element.shape) ?? undefined} transform="scale(0.01)" />
+            </clipPath>
+          </defs>
+        </svg>
+      )}
       {element.type === "image" && (
         <div
           style={{
