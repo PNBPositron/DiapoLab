@@ -30,7 +30,11 @@ import {
   TerminalSquare,
   ToggleRight,
   TrendingUp,
-  ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
+  ChartColumn,
+  ChartLine,
+  ChartArea,
+  ChartPie,
+  Circle,
   User,
   type LucideIcon,
 } from "lucide-react";
@@ -234,9 +238,7 @@ export function ComponentsPanel() {
     if (!search.trim()) return rawPresets;
     const query = search.toLowerCase();
     return rawPresets.filter(
-      (p) =>
-        p.label.toLowerCase().includes(query) ||
-        p.kind.toLowerCase().includes(query)
+      (p) => p.label.toLowerCase().includes(query) || p.kind.toLowerCase().includes(query),
     );
   }, [rawPresets, search]);
 
@@ -247,15 +249,25 @@ export function ComponentsPanel() {
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
       <PanelHeader title="Components" />
-      <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
-        { value: "interfaces", label: "Frames", icon: MonitorCog },
-        { value: "ui", label: "Widgets", icon: Blocks },
-        { value: "elements", label: "Blocks", icon: Sparkles },
-      ]} />
+      <SegmentedControl
+        value={section}
+        onChange={setSection}
+        label="Component category"
+        options={[
+          { value: "interfaces", label: "Frames", icon: MonitorCog },
+          { value: "ui", label: "Widgets", icon: Blocks },
+          { value: "elements", label: "Blocks", icon: Sparkles },
+        ]}
+      />
       <SearchField value={search} onChange={setSearch} placeholder={`Search ${section}...`} />
       <div className="space-y-2">
         <span className="text-xs text-selector-subtle">Visual theme</span>
-        <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
+        <ChipGroup
+          value={style}
+          onChange={pickStyle}
+          label="Visual theme"
+          options={STYLES.map((value) => ({ value, label: UI_STYLE_THEMES[value].label }))}
+        />
       </div>
 
       {/* Elements Section */}
@@ -266,7 +278,19 @@ export function ComponentsPanel() {
               Blocks ({filteredElements.length})
             </span>
           </div>
-          <OptionGrid label="Charts and quiz" options={filteredElements.map(e => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))} onChange={label => { const preset = filteredElements.find(e => e.label === label); if (preset) add(preset.create()); }} />
+          <OptionGrid
+            label="Charts and quiz"
+            options={filteredElements.map((e) => ({
+              value: e.label,
+              label: e.label,
+              icon: e.Icon,
+              title: e.description,
+            }))}
+            onChange={(label) => {
+              const preset = filteredElements.find((e) => e.label === label);
+              if (preset) add(preset.create());
+            }}
+          />
         </div>
       )}
 
@@ -308,9 +332,7 @@ export function ComponentsPanel() {
                   {/* Caption & Icon */}
                   <div className="flex items-center gap-1.5 px-0.5">
                     <Icon className="size-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                    <span className="truncate text-[11px] font-medium text-slate-700">
-                      {label}
-                    </span>
+                    <span className="truncate text-[11px] font-medium text-slate-700">{label}</span>
                   </div>
                 </button>
               );

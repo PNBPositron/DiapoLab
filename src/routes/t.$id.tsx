@@ -9,7 +9,11 @@ export const Route = createFileRoute("/t/$id")({
   head: () => ({
     meta: [
       { title: "Shared deck — DiapoLab" },
-      { name: "description", content: "View a deck shared publicly from DiapoLab, the neobrutalist design and presentation editor." },
+      {
+        name: "description",
+        content:
+          "View a deck shared publicly from DiapoLab, the neobrutalist design and presentation editor.",
+      },
       { property: "og:title", content: "Shared deck — DiapoLab" },
       { property: "og:description", content: "View a deck shared publicly from DiapoLab." },
       { property: "og:type", content: "website" },

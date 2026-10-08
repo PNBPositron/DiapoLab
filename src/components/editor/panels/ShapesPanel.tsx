@@ -63,7 +63,9 @@ const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string
       { kind: "corner_bracket", label: "Corner Bracket" },
     ],
   },
-  { name: "Bubbles & Badges", shapes: [
+  {
+    name: "Bubbles & Badges",
+    shapes: [
       { kind: "speech", label: "Speech" },
       { kind: "shield", label: "Shield" },
       { kind: "ticket", label: "Ticket" },
@@ -110,34 +112,102 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
     <div className="space-y-4">
       {!embedded && <PanelHeader title="Shapes" />}
 
-      <ChipGroup value={category} options={SHAPE_CATEGORIES.map(c => ({ value: c.name, label: `${c.name} (${c.shapes.length})` }))} onChange={setCategory} label="Shape categories" />
-      <OptionGrid columns={3} label="Shapes" options={activeShapes.map(s => ({ value: s.kind, label: s.label, preview: <ShapePreview kind={s.kind} fill="#9ca3af" /> }))} onChange={kind => add(newShape(kind, { fill: "#9ca3af", stroke: "#0a0f1f" }))} />
+      <ChipGroup
+        value={category}
+        options={SHAPE_CATEGORIES.map((c) => ({
+          value: c.name,
+          label: `${c.name} (${c.shapes.length})`,
+        }))}
+        onChange={setCategory}
+        label="Shape categories"
+      />
+      <OptionGrid
+        columns={3}
+        label="Shapes"
+        options={activeShapes.map((s) => ({
+          value: s.kind,
+          label: s.label,
+          preview: <ShapePreview kind={s.kind} fill="#9ca3af" />,
+        }))}
+        onChange={(kind) => add(newShape(kind, { fill: "#9ca3af", stroke: "#0a0f1f" }))}
+      />
 
       <div className="brutal-border-2 bg-surface p-3">
-        <div className="mb-3 font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">▸ Custom gradient</div>
+        <div className="mb-3 font-display text-[10px] uppercase tracking-[0.2em] text-teal/80">
+          ▸ Custom gradient
+        </div>
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 font-mono text-[9px] text-teal/70">
             FROM
-            <input aria-label="Gradient start color" type="color" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="h-8 w-12 cursor-pointer border-2 border-teal/30 bg-transparent p-0" />
+            <input
+              aria-label="Gradient start color"
+              type="color"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="h-8 w-12 cursor-pointer border-2 border-teal/30 bg-transparent p-0"
+            />
           </label>
           <label className="flex flex-col gap-1 font-mono text-[9px] text-teal/70">
             TO
-            <input aria-label="Gradient end color" type="color" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="h-8 w-12 cursor-pointer border-2 border-teal/30 bg-transparent p-0" />
+            <input
+              aria-label="Gradient end color"
+              type="color"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="h-8 w-12 cursor-pointer border-2 border-teal/30 bg-transparent p-0"
+            />
           </label>
           <label className="flex min-w-28 flex-1 flex-col gap-1 font-mono text-[9px] text-teal/70">
             ANGLE · {customAngle}°
-            <input aria-label="Gradient angle" type="range" min="0" max="360" value={customAngle} onChange={(e) => setCustomAngle(Number(e.target.value))} className="accent-teal" />
+            <input
+              aria-label="Gradient angle"
+              type="range"
+              min="0"
+              max="360"
+              value={customAngle}
+              onChange={(e) => setCustomAngle(Number(e.target.value))}
+              className="accent-teal"
+            />
           </label>
-          <button type="button" onClick={addCustomGradient} className="brutal-border brutal-press h-8 bg-blue px-3 font-display text-[10px] tracking-[0.12em] text-ink">
+          <button
+            type="button"
+            onClick={addCustomGradient}
+            className="brutal-border brutal-press h-8 bg-blue px-3 font-display text-[10px] tracking-[0.12em] text-ink"
+          >
             ADD
           </button>
         </div>
         <div className="my-3">
-          <OptionGrid columns={3} label="Custom gradient shape" value={customKind} onChange={setCustomKind} options={(["rect", "circle", "triangle", "star", "heart", "hexagon", "diamond", "shield", "blob"] as ShapeKind[]).map(kind => ({ value: kind, label: kind === "rect" ? "Rectangle" : kind, preview: <ShapePreview kind={kind} fill="#9ca3af" /> }))} />
+          <OptionGrid
+            columns={3}
+            label="Custom gradient shape"
+            value={customKind}
+            onChange={setCustomKind}
+            options={(
+              [
+                "rect",
+                "circle",
+                "triangle",
+                "star",
+                "heart",
+                "hexagon",
+                "diamond",
+                "shield",
+                "blob",
+              ] as ShapeKind[]
+            ).map((kind) => ({
+              value: kind,
+              label: kind === "rect" ? "Rectangle" : kind,
+              preview: <ShapePreview kind={kind} fill="#9ca3af" />,
+            }))}
+          />
         </div>
-        <div className="mt-3 h-5 border border-teal/30" style={{ background: `linear-gradient(${customAngle}deg, ${customFrom}, ${customTo})` }} aria-label="Custom gradient preview" />
+        <div
+          className="mt-3 h-5 border border-teal/30"
+          style={{ background: `linear-gradient(${customAngle}deg, ${customFrom}, ${customTo})` }}
+          aria-label="Custom gradient preview"
+        />
       </div>
-
     </div>
   );
 }

@@ -103,13 +103,17 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json">(null);
+  const [exporting, setExporting] = useState<
+    null | "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json"
+  >(null);
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
 
-  const runExport = async (kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json") => {
+  const runExport = async (
+    kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json",
+  ) => {
     setExportOpen(false);
     setExporting(kind);
     try {
@@ -173,18 +177,20 @@ export function Toolbar() {
                   }),
                   ...activeEdits
                     .filter((edit) => edit.type === "addText" && typeof edit.text === "string")
-                     .map((edit) => newText({
-                       text: edit.text ?? "",
-                       x: edit.x ?? 120,
-                       y: edit.y ?? 120,
-                       fontSize: 48,
-                       color: "#0b1736",
-                       width: 420,
-                       height: 100,
-                       fontWeight: 700,
-                     })),
+                    .map((edit) =>
+                      newText({
+                        text: edit.text ?? "",
+                        x: edit.x ?? 120,
+                        y: edit.y ?? 120,
+                        fontSize: 48,
+                        color: "#0b1736",
+                        width: 420,
+                        height: 100,
+                        fontWeight: 700,
+                      }),
+                    ),
                 ],
-              }
+              },
         );
         loadPages(nextPages);
       }
@@ -269,7 +275,10 @@ export function Toolbar() {
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
-        <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
+        <Link
+          to="/"
+          className="group flex items-center gap-2.5 transition-transform active:scale-95"
+        >
           <div className="relative overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all group-hover:shadow-indigo-500/20 group-hover:ring-indigo-500/30">
             <img
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
@@ -334,7 +343,10 @@ export function Toolbar() {
           title="Gemini Slide Assistant"
           className="group flex h-9 items-center gap-2 rounded-xl border border-purple-200/90 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50 px-3 text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:shadow-purple-500/10 active:scale-95"
         >
-          <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
+          <Sparkles
+            className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110"
+            strokeWidth={2.2}
+          />
           <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-purple-800">
             Assistant
           </span>
@@ -420,14 +432,14 @@ export function Toolbar() {
                     {k === "png"
                       ? "Current slide"
                       : k === "pdf-print"
-                      ? "Vector · selectable"
-                      : k === "gif"
-                      ? "Animated"
-                      : k === "html"
-                      ? "Interactive"
-                      : k === "json"
-                      ? "Source file"
-                      : "All slides"}
+                        ? "Vector · selectable"
+                        : k === "gif"
+                          ? "Animated"
+                          : k === "html"
+                            ? "Interactive"
+                            : k === "json"
+                              ? "Source file"
+                              : "All slides"}
                   </span>
                 </button>
               ))}
@@ -461,19 +473,22 @@ export function Toolbar() {
             </DialogTitle>
           </DialogHeader>
           <div className="font-mono text-[11px] text-slate-400">
-            Current slide: {pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}px
+            Current slide: {pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×
+            {canvasH}px
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
-            {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => (
-              <button
-                key={question}
-                type="button"
-                onClick={() => void askAssistant(question)}
-                className="rounded-lg border border-purple-100 bg-purple-50/50 px-3 py-1.5 font-display text-[10px] font-medium tracking-wide text-purple-700 transition-colors hover:bg-purple-100"
-              >
-                {question}
-              </button>
-            ))}
+            {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map(
+              (question) => (
+                <button
+                  key={question}
+                  type="button"
+                  onClick={() => void askAssistant(question)}
+                  className="rounded-lg border border-purple-100 bg-purple-50/50 px-3 py-1.5 font-display text-[10px] font-medium tracking-wide text-purple-700 transition-colors hover:bg-purple-100"
+                >
+                  {question}
+                </button>
+              ),
+            )}
           </div>
           <div className="mt-3 max-h-64 space-y-2.5 overflow-y-auto">
             {assistantMessages.length === 0 && (
@@ -822,9 +837,7 @@ function MenuCardItem({
           >
             {title}
           </span>
-          <span className="text-[10px] leading-tight text-slate-400">
-            {subtitle}
-          </span>
+          <span className="text-[10px] leading-tight text-slate-400">{subtitle}</span>
         </div>
       </div>
 
@@ -866,7 +879,9 @@ function UserMenu({ email }: { email: string }) {
       {open && (
         <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active account</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              Active account
+            </p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
           <button

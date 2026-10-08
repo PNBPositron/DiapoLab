@@ -15,18 +15,23 @@ export function PresentationMode() {
 
   const page = pages[currentIndex];
 
-  useEffect(() => useEditor.subscribe((next, previous) => {
-    if (!next.presenting || !previous.presenting) {
-      prevGeomRef.current = new Map();
-      return;
-    }
-    if (next.currentIndex === previous.currentIndex) return;
-    const outgoing = previous.pages[previous.currentIndex];
-    const incoming = next.pages[next.currentIndex];
-    prevGeomRef.current = outgoing && incoming?.transition === "morph"
-      ? matchMorphElements(outgoing.elements, incoming.elements)
-      : new Map();
-  }), []);
+  useEffect(
+    () =>
+      useEditor.subscribe((next, previous) => {
+        if (!next.presenting || !previous.presenting) {
+          prevGeomRef.current = new Map();
+          return;
+        }
+        if (next.currentIndex === previous.currentIndex) return;
+        const outgoing = previous.pages[previous.currentIndex];
+        const incoming = next.pages[next.currentIndex];
+        prevGeomRef.current =
+          outgoing && incoming?.transition === "morph"
+            ? matchMorphElements(outgoing.elements, incoming.elements)
+            : new Map();
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (!presenting) return;
@@ -168,10 +173,13 @@ function MorphItem({
     const from = prevGeom
       ? `translate(${prevGeom.x - el.x}px, ${prevGeom.y - el.y}px) scale(${prevGeom.w / (el.width || 1)}, ${prevGeom.h / (el.height || 1)}) rotate(${prevGeom.rotation - el.rotation}deg)`
       : "scale(0.92)";
-    const animation = node.animate([
-      { transform: from, opacity: prevGeom ? 1 : 0 },
-      { transform: "none", opacity: 1 },
-    ], { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" });
+    const animation = node.animate(
+      [
+        { transform: from, opacity: prevGeom ? 1 : 0 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" },
+    );
     return () => animation.cancel();
   }, [el.id, el.x, el.y, el.width, el.height, el.rotation, prevGeom]);
 

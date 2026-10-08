@@ -74,19 +74,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "DiapoLab — Design & Presentation Editor" },
-      { name: "description", content: "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides." },
+      {
+        name: "description",
+        content:
+          "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides.",
+      },
       { name: "author", content: "DiapoLab" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#0b1020" },
-      { rel: "icon", href: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot-2026-09-18-at-12-38-38-DiapoLab-%E2%80%94-Neobrutalist-Design-Editor_1_.ico-AlDQvUWF9TQAvP67GUpnGwM64vdGFR.x-icon", type: "image/x-icon" },
+      {
+        rel: "icon",
+        href: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot-2026-09-18-at-12-38-38-DiapoLab-%E2%80%94-Neobrutalist-Design-Editor_1_.ico-AlDQvUWF9TQAvP67GUpnGwM64vdGFR.x-icon",
+        type: "image/x-icon",
+      },
       { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
-      { property: "og:description", content: "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides." },
+      {
+        property: "og:description",
+        content:
+          "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides.",
+      },
       { property: "og:site_name", content: "DiapoLab" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "DiapoLab — Neobrutalist Design Editor" },
-      { name: "twitter:description", content: "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides." },
+      {
+        name: "twitter:description",
+        content:
+          "DiapoLab is a futuristic, neobrutalist presentation and design editor for creating bold multipage slides.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

@@ -7,7 +7,8 @@ export function DesignerPanel() {
   const page = pages[currentIndex];
   const els = page?.elements ?? [];
 
-  const preview = (id: (typeof SUGGESTIONS)[number]["id"]) => applyLayout(els, id, canvasW, canvasH);
+  const preview = (id: (typeof SUGGESTIONS)[number]["id"]) =>
+    applyLayout(els, id, canvasW, canvasH);
 
   return (
     <div className="space-y-3">

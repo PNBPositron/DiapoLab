@@ -405,7 +405,11 @@ export function CanvasElement({
                   : hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient
                     ? gradientCss(interaction.hoverGradient)
                     : undefined,
-            backgroundSize: knockout ? bgFill!.backgroundSize : element.imageOverlay ? "cover" : undefined,
+            backgroundSize: knockout
+              ? bgFill!.backgroundSize
+              : element.imageOverlay
+                ? "cover"
+                : undefined,
             backgroundPosition: knockout
               ? bgFill!.backgroundPosition
               : element.imageOverlay
@@ -497,7 +501,15 @@ export function CanvasElement({
               {/* Slide-bg knockout: an overlay clipped by the shape's own
                   silhouette, painted with the page background (aligned). */}
               {useSlideBg && (
-                <div aria-hidden="true" style={{ position: "absolute", inset: 0, ...bgFill, clipPath: `url("#shape-silhouette-${element.id}")` }} />
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    ...bgFill,
+                    clipPath: `url("#shape-silhouette-${element.id}")`,
+                  }}
+                />
               )}
               {!isOverlay && (
                 <ShapeRender
@@ -561,9 +573,7 @@ export function CanvasElement({
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-                filter: [filterCss(element.filters)]
-                  .filter(Boolean)
-                  .join(" "),
+                filter: [filterCss(element.filters)].filter(Boolean).join(" "),
                 opacity: element.opacity ?? 1,
               }}
             />
@@ -589,7 +599,9 @@ export function CanvasElement({
                 transformOrigin: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
                 transform: `scale(${(element.flipX ? -1 : 1) * (element.cropZoom ?? 1)}, ${(element.flipY ? -1 : 1) * (element.cropZoom ?? 1)})`,
                 filter: [
-                  element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
+                  element.assetKind === "icon" && element.tint
+                    ? `brightness(0) drop-shadow(0 0 0 ${element.tint})`
+                    : "",
                   filterCss(element.filters),
                 ]
                   .filter(Boolean)
@@ -627,7 +639,26 @@ export function CanvasElement({
       {element.type === "icon" &&
         (() => {
           if (element.src) {
-            return <div aria-hidden="true" style={{ width: "100%", height: "100%", display: "block", backgroundColor: element.color, maskImage: `url("${element.src}")`, maskSize: "contain", maskPosition: "center", maskRepeat: "no-repeat", WebkitMaskImage: `url("${element.src}")`, WebkitMaskSize: "contain", WebkitMaskPosition: "center", WebkitMaskRepeat: "no-repeat", opacity: 1 }} />;
+            return (
+              <div
+                aria-hidden="true"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "block",
+                  backgroundColor: element.color,
+                  maskImage: `url("${element.src}")`,
+                  maskSize: "contain",
+                  maskPosition: "center",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskImage: `url("${element.src}")`,
+                  WebkitMaskSize: "contain",
+                  WebkitMaskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  opacity: 1,
+                }}
+              />
+            );
           }
           const Comp =
             (
@@ -759,12 +790,15 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     chanRef.current?.postMessage({ type: "reset" });
   };
 
-  const glassStyle = element.effect === "liquid_glass" ? {
-    backdropFilter: "blur(14px) saturate(160%)",
-    WebkitBackdropFilter: "blur(14px) saturate(160%)",
-    background: "linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08))",
-    boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.55), 0 18px 40px rgba(0,0,0,0.22)",
-  } : {};
+  const glassStyle =
+    element.effect === "liquid_glass"
+      ? {
+          backdropFilter: "blur(14px) saturate(160%)",
+          WebkitBackdropFilter: "blur(14px) saturate(160%)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08))",
+          boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.55), 0 18px 40px rgba(0,0,0,0.22)",
+        }
+      : {};
 
   return (
     <div
@@ -774,7 +808,10 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         ...glassStyle,
         width: "100%",
         height: "100%",
-        background: element.effect === "liquid_glass" && !theme ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : element.bgColor,
+        background:
+          element.effect === "liquid_glass" && !theme
+            ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))"
+            : element.bgColor,
         color: element.fgColor,
         padding: "5%",
         display: "flex",
@@ -807,7 +844,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                   overflow: "hidden",
                   background: theme?.bg ?? "rgba(255,255,255,0.06)",
                   color: element.fgColor,
-                  border: `2px solid ${mine ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  border: `2px solid ${mine ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
                   borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(15px, 3%)",
@@ -863,12 +900,12 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             const isCorrect = opt.id === element.correctId;
             const showResult = picked !== null;
             const bg = !showResult
-              ? theme?.bg ?? "rgba(255,255,255,0.06)"
+              ? (theme?.bg ?? "rgba(255,255,255,0.06)")
               : isCorrect
                 ? "#16a34a"
                 : isPicked
                   ? "#dc2626"
-                  : theme?.bg ?? "rgba(255,255,255,0.04)";
+                  : (theme?.bg ?? "rgba(255,255,255,0.04)");
             return (
               <button
                 key={opt.id}
@@ -877,7 +914,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                 style={{
                   background: bg,
                   color: showResult && (isCorrect || isPicked) ? "#ffffff" : element.fgColor,
-                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
                   borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(16px, 3.2%)",
@@ -1065,12 +1102,27 @@ function ChartRender({ element }: { element: ChartElement }) {
       style={{
         width: "100%",
         height: "100%",
-        background: element.effect === "liquid_glass" ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : bgColor,
+        background:
+          element.effect === "liquid_glass"
+            ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))"
+            : bgColor,
         borderRadius: theme ? theme.radius : 12,
-        border: element.effect === "liquid_glass" ? "1px solid rgba(255,255,255,0.45)" : theme ? `${theme.borderWidth}px solid ${theme.border}` : "none",
-        boxShadow: element.effect === "liquid_glass" ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)" : theme ? theme.shadow : "none",
-        backdropFilter: element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
-        WebkitBackdropFilter: element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
+        border:
+          element.effect === "liquid_glass"
+            ? "1px solid rgba(255,255,255,0.45)"
+            : theme
+              ? `${theme.borderWidth}px solid ${theme.border}`
+              : "none",
+        boxShadow:
+          element.effect === "liquid_glass"
+            ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)"
+            : theme
+              ? theme.shadow
+              : "none",
+        backdropFilter:
+          element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
+        WebkitBackdropFilter:
+          element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
         overflow: "hidden",
         padding: "2%",
         boxSizing: "border-box",
@@ -1159,7 +1211,10 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
   return (
     <button
       onMouseDown={(e) => interactive && e.stopPropagation()}
-      onClick={(event) => { if (interactive) event.stopPropagation(); onClick(); }}
+      onClick={(event) => {
+        if (interactive) event.stopPropagation();
+        onClick();
+      }}
       style={{
         width: "100%",
         height: "100%",

@@ -11,9 +11,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DiapoLab — Design & Presentation Editor" },
-      { name: "description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
+      {
+        name: "description",
+        content:
+          "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship.",
+      },
       { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
-      { property: "og:description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
+      {
+        property: "og:description",
+        content:
+          "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://diapolab.lovable.app/" },
@@ -24,7 +32,10 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden bg-white" style={{ background: "linear-gradient(180deg, #ffffff 0%, #ffffff 60%, #f5f9ff 100%)" }}>
+    <div
+      className="relative flex h-screen flex-col overflow-hidden bg-white"
+      style={{ background: "linear-gradient(180deg, #ffffff 0%, #ffffff 60%, #f5f9ff 100%)" }}
+    >
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">

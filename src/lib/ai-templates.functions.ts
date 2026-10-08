@@ -54,7 +54,8 @@ async function chatComplete(
     }),
   });
   if (res.status === 429) throw new Error("AI rate limit hit. Try again in a moment.");
-  if (res.status === 401 || res.status === 403) throw new Error("AI authentication failed. Check GROQ_KEY.");
+  if (res.status === 401 || res.status === 403)
+    throw new Error("AI authentication failed. Check GROQ_KEY.");
   if (!res.ok) throw new Error(`AI error ${res.status}: ${await res.text()}`);
   const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
   const content = json.choices?.[0]?.message?.content?.trim();
@@ -210,8 +211,10 @@ export type AiStyle =
 
 const STYLE_GUIDES: Record<AiStyle, string> = {
   auto: "AUTO-DETECT STYLE. Read the user's prompt carefully, then pick the most appropriate visual style.",
-  cyberpunk: "CYBERPUNK / NEOBRUTALIST. Palette: ink #0a0f1f, neon teal #7df9ff, electric blue #4d7cff.",
-  liquid_glass: "LIQUID GLASS. Deep gradient backgrounds (indigo→violet→cyan), translucent surfaces.",
+  cyberpunk:
+    "CYBERPUNK / NEOBRUTALIST. Palette: ink #0a0f1f, neon teal #7df9ff, electric blue #4d7cff.",
+  liquid_glass:
+    "LIQUID GLASS. Deep gradient backgrounds (indigo→violet→cyan), translucent surfaces.",
   minimal: "SWISS MINIMALIST. Paper #f5f3ee, ink #0d0d0d, single accent. Massive negative space.",
   editorial: "EDITORIAL / MAGAZINE. Warm off-white #f8f4ec, deep ink #1a1a1a, gold #c9a84c.",
   brutalist: "RAW BRUTALIST. Stark white #ffffff, pure black #000000, saturated accent.",

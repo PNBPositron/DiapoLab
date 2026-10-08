@@ -1,4 +1,4 @@
-#  DiapoLab
+# DiapoLab
 
 <div align="center">
 
@@ -14,7 +14,6 @@
   <img src="./public/screenshot.png" alt="DiapoLab editor screenshot" width="900" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);" />
 </p>
 
-
 ## 🌍 Overview
 
 DiapoLab is a browser-based presentation workspace built with React, Vite, TypeScript, and Supabase. It is designed for users who want a flexible editor that feels fast and expressive while remaining approachable for real-world deck creation.
@@ -28,7 +27,6 @@ The app includes:
 - 🎨 theme customization and presentation mode
 - 📦 import/export for sharing and downstream workflows
 - 🔐 authenticated cloud saves and publishing
-
 
 ## ⚡ Features
 

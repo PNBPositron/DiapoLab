@@ -1,12 +1,6 @@
 import { useState } from "react";
 import * as LucideIcons from "lucide-react";
-import {
-  Link2,
-  Shapes,
-  Star,
-  Search,
-  ImagePlus,
-} from "lucide-react";
+import { Link2, Shapes, Star, Search, ImagePlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
@@ -19,7 +13,11 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.e
     const isLucideComponent = typeof icon === "object" && icon !== null && "render" in icon;
     return name !== "createLucideIcon" && isLucideComponent && /^[A-Z]/.test(name);
   })
-  .map(([name, Icon]) => ({ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon: Icon as LucideIcon }))
+  .map(([name, Icon]) => ({
+    name,
+    label: name.replace(/([a-z])([A-Z])/g, "$1 $2"),
+    Icon: Icon as LucideIcon,
+  }))
   .sort((a, b) => a.label.localeCompare(b.label))
   .slice(0, 500);
 
@@ -49,7 +47,9 @@ function ActionTile({
     : "bg-slate-100/80 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600";
   const inner = (
     <>
-      <span className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}>
+      <span
+        className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}
+      >
         <Icon className="size-4" />
       </span>
       <span className="text-[10px] font-semibold tracking-wide text-slate-600 uppercase group-hover:text-slate-800">
@@ -59,11 +59,7 @@ function ActionTile({
     </>
   );
   if (asLabel) {
-    return (
-      <label className={`${base} ${state}`}>
-        {inner}
-      </label>
-    );
+    return <label className={`${base} ${state}`}>{inner}</label>;
   }
   return (
     <button onClick={onClick} className={`${base} ${state}`}>
@@ -114,11 +110,17 @@ export function ElementsPanel() {
 
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-3 text-xs font-semibold text-card-foreground transition-colors hover:bg-accent">
         <ImagePlus className="size-4" /> {uploading ? "Preparing image…" : "Upload image"}
-        <input type="file" accept="image/*" className="sr-only" disabled={uploading} onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) void addFile(file);
-          event.target.value = "";
-        }} />
+        <input
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          disabled={uploading}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void addFile(file);
+            event.target.value = "";
+          }}
+        />
       </label>
 
       {/* Add image by URL — permanent, survives refresh & design sharing. */}
@@ -142,9 +144,7 @@ export function ElementsPanel() {
             Ajouter
           </button>
         </label>
-        {urlError && (
-          <p className="px-1 text-[10px] font-medium text-rose-500">{urlError}</p>
-        )}
+        {urlError && <p className="px-1 text-[10px] font-medium text-rose-500">{urlError}</p>}
       </div>
 
       <div className="panel-action-grid">
@@ -185,7 +185,10 @@ export function ElementsPanel() {
                 onClick={() => add(newIcon(name))}
                 className="group flex h-20 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-slate-200/80 bg-white/70 text-slate-500 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:text-blue-600 hover:shadow-[0_8px_18px_-6px_rgba(15,23,42,0.15)] active:translate-y-0 active:scale-[0.97]"
               >
-                <Icon className="size-6 transition-transform duration-200 group-hover:scale-110" strokeWidth={2} />
+                <Icon
+                  className="size-6 transition-transform duration-200 group-hover:scale-110"
+                  strokeWidth={2}
+                />
                 <span className="w-full truncate px-1.5 text-[8px] font-medium text-slate-400 group-hover:text-slate-600">
                   {label}
                 </span>

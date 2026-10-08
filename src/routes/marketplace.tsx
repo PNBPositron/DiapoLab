@@ -3,7 +3,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Loader2, Palette, LayoutTemplate } from "lucide-react";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
-import { listPublicThemes, themeCssVars, CUSTOM_THEME_PREFIX, type PublicTheme } from "@/lib/themes";
+import {
+  listPublicThemes,
+  themeCssVars,
+  CUSTOM_THEME_PREFIX,
+  type PublicTheme,
+} from "@/lib/themes";
 import { useEditor, type Page } from "@/store/editor";
 import { useSettings } from "@/store/settings";
 
@@ -152,12 +157,18 @@ function Marketplace() {
                         {Object.values(vars)
                           .slice(0, 6)
                           .map((c, i) => (
-                            <span key={i} className="h-4 w-4 border border-black/20" style={{ background: c }} />
+                            <span
+                              key={i}
+                              className="h-4 w-4 border border-black/20"
+                              style={{ background: c }}
+                            />
                           ))}
                       </div>
                     </div>
                   </div>
-                  <div className="font-display text-[11px] tracking-[0.15em] text-teal">{t.name}</div>
+                  <div className="font-display text-[11px] tracking-[0.15em] text-teal">
+                    {t.name}
+                  </div>
                   <div className="mb-2 font-mono text-[9px] text-teal/50">
                     {new Date(t.created_at).toLocaleDateString()}
                   </div>

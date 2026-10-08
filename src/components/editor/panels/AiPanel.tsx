@@ -93,7 +93,7 @@ export function AiPanel() {
                   const update = matching.find((edit) => edit.type === "update");
                   return update?.patch ? [{ ...element, ...update.patch }] : [element];
                 }),
-              }
+              },
         );
         loadPages(nextPages);
         setStatus({
@@ -274,9 +274,7 @@ export function AiPanel() {
                         : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    <div
-                      className={`size-3 shrink-0 rounded-full bg-linear-to-tr ${s.accent}`}
-                    />
+                    <div className={`size-3 shrink-0 rounded-full bg-linear-to-tr ${s.accent}`} />
                     <span
                       className={`truncate text-[11px] font-medium ${
                         isSelected ? "text-sky-900" : "text-slate-700"

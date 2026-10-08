@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://ixohivvtozrrmanfpdyr.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -60,9 +58,7 @@
               "description": "Design id."
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "outputSchema": null
       },
@@ -109,9 +105,7 @@
               }
             }
           },
-          "required": [
-            "name"
-          ]
+          "required": ["name"]
         },
         "outputSchema": null
       },
@@ -136,9 +130,7 @@
               "description": "Design id to delete."
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "outputSchema": null
       },

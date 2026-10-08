@@ -219,7 +219,10 @@ export async function exportGIF(
     const { data } = ctx.getImageData(0, 0, W, H);
     const palette = quantize(data, 256);
     const index = applyPalette(data, palette);
-    enc.writeFrame(index, W, H, { palette, delay: Math.max(200, Math.round((pages[i].duration || 3) * 1000)) });
+    enc.writeFrame(index, W, H, {
+      palette,
+      delay: Math.max(200, Math.round((pages[i].duration || 3) * 1000)),
+    });
     await new Promise((r) => setTimeout(r, 0));
   }
   enc.finish();

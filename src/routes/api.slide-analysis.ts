@@ -11,13 +11,24 @@ export const Route = createFileRoute("/api/slide-analysis")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json().catch(() => null)) as { page?: unknown; slideshow?: unknown; canEdit?: boolean; question?: string } | null;
+        const body = (await request.json().catch(() => null)) as {
+          page?: unknown;
+          slideshow?: unknown;
+          canEdit?: boolean;
+          question?: string;
+        } | null;
         if (!body?.page) return Response.json({ error: "A slide is required." }, { status: 400 });
-        const question = body.question?.trim() || "Analyze this slide and suggest concrete improvements.";
-        const wantsEdit = /\b(edit|change|update|move|resize|delete|remove|add|rewrite|modify)\b/i.test(question);
+        const question =
+          body.question?.trim() || "Analyze this slide and suggest concrete improvements.";
+        const wantsEdit =
+          /\b(edit|change|update|move|resize|delete|remove|add|rewrite|modify)\b/i.test(question);
 
         const apiKey = process.env.GROQ_KEY;
-        if (!apiKey) return Response.json({ error: "The slide assistant is not configured." }, { status: 503 });
+        if (!apiKey)
+          return Response.json(
+            { error: "The slide assistant is not configured." },
+            { status: 503 },
+          );
 
         const messages: ChatMessage[] = [
           { role: "system", content: wantsEdit ? SYSTEM_EDIT : SYSTEM_ANALYSIS },
@@ -43,14 +54,25 @@ export const Route = createFileRoute("/api/slide-analysis")({
           choices?: Array<{ message?: { content?: string } }>;
           error?: { message?: string };
         } | null;
-        if (!response.ok) return Response.json({ error: payload?.error?.message || "The slide assistant could not respond." }, { status: 502 });
+        if (!response.ok)
+          return Response.json(
+            { error: payload?.error?.message || "The slide assistant could not respond." },
+            { status: 502 },
+          );
         const rawText = payload?.choices?.[0]?.message?.content;
-        if (!rawText) return Response.json({ error: "The slide assistant returned an empty response." }, { status: 502 });
+        if (!rawText)
+          return Response.json(
+            { error: "The slide assistant returned an empty response." },
+            { status: 502 },
+          );
 
         if (wantsEdit) {
           try {
             const result = JSON.parse(rawText) as { text?: string; edits?: unknown[] };
-            return Response.json({ text: result.text || "I prepared the requested slide changes.", edits: Array.isArray(result.edits) ? result.edits : [] });
+            return Response.json({
+              text: result.text || "I prepared the requested slide changes.",
+              edits: Array.isArray(result.edits) ? result.edits : [],
+            });
           } catch {
             return Response.json({ text: rawText, edits: [] });
           }

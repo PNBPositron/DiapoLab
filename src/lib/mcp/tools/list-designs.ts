@@ -18,7 +18,9 @@ export default defineTool({
   name: "list_designs",
   title: "List my designs",
   description: "List the signed-in user's saved DiapoLab designs (decks), newest first.",
-  inputSchema: { limit: z.number().int().min(1).max(50).default(20).describe("Max designs to return.") },
+  inputSchema: {
+    limit: z.number().int().min(1).max(50).default(20).describe("Max designs to return."),
+  },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ limit }, ctx) => {
     if (!ctx.isAuthenticated()) return notAuthed;

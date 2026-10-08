@@ -34,8 +34,11 @@ export function Canvas() {
     const onWheel = (event: WheelEvent) => {
       if ((event.target as HTMLElement).closest('[contenteditable="true"]')) return;
       event.preventDefault();
-      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? node.clientHeight : 1);
-      setZoom((value) => Math.max(0.1, Math.min(3, (value ?? fitScale) * Math.exp(-delta * 0.002))));
+      const delta =
+        event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? node.clientHeight : 1);
+      setZoom((value) =>
+        Math.max(0.1, Math.min(3, (value ?? fitScale) * Math.exp(-delta * 0.002))),
+      );
     };
     node.addEventListener("wheel", onWheel, { passive: false });
     return () => node.removeEventListener("wheel", onWheel);
@@ -105,79 +108,112 @@ export function Canvas() {
       }}
     >
       <div className="absolute inset-0 overflow-auto pb-16">
-      <div className="flex min-h-full min-w-full w-max items-center justify-center p-10">
-      <div
-        className="brutal-shadow-lg relative shrink-0"
-        style={{ width: canvasW * scale, height: canvasH * scale }}
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) select(null);
-        }}
-      >
-        <div
-          id="canvas-export"
-          className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink"
-          style={{
-            width: canvasW,
-            height: canvasH,
-            backgroundColor: bgColor.includes("gradient(") ? "#0a0f1f" : bgColor,
-            backgroundImage: page.bgImage
-              ? `url(${page.bgImage})`
-              : bgColor.includes("gradient(")
-                ? bgColor
-                : undefined,
-            backgroundSize: page.bgImage ? (page.bgFit ?? "cover") : "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-          }}
-        >
-          {elements.map((el) => (
-            <CanvasElement key={el.id} element={el} scale={scale} />
-          ))}
-          {(guides.v.length > 0 || guides.h.length > 0) && (
-            <div className="pointer-events-none absolute inset-0 z-50">
-              {guides.v.map((x, i) => (
-                <div
-                  key={`v${i}-${x}`}
-                  style={{
-                    position: "absolute",
-                    left: x,
-                    top: 0,
-                    width: 1 / scale,
-                    height: canvasH,
-                    background: "#ff0080",
-                    boxShadow: `0 0 ${4 / scale}px #ff0080`,
-                  }}
-                />
+        <div className="flex min-h-full min-w-full w-max items-center justify-center p-10">
+          <div
+            className="brutal-shadow-lg relative shrink-0"
+            style={{ width: canvasW * scale, height: canvasH * scale }}
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) select(null);
+            }}
+          >
+            <div
+              id="canvas-export"
+              className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink"
+              style={{
+                width: canvasW,
+                height: canvasH,
+                backgroundColor: bgColor.includes("gradient(") ? "#0a0f1f" : bgColor,
+                backgroundImage: page.bgImage
+                  ? `url(${page.bgImage})`
+                  : bgColor.includes("gradient(")
+                    ? bgColor
+                    : undefined,
+                backgroundSize: page.bgImage ? (page.bgFit ?? "cover") : "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              {elements.map((el) => (
+                <CanvasElement key={el.id} element={el} scale={scale} />
               ))}
-              {guides.h.map((y, i) => (
-                <div
-                  key={`h${i}-${y}`}
-                  style={{
-                    position: "absolute",
-                    top: y,
-                    left: 0,
-                    height: 1 / scale,
-                    width: canvasW,
-                    background: "#ff0080",
-                    boxShadow: `0 0 ${4 / scale}px #ff0080`,
-                  }}
-                />
-              ))}
+              {(guides.v.length > 0 || guides.h.length > 0) && (
+                <div className="pointer-events-none absolute inset-0 z-50">
+                  {guides.v.map((x, i) => (
+                    <div
+                      key={`v${i}-${x}`}
+                      style={{
+                        position: "absolute",
+                        left: x,
+                        top: 0,
+                        width: 1 / scale,
+                        height: canvasH,
+                        background: "#ff0080",
+                        boxShadow: `0 0 ${4 / scale}px #ff0080`,
+                      }}
+                    />
+                  ))}
+                  {guides.h.map((y, i) => (
+                    <div
+                      key={`h${i}-${y}`}
+                      style={{
+                        position: "absolute",
+                        top: y,
+                        left: 0,
+                        height: 1 / scale,
+                        width: canvasW,
+                        background: "#ff0080",
+                        boxShadow: `0 0 ${4 / scale}px #ff0080`,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-      </div>
       </div>
 
       <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-border bg-card p-1 text-card-foreground shadow-sm">
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom out" aria-label="Zoom out" disabled={scale <= 0.1} onClick={() => changeZoom(scale - 0.1)}><Minus /></Button>
-        <output aria-label="Preview zoom" className="min-w-12 text-center font-mono text-xs">{Math.round(scale * 100)}%</output>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom in" aria-label="Zoom in" disabled={scale >= 3} onClick={() => changeZoom(scale + 0.1)}><Plus /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Fit slide" aria-label="Fit slide" onClick={() => setZoom(null)}><Scan /></Button>
-        <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">{canvasW}×{canvasH}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title="Zoom out"
+          aria-label="Zoom out"
+          disabled={scale <= 0.1}
+          onClick={() => changeZoom(scale - 0.1)}
+        >
+          <Minus />
+        </Button>
+        <output aria-label="Preview zoom" className="min-w-12 text-center font-mono text-xs">
+          {Math.round(scale * 100)}%
+        </output>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title="Zoom in"
+          aria-label="Zoom in"
+          disabled={scale >= 3}
+          onClick={() => changeZoom(scale + 0.1)}
+        >
+          <Plus />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title="Fit slide"
+          aria-label="Fit slide"
+          onClick={() => setZoom(null)}
+        >
+          <Scan />
+        </Button>
+        <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">
+          {canvasW}×{canvasH}
+        </span>
       </div>
     </div>
   );

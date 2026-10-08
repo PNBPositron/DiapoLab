@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Loader2, Eye, EyeOff, ArrowRight, Sparkles, Cloud, Palette, MonitorSmartphone } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Sparkles,
+  Cloud,
+  Palette,
+  MonitorSmartphone,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/hooks/use-auth";
 
@@ -106,7 +115,10 @@ function AuthPage() {
               {[
                 { icon: Cloud, text: "Save your designs and pick up on any device" },
                 { icon: Palette, text: "40+ shape effects, liquid glass, themes" },
-                { icon: MonitorSmartphone, text: "Present fullscreen with laser & annotation tools" },
+                {
+                  icon: MonitorSmartphone,
+                  text: "Present fullscreen with laser & annotation tools",
+                },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-center gap-3 text-sm text-slate-300">
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
@@ -201,7 +213,9 @@ function AuthPage() {
                 <Sparkles className="size-4" />
               )}
               {mode === "signin" ? "Sign in" : "Create account"}
-              {!loading && <ArrowRight className="size-4 transition-transform group-hover\:translate-x-0.5" />}
+              {!loading && (
+                <ArrowRight className="size-4 transition-transform group-hover\:translate-x-0.5" />
+              )}
             </button>
           </form>
 
@@ -215,11 +229,13 @@ function AuthPage() {
             >
               {mode === "signin" ? (
                 <>
-                  No account yet? <span className="font-semibold text-blue-600 hover\:underline">Sign up</span>
+                  No account yet?{" "}
+                  <span className="font-semibold text-blue-600 hover\:underline">Sign up</span>
                 </>
               ) : (
                 <>
-                  Already have an account? <span className="font-semibold text-blue-600 hover\:underline">Sign in</span>
+                  Already have an account?{" "}
+                  <span className="font-semibold text-blue-600 hover\:underline">Sign in</span>
                 </>
               )}
             </button>

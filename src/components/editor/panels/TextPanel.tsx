@@ -117,7 +117,7 @@ export function TextPanel() {
                       fontFamily: p.fontFamily,
                       height: p.fontSize * 1.4,
                       color: "#0f172a",
-                    })
+                    }),
                   )
                 }
                 className="group flex items-center justify-between rounded-xl border border-slate-200/90 bg-white p-3 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:translate-y-0"
@@ -160,7 +160,12 @@ export function TextPanel() {
         </div>
 
         <SearchField value={search} onChange={setSearch} placeholder="Search fonts..." />
-        <ChipGroup value={activeCategory} options={CATEGORIES} onChange={setActiveCategory} label="Font categories" />
+        <ChipGroup
+          value={activeCategory}
+          options={CATEGORIES}
+          onChange={setActiveCategory}
+          label="Font categories"
+        />
       </div>
 
       {/* Font Specimen List */}
@@ -179,7 +184,7 @@ export function TextPanel() {
                   height: 120,
                   width: 600,
                   color: "#0f172a",
-                })
+                }),
               )
             }
             title={`Insert ${f.family}`}
@@ -197,9 +202,7 @@ export function TextPanel() {
               >
                 {f.sample ?? f.family}
               </span>
-              <span className="text-[10px] text-slate-400 font-sans">
-                {f.family}
-              </span>
+              <span className="text-[10px] text-slate-400 font-sans">{f.family}</span>
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">

@@ -7,7 +7,8 @@ const HIGHLIGHTS = [
   ...Array.from({ length: 17 }, (_, i) => `Arrow-${i + 1}.svg`),
   ...Array.from({ length: 12 }, (_, i) => `Blob-${i + 1}.svg`),
   ...Array.from({ length: 14 }, (_, i) => `Doodle-${i + 1}.svg`),
-  "Donuts-1.svg", "Donuts-2.svg",
+  "Donuts-1.svg",
+  "Donuts-2.svg",
   ...Array.from({ length: 11 }, (_, i) => `Line-${i + 1}.svg`),
   ...Array.from({ length: 8 }, (_, i) => `Loop-${i + 1}.svg`),
   ...Array.from({ length: 8 }, (_, i) => `Spiral-${i + 1}.svg`),
@@ -19,12 +20,44 @@ const HIGHLIGHTS = [
 ];
 
 const TRANSHUMANS = [
-  "astro.png", "bueno.png", "chaotic-good.png", "chillin.png", "chilly.png", "coffee.png",
-  "consumer.png", "cube-leg.png", "ecto-plasma.png", "entertainment.png", "experiments.png", "feliz.png",
-  "fling.png", "gamestation.png", "groceries.png", "growth.png", "jumping-air.png", "kiddo.png",
-  "late-for-class.png", "looking-ahead.png", "mask.png", "mechanical-love.png", "meela-pantalones.png", "new-beginnings.png",
-  "pacheco.png", "pilot.png", "plants.png", "polka-pup.png", "pondering.png", "puppy.png", "reflecting.png",
-  "roboto.png", "rogue.png", "runner.png", "waiting.png", "walking-contradiction.png", "whoa.png", "wont-stop.png",
+  "astro.png",
+  "bueno.png",
+  "chaotic-good.png",
+  "chillin.png",
+  "chilly.png",
+  "coffee.png",
+  "consumer.png",
+  "cube-leg.png",
+  "ecto-plasma.png",
+  "entertainment.png",
+  "experiments.png",
+  "feliz.png",
+  "fling.png",
+  "gamestation.png",
+  "groceries.png",
+  "growth.png",
+  "jumping-air.png",
+  "kiddo.png",
+  "late-for-class.png",
+  "looking-ahead.png",
+  "mask.png",
+  "mechanical-love.png",
+  "meela-pantalones.png",
+  "new-beginnings.png",
+  "pacheco.png",
+  "pilot.png",
+  "plants.png",
+  "polka-pup.png",
+  "pondering.png",
+  "puppy.png",
+  "reflecting.png",
+  "roboto.png",
+  "rogue.png",
+  "runner.png",
+  "waiting.png",
+  "walking-contradiction.png",
+  "whoa.png",
+  "wont-stop.png",
 ];
 
 const ICONS = [
@@ -103,7 +136,7 @@ export function IllustrationsPanel() {
         illustrationFormat: isHighlight ? "svg" : "png",
         fit: "contain",
         ...(isHighlight ? { tint: isDark ? "#ffffff" : "#0f172a" } : {}),
-      })
+      }),
     );
 
     setRecentlyAdded(file);
@@ -165,7 +198,11 @@ export function IllustrationsPanel() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={`Search ${
-            activeTab === "Icons" ? "3d icons" : activeTab === "Transhumans" ? "transhumans" : "highlights"
+            activeTab === "Icons"
+              ? "3d icons"
+              : activeTab === "Transhumans"
+                ? "transhumans"
+                : "highlights"
           }...`}
           className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
         />

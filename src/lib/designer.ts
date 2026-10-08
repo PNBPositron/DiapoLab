@@ -88,8 +88,11 @@ export function applyLayout(
 
   // hero: biggest text huge on top, everything else in a row underneath
   const hero =
-    texts.slice().sort((a, b) => (b.type === "text" ? b.fontSize : 0) - (a.type === "text" ? a.fontSize : 0))[0] ??
-    els[0];
+    texts
+      .slice()
+      .sort(
+        (a, b) => (b.type === "text" ? b.fontSize : 0) - (a.type === "text" ? a.fontSize : 0),
+      )[0] ?? els[0];
   const rest = els.filter((e) => e.id !== hero.id);
   const heroH = Math.round(H * 0.4);
   const out: AnyElement[] = [

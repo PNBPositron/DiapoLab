@@ -52,7 +52,7 @@ export type TextElement = ElementBase & {
   blendMode?: BlendMode;
   imageOverlay?: string;
   interaction?: ElementInteraction;
-    /** clip the element's silhouette by a shape (works like image masks) */
+  /** clip the element's silhouette by a shape (works like image masks) */
   maskShape?: ShapeKind;
   /** fill source: own color, or the slide's background (knockout) */
   fillSource?: "color" | "slide-bg";
@@ -118,7 +118,15 @@ export type ShapeKind =
   | "wave"
   | "leaf"
   | "ribbon";
-export type ShapeEffect = "none" | "liquid_glass" | "neon" | "soft_shadow" | "inner_glow" | "holographic" | "glitch" | "honeycomb";
+export type ShapeEffect =
+  | "none"
+  | "liquid_glass"
+  | "neon"
+  | "soft_shadow"
+  | "inner_glow"
+  | "holographic"
+  | "glitch"
+  | "honeycomb";
 export type BlendMode = "normal" | "screen" | "overlay" | "multiply" | "color-dodge";
 export type ElementShadow = {
   x: number;
@@ -577,7 +585,15 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "ai" | "components" | "illustrations" | "my-designs";
+type Tool =
+  | "home"
+  | "text"
+  | "elements"
+  | "design"
+  | "ai"
+  | "components"
+  | "illustrations"
+  | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 
@@ -923,7 +939,14 @@ const UI_DEFAULTS: Record<
   },
   badge: { w: 280, h: 96, title: "NEW", body: "", value: 0, items: [] },
   progress: { w: 560, h: 160, title: "Progress", body: "Loading assets", value: 68, items: [] },
-  timeline: { w: 640, h: 220, title: "Product launch", body: "Discovery → Build → Launch", value: 68, items: ["Discovery", "Prototype", "Launch"] },
+  timeline: {
+    w: 640,
+    h: 220,
+    title: "Product launch",
+    body: "Discovery → Build → Launch",
+    value: 68,
+    items: ["Discovery", "Prototype", "Launch"],
+  },
   alert: {
     w: 620,
     h: 200,
@@ -1184,7 +1207,13 @@ export const useEditor = create<State>((set, get) => {
           return scaled;
         }),
       }));
-      set({ ...syncCurrent(next, currentIndex), canvasW: w, canvasH: h, selectedId: null, selectedIds: [] });
+      set({
+        ...syncCurrent(next, currentIndex),
+        canvasW: w,
+        canvasH: h,
+        selectedId: null,
+        selectedIds: [],
+      });
     },
 
     applyBrandKit: (kit, scope) => {
@@ -1278,7 +1307,10 @@ export const useEditor = create<State>((set, get) => {
           y: e.y + 30,
         }));
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...clones] }));
-      set({ selectedIds: clones.map((c) => c.id), selectedId: clones[clones.length - 1]?.id ?? null });
+      set({
+        selectedIds: clones.map((c) => c.id),
+        selectedId: clones[clones.length - 1]?.id ?? null,
+      });
     },
 
     add: (el) => {
@@ -1335,7 +1367,11 @@ export const useEditor = create<State>((set, get) => {
     },
     setTransition: (t) => {
       pushHistory();
-      updateCurrentPage((p) => ({ ...p, transition: t, transitionZoom: t === "zoom" ? p.transitionZoom ?? 0.5 : p.transitionZoom }));
+      updateCurrentPage((p) => ({
+        ...p,
+        transition: t,
+        transitionZoom: t === "zoom" ? (p.transitionZoom ?? 0.5) : p.transitionZoom,
+      }));
     },
     setTransitionZoom: (zoom) => {
       if (!Number.isFinite(zoom)) return;
@@ -1383,7 +1419,24 @@ export const useEditor = create<State>((set, get) => {
         ...p,
         id: p.id ?? uid(),
         duration: p.duration ?? DEFAULT_PAGE_DURATION,
-        elements: p.elements.map((element) => element.type === "image" && element.assetKind === "icon" ? { ...element, type: "icon" as const, name: ("name" in element && typeof element.name === "string" ? element.name : element.src.split("/").pop()?.replace(/\.svg$/i, "") ?? "Icon"), color: element.tint ?? "#111827", strokeWidth: 2, src: element.src } : element),
+        elements: p.elements.map((element) =>
+          element.type === "image" && element.assetKind === "icon"
+            ? {
+                ...element,
+                type: "icon" as const,
+                name:
+                  "name" in element && typeof element.name === "string"
+                    ? element.name
+                    : (element.src
+                        .split("/")
+                        .pop()
+                        ?.replace(/\.svg$/i, "") ?? "Icon"),
+                color: element.tint ?? "#111827",
+                strokeWidth: 2,
+                src: element.src,
+              }
+            : element,
+        ),
       }));
       set({ ...syncCurrent(safe, 0), selectedId: null, selectedIds: [] });
     },

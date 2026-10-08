@@ -5,7 +5,11 @@ type RGB = { r: number; g: number; b: number };
 
 function hexToRgb(hex: string): RGB {
   let h = hex.replace("#", "");
-  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (h.length === 3)
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
   const n = parseInt(h || "000000", 16);
   return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
@@ -13,8 +17,11 @@ function rgbToHex({ r, g, b }: RGB): string {
   return "#" + [r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
 }
 function rgbToHsv({ r, g, b }: RGB): { h: number; s: number; v: number } {
-  const rn = r / 255, gn = g / 255, bn = b / 255;
-  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  const rn = r / 255,
+    gn = g / 255,
+    bn = b / 255;
+  const max = Math.max(rn, gn, bn),
+    min = Math.min(rn, gn, bn);
   const d = max - min;
   let h = 0;
   if (d !== 0) {
@@ -30,7 +37,9 @@ function hsvToRgb(h: number, s: number, v: number): RGB {
   const c = v * s;
   const hp = h / 60;
   const x = c * (1 - Math.abs((hp % 2) - 1));
-  let rn = 0, gn = 0, bn = 0;
+  let rn = 0,
+    gn = 0,
+    bn = 0;
   if (hp < 1) [rn, gn, bn] = [c, x, 0];
   else if (hp < 2) [rn, gn, bn] = [x, c, 0];
   else if (hp < 3) [rn, gn, bn] = [0, c, x];

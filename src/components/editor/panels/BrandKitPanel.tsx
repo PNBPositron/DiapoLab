@@ -24,9 +24,18 @@ export function BrandKitPanel() {
     setGenerating(true);
     const colors = Array.from(
       { length: 5 },
-      () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`
+      () =>
+        `#${Math.floor(Math.random() * 0xffffff)
+          .toString(16)
+          .padStart(6, "0")}`,
     );
-    setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
+    setBrandKit({
+      primary: colors[0],
+      secondary: colors[1],
+      accent: colors[2],
+      bg: colors[4],
+      text: colors[3],
+    });
     window.setTimeout(() => setGenerating(false), 180);
   };
 
@@ -42,7 +51,9 @@ export function BrandKitPanel() {
           disabled={generating}
           className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
         >
-          <WandSparkles className={`size-3.5 ${generating ? "animate-spin" : "transition-transform group-hover:rotate-12"}`} />
+          <WandSparkles
+            className={`size-3.5 ${generating ? "animate-spin" : "transition-transform group-hover:rotate-12"}`}
+          />
           {generating ? "Generating…" : "Generate random palette"}
         </button>
       </div>
@@ -79,7 +90,9 @@ export function BrandKitPanel() {
 
       {/* Couleurs */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Colors</div>
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          Colors
+        </div>
         {SWATCHES.map((s) => (
           <div key={s.key}>
             <button
@@ -134,7 +147,9 @@ export function BrandKitPanel() {
 
       {/* Application */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Apply to</div>
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          Apply to
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => applyBrandKit(brandKit, "slide")}

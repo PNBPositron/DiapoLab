@@ -4,7 +4,13 @@ import { listDesigns, deleteDesign, type SavedDesign } from "@/lib/designs";
 import { useEditor } from "@/store/editor";
 import { SlideThumbnail } from "./SlideThumbnail";
 
-export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
+export function MyDesignsDialog({
+  onClose,
+  embedded = false,
+}: {
+  onClose: () => void;
+  embedded?: boolean;
+}) {
   const { loadDesign } = useEditor();
   const [items, setItems] = useState<SavedDesign[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +80,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               </h2>
               {items && (
                 <p className="mt-0.5 text-sm text-slate-500">
-                  {items.length} saved {items.length === 1 ? "design" : "designs"} · stored on this device
+                  {items.length} saved {items.length === 1 ? "design" : "designs"} · stored on this
+                  device
                 </p>
               )}
             </div>
@@ -91,7 +98,11 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
         </div>
 
         {/* Contenu */}
-        <div className={embedded ? "max-h-full overflow-y-auto p-3 sm:p-4" : "flex-1 overflow-y-auto p-4 sm:p-6"}>
+        <div
+          className={
+            embedded ? "max-h-full overflow-y-auto p-3 sm:p-4" : "flex-1 overflow-y-auto p-4 sm:p-6"
+          }
+        >
           {error && (
             <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-600">
               {error}
@@ -150,7 +161,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                         {d.name}
                       </div>
                       <div className="mt-0.5 text-[10px] text-slate-400">
-                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0} page{(d.pages?.length ?? 0) === 1 ? "" : "s"}
+                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0} page
+                        {(d.pages?.length ?? 0) === 1 ? "" : "s"}
                       </div>
                     </div>
                     <button

@@ -51,11 +51,7 @@ export async function saveDesign(input: {
     if (error) throw error;
     return data as unknown as SavedDesign;
   }
-  const { data, error } = await supabase
-    .from("designs")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("designs").insert(payload).select().single();
   if (error) throw error;
   return data as unknown as SavedDesign;
 }

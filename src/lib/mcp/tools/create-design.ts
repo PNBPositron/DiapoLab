@@ -28,6 +28,9 @@ export default defineTool({
       .select("id, name, canvas_w, canvas_h, updated_at")
       .single();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    return { content: [{ type: "text", text: JSON.stringify(data) }], structuredContent: { design: data } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(data) }],
+      structuredContent: { design: data },
+    };
   },
 });

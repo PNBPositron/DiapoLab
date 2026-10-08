@@ -1,11 +1,5 @@
 import { useState, type ReactNode } from "react";
-import {
-  ChevronRight,
-  Maximize2,
-  Palette,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronRight, Maximize2, Palette, Sparkles, type LucideIcon } from "lucide-react";
 import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
@@ -49,13 +43,9 @@ function SectionRow({
 
         {/* Title & Micro-detail */}
         <div className="flex flex-col min-w-0">
-          <span className="text-[12px] font-medium text-slate-850 leading-tight">
-            {title}
-          </span>
+          <span className="text-[12px] font-medium text-slate-850 leading-tight">{title}</span>
           {!open && (
-            <span className="text-[10px] text-slate-400 font-normal leading-tight">
-              {subtitle}
-            </span>
+            <span className="text-[10px] text-slate-400 font-normal leading-tight">{subtitle}</span>
           )}
         </div>
 

@@ -100,7 +100,7 @@ export function TemplatesPanel() {
       )}
 
       {/* Search + filtres */}
-        <div className="relative z-30 space-y-3 px-4">
+      <div className="relative z-30 space-y-3 px-4">
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
@@ -168,7 +168,8 @@ export function TemplatesPanel() {
                   canLike={!!user}
                   onLike={() => toggleLike(c.id)}
                   onLoad={() => {
-                    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
+                    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`))
+                      return;
                     useEditor.getState().loadPages(c.pages as Page[]);
                     useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
                   }}
@@ -238,9 +239,7 @@ function TemplateCard({
           <div className="truncate text-xs font-semibold text-slate-800" title={c.name}>
             {c.name}
           </div>
-          <div className="mt-0.5 text-[10px] text-slate-400">
-            {c.pages?.length ?? 0} slides
-          </div>
+          <div className="mt-0.5 text-[10px] text-slate-400">{c.pages?.length ?? 0} slides</div>
         </div>
       </button>
       <button
@@ -368,7 +367,8 @@ function AllTemplatesDialog({
                 canLike={canLike}
                 onLike={() => toggleLike(c.id)}
                 onLoad={() => {
-                  if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
+                  if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`))
+                    return;
                   useEditor.getState().loadPages(c.pages as Page[]);
                   useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
                   onOpenChange(false);

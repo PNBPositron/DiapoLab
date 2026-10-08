@@ -102,7 +102,10 @@ export async function publishTheme(name: string, tokens: ThemeTokens): Promise<P
     .select("id, user_id, name, tokens, created_at")
     .single();
   if (error) throw error;
-  return { ...(data as unknown as PublicTheme), tokens: normalizeTokens((data as never as PublicTheme).tokens) };
+  return {
+    ...(data as unknown as PublicTheme),
+    tokens: normalizeTokens((data as never as PublicTheme).tokens),
+  };
 }
 
 export async function deletePublicTheme(id: string): Promise<void> {

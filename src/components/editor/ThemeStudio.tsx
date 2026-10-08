@@ -2,22 +2,258 @@ import { useEffect, useState } from "react";
 import { Loader2, Trash2, Upload } from "lucide-react";
 import { useSettings } from "@/store/settings";
 import { useAuth } from "@/hooks/use-auth";
-import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, THEME_TOKEN_FIELDS, deletePublicTheme, listMyPublicThemes, publishTheme, type PublicTheme, type ThemeTokens } from "@/lib/themes";
+import {
+  CUSTOM_THEME_PREFIX,
+  DEFAULT_THEME_TOKENS,
+  THEME_TOKEN_FIELDS,
+  deletePublicTheme,
+  listMyPublicThemes,
+  publishTheme,
+  type PublicTheme,
+  type ThemeTokens,
+} from "@/lib/themes";
 
 const card = "rounded-2xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)]";
 export function ThemeStudio() {
   const { user } = useAuth();
-  const { customThemes, addCustomTheme, removeCustomTheme, editorTheme, setEditorTheme } = useSettings();
+  const { customThemes, addCustomTheme, removeCustomTheme, editorTheme, setEditorTheme } =
+    useSettings();
   const [tokens, setTokens] = useState<ThemeTokens>({ ...DEFAULT_THEME_TOKENS });
   const [name, setName] = useState("My theme");
   const [mine, setMine] = useState<PublicTheme[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
-  useEffect(() => { if (!user) { setMine([]); return; } listMyPublicThemes().then(setMine).catch((e) => setError(e instanceof Error ? e.message : "Failed to load themes")); }, [user]);
-  const set = (key: keyof ThemeTokens, value: string) => setTokens((current) => ({ ...current, [key]: value }));
-  const saveLocal = () => { const id = `local-${Date.now().toString(36)}`; addCustomTheme({ id, name: name.trim() || "My theme", tokens }); setEditorTheme(`${CUSTOM_THEME_PREFIX}${id}`); setNote("Saved to this device and applied"); };
-  const publish = async () => { setBusy("publish"); setError(null); try { const theme = await publishTheme(name.trim() || "My theme", tokens); setMine((list) => [theme, ...(list ?? [])]); addCustomTheme({ id: theme.id, name: theme.name, tokens: theme.tokens }); setEditorTheme(`${CUSTOM_THEME_PREFIX}${theme.id}`); setNote("Published to the marketplace"); } catch (e) { setError(e instanceof Error ? e.message : "Publish failed"); } finally { setBusy(null); } };
-  const unpublish = async (theme: PublicTheme) => { if (!window.confirm(`Unpublish "${theme.name}"?`)) return; setBusy(theme.id); try { await deletePublicTheme(theme.id); setMine((list) => (list ?? []).filter((item) => item.id !== theme.id)); } catch (e) { setError(e instanceof Error ? e.message : "Delete failed"); } finally { setBusy(null); } };
-  return <section className={`${card} mb-4 p-4 sm:p-5`}><div className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700">Theme studio</div><p className="mt-1 text-[10px] text-slate-400">Create a custom editor theme or save one for later.</p><label className="mt-4 block"><span className="text-xs text-slate-500">Theme name</span><input value={name} onChange={(event) => setName(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white" /></label><div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">{THEME_TOKEN_FIELDS.map((field) => <label key={field.key} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2"><input type="color" value={tokens[field.key]} onChange={(event) => set(field.key, event.target.value)} aria-label={field.label} className="size-7 cursor-pointer rounded border-0 bg-transparent" /><span className="truncate text-[10px] text-slate-500">{field.label}</span></label>)}</div><div className="mt-3 rounded-xl border p-3" style={{ background: tokens.paper, borderColor: tokens.grid }}><div className="flex items-center gap-2"><div className="size-8 rounded-lg" style={{ background: tokens.ink }} /><div className="flex-1"><div className="text-[11px] font-semibold" style={{ color: tokens.teal }}>Preview</div><div className="text-[9px]" style={{ color: tokens.tealDeep }}>Surfaces, accent and text</div></div><span className="rounded-md px-2 py-1 text-[10px] font-semibold" style={{ background: tokens.blue, color: tokens.ink }}>Accent</span></div><div className="mt-2 flex gap-2"><div className="h-6 flex-1 rounded" style={{ background: tokens.surface }} /><div className="h-6 flex-1 rounded" style={{ background: tokens.surface2 }} /><div className="h-6 flex-1 rounded" style={{ background: tokens.blueDeep }} /></div></div><div className="mt-3 flex flex-wrap gap-2"><button onClick={saveLocal} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-600 hover:bg-slate-50">Save locally</button><button onClick={publish} disabled={!user || busy === "publish"} className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-blue-700 disabled:opacity-50">{busy === "publish" ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}Publish</button><button onClick={() => setTokens({ ...DEFAULT_THEME_TOKENS })} className="px-2 text-[10px] text-slate-400 underline hover:text-slate-700">Reset tokens</button></div>{!user && <p className="mt-2 text-[10px] text-slate-400">Sign in to publish themes.</p>}{note && <p className="mt-2 text-[10px] text-emerald-600">{note}</p>}{error && <p className="mt-2 text-[10px] text-rose-600">{error}</p>}{customThemes.length > 0 && <div className="mt-5"><div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Saved on this device</div><ul className="space-y-2">{customThemes.map((theme) => { const on = editorTheme === `${CUSTOM_THEME_PREFIX}${theme.id}`; return <li key={theme.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"><span className="flex gap-1">{[theme.tokens.ink, theme.tokens.surface, theme.tokens.teal, theme.tokens.blue].map((color, index) => <span key={index} className="size-4 rounded border border-white" style={{ background: color }} />)}</span><span className="min-w-0 flex-1 truncate text-xs text-slate-600">{theme.name}</span><button onClick={() => setEditorTheme(`${CUSTOM_THEME_PREFIX}${theme.id}`)} className="rounded-md px-2 py-1 text-[10px] text-blue-600 hover:bg-blue-50">{on ? "Active" : "Apply"}</button><button onClick={() => removeCustomTheme(theme.id)} aria-label={`Remove ${theme.name}`} className="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 className="size-3.5" /></button></li>; })}</ul></div>}<div className="mt-5"><div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">My published themes</div>{!user ? <p className="text-[10px] text-slate-400">Sign in to manage your themes.</p> : mine === null ? <Loader2 className="size-3 animate-spin text-slate-400" /> : mine.length === 0 ? <p className="text-[10px] text-slate-400">Nothing published yet.</p> : <ul className="space-y-2">{mine.map((theme) => <li key={theme.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"><span className="flex gap-1">{[theme.tokens.ink, theme.tokens.surface, theme.tokens.teal, theme.tokens.blue].map((color, index) => <span key={index} className="size-4 rounded border border-white" style={{ background: color }} />)}</span><span className="min-w-0 flex-1 truncate text-xs text-slate-600">{theme.name}</span><button onClick={() => unpublish(theme)} disabled={busy === theme.id} className="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600">{busy === theme.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}</button></li>)}</ul>}</div></section>;
+  useEffect(() => {
+    if (!user) {
+      setMine([]);
+      return;
+    }
+    listMyPublicThemes()
+      .then(setMine)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load themes"));
+  }, [user]);
+  const set = (key: keyof ThemeTokens, value: string) =>
+    setTokens((current) => ({ ...current, [key]: value }));
+  const saveLocal = () => {
+    const id = `local-${Date.now().toString(36)}`;
+    addCustomTheme({ id, name: name.trim() || "My theme", tokens });
+    setEditorTheme(`${CUSTOM_THEME_PREFIX}${id}`);
+    setNote("Saved to this device and applied");
+  };
+  const publish = async () => {
+    setBusy("publish");
+    setError(null);
+    try {
+      const theme = await publishTheme(name.trim() || "My theme", tokens);
+      setMine((list) => [theme, ...(list ?? [])]);
+      addCustomTheme({ id: theme.id, name: theme.name, tokens: theme.tokens });
+      setEditorTheme(`${CUSTOM_THEME_PREFIX}${theme.id}`);
+      setNote("Published to the marketplace");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Publish failed");
+    } finally {
+      setBusy(null);
+    }
+  };
+  const unpublish = async (theme: PublicTheme) => {
+    if (!window.confirm(`Unpublish "${theme.name}"?`)) return;
+    setBusy(theme.id);
+    try {
+      await deletePublicTheme(theme.id);
+      setMine((list) => (list ?? []).filter((item) => item.id !== theme.id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setBusy(null);
+    }
+  };
+  return (
+    <section className={`${card} mb-4 p-4 sm:p-5`}>
+      <div className="font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700">
+        Theme studio
+      </div>
+      <p className="mt-1 text-[10px] text-slate-400">
+        Create a custom editor theme or save one for later.
+      </p>
+      <label className="mt-4 block">
+        <span className="text-xs text-slate-500">Theme name</span>
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
+        />
+      </label>
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {THEME_TOKEN_FIELDS.map((field) => (
+          <label
+            key={field.key}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2"
+          >
+            <input
+              type="color"
+              value={tokens[field.key]}
+              onChange={(event) => set(field.key, event.target.value)}
+              aria-label={field.label}
+              className="size-7 cursor-pointer rounded border-0 bg-transparent"
+            />
+            <span className="truncate text-[10px] text-slate-500">{field.label}</span>
+          </label>
+        ))}
+      </div>
+      <div
+        className="mt-3 rounded-xl border p-3"
+        style={{ background: tokens.paper, borderColor: tokens.grid }}
+      >
+        <div className="flex items-center gap-2">
+          <div className="size-8 rounded-lg" style={{ background: tokens.ink }} />
+          <div className="flex-1">
+            <div className="text-[11px] font-semibold" style={{ color: tokens.teal }}>
+              Preview
+            </div>
+            <div className="text-[9px]" style={{ color: tokens.tealDeep }}>
+              Surfaces, accent and text
+            </div>
+          </div>
+          <span
+            className="rounded-md px-2 py-1 text-[10px] font-semibold"
+            style={{ background: tokens.blue, color: tokens.ink }}
+          >
+            Accent
+          </span>
+        </div>
+        <div className="mt-2 flex gap-2">
+          <div className="h-6 flex-1 rounded" style={{ background: tokens.surface }} />
+          <div className="h-6 flex-1 rounded" style={{ background: tokens.surface2 }} />
+          <div className="h-6 flex-1 rounded" style={{ background: tokens.blueDeep }} />
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          onClick={saveLocal}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-600 hover:bg-slate-50"
+        >
+          Save locally
+        </button>
+        <button
+          onClick={publish}
+          disabled={!user || busy === "publish"}
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {busy === "publish" ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Upload className="size-3.5" />
+          )}
+          Publish
+        </button>
+        <button
+          onClick={() => setTokens({ ...DEFAULT_THEME_TOKENS })}
+          className="px-2 text-[10px] text-slate-400 underline hover:text-slate-700"
+        >
+          Reset tokens
+        </button>
+      </div>
+      {!user && <p className="mt-2 text-[10px] text-slate-400">Sign in to publish themes.</p>}
+      {note && <p className="mt-2 text-[10px] text-emerald-600">{note}</p>}
+      {error && <p className="mt-2 text-[10px] text-rose-600">{error}</p>}
+      {customThemes.length > 0 && (
+        <div className="mt-5">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Saved on this device
+          </div>
+          <ul className="space-y-2">
+            {customThemes.map((theme) => {
+              const on = editorTheme === `${CUSTOM_THEME_PREFIX}${theme.id}`;
+              return (
+                <li
+                  key={theme.id}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"
+                >
+                  <span className="flex gap-1">
+                    {[
+                      theme.tokens.ink,
+                      theme.tokens.surface,
+                      theme.tokens.teal,
+                      theme.tokens.blue,
+                    ].map((color, index) => (
+                      <span
+                        key={index}
+                        className="size-4 rounded border border-white"
+                        style={{ background: color }}
+                      />
+                    ))}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-xs text-slate-600">
+                    {theme.name}
+                  </span>
+                  <button
+                    onClick={() => setEditorTheme(`${CUSTOM_THEME_PREFIX}${theme.id}`)}
+                    className="rounded-md px-2 py-1 text-[10px] text-blue-600 hover:bg-blue-50"
+                  >
+                    {on ? "Active" : "Apply"}
+                  </button>
+                  <button
+                    onClick={() => removeCustomTheme(theme.id)}
+                    aria-label={`Remove ${theme.name}`}
+                    className="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+      <div className="mt-5">
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          My published themes
+        </div>
+        {!user ? (
+          <p className="text-[10px] text-slate-400">Sign in to manage your themes.</p>
+        ) : mine === null ? (
+          <Loader2 className="size-3 animate-spin text-slate-400" />
+        ) : mine.length === 0 ? (
+          <p className="text-[10px] text-slate-400">Nothing published yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {mine.map((theme) => (
+              <li
+                key={theme.id}
+                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2"
+              >
+                <span className="flex gap-1">
+                  {[
+                    theme.tokens.ink,
+                    theme.tokens.surface,
+                    theme.tokens.teal,
+                    theme.tokens.blue,
+                  ].map((color, index) => (
+                    <span
+                      key={index}
+                      className="size-4 rounded border border-white"
+                      style={{ background: color }}
+                    />
+                  ))}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-xs text-slate-600">{theme.name}</span>
+                <button
+                  onClick={() => unpublish(theme)}
+                  disabled={busy === theme.id}
+                  className="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  {busy === theme.id ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-3.5" />
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
 }

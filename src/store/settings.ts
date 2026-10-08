@@ -144,9 +144,11 @@ export const useSettings = create<SettingsState>()(
           customThemes: previous?.customThemes ?? [],
           // Replace all legacy slide-dependent theme values with the fixed light theme.
           editorTheme:
-            previousTheme === "auto" || previousTheme === "auto-light" || previousTheme === "auto-dark"
+            previousTheme === "auto" ||
+            previousTheme === "auto-light" ||
+            previousTheme === "auto-dark"
               ? DEFAULT_EDITOR_THEME
-              : previousTheme ?? DEFAULT_EDITOR_THEME,
+              : (previousTheme ?? DEFAULT_EDITOR_THEME),
           reduceMotion: true,
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
         };

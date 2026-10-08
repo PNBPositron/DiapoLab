@@ -17,6 +17,9 @@ export default defineTool({
       .maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     if (!data) return { content: [{ type: "text", text: "Design not found" }], isError: true };
-    return { content: [{ type: "text", text: JSON.stringify(data) }], structuredContent: { design: data } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(data) }],
+      structuredContent: { design: data },
+    };
   },
 });
