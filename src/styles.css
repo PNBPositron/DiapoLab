@@ -52,32 +52,32 @@
   --selector-active: oklch(0.95 0.026 275);
   --selector-shadow: 0 3px 10px oklch(0.28 0.035 257 / 0.07);
   --selector-panel-shadow: 0 12px 32px oklch(0.28 0.035 257 / 0.14);
-  --radius: 1.25rem;
-  --ink: #f7f9ff;
-  --paper: #091326;
-  --surface: #12203a;
-  --surface-2: #1b2d4d;
-  --grid: rgba(190, 220, 255, 0.09);
-  --teal: #eef7ff;
-  --teal-deep: #b5c8e7;
-  --blue: #86b9ff;
-  --blue-deep: #526fe0;
+  --radius: 0.75rem;
+  --ink: #f8fafc;
+  --paper: #f4f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef2f7;
+  --grid: rgba(71, 85, 105, 0.12);
+  --teal: #172033;
+  --teal-deep: #64748b;
+  --blue: #4f46e5;
+  --blue-deep: #3730a3;
   --background: var(--paper);
   --foreground: var(--teal);
   --card: var(--surface);
   --card-foreground: var(--teal);
-  --popover: var(--surface-2);
+  --popover: var(--surface);
   --popover-foreground: var(--teal);
   --primary: var(--blue);
-  --primary-foreground: #0b1426;
+  --primary-foreground: #ffffff;
   --secondary: var(--surface-2);
   --secondary-foreground: var(--teal);
-  --muted: rgba(255, 255, 255, 0.08);
+  --muted: #eef2f7;
   --muted-foreground: var(--teal-deep);
-  --accent: rgba(102, 168, 255, 0.3);
-  --accent-foreground: #f7fbff;
-  --border: rgba(181, 200, 231, 0.28);
-  --input: rgba(255, 255, 255, 0.18);
+  --accent: #e8e7ff;
+  --accent-foreground: var(--blue-deep);
+  --border: #dbe2ec;
+  --input: #d5dce8;
   --ring: var(--blue);
 }
 
@@ -117,8 +117,8 @@
 
 @layer base {
   * { border-color: color-mix(in oklab, var(--teal) 30%, transparent); }
-  html, body { background-color: var(--paper); color: var(--teal); font-family: "Geist", system-ui, sans-serif; background-image: radial-gradient(circle at 8% 12%, rgba(93, 143, 255, 0.18), transparent 28%), radial-gradient(circle at 92% 86%, rgba(124, 91, 214, 0.16), transparent 30%), linear-gradient(135deg, #0b1020 0%, #121b32 50%, #0c1325 100%); background-attachment: fixed; }
-  h1, h2, h3, h4 { font-family: "Geist", system-ui, sans-serif; letter-spacing: -0.02em; text-transform: none; }
+  html, body { min-height: 100%; background-color: var(--paper); color: var(--teal); font-family: "Inter", system-ui, sans-serif; }
+  h1, h2, h3, h4 { font-family: "Manrope", "Inter", system-ui, sans-serif; letter-spacing: -0.025em; text-transform: none; }
   button, input, textarea, select { font: inherit; }
   ::selection { background: var(--teal); color: var(--ink); }
 }

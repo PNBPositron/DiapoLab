@@ -8,8 +8,8 @@
   }
 
   .editor-side-panel {
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.92);
+    padding: 0.875rem;
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border-color: rgba(255, 255, 255, 0.7);
@@ -269,3 +269,35 @@
 .editor-inspector .inspector-section > button { padding: 10px 2px; }
 .editor-inspector .inspector-section > div { padding: 10px 2px; border: 0; }
 .editor-side-panel .selector-search input { border: 0; box-shadow: none; }
+
+/* Shared editor chrome: quiet surfaces, consistent rhythm, clear focus. */
+.editor-ui .brutal-border,
+.editor-ui .brutal-border-2 {
+  border-color: var(--border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.editor-ui .brutal-press:hover {
+  border-color: color-mix(in srgb, var(--blue) 42%, var(--border));
+  box-shadow: 0 8px 20px -10px rgba(79, 70, 229, 0.35);
+}
+.editor-ui button:focus-visible,
+.editor-ui input:focus-visible,
+.editor-ui textarea:focus-visible,
+.editor-ui select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
+  outline-offset: 2px;
+}
+.editor-ui .bg-paper { background: var(--paper); }
+.editor-ui .bg-ink { background: var(--surface); color: var(--teal); }
+.editor-ui .bg-surface { background: var(--surface); color: var(--teal); }
+.editor-ui .bg-surface-2 { background: var(--surface-2); color: var(--teal); }
+.editor-ui .text-teal { color: var(--teal); }
+.editor-ui .text-teal\/70 { color: color-mix(in srgb, var(--teal) 70%, transparent); }
+.editor-ui .text-teal\/60 { color: color-mix(in srgb, var(--teal) 60%, transparent); }
+.editor-ui .border-teal\/20,
+.editor-ui .border-teal\/25,
+.editor-ui .border-teal\/30 { border-color: color-mix(in srgb, var(--teal) 16%, transparent); }
+.editor-ui .bg-blue { background: var(--blue); color: var(--primary-foreground); }
+.editor-ui .bg-teal { background: var(--teal); color: var(--ink); }
+.editor-ui .font-mono { font-family: var(--font-mono); }
