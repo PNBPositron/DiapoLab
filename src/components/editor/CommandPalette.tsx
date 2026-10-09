@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  useEditor,
-  type AnyElement,
-} from "@/store/editor";
+import { useEditor, type AnyElement } from "@/store/editor";
 import {
   Search,
   CornerDownLeft,
@@ -88,14 +85,14 @@ export function CommandPalette({
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+  const modifierKey = isMac ? "⌘" : "Ctrl";
 
   const store = useEditor();
 
   /* ------------------ Command registry ------------------ */
   const commands = useMemo<Command[]>(() => {
-    const selected: AnyElement | undefined = store.elements.find(
-      (e) => e.id === store.selectedId,
-    );
+    const selected: AnyElement | undefined = store.elements.find((e) => e.id === store.selectedId);
 
     const actions: Command[] = [
       {
@@ -484,7 +481,7 @@ export function CommandPalette({
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.25)] animate-in slide-in-from-top-2 duration-150"
+        className="w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-[0_28px_90px_rgba(15,23,42,0.28)] ring-1 ring-black/5 animate-in slide-in-from-top-2 duration-150"
         onKeyDown={onKeyDown}
       >
         {/* Input */}
@@ -494,8 +491,13 @@ export function CommandPalette({
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search commands, shortcuts, features, links…"
-            className="h-12 min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+            placeholder="Search commands, features, shortcuts, or links…"
+            aria-label="Search commands"
+            aria-controls="command-results"
+            aria-activedescendant={
+              filtered[activeIndex] ? `command-${filtered[activeIndex].id}` : undefined
+            }
+            className="h-14 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-800 outline-none placeholder:text-slate-400"
           />
           <kbd className="shrink-0 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-500">
             ESC
@@ -503,7 +505,7 @@ export function CommandPalette({
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[52vh] overflow-y-auto p-1.5">
+        <div id="command-results" ref={listRef} className="max-h-[52vh] overflow-y-auto p-2">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-slate-400">
               <Search className="size-6" />
@@ -521,11 +523,13 @@ export function CommandPalette({
                     </div>
                   )}
                   <button
+                    id={`command-${c.id}`}
                     type="button"
+                    aria-selected={i === activeIndex}
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => runCommand(c)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
-                      i === activeIndex ? "bg-sky-50" : "hover:bg-slate-50"
+                    className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
+                      i === activeIndex ? "bg-sky-50 ring-1 ring-sky-100" : "hover:bg-slate-50"
                     }`}
                   >
                     <span
@@ -542,9 +546,7 @@ export function CommandPalette({
                         {c.label}
                       </span>
                       {c.hint && (
-                        <span className="block truncate text-[10px] text-slate-400">
-                          {c.hint}
-                        </span>
+                        <span className="block truncate text-[10px] text-slate-400">{c.hint}</span>
                       )}
                     </span>
                     {c.href && <ExternalLink className="size-3.5 shrink-0 text-slate-300" />}
@@ -580,8 +582,10 @@ export function CommandPalette({
             <CornerDownLeft className="size-3" /> run
           </span>
           <span className="ml-auto flex items-center gap-1">
-            <kbd className="rounded border border-slate-200 bg-white px-1 font-mono">⌘K</kbd>
-            toggle
+            <kbd className="rounded border border-slate-200 bg-white px-1 font-mono">
+              {modifierKey} K
+            </kbd>
+            toggle palette
           </span>
         </div>
       </div>
