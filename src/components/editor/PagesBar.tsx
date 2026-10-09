@@ -1,11 +1,12 @@
 import { useEditor, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
-import { useState } from "react";
-import { Ban, Blend, ArrowRight, ZoomIn, FlipHorizontal, Shapes, Zap, MoveLeft, MoveUp, Layers, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Ban, Blend, ArrowRight, ZoomIn, FlipHorizontal, Shapes, Zap, MoveLeft, MoveUp, Layers, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
+import { CommandPalette } from "./CommandPalette";
 
 const transitionIcons = { none: Ban, fade: Blend, slide: ArrowRight, zoom: ZoomIn, flip: FlipHorizontal, morph: Shapes, glitch: Zap, "parallax-left": MoveLeft, "parallax-up": MoveUp, "parallax-depth": Layers };
 
@@ -24,6 +25,7 @@ const transitionOptions: SlideTransition[] = [
 
 export function PagesBar() {
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const {
     pages,
     currentIndex,
@@ -38,11 +40,24 @@ export function PagesBar() {
     setTransitionZoom,
     setPresenting,
   } = useEditor();
+
+  // ⌘K / Ctrl+K — toggle command palette
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const currentTransition: SlideTransition = pages[currentIndex]?.transition ?? "none";
   const currentZoom = pages[currentIndex]?.transitionZoom ?? 0.5;
   const ratio = canvasW / canvasH;
   const thumbW = ratio >= 1 ? 116 : 116 * ratio;
-  const thumbH = ratio >= 1 ? 116 / ratio : 116;
+  const thumbH = ratio >= 1 ? 116 / ratio : 116 * ratio;
 
   return (
     <div className="flex h-[94px] shrink-0 items-center gap-3 border-t border-transparent bg-transparent px-3 py-2 text-slate-700">
@@ -78,6 +93,16 @@ export function PagesBar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        {/* ⌘K — Search commands */}
+        <button
+          onClick={() => setPaletteOpen(true)}
+          title="Search commands (Ctrl+K)"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white/80 px-2.5 py-2 text-[10px] font-medium text-slate-500 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
+          type="button"
+        >
+          <Search className="h-3.5 w-3.5" />
+          <kbd className="font-mono text-[9px]">Ctrl K</kbd>
+        </button>
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-2 py-1.5 shadow-sm">
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -119,6 +144,9 @@ export function PagesBar() {
           <Play className="h-3.5 w-3.5 fill-white" /> Present
         </button>
       </div>
+
+      {/* ⌘K command palette */}
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </div>
   );
 }
