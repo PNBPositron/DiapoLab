@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { Sidebar } from "@/components/editor/Sidebar";
 import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
-import { CommandPalette } from "@/components/editor/CommandPalette";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -26,20 +23,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Editor() {
-  const [paletteOpen, setPaletteOpen] = useState(false);
-
-  // ⌘K / Ctrl+K — toggle command palette
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setPaletteOpen((v) => !v);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   return (
     <div className="relative flex h-screen flex-col overflow-hidden bg-white" style={{ background: "linear-gradient(180deg, #ffffff 0%, #ffffff 60%, #f5f9ff 100%)" }}>
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
@@ -62,20 +45,6 @@ function Editor() {
       </div>
       <PagesBar />
       <PresentationMode />
-
-      {/* ⌘K palette trigger — floating, bottom-right */}
-      {!paletteOpen && (
-        <button
-          onClick={() => setPaletteOpen(true)}
-          title="Search commands (Ctrl+K)"
-          className="fixed bottom-16 right-5 z-30 flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/90 px-2.5 py-1.5 text-xs text-slate-500 shadow-md backdrop-blur transition hover:border-sky-400 hover:text-sky-600"
-        >
-          <Search className="size-3.5" />
-          <kbd className="font-mono text-[10px]">Ctrl K</kbd>
-        </button>
-      )}
-
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </div>
   );
 }
