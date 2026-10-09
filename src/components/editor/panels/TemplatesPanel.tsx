@@ -14,6 +14,7 @@ import {
 import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 import { Dropdown } from "../ui/Dropdown";
+import { ensureFontsForPages } from "@/lib/fontLoader";
 
 export function TemplatesPanel() {
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +35,9 @@ export function TemplatesPanel() {
     listPublicTemplates()
       .then(async (tpls) => {
         setCommunity(tpls);
+        // Preload every font family referenced by the templates' slides so
+        // thumbnails render with the correct fonts instead of fallbacks.
+        tpls.forEach((t) => ensureFontsForPages(t.pages as never));
         const ids = tpls.map((t) => t.id);
         const [counts, mine] = await Promise.all([
           listTemplateLikeCounts(ids),
@@ -100,7 +104,7 @@ export function TemplatesPanel() {
       )}
 
       {/* Search + filtres */}
-        <div className="relative z-30 space-y-3 px-4">
+      <div className="relative z-30 space-y-3 px-4">
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
