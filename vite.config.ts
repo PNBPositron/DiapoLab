@@ -29,16 +29,20 @@ export default defineConfig(({ mode }) => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   return {
+    tanstackStart: {
+      server: { entry: "server" },
+    },
+    envPrefix: ["VITE_", "NEXT_PUBLIC_", "SUPABASE_"],
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
         supabasePublishableKey,
       ),
+      "import.meta.env.SUPABASE_URL": JSON.stringify(supabaseUrl),
+      "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
+        supabasePublishableKey,
+      ),
     },
-    tanstackStart: {
-      server: { entry: "server" },
-    },
-    vite: {
     // TanStack's SSR/client entrypoints are resolved by the router runtime.
     // Excluding them prevents Vite from serving stale optimized-dependency
     // URLs after a lockfile or package-version change.
@@ -49,7 +53,6 @@ export default defineConfig(({ mode }) => {
         "@tanstack/router-core",
         "@tanstack/history",
       ],
-    },
     },
   };
 });
