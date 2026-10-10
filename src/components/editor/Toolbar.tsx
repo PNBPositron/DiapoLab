@@ -698,6 +698,9 @@ function LargeModernHamburger({
             />
           )}
           
+          {/* SEPARATOR */}
+          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+          
           {isAuthenticated && (
             <MenuCardItem
             icon={Github}
