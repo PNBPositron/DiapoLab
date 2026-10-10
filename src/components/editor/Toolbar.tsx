@@ -537,7 +537,7 @@ export function Toolbar() {
 
       {/* About dialog */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-<DialogContent className="max-w-md overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/80 p-0 text-slate-700 shadow-[0_24px_80px_-24px_rgba(15,23,42,0.38)] backdrop-blur-2xl">
+<DialogContent className="max-w-sm overflow-hidden rounded-2xl border border-white/70 bg-white/75 p-0 text-slate-700 shadow-[0_20px_60px_-24px_rgba(15,23,42,0.32)] backdrop-blur-2xl">
   <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-blue-900 px-6 pb-7 pt-8 text-white">
     <div className="absolute -right-12 -top-16 size-44 rounded-full bg-blue-400/20 blur-2xl" />
     <div className="absolute -bottom-20 left-1/3 size-40 rounded-full bg-fuchsia-400/20 blur-3xl" />

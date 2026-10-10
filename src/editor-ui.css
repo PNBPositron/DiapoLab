@@ -239,9 +239,9 @@
 .editor-side-panel {
   width: 280px;
   padding: 12px;
-  background: var(--selector-surface);
+  background: color-mix(in srgb, var(--selector-surface) 38%, transparent);
   color: var(--selector-ink);
-  border-color: var(--selector-border);
+  border-color: color-mix(in srgb, var(--selector-border) 55%, transparent);
   box-shadow: var(--selector-panel-shadow);
   overflow-x: hidden;
   scrollbar-gutter: stable;

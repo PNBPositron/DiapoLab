@@ -6,13 +6,22 @@ import {
   Star,
   Search,
   ImagePlus,
+  Loader2,
+  Camera,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 
-type ElementSection = "shapes" | "icons" | null;
+type ElementSection = "shapes" | "icons" | "unsplash" | null;
+
+type UnsplashPhoto = {
+  id: string;
+  alt_description: string | null;
+  urls: { small: string; regular: string };
+  user: { name: string; links: { html: string } };
+};
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.entries(LucideIcons)
   .filter(([name, icon]) => {
@@ -79,6 +88,10 @@ export function ElementsPanel() {
   const [imageUrl, setImageUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [unsplashQuery, setUnsplashQuery] = useState("abstract presentation");
+  const [unsplashPhotos, setUnsplashPhotos] = useState<UnsplashPhoto[]>([]);
+  const [unsplashLoading, setUnsplashLoading] = useState(false);
+  const [unsplashError, setUnsplashError] = useState<string | null>(null);
   const filteredIcons = ICONS.filter(({ label }) =>
     label.toLowerCase().includes(iconQuery.trim().toLowerCase()),
   );
@@ -93,6 +106,28 @@ export function ElementsPanel() {
     }
     add(newImage(trimmed));
     setImageUrl("");
+  };
+
+  const searchUnsplash = async () => {
+    const key = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
+    if (!key) {
+      setUnsplashError("Unsplash access key is not configured.");
+      return;
+    }
+    setUnsplashLoading(true);
+    setUnsplashError(null);
+    try {
+      const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(unsplashQuery || "abstract presentation")}&per_page=12`, {
+        headers: { Authorization: `Client-ID ${key}` },
+      });
+      if (!response.ok) throw new Error("Unable to load Unsplash images.");
+      const data = (await response.json()) as { results: UnsplashPhoto[] };
+      setUnsplashPhotos(data.results);
+    } catch (error) {
+      setUnsplashError(error instanceof Error ? error.message : "Unable to load Unsplash images.");
+    } finally {
+      setUnsplashLoading(false);
+    }
   };
 
   const addFile = async (file: File) => {
@@ -160,9 +195,47 @@ export function ElementsPanel() {
           active={section === "icons"}
           onClick={() => setSection(section === "icons" ? null : "icons")}
         />
+        <ActionTile
+          Icon={Camera}
+          label="Unsplash"
+          active={section === "unsplash"}
+          onClick={() => setSection(section === "unsplash" ? null : "unsplash")}
+        />
       </div>
 
       {section === "shapes" && <ShapesPanel embedded />}
+
+      {section === "unsplash" && (
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-400 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.14)]">
+            <Search className="size-4" />
+            <input
+              value={unsplashQuery}
+              onChange={(event) => setUnsplashQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) void searchUnsplash();
+              }}
+              placeholder="Search Unsplash"
+              aria-label="Search Unsplash"
+              className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
+            />
+            <button type="button" onClick={() => void searchUnsplash()} disabled={unsplashLoading} className="grid size-7 shrink-0 place-items-center rounded-lg bg-slate-900 text-white transition hover:bg-slate-700 disabled:opacity-60" aria-label="Search Unsplash">
+              {unsplashLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Search className="size-3.5" />}
+            </button>
+          </label>
+          {unsplashError && <p className="px-1 text-[10px] font-medium text-rose-500">{unsplashError}</p>}
+          <div className="grid grid-cols-2 gap-2">
+            {unsplashPhotos.map((photo) => (
+              <button key={photo.id} type="button" onClick={() => add(newImage(photo.urls.regular))} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100" title={`Add photo by ${photo.user.name}`}>
+                <img src={photo.urls.small} alt={photo.alt_description || `Unsplash photo by ${photo.user.name}`} className="size-full object-cover transition duration-300 group-hover:scale-105" />
+                <span className="absolute inset-x-1 bottom-1 truncate rounded-md bg-slate-950/60 px-1.5 py-1 text-left text-[8px] text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">{photo.user.name}</span>
+              </button>
+            ))}
+          </div>
+          {unsplashPhotos.length === 0 && !unsplashLoading && <p className="py-3 text-center text-[10px] text-slate-400">Search for a photo to add to your slide.</p>}
+          <p className="text-[9px] text-slate-400">Photos by Unsplash creators. Click an image to add it.</p>
+        </div>
+      )}
 
       {section === "icons" && (
         <div className="flex flex-col gap-3">
