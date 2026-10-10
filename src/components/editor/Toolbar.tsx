@@ -10,6 +10,7 @@ import {
   Cloud,
   LogOut,
   FilePlus,
+  Github,
   Loader2,
   User as UserIcon,
   ChevronDown,
@@ -695,7 +696,16 @@ function LargeModernHamburger({
               subtitle="Account & editing preferences"
               onClick={() => handleAction(onSettings)}
             />
-          )
+          )}
+
+            <MenuCardItem
+            icon={Github}
+            iconColor="text-slate-800"
+            iconBg="bg-slate-100 group-hover:bg-slate-200/80"
+            title="GitHub repository"
+            subtitle="Source code · issues & contributions"
+            onClick={() => handleAction(() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer"))}
+          />
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
