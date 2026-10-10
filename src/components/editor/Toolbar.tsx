@@ -266,7 +266,7 @@ export function Toolbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200/80 bg-white/80 px-4 backdrop-blur-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)]">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-white/60 bg-white/35 px-4 backdrop-blur-2xl shadow-[0_2px_15px_-3px_rgba(15,23,42,0.05)]">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
@@ -537,48 +537,37 @@ export function Toolbar() {
 
       {/* About dialog */}
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="max-w-sm rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
-          <DialogHeader className="text-left">
-            <DialogTitle className="font-display text-lg tracking-[0.16em] text-slate-900">
-              DIAPOLAB
-            </DialogTitle>
-            <DialogDescription className="font-mono text-xs leading-relaxed text-slate-500">
-              A next-generation creative presentation studio.
-            </DialogDescription>
-          </DialogHeader>
-          <nav className="mt-3 flex flex-col gap-2">
-            <a
-              href="https://github.com/PNBPositron/positronstudio-project"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
-            >
-              GITHUB <ExternalLink className="size-3.5 opacity-60" />
-            </a>
-            <Link
-              to="/privacypolicy"
-              onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
-            >
-              PRIVACY POLICY →
-            </Link>
-            <Link
-              to="/license"
-              onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
-            >
-              LICENSE →
-            </Link>
-            <Link
-              to="/marketplace"
-              onClick={() => setAboutOpen(false)}
-              className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/50 px-3.5 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100"
-            >
-              MARKETPLACE →
-            </Link>
-          </nav>
-        </DialogContent>
+<DialogContent className="max-w-md overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/80 p-0 text-slate-700 shadow-[0_24px_80px_-24px_rgba(15,23,42,0.38)] backdrop-blur-2xl">
+  <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-blue-900 px-6 pb-7 pt-8 text-white">
+    <div className="absolute -right-12 -top-16 size-44 rounded-full bg-blue-400/20 blur-2xl" />
+    <div className="absolute -bottom-20 left-1/3 size-40 rounded-full bg-fuchsia-400/20 blur-3xl" />
+    <DialogHeader className="relative text-left">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-white/12 ring-1 ring-white/20 backdrop-blur-sm">
+          <Sparkles className="size-5 text-blue-200" />
+        </div>
+        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-blue-100">Studio 01</span>
+      </div>
+      <DialogTitle className="font-display text-2xl tracking-[0.18em] text-white">DIAPOLAB</DialogTitle>
+      <DialogDescription className="mt-2 max-w-xs font-mono text-xs leading-relaxed text-blue-100/75">A focused creative studio for turning sharp ideas into memorable slides.</DialogDescription>
+    </DialogHeader>
+    <div className="relative mt-7 grid grid-cols-3 gap-2 border-t border-white/15 pt-4">
+      <div><p className="font-display text-sm font-semibold text-white">Create</p><p className="mt-1 font-mono text-[10px] text-blue-100/60">without friction</p></div>
+      <div><p className="font-display text-sm font-semibold text-white">Compose</p><p className="mt-1 font-mono text-[10px] text-blue-100/60">with intention</p></div>
+      <div><p className="font-display text-sm font-semibold text-white">Share</p><p className="mt-1 font-mono text-[10px] text-blue-100/60">with confidence</p></div>
+    </div>
+  </div>
+  <div className="flex flex-col gap-2 p-5">
+    <p className="px-1 pb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">Explore DiapoLab</p>
+    <a href="https://github.com/PNBPositron/positronstudio-project" target="_blank" rel="noreferrer" onClick={() => setAboutOpen(false)} className="group flex items-center justify-between rounded-xl border border-slate-200/70 bg-white/60 px-4 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/60 hover:shadow-md">GITHUB <ExternalLink className="size-3.5 text-slate-400 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></a>
+    <Link to="/marketplace" onClick={() => setAboutOpen(false)} className="group flex items-center justify-between rounded-xl border border-slate-200/70 bg-white/60 px-4 py-3 font-display text-xs tracking-wider text-slate-700 transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/60 hover:shadow-md">MARKETPLACE <span className="text-slate-400 transition-transform group-hover:translate-x-1">→</span></Link>
+    <div className="grid grid-cols-2 gap-2">
+      <Link to="/privacypolicy" onClick={() => setAboutOpen(false)} className="rounded-xl border border-slate-200/70 bg-white/40 px-3 py-2.5 text-center font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:bg-slate-100">Privacy</Link>
+      <Link to="/license" onClick={() => setAboutOpen(false)} className="rounded-xl border border-slate-200/70 bg-white/40 px-3 py-2.5 text-center font-mono text-[10px] uppercase tracking-wider text-slate-500 transition-colors hover:bg-slate-100">License</Link>
+    </div>
+    <p className="pt-2 text-center font-mono text-[10px] text-slate-400">Made for ideas worth presenting.</p>
+  </div>
+  </DialogContent>
       </Dialog>
 
       {/* Published link notification */}

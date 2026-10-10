@@ -396,7 +396,7 @@ export function CommandPalette({
         label: "Live app",
         group: "Links",
         icon: <Globe className="size-4" />,
-        href: window.location.origin,
+        href: typeof window === "undefined" ? "/" : window.location.origin,
         keywords: "app live deploy site",
       },
       {
