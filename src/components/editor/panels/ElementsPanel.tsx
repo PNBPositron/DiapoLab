@@ -120,7 +120,11 @@ export function ElementsPanel() {
       const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(unsplashQuery || "abstract presentation")}&per_page=12`, {
         headers: { Authorization: `Client-ID ${key}` },
       });
-      if (!response.ok) throw new Error("Unable to load Unsplash images.");
+      if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        if (response.status === 401) throw new Error("Unsplash rejected the access key. Check the VITE_UNSPLASH_ACCESS_KEY value and restart the preview.");
+        throw new Error(`Unsplash request failed (${response.status})${detail ? `: ${detail.slice(0, 120)}` : ""}`);
+      }
       const data = (await response.json()) as { results: UnsplashPhoto[] };
       setUnsplashPhotos(data.results);
     } catch (error) {
