@@ -698,6 +698,7 @@ function LargeModernHamburger({
             />
           )}
           
+          {isAuthenticated && (
             <MenuCardItem
             icon={Github}
             iconColor="text-slate-800"
@@ -706,6 +707,7 @@ function LargeModernHamburger({
             subtitle="Source code · issues & contributions"
             onClick={() => handleAction(() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer"))}
           />
+          )}
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
