@@ -347,13 +347,18 @@ export function PropertiesPanel() {
 
   const el = elements.find((e) => e.id === selectedId);
 
+    // Reset popovers + JSON draft ONLY when the selection changes — not on
+  // every property edit. Reading the element via getState() avoids putting
+  // `el` in the deps (a new object reference on each update would re-run
+  // this effect and collapse the inspector while editing).
   useEffect(() => {
     setAdvancedOpen(false);
     setColorPaletteOpen(false);
-    setJsonDraft(el ? JSON.stringify(el, null, 2) : "");
     setJsonError(null);
-  }, [selectedId, el]);
-
+    const current = useEditor.getState().elements.find((e) => e.id === selectedId);
+    setJsonDraft(current ? JSON.stringify(current, null, 2) : "");
+  }, [selectedId]);
+  
   if (!el) return null;
 
   // Quick Bar (floating, contextual & immediate)
