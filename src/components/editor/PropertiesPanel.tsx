@@ -342,13 +342,17 @@ export function PropertiesPanel() {
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [colorPaletteOpen, setColorPaletteOpen] = useState(false);
+  const [jsonDraft, setJsonDraft] = useState("");
+  const [jsonError, setJsonError] = useState<string | null>(null);
 
   const el = elements.find((e) => e.id === selectedId);
 
   useEffect(() => {
     setAdvancedOpen(false);
     setColorPaletteOpen(false);
-  }, [selectedId]);
+    setJsonDraft(el ? JSON.stringify(el, null, 2) : "");
+    setJsonError(null);
+  }, [selectedId, el]);
 
   if (!el) return null;
 
@@ -804,8 +808,8 @@ export function PropertiesPanel() {
                 <Field label="Effect">
                   <Dropdown
                     value={el.effect ?? "none"}
-                    options={SHAPE_EFFECTS}
-                    onChange={(v) => update(el.id, { effect: v })}
+                    options={SHAPE_EFFECTS.map((option) => ({ ...option, value: option.value ?? "none" }))}
+                    onChange={(v) => update(el.id, { effect: v as ShapeElement["effect"] })}
                   />
                 </Field>
                 <Field label="Fill">
@@ -857,6 +861,26 @@ export function PropertiesPanel() {
                     onChange={(val) => update(el.id, { cornerRadius: val })}
                   />
                 )}
+              </Section>
+            )}
+
+            {/* ICON ELEMENT */}
+            {el.type === "icon" && (
+              <Section title="Icon styling">
+                <ModernColorPicker
+                  label="Icon Color"
+                  value={el.color}
+                  onChange={(color) => update(el.id, { color })}
+                />
+                <SliderWithInput
+                  label="Stroke Width"
+                  min={0.5}
+                  max={6}
+                  step={0.5}
+                  value={el.strokeWidth}
+                  unit="px"
+                  onChange={(strokeWidth) => update(el.id, { strokeWidth })}
+                />
               </Section>
             )}
 
@@ -1253,6 +1277,10 @@ export function PropertiesPanel() {
                     { value: "fade-up", label: "Fade Up" },
                     { value: "pop", label: "Pop Spring" },
                     { value: "glitch", label: "Digital Glitch" },
+                    { value: "move-left", label: "Move Left" },
+                    { value: "move-right", label: "Move Right" },
+                    { value: "move-up", label: "Move Up" },
+                    { value: "move-down", label: "Move Down" },
                   ]}
                   onChange={(v) => update(el.id, { animation: v as any })}
                 />
@@ -1282,6 +1310,30 @@ export function PropertiesPanel() {
                   </>
                 );
               })()}
+            </Section>
+
+            <Section title="Element JSON" defaultOpen={false}>
+              <p className="text-[10px] leading-relaxed text-slate-500">Edit the selected element&apos;s properties directly. The id and type are locked.</p>
+              <textarea
+                value={jsonDraft}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  setJsonDraft(next);
+                  try {
+                    const parsed = JSON.parse(next) as Record<string, unknown>;
+                    if (parsed.id !== el.id || parsed.type !== el.type) throw new Error("id and type cannot be changed");
+                    const { id: _id, type: _type, ...patch } = parsed;
+                    update(el.id, patch as Partial<typeof el>);
+                    setJsonError(null);
+                  } catch (error) {
+                    setJsonError(error instanceof Error ? error.message : "Invalid JSON");
+                  }
+                }}
+                spellCheck={false}
+                aria-label="Selected element JSON"
+                className="min-h-48 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+              />
+              {jsonError && <p className="text-[10px] font-medium text-rose-500">{jsonError}</p>}
             </Section>
 
             {/* LAYER ORDER ACTIONS */}

@@ -232,7 +232,15 @@
 @keyframes el-glitch { 0% { opacity: 0; transform: translate(-6px); filter: hue-rotate(0) saturate(2); } 50% { opacity: 1; transform: translate(6px, -3px); filter: hue-rotate(120deg); } 100% { opacity: 1; transform: translate(0); filter: none; } }
 .el-anim-fade-up { animation: el-fade-up 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 .el-anim-pop { animation: el-pop 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.el-anim-glitch { animation: el-glitch 600ms steps(8, end) both; }
+  .el-anim-glitch { animation: el-glitch 600ms steps(8, end) both; }
+  @keyframes el-move-left { from { opacity: 0; transform: translateX(90px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes el-move-right { from { opacity: 0; transform: translateX(-90px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes el-move-up { from { opacity: 0; transform: translateY(70px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes el-move-down { from { opacity: 0; transform: translateY(-70px); } to { opacity: 1; transform: translateY(0); } }
+  .el-anim-move-left { animation: el-move-left 620ms cubic-bezier(0.22,1,0.36,1) both; }
+  .el-anim-move-right { animation: el-move-right 620ms cubic-bezier(0.22,1,0.36,1) both; }
+  .el-anim-move-up { animation: el-move-up 620ms cubic-bezier(0.22,1,0.36,1) both; }
+  .el-anim-move-down { animation: el-move-down 620ms cubic-bezier(0.22,1,0.36,1) both; }
 .el-hover-glitch { animation: el-glitch 420ms steps(8, end) infinite; }
 @keyframes morph-item-in { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
 .morph-item { animation: morph-item-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }

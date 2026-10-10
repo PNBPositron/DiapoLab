@@ -16,7 +16,7 @@ export type ElementBase = {
   shadow?: ElementShadow;
 };
 
-export type ElementAnimation = "none" | "fade-up" | "pop" | "glitch";
+export type ElementAnimation = "none" | "fade-up" | "pop" | "glitch" | "move-left" | "move-right" | "move-up" | "move-down";
 export type SlideTransition =
   | "none"
   | "fade"
