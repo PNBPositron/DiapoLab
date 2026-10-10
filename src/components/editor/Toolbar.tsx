@@ -10,7 +10,7 @@ import {
   Cloud,
   LogOut,
   FilePlus,
-  GitHub,
+  Github,
   Loader2,
   User as UserIcon,
   ChevronDown,
@@ -696,12 +696,8 @@ function LargeModernHamburger({
               subtitle="Account & editing preferences"
               onClick={() => handleAction(onSettings)}
             />
-          )}
+          )
           
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-          
-          {isAuthenticated && (
             <MenuCardItem
             icon={Github}
             iconColor="text-slate-800"
