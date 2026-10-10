@@ -3,6 +3,7 @@ import { X, Loader2, Trash2, Layers, FilePlus2, HardDriveDownload } from "lucide
 import { listDesigns, deleteDesign, type SavedDesign } from "@/lib/designs";
 import { useEditor } from "@/store/editor";
 import { SlideThumbnail } from "./SlideThumbnail";
+import { ensureFontsForPages } from "@/lib/fontLoader";
 
 export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
   const { loadDesign } = useEditor();
@@ -13,7 +14,11 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
   const refresh = async () => {
     setError(null);
     try {
-      setItems(await listDesigns());
+      const designs = await listDesigns();
+      // Preload every font family referenced by the saved designs so
+      // thumbnails render with the correct fonts instead of fallbacks.
+      designs.forEach((d) => ensureFontsForPages(d.pages as never));
+      setItems(designs);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }
@@ -24,6 +29,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
   }, []);
 
   const handleOpen = (d: SavedDesign) => {
+    // Also ensure fonts before loading the design onto the canvas
+    ensureFontsForPages(d.pages as never);
     loadDesign({
       id: d.id,
       name: d.name,
