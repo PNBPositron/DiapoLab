@@ -199,9 +199,9 @@ export function TemplatesPanel() {
           )}
         </div>
 
-        {/* Style — compact color-dot chips */}
-        <div className="flex items-center gap-2">
-          <span className="flex w-16 shrink-0 items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+        {/* Style — titre au-dessus des chips */}
+        <div>
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
             <SlidersHorizontal className="size-2.5" />
             Style
           </span>
@@ -225,22 +225,50 @@ export function TemplatesPanel() {
           </div>
         </div>
 
-        {/* Creator + License chips */}
-        <div className="space-y-1.5">
-          <FilterChips
-            icon={<Users className="size-2.5" />}
-            label="Creator"
-            options={["all", "builtin", "community"]}
-            value={creatorFilter}
-            onChange={setCreatorFilter}
-          />
-          <FilterChips
-            icon={<Layers className="size-2.5" />}
-            label="License"
-            options={["all", "CC0", "community"]}
-            value={licenseFilter}
-            onChange={setLicenseFilter}
-          />
+        {/* Creator — titre au-dessus des chips */}
+        <div>
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <Users className="size-2.5" />
+            Creator
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {["all", "builtin", "community"].map((o) => (
+              <button
+                key={o}
+                onClick={() => setCreatorFilter(o)}
+                className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
+                  creatorFilter === o
+                    ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* License — titre au-dessus des chips */}
+        <div>
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <Layers className="size-2.5" />
+            License
+          </span>
+          <div className="flex flex-wrap gap-1">
+            {["all", "CC0", "community"].map((o) => (
+              <button
+                key={o}
+                onClick={() => setLicenseFilter(o)}
+                className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
+                  licenseFilter === o
+                    ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
         </div>
 
         {activeFilters > 0 && (
@@ -330,7 +358,7 @@ export function TemplatesPanel() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Style chip — minimal, one line, colored dot                         */
+/* Style chip — minimal, colored dot, live count                       */
 /* ------------------------------------------------------------------ */
 
 function StyleChip({
@@ -362,48 +390,6 @@ function StyleChip({
         {count}
       </span>
     </button>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Filter chips (creator / license)                                     */
-/* ------------------------------------------------------------------ */
-
-function FilterChips({
-  icon,
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="flex w-16 shrink-0 items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
-        {icon}
-        {label}
-      </span>
-      <div className="flex flex-wrap gap-1">
-        {options.map((o) => (
-          <button
-            key={o}
-            onClick={() => onChange(o)}
-            className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
-              value === o
-                ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
-            }`}
-          >
-            {o}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
