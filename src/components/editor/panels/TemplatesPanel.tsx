@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Heart, LayoutGrid, Search, SlidersHorizontal, Users, Sparkles, Download, Layers } from "lucide-react";
+import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, Check } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -16,6 +16,94 @@ import { useAuth } from "@/hooks/use-auth";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 
 /* ------------------------------------------------------------------ */
+/* Style definitions — each style gets a visual swatch                 */
+/* ------------------------------------------------------------------ */
+
+export const TEMPLATE_STYLES = ["cyber", "glass", "neobrutalist", "minimal", "corporate"] as const;
+export type TemplateStyle = (typeof TEMPLATE_STYLES)[number];
+
+const STYLE_META: Record<
+  TemplateStyle,
+  { label: string; gradient: string; glyph: string }
+> = {
+  cyber: {
+    label: "Cyber",
+    gradient: "linear-gradient(135deg, #0ea5e9 0%, #7c3aed 55%, #0a0f1f 100%)",
+    glyph: "◉ ⚡ ◉",
+  },
+  glass: {
+    label: "Glass",
+    gradient:
+      "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.6) 45%, rgba(147,197,253,0.45) 100%)",
+    glyph: "▤ ▢ ▤",
+  },
+  neobrutalist: {
+    label: "Brutal",
+    gradient: "linear-gradient(135deg, #ffd84a 0%, #ff6b6b 100%)",
+    glyph: "▮ ▮ ▮",
+  },
+  minimal: {
+    label: "Minimal",
+    gradient: "linear-gradient(135deg, #fafafa 0%, #e2e8f0 100%)",
+    glyph: "— · —",
+  },
+  corporate: {
+    label: "Corporate",
+    gradient: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+    glyph: "▤ ▤ ▥",
+  },
+};
+
+/* Legacy styles stored in Supabase before the rename */
+const LEGACY_STYLES: Record<string, TemplateStyle> = {
+  editorial: "minimal",
+  bold: "neobrutalist",
+};
+
+function normalizeStyle(raw?: string | null): TemplateStyle {
+  if (!raw) return "minimal";
+  const clean = raw.trim().toLowerCase();
+  if ((TEMPLATE_STYLES as readonly string[]).includes(clean)) return clean as TemplateStyle;
+  return LEGACY_STYLES[clean] ?? "minimal";
+}
+
+function inferTemplateStyle(template: PublicTemplate): TemplateStyle {
+  const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
+
+  if (
+    text.includes("cyber") || text.includes("neon") || text.includes("glitch") ||
+    text.includes("synthwave") || /\b(orbitron|zen dots|rampart|unbounded|major mono)\b/i.test(text)
+  ) return "cyber";
+
+  if (
+    text.includes("glass") || text.includes("frosted") || text.includes("liquid") ||
+    text.includes("translucent") || text.includes("blur")
+  ) return "glass";
+
+  if (
+    text.includes("brutal") || text.includes("loud") || text.includes("poster") ||
+    text.includes("sticker") || /\b(archivo black|anton|bungee|shrikhand|tilt prism)\b/i.test(text)
+  ) return "neobrutalist";
+
+  if (
+    text.includes("corporate") || text.includes("business") || text.includes("report") ||
+    text.includes("pitch") || text.includes("professional") || text.includes("deck")
+  ) return "corporate";
+
+  return "minimal";
+}
+
+function getStyle(template: PublicTemplate): TemplateStyle {
+  const raw = template.style;
+  if (!raw || !(TEMPLATE_STYLES as readonly string[]).includes(raw.trim().toLowerCase())) {
+    // stored value is missing or legacy — infer from content, unless it's a legacy name we can map
+    if (raw && LEGACY_STYLES[raw.trim().toLowerCase()]) return normalizeStyle(raw);
+    return inferTemplateStyle(template);
+  }
+  return raw.trim().toLowerCase() as TemplateStyle;
+}
+
+/* ------------------------------------------------------------------ */
 /* Panel                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -29,7 +117,7 @@ export function TemplatesPanel() {
   const [showAll, setShowAll] = useState(false);
   const [sortBy, setSortBy] = useState<"likes" | "recent">("likes");
   const [query, setQuery] = useState("");
-  const [styleFilter, setStyleFilter] = useState("all");
+  const [styleFilter, setStyleFilter] = useState<"all" | TemplateStyle>("all");
   const [creatorFilter, setCreatorFilter] = useState("all");
   const [licenseFilter, setLicenseFilter] = useState("all");
 
@@ -118,8 +206,9 @@ export function TemplatesPanel() {
         </div>
       )}
 
-      {/* Search + filtres — clean card */}
+      {/* Search + filtres */}
       <div className="relative z-30 space-y-2.5 px-4">
+        {/* Search */}
         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
@@ -138,15 +227,42 @@ export function TemplatesPanel() {
           )}
         </div>
 
-        {/* Chips de filtres — un toggle par valeur, plus de dropdowns */}
+        {/* Style picker — visual swatches */}
+        <div>
+          <span className="mb-1.5 block text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            Style
+          </span>
+          <div className="grid grid-cols-3 gap-1.5">
+            {/* "All" card */}
+            <StyleSwatch
+              active={styleFilter === "all"}
+              onClick={() => setStyleFilter("all")}
+              gradient="conic-gradient(from 0deg, #7df9ff, #bfdbfe, #ffd84a, #3b82f6, #7df9ff)"
+              label="All"
+              count={community.length}
+              rainbow
+            />
+            {TEMPLATE_STYLES.map((s) => {
+              const meta = STYLE_META[s];
+              const count = community.filter((t) => getStyle(t) === s).length;
+              return (
+                <StyleSwatch
+                  key={s}
+                  active={styleFilter === s}
+                  onClick={() => setStyleFilter(styleFilter === s ? "all" : s)}
+                  gradient={meta.gradient}
+                  label={meta.label}
+                  count={count}
+                  glyph={meta.glyph}
+                  dark={s === "cyber" || s === "neobrutalist" || s === "corporate"}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Creator + License chips */}
         <div className="space-y-1.5">
-          <FilterChips
-            icon={<SlidersHorizontal className="size-2.5" />}
-            label="Style"
-            options={["all", "editorial", "bold", "minimal"]}
-            value={styleFilter}
-            onChange={setStyleFilter}
-          />
           <FilterChips
             icon={<Users className="size-2.5" />}
             label="Creator"
@@ -250,7 +366,81 @@ export function TemplatesPanel() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Filter chips                                                        */
+/* Style swatch — the visual style filter card                          */
+/* ------------------------------------------------------------------ */
+
+function StyleSwatch({
+  active,
+  onClick,
+  gradient,
+  label,
+  count,
+  glyph,
+  dark,
+  rainbow,
+}: {
+  active: boolean;
+  onClick: () => void;
+  gradient: string;
+  label: string;
+  count: number;
+  glyph?: string;
+  dark?: boolean;
+  rainbow?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-xl border text-left transition-all duration-200 ${
+        active
+          ? "border-blue-600 shadow-[0_0_0_3px_rgba(37,99,235,0.15)]"
+          : "border-slate-200 hover:border-blue-300 hover:shadow-sm"
+      }`}
+    >
+      {/* Gradient preview */}
+      <div
+        className="relative flex h-9 items-center justify-center overflow-hidden"
+        style={{ background: gradient }}
+      >
+        {glyph && (
+          <span
+            className={`font-mono text-[9px] tracking-[0.25em] ${
+              dark ? "text-white/80" : "text-slate-600/70"
+            }`}
+          >
+            {glyph}
+          </span>
+        )}
+        {rainbow && (
+          <span className="rounded-full bg-white/85 px-1.5 py-0.5 text-[8px] font-bold text-slate-700 shadow-sm">
+            ALL
+          </span>
+        )}
+        {/* Active check */}
+        {active && (
+          <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-blue-600 text-white shadow">
+            <Check className="size-2.5" strokeWidth={3} />
+          </span>
+        )}
+      </div>
+      {/* Label + live count */}
+      <div className="flex items-center justify-between gap-1 bg-white px-1.5 py-1">
+        <span
+          className={`text-[9px] font-semibold capitalize ${
+            active ? "text-blue-700" : "text-slate-600"
+          }`}
+        >
+          {label}
+        </span>
+        <span className="font-mono text-[8px] text-slate-400">{count}</span>
+      </div>
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Filter chips (creator / license)                                     */
 /* ------------------------------------------------------------------ */
 
 function FilterChips({
@@ -299,10 +489,7 @@ function TemplateSkeleton() {
   return (
     <div className="space-y-3">
       {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
-        >
+        <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           <div className="aspect-video min-h-[130px] animate-pulse bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100" />
           <div className="space-y-1.5 px-3 py-2.5">
             <div className="h-2.5 w-2/3 animate-pulse rounded bg-slate-100" />
@@ -319,7 +506,7 @@ function TemplateSkeleton() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Template card — cleaner, footer overlay, meta badges                 */
+/* Template card                                                        */
 /* ------------------------------------------------------------------ */
 
 function TemplateCard({
@@ -338,10 +525,10 @@ function TemplateCard({
   onLoad: () => void;
 }) {
   const slides = c.pages?.length ?? 0;
-  const style = c.style ?? "minimal";
+  const style = getStyle(c);
+  const meta = STYLE_META[style];
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_12px_32px_rgba(37,99,235,0.14)]">
-      {/* Preview */}
       <button onClick={onLoad} className="block w-full text-left" title={`Load ${c.name}`}>
         <div className="relative w-full overflow-hidden">
           {c.pages?.[0] ? (
@@ -363,10 +550,25 @@ function TemplateCard({
         </div>
       </button>
 
-      {/* Meta badges — top-left */}
+      {/* Style badge with dot colored per style */}
       <div className="pointer-events-none absolute left-2 top-2 flex gap-1">
-        <span className="rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold capitalize text-white backdrop-blur">
-          {style}
+        <span className="flex items-center gap-1 rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold capitalize text-white backdrop-blur">
+          <span
+            className="size-1.5 rounded-full"
+            style={{
+              background:
+                style === "cyber"
+                  ? "#7df9ff"
+                  : style === "glass"
+                    ? "#bfdbfe"
+                    : style === "neobrutalist"
+                      ? "#ffd84a"
+                      : style === "corporate"
+                        ? "#3b82f6"
+                        : "#e2e8f0",
+            }}
+          />
+          {meta.label}
         </span>
         {slides > 1 && (
           <span className="flex items-center gap-0.5 rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold text-white backdrop-blur">
@@ -400,7 +602,7 @@ function TemplateCard({
           {c.name}
         </div>
         <div className="flex shrink-0 items-center gap-1 text-[9px] font-medium text-slate-400">
-          <Sparkles className="size-2.5" />
+          <Layers className="size-2.5" />
           {slides} slide{slides === 1 ? "" : "s"}
         </div>
       </div>
@@ -409,7 +611,7 @@ function TemplateCard({
 }
 
 /* ------------------------------------------------------------------ */
-/* Logique de filtrage / tri (inchangée)                                 */
+/* Filtrage / tri                                                       */
 /* ------------------------------------------------------------------ */
 
 function filterTemplates(
@@ -419,7 +621,7 @@ function filterTemplates(
   const query = filters.query.trim().toLowerCase();
   return templates.filter((template) => {
     const creator = template.creator ?? (template.user_id === "builtin" ? "builtin" : "community");
-    const style = template.style ?? inferTemplateStyle(template);
+    const style = getStyle(template);
     const license = template.license ?? (template.user_id === "builtin" ? "CC0" : "community");
     return (
       (!query || `${template.name} ${creator} ${style} ${license}`.toLowerCase().includes(query)) &&
@@ -428,13 +630,6 @@ function filterTemplates(
       (filters.license === "all" || license === filters.license)
     );
   });
-}
-
-function inferTemplateStyle(template: PublicTemplate) {
-  const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
-  if (text.includes("quote") || text.includes("editorial")) return "editorial";
-  if (text.includes("launch") || text.includes("bold")) return "bold";
-  return "minimal";
 }
 
 function sortTemplates(
@@ -452,7 +647,7 @@ function sortTemplates(
 }
 
 /* ------------------------------------------------------------------ */
-/* Dialog "Show all" — modernisée                                       */
+/* Dialog "Show all"                                                    */
 /* ------------------------------------------------------------------ */
 
 function AllTemplatesDialog({
