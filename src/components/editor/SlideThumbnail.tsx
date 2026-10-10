@@ -16,6 +16,7 @@ export function SlideThumbnail({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.1);
+  const [fontTick, setFontTick] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
@@ -31,6 +32,18 @@ export function SlideThumbnail({
     return () => obs.disconnect();
   }, [canvasW, canvasH]);
 
+  // Repaint once any pending web font finishes loading, so text never
+  // stays stuck on a fallback font in the thumbnail.
+  useEffect(() => {
+    let alive = true;
+    document.fonts.ready.then(() => {
+      if (alive) setFontTick((t) => t + 1);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   return (
     <div
       ref={ref}
@@ -38,6 +51,7 @@ export function SlideThumbnail({
       style={{ aspectRatio: `${canvasW} / ${canvasH}` }}
     >
       <div
+        key={fontTick}
         className="absolute left-0 top-0 pointer-events-none"
         style={{
           width: canvasW,
