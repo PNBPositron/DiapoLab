@@ -30,7 +30,7 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.e
   })
   .map(([name, Icon]) => ({ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon: Icon as LucideIcon }))
   .sort((a, b) => a.label.localeCompare(b.label))
-  .slice(0, 500);
+  .slice(0, 100);
 
 /* Modern tile: frosted white card, gradient icon chip, blue accent when active. */
 function ActionTile({

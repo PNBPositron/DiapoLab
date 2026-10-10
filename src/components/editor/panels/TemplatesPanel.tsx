@@ -236,7 +236,6 @@ export function TemplatesPanel() {
 
       <AllTemplatesDialog
         open={showAll}
-        onOpenOpenChangeCompat={undefined}
         onOpenChange={setShowAll}
         templates={filteredCommunity}
         likeCounts={likeCounts}

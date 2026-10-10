@@ -26,6 +26,21 @@ const filterCss = (f?: ImageFilters) => {
 const shadowFilter = (s?: ElementShadow) =>
   s ? `drop-shadow(${s.x}px ${s.y}px ${s.blur}px ${s.color})` : "";
 
+const maskClipPath = (kind?: string) => {
+  const clips: Record<string, string> = {
+    circle: "circle(50% at 50% 50%)",
+    triangle: "polygon(50% 0%, 100% 100%, 0% 100%)",
+    diamond: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+    hexagon: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+    pentagon: "polygon(50% 0%, 100% 35%, 80% 100%, 20% 100%, 0% 35%)",
+    octagon: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
+    star: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 100%, 50% 73%, 21% 100%, 32% 57%, 2% 35%, 39% 35%)",
+    heart: "polygon(50% 100%, 8% 45%, 8% 20%, 25% 5%, 50% 25%, 75% 5%, 92% 20%, 92% 45%)",
+    blob: "path(\"M37 6 C62 -2 92 16 94 42 C96 66 78 92 52 95 C26 98 6 80 5 54 C4 30 14 12 37 6 Z\")",
+  };
+  return kind ? clips[kind] : undefined;
+};
+
 const gradientCss = (g: ShapeGradient) =>
   (g.type ?? "linear") === "radial"
     ? `radial-gradient(circle at 50% 50%, ${g.from}, ${g.to})`
@@ -526,7 +541,7 @@ export function CanvasElement({
             height: "100%",
             borderRadius: maskPath ? 0 : (element.cornerRadius ?? 0),
             overflow: "hidden",
-            clipPath: maskPath ? `url("#img-mask-${element.id}")` : undefined,
+            clipPath: maskClipPath(element.maskShape) ?? (maskPath ? `url("#img-mask-${element.id}")` : undefined),
             border:
               !maskPath && element.borderWidth && element.borderWidth > 0
                 ? `${element.borderWidth}px solid ${element.borderColor ?? "#000000"}`
