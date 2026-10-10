@@ -697,7 +697,8 @@ function LargeModernHamburger({
               onClick={() => handleAction(onSettings)}
             />
           )
-          
+            
+          {isAuthenticated && (
             <MenuCardItem
             icon={Github}
             iconColor="text-slate-800"
