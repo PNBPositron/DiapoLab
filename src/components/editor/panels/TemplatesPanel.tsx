@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, Check } from "lucide-react";
+import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -16,42 +16,18 @@ import { useAuth } from "@/hooks/use-auth";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 
 /* ------------------------------------------------------------------ */
-/* Style definitions — each style gets a visual swatch                 */
+/* Style definitions                                                    */
 /* ------------------------------------------------------------------ */
 
 export const TEMPLATE_STYLES = ["cyber", "glass", "neobrutalist", "minimal", "corporate"] as const;
 export type TemplateStyle = (typeof TEMPLATE_STYLES)[number];
 
-const STYLE_META: Record<
-  TemplateStyle,
-  { label: string; gradient: string; glyph: string }
-> = {
-  cyber: {
-    label: "Cyber",
-    gradient: "linear-gradient(135deg, #0ea5e9 0%, #7c3aed 55%, #0a0f1f 100%)",
-    glyph: "◉ ⚡ ◉",
-  },
-  glass: {
-    label: "Glass",
-    gradient:
-      "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(191,219,254,0.6) 45%, rgba(147,197,253,0.45) 100%)",
-    glyph: "▤ ▢ ▤",
-  },
-  neobrutalist: {
-    label: "Brutal",
-    gradient: "linear-gradient(135deg, #ffd84a 0%, #ff6b6b 100%)",
-    glyph: "▮ ▮ ▮",
-  },
-  minimal: {
-    label: "Minimal",
-    gradient: "linear-gradient(135deg, #fafafa 0%, #e2e8f0 100%)",
-    glyph: "— · —",
-  },
-  corporate: {
-    label: "Corporate",
-    gradient: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
-    glyph: "▤ ▤ ▥",
-  },
+const STYLE_META: Record<TemplateStyle, { label: string; dot: string }> = {
+  cyber: { label: "Cyber", dot: "#22d3ee" },
+  glass: { label: "Glass", dot: "#bfdbfe" },
+  neobrutalist: { label: "Brutal", dot: "#ffd84a" },
+  minimal: { label: "Minimal", dot: "#e2e8f0" },
+  corporate: { label: "Corporate", dot: "#3b82f6" },
 };
 
 /* Legacy styles stored in Supabase before the rename */
@@ -95,16 +71,12 @@ function inferTemplateStyle(template: PublicTemplate): TemplateStyle {
 
 function getStyle(template: PublicTemplate): TemplateStyle {
   const raw = template.style;
-  if (!raw || !(TEMPLATE_STYLES as readonly string[]).includes(raw.trim().toLowerCase())) {
-    // stored value is missing or legacy — infer from content, unless it's a legacy name we can map
-    if (raw && LEGACY_STYLES[raw.trim().toLowerCase()]) return normalizeStyle(raw);
-    return inferTemplateStyle(template);
-  }
-  return raw.trim().toLowerCase() as TemplateStyle;
+  if (!raw) return inferTemplateStyle(template);
+  return normalizeStyle(raw);
 }
 
 /* ------------------------------------------------------------------ */
-/* Panel                                                               */
+/* Panel                                                                */
 /* ------------------------------------------------------------------ */
 
 export function TemplatesPanel() {
@@ -227,37 +199,29 @@ export function TemplatesPanel() {
           )}
         </div>
 
-        {/* Style picker — visual swatches */}
-        <div>
-          <span className="mb-1.5 block text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+        {/* Style — compact color-dot chips */}
+        <div className="flex items-center gap-2">
+          <span className="flex w-16 shrink-0 items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <SlidersHorizontal className="size-2.5" />
             Style
           </span>
-          <div className="grid grid-cols-3 gap-1.5">
-            {/* "All" card */}
-            <StyleSwatch
+          <div className="flex flex-wrap gap-1">
+            <StyleChip
               active={styleFilter === "all"}
               onClick={() => setStyleFilter("all")}
-              gradient="conic-gradient(from 0deg, #7df9ff, #bfdbfe, #ffd84a, #3b82f6, #7df9ff)"
               label="All"
               count={community.length}
-              rainbow
             />
-            {TEMPLATE_STYLES.map((s) => {
-              const meta = STYLE_META[s];
-              const count = community.filter((t) => getStyle(t) === s).length;
-              return (
-                <StyleSwatch
-                  key={s}
-                  active={styleFilter === s}
-                  onClick={() => setStyleFilter(styleFilter === s ? "all" : s)}
-                  gradient={meta.gradient}
-                  label={meta.label}
-                  count={count}
-                  glyph={meta.glyph}
-                  dark={s === "cyber" || s === "neobrutalist" || s === "corporate"}
-                />
-              );
-            })}
+            {TEMPLATE_STYLES.map((s) => (
+              <StyleChip
+                key={s}
+                active={styleFilter === s}
+                onClick={() => setStyleFilter(styleFilter === s ? "all" : s)}
+                label={STYLE_META[s].label}
+                dot={STYLE_META[s].dot}
+                count={community.filter((t) => getStyle(t) === s).length}
+              />
+            ))}
           </div>
         </div>
 
@@ -366,75 +330,37 @@ export function TemplatesPanel() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Style swatch — the visual style filter card                          */
+/* Style chip — minimal, one line, colored dot                         */
 /* ------------------------------------------------------------------ */
 
-function StyleSwatch({
+function StyleChip({
   active,
   onClick,
-  gradient,
   label,
   count,
-  glyph,
-  dark,
-  rainbow,
+  dot,
 }: {
   active: boolean;
   onClick: () => void;
-  gradient: string;
   label: string;
   count: number;
-  glyph?: string;
-  dark?: boolean;
-  rainbow?: boolean;
+  dot?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-xl border text-left transition-all duration-200 ${
+      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
         active
-          ? "border-blue-600 shadow-[0_0_0_3px_rgba(37,99,235,0.15)]"
-          : "border-slate-200 hover:border-blue-300 hover:shadow-sm"
+          ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+          : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
       }`}
     >
-      {/* Gradient preview */}
-      <div
-        className="relative flex h-9 items-center justify-center overflow-hidden"
-        style={{ background: gradient }}
-      >
-        {glyph && (
-          <span
-            className={`font-mono text-[9px] tracking-[0.25em] ${
-              dark ? "text-white/80" : "text-slate-600/70"
-            }`}
-          >
-            {glyph}
-          </span>
-        )}
-        {rainbow && (
-          <span className="rounded-full bg-white/85 px-1.5 py-0.5 text-[8px] font-bold text-slate-700 shadow-sm">
-            ALL
-          </span>
-        )}
-        {/* Active check */}
-        {active && (
-          <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-blue-600 text-white shadow">
-            <Check className="size-2.5" strokeWidth={3} />
-          </span>
-        )}
-      </div>
-      {/* Label + live count */}
-      <div className="flex items-center justify-between gap-1 bg-white px-1.5 py-1">
-        <span
-          className={`text-[9px] font-semibold capitalize ${
-            active ? "text-blue-700" : "text-slate-600"
-          }`}
-        >
-          {label}
-        </span>
-        <span className="font-mono text-[8px] text-slate-400">{count}</span>
-      </div>
+      {dot && <span className="size-1.5 rounded-full" style={{ backgroundColor: dot }} />}
+      {label}
+      <span className={`font-mono text-[8px] ${active ? "text-blue-200" : "text-slate-300"}`}>
+        {count}
+      </span>
     </button>
   );
 }
@@ -553,21 +479,7 @@ function TemplateCard({
       {/* Style badge with dot colored per style */}
       <div className="pointer-events-none absolute left-2 top-2 flex gap-1">
         <span className="flex items-center gap-1 rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold capitalize text-white backdrop-blur">
-          <span
-            className="size-1.5 rounded-full"
-            style={{
-              background:
-                style === "cyber"
-                  ? "#7df9ff"
-                  : style === "glass"
-                    ? "#bfdbfe"
-                    : style === "neobrutalist"
-                      ? "#ffd84a"
-                      : style === "corporate"
-                        ? "#3b82f6"
-                        : "#e2e8f0",
-            }}
-          />
+          <span className="size-1.5 rounded-full" style={{ backgroundColor: meta.dot }} />
           {meta.label}
         </span>
         {slides > 1 && (
