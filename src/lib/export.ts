@@ -1,4 +1,4 @@
-import { toPng } from "html-to-image";
+import { toJpeg, toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
 import { buildInteractiveHTML, buildPrintHTML } from "@/lib/export-html";
 
@@ -41,7 +41,9 @@ export async function importJSONFile(file: File): Promise<void> {
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function captureAllPages(): Promise<string[]> {
+const JPEG_QUALITY = 0.92;
+
+async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]> {
   const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
   select(null);
   const original = currentIndex;
@@ -53,12 +55,17 @@ async function captureAllPages(): Promise<string[]> {
     const node = document.getElementById("canvas-export");
     if (!node) continue;
     node.dataset.exporting = "true";
-    const dataUrl = await toPng(node, {
+    const options = {
       width: canvasW,
       height: canvasH,
       pixelRatio: 2,
       style: { transform: "none", left: "0", top: "0", margin: "0" },
-    });
+    };
+    // JPEG has no alpha channel, so give it a white base for any transparent areas.
+    const dataUrl =
+      format === "jpeg"
+        ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: "#ffffff" })
+        : await toPng(node, options);
     delete node.dataset.exporting;
     shots.push(dataUrl);
   }
@@ -88,14 +95,14 @@ export async function exportPNG(name: string) {
 
 export async function exportPDF(name: string) {
   const { canvasW, canvasH } = useEditor.getState();
-  const shots = await captureAllPages();
+  const shots = await captureAllPages("jpeg");
   if (shots.length === 0) return;
   const { jsPDF } = await import("jspdf");
   const orientation = canvasW >= canvasH ? "landscape" : "portrait";
   const pdf = new jsPDF({ orientation, unit: "px", format: [canvasW, canvasH] });
   shots.forEach((src, i) => {
     if (i > 0) pdf.addPage([canvasW, canvasH], orientation);
-    pdf.addImage(src, "PNG", 0, 0, canvasW, canvasH);
+    pdf.addImage(src, "JPEG", 0, 0, canvasW, canvasH, undefined, "FAST");
   });
   pdf.save(`${name || "positron"}-${Date.now()}.pdf`);
 }
