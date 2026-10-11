@@ -264,7 +264,7 @@ export function Toolbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 shadow-[0_2px_15px_-3px_rgba(15,23,42,0.08)]">
+    <header className="sticky top-0 z-30 flex h-[4.25rem] w-full items-center justify-between border-b border-slate-200/90 bg-white px-4 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.35)]">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
@@ -304,7 +304,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/90 p-1 shadow-inner shadow-slate-200/40">
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl border border-slate-200/90 bg-white/70 p-0.5 shadow-sm">
           <button
@@ -329,7 +329,7 @@ export function Toolbar() {
         {/* Gemini AI button (purple accents / gradient) */}
         <button
           onClick={() => setAssistantOpen(true)}
-          title="Gemini Slide Assistant"
+          title="Groq Vision slide assistant"
           className="group flex h-9 items-center gap-2 rounded-xl border border-purple-200/90 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50 px-3 text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:shadow-purple-500/10 active:scale-95"
         >
           <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
@@ -454,7 +454,7 @@ export function Toolbar() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-wide text-slate-800">
               <Sparkles className="size-5 text-purple-600" />
-              Gemini Slide Assistant
+              Groq Vision Assistant
             </DialogTitle>
           </DialogHeader>
           <div className="font-mono text-[11px] text-slate-400">

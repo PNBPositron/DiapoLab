@@ -23,14 +23,24 @@ type UnsplashPhoto = {
   user: { name: string; links: { html: string } };
 };
 
-const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = Object.entries(LucideIcons)
-  .filter(([name, icon]) => {
-    const isLucideComponent = typeof icon === "object" && icon !== null && "render" in icon;
-    return name !== "createLucideIcon" && isLucideComponent && /^[A-Z]/.test(name);
-  })
-  .map(([name, Icon]) => ({ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon: Icon as LucideIcon }))
-  .sort((a, b) => a.label.localeCompare(b.label))
-  .slice(0, 100);
+const POPULAR_ICON_NAMES = [
+  "Activity", "AlertCircle", "AlertTriangle", "AlignCenter", "AlignLeft", "AlignRight", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight",
+  "ArrowUp", "Asterisk", "AtSign", "Award", "Ban", "Bell", "Bookmark", "BookOpen", "Briefcase", "Calendar",
+  "Camera", "Check", "CheckCircle", "ChevronDown", "ChevronLeft", "ChevronRight", "ChevronUp", "Circle", "Clipboard", "Clock",
+  "Cloud", "Code", "Cog", "Columns3", "Command", "Compass", "Copy", "CreditCard", "Crown", "Database",
+  "Download", "Edit", "Ellipsis", "Mail", "ExternalLink", "Eye", "EyeOff", "File", "FileText", "Filter",
+  "Flag", "Folder", "Gauge", "Globe", "Grid2X2", "Heart", "HelpCircle", "Home", "Image", "Info",
+  "Key", "Layers", "Layout", "LayoutDashboard", "Link", "Link2", "List", "Lock", "LogIn", "LogOut",
+  "Mail", "MapPin", "Menu", "MessageCircle", "Mic", "Minus", "Monitor", "Moon", "MoreHorizontal", "Paperclip",
+  "Pause", "PenTool", "Phone", "Play", "Plus", "RefreshCw", "Save", "Search", "Send", "Settings",
+  "Share2", "Shield", "ShoppingCart", "Sidebar", "Star", "Sun", "Tag", "ThumbsUp", "Trash2", "Twitter",
+  "Upload", "User", "Users", "Video", "X", "XCircle", "Zap", "ZoomIn", "ZoomOut",
+] as const;
+
+const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
+  const Icon = LucideIcons[name] as LucideIcon | undefined;
+  return Icon ? [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }] : [];
+});
 
 /* Modern tile: frosted white card, gradient icon chip, blue accent when active. */
 function ActionTile({
