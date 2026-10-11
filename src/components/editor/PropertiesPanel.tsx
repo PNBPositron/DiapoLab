@@ -4,6 +4,7 @@ import {
   DEFAULT_FILTERS,
   UI_STYLE_THEMES,
   chartStylePatch,
+  quizStylePatch,
   type ImageFilters,
   type ElementShadow,
   type ShapeElement,
@@ -631,6 +632,25 @@ export function PropertiesPanel() {
                   <Field label="Mode">
                     <SegmentedControl label="Quiz mode" value={q.mode ?? "quiz"} onChange={mode => update(q.id, { mode } as never)} options={[{ value: "quiz", label: "Quiz" }, { value: "poll", label: "Live poll" }]} />
                   </Field>
+                  <Field label="Visual style">
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((style) => (
+                        <button
+                          key={style}
+                          type="button"
+                          onClick={() => update(q.id, { ...quizStylePatch(style) } as never)}
+                          className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${q.uiStyle === style ? "border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-500/20" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                        >
+                          {UI_STYLE_THEMES[style].label}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  <Field label="Effect">
+                    <select value={q.effect ?? "none"} onChange={(e) => update(q.id, { effect: e.target.value } as never)} className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs">
+                      {SHAPE_EFFECTS.map((effect) => <option key={effect.value} value={effect.value}>{effect.label}</option>)}
+                    </select>
+                  </Field>
                   <Field label="Question">
                     <textarea
                       rows={2}
@@ -1105,6 +1125,25 @@ export function PropertiesPanel() {
             {/* CHART */}
             {el.type === "chart" && (
               <Section title="Chart">
+                <Field label="Visual style">
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((style) => (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => update(el.id, { ...chartStylePatch(style) } as never)}
+                        className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${el.uiStyle === style ? "border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-500/20" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
+                      >
+                        {UI_STYLE_THEMES[style].label}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+                <Field label="Effect">
+                  <select value={el.effect ?? "none"} onChange={(e) => update(el.id, { effect: e.target.value } as never)} className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs">
+                    {SHAPE_EFFECTS.map((effect) => <option key={effect.value} value={effect.value}>{effect.label}</option>)}
+                  </select>
+                </Field>
                 <Field label="Chart Type">
                   <OptionGrid label="Chart type" columns={3} value={el.chart} onChange={chart => update(el.id, { chart })} options={[
                     { value: "bar", label: "Bar", icon: ChartColumn },
@@ -1185,7 +1224,8 @@ export function PropertiesPanel() {
                 <Field label="Series Colors">
                   <div className="flex flex-wrap gap-1.5">
                     {el.colors.map((c, i) => (
-                      <input
+                      <div key={i} className="flex items-center gap-1">
+                        <input
                         key={i}
                         type="color"
                         value={c}
@@ -1197,7 +1237,10 @@ export function PropertiesPanel() {
                         }}
                         className="size-7 cursor-pointer rounded border border-slate-200 bg-transparent"
                       />
+                      <button type="button" aria-label={`Remove series color ${i + 1}`} onClick={() => update(el.id, { colors: el.colors.filter((_, j) => j !== i) })} disabled={el.colors.length <= 1} className="text-[10px] text-slate-400 hover:text-rose-600 disabled:opacity-30">×</button>
+                      </div>
                     ))}
+                    {el.colors.length < 8 && <button type="button" onClick={() => update(el.id, { colors: [...el.colors, "#64748b"] })} className="rounded border border-dashed border-slate-300 px-2 py-1 text-[10px] text-slate-500 hover:border-sky-400 hover:text-sky-600">+ color</button>}
                   </div>
                 </Field>
                 <Field label="Display">
