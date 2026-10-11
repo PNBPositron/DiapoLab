@@ -13,8 +13,13 @@
   }
 
   .editor-tool-rail > button {
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .editor-tool-rail > button:hover,
+  .editor-tool-rail > button:focus-visible {
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-    backdrop-filter: blur(8px);
   }
 
   .editor-side-panel {

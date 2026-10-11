@@ -73,7 +73,7 @@ export function Sidebar() {
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
-          return <button key={t.id} onClick={() => { setTool(t.id); setHovering(true); }} className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${active && panelOpen ? "border-slate-300 bg-white text-slate-700 shadow-sm" : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"}`}><Icon className="h-4 w-4" strokeWidth={2.2} />{t.label}</button>;
+          return <button key={t.id} onClick={() => { setTool(t.id); setHovering(true); }} className={`group relative flex flex-col items-center gap-1 rounded-xl border px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-all duration-200 ${active && panelOpen ? "border-transparent bg-transparent text-slate-700" : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-700"}`}><Icon className="h-4 w-4" strokeWidth={2.2} />{t.label}</button>;
         })}
         <button onClick={() => setSettingsOpen(true)} title="Settings" aria-label="Settings" className="mt-auto flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-1 py-3 text-[9px] font-semibold text-slate-600 shadow-sm hover:border-slate-300"><Settings className="h-5 w-5" strokeWidth={2.2} />Settings</button>
       </nav>
