@@ -31,7 +31,7 @@ export const Route = createFileRoute("/api/slide-analysis")({
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            model: "meta-llama/llama-4-maverick-17b-128e-instruct",
             temperature: 0.35,
             max_completion_tokens: 900,
             response_format: wantsEdit ? { type: "json_object" } : undefined,

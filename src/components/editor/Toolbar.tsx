@@ -329,7 +329,7 @@ export function Toolbar() {
         {/* Gemini AI button (purple accents / gradient) */}
         <button
           onClick={() => setAssistantOpen(true)}
-          title="Gemini Slide Assistant"
+          title="Groq Vision slide assistant"
           className="group flex h-9 items-center gap-2 rounded-xl border border-purple-200/90 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50 px-3 text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:shadow-purple-500/10 active:scale-95"
         >
           <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
@@ -454,7 +454,7 @@ export function Toolbar() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-wide text-slate-800">
               <Sparkles className="size-5 text-purple-600" />
-              Gemini Slide Assistant
+              Groq Vision Assistant
             </DialogTitle>
           </DialogHeader>
           <div className="font-mono text-[11px] text-slate-400">
