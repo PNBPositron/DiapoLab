@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const GROQ_TEXT_MODEL = "openai/gpt-oss-120b";
+const GROQ_TEXT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 const GEMINI_MODEL = GROQ_TEXT_MODEL;
 const GROQ_VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 const pickModel = (hasImage = false) => (hasImage ? GROQ_VISION_MODEL : GROQ_TEXT_MODEL);
