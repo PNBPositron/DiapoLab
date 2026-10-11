@@ -3,7 +3,7 @@ import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { useUi } from "@/store/ui";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
-import { LayoutTemplate, Type, Shapes, SlidersHorizontal, Blocks, Settings, Images, Sparkles, FolderHeart } from "lucide-react";
+import { Home, Type, Shapes, Image, Layers, Palette, Sparkles, Folder, Settings } from "lucide-react";
 import "@/editor-ui.css";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -16,14 +16,14 @@ import { SettingsDialog } from "./SettingsDialog";
 import { MyDesignsDialog } from "./MyDesignsDialog";
 
 const TOOLS = [
-  { id: "home", label: "Home", icon: LayoutTemplate },
+  { id: "home", label: "Home", icon: Home },
   { id: "text", label: "Text", icon: Type },
   { id: "elements", label: "Elements", icon: Shapes },
-  { id: "illustrations", label: "Illus.", icon: Images },
-  { id: "components", label: "Presets", icon: Blocks },
-  { id: "design", label: "Design", icon: SlidersHorizontal },
+  { id: "illustrations", label: "Illus.", icon: Image },
+  { id: "components", label: "Presets", icon: Layers },
+  { id: "design", label: "Design", icon: Palette },
   { id: "ai", label: "AI", icon: Sparkles },
-  { id: "my-designs", label: "Projects", icon: FolderHeart },
+  { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
 export function Sidebar() {
@@ -69,7 +69,7 @@ export function Sidebar() {
 
   return (
     <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-      <nav className="flex w-[4.5rem] flex-col gap-1 border-r border-white/55 bg-white/18 p-2 backdrop-blur-2xl">
+      <nav className="flex w-[4.5rem] flex-col gap-1 border-r border-slate-200 bg-white p-2">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -77,7 +77,7 @@ export function Sidebar() {
         })}
         <button onClick={() => setSettingsOpen(true)} title="Settings" aria-label="Settings" className="mt-auto flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-1 py-3 text-[9px] font-semibold text-slate-600 shadow-sm hover:border-slate-300"><Settings className="h-5 w-5" strokeWidth={2.2} />Settings</button>
       </nav>
-      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-white/70 bg-white/90 p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] backdrop-blur-2xl ring-1 ring-black/[0.03] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
+      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
         {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "ai" && <AiPanel />}
       </div>
       {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}{settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}

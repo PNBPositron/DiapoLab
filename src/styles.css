@@ -119,6 +119,7 @@
   * { border-color: color-mix(in oklab, var(--teal) 30%, transparent); }
   html, body { min-height: 100%; background-color: var(--paper); color: var(--teal); font-family: "Inter", system-ui, sans-serif; }
   h1, h2, h3, h4 { font-family: "Manrope", "Inter", system-ui, sans-serif; letter-spacing: -0.025em; text-transform: none; }
+  .logo-wordmark { font-family: "Orbitron", "Inter", system-ui, sans-serif; }
   button, input, textarea, select { font: inherit; }
   ::selection { background: var(--teal); color: var(--ink); }
 }
