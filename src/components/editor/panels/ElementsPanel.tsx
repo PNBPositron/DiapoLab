@@ -82,7 +82,7 @@ function ActionTile({
 }
 
 export function ElementsPanel() {
-  const { add } = useEditor();
+  const { add, setBgImage } = useEditor();
   const [section, setSection] = useState<ElementSection>(null);
   const [iconQuery, setIconQuery] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -230,14 +230,18 @@ export function ElementsPanel() {
           {unsplashError && <p className="px-1 text-[10px] font-medium text-rose-500">{unsplashError}</p>}
           <div className="grid grid-cols-2 gap-2">
             {unsplashPhotos.map((photo) => (
-              <button key={photo.id} type="button" onClick={() => add(newImage(photo.urls.regular))} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100" title={`Add photo by ${photo.user.name}`}>
-                <img src={photo.urls.small} alt={photo.alt_description || `Unsplash photo by ${photo.user.name}`} className="size-full object-cover transition duration-300 group-hover:scale-105" />
-                <span className="absolute inset-x-1 bottom-1 truncate rounded-md bg-slate-950/60 px-1.5 py-1 text-left text-[8px] text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">{photo.user.name}</span>
-              </button>
+              <div key={photo.id} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100">
+                <button type="button" onClick={() => add(newImage(photo.urls.regular))} className="size-full" title={`Add photo by ${photo.user.name}`}>
+                  <img src={photo.urls.small} alt={photo.alt_description || `Unsplash photo by ${photo.user.name}`} className="size-full object-cover transition duration-300 group-hover:scale-105" />
+                </button>
+                <button type="button" onClick={() => setBgImage(photo.urls.regular, "cover")} className="absolute inset-x-1 bottom-1 rounded-md bg-slate-950/75 px-1.5 py-1 text-[8px] font-semibold text-white opacity-0 transition group-hover:opacity-100 hover:bg-slate-900 focus-visible:opacity-100" title="Use as slide background">
+                  Use as background
+                </button>
+              </div>
             ))}
           </div>
           {unsplashPhotos.length === 0 && !unsplashLoading && <p className="py-3 text-center text-[10px] text-slate-400">Search for a photo to add to your slide.</p>}
-          <p className="text-[9px] text-slate-400">Photos by Unsplash creators. Click an image to add it.</p>
+          <p className="text-[9px] text-slate-400">Photos by Unsplash creators. Click an image to add it, or use the button to set it as the slide background.</p>
         </div>
       )}
 
