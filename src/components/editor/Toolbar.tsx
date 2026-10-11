@@ -311,7 +311,7 @@ export function Toolbar() {
             onClick={undo}
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           >
             <Undo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
@@ -320,7 +320,7 @@ export function Toolbar() {
             onClick={redo}
             title="Redo (Ctrl+Y)"
             aria-label="Redo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           >
             <Redo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
@@ -330,7 +330,7 @@ export function Toolbar() {
         <button
           onClick={() => setAssistantOpen(true)}
           title="Groq Vision slide assistant"
-          className="group flex h-9 items-center gap-2 rounded-xl border border-purple-200/90 bg-gradient-to-r from-purple-50 via-indigo-50/50 to-purple-50 px-3 text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:shadow-purple-500/10 active:scale-95"
+          className="group flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-purple-700 transition-all hover:border-purple-200 hover:bg-purple-50 hover:shadow-purple-500/10 active:scale-95"
         >
           <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
           <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-purple-800">
@@ -342,7 +342,7 @@ export function Toolbar() {
         <button
           onClick={() => importRef.current?.click()}
           title="Import .json design"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/70 text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-white hover:text-slate-900 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
         >
           <Upload className="h-4 w-4" strokeWidth={2.2} />
         </button>
@@ -363,7 +363,7 @@ export function Toolbar() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95 disabled:opacity-60"
+            className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 transition-all hover:border-slate-200 hover:bg-slate-100 active:scale-95 disabled:opacity-60"
           >
             {saving ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" />
@@ -388,7 +388,7 @@ export function Toolbar() {
           <button
             onClick={() => setExportOpen((v) => !v)}
             disabled={!!exporting}
-            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-md shadow-blue-500/20 transition-all hover:brightness-105 active:scale-95 disabled:opacity-60"
+            className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3.5 font-display text-[11px] font-semibold tracking-wider text-blue-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800 active:scale-95 disabled:opacity-60"
           >
             {exporting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />

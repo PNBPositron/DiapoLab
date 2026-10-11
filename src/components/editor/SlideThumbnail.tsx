@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Page } from "@/store/editor";
+import { ensureFontsForPages } from "@/lib/fontLoader";
 import { CanvasElement } from "./CanvasElement";
 
 // Renders a single slide (page) scaled to fit a container. Read-only.
@@ -32,17 +33,22 @@ export function SlideThumbnail({
     return () => obs.disconnect();
   }, [canvasW, canvasH]);
 
-  // Repaint once any pending web font finishes loading, so text never
-  // stays stuck on a fallback font in the thumbnail.
+  // Load the page's families before the thumbnail paints, then repaint once
+  // the browser has finished resolving the web fonts.
   useEffect(() => {
     let alive = true;
+    ensureFontsForPages([{ elements: page.elements.flatMap((element) =>
+      "fontFamily" in element && element.fontFamily ? [{ fontFamily: element.fontFamily }] : []
+    ) }]).finally(() => {
+      if (alive) setFontTick((t) => t + 1);
+    });
     document.fonts.ready.then(() => {
       if (alive) setFontTick((t) => t + 1);
     });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [page]);
 
   return (
     <div

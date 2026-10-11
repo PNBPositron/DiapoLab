@@ -7,6 +7,21 @@
     font-family: Inter, system-ui, sans-serif !important;
   }
 
+  .editor-tool-rail {
+    background: transparent;
+    border: 0;
+  }
+
+  .editor-tool-rail > button {
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .editor-tool-rail > button:hover,
+  .editor-tool-rail > button:focus-visible {
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  }
+
   .editor-side-panel {
     padding: 0.875rem;
     background: #ffffff !important;
