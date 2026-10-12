@@ -264,7 +264,7 @@ export function Toolbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[4.25rem] w-full items-center justify-between border-b border-slate-200/90 bg-white px-4 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.35)]">
+    <header className="sticky top-0 z-30 flex h-[4.25rem] w-full items-center justify-between bg-transparent px-4">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
@@ -304,7 +304,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/90 p-1 shadow-inner shadow-slate-200/40">
+      <div className="flex items-center gap-1.5 rounded-2xl border border-white/70 bg-white/55 p-1 shadow-[0_10px_28px_-16px_rgba(15,23,42,0.35)] backdrop-blur-sm">
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl border border-slate-200/90 bg-white/70 p-0.5 shadow-sm">
           <button
