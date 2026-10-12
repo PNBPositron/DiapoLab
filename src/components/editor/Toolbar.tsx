@@ -94,6 +94,8 @@ export function Toolbar() {
   const [assistantMessages, setAssistantMessages] = useState<
     Array<{ role: "user" | "assistant"; text: string }>
   >([]);
+  const [parseBusy, setParseBusy] = useState(false);
+  const [parsedDocument, setParsedDocument] = useState<{ markdown: string; html: string; filename: string } | null>(null);
 
   useEffect(() => {
     if (!savedAt) return;
@@ -106,6 +108,7 @@ export function Toolbar() {
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
+  const parseRef = useRef<HTMLInputElement>(null);
 
   const runExport = async (kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json") => {
     setExportOpen(false);
@@ -210,6 +213,34 @@ export function Toolbar() {
     } catch (e) {
       alert(e instanceof Error ? e.message : "Import failed");
     }
+  };
+
+  const handleParse = async (file: File) => {
+    setParseBusy(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/llamaparse", { method: "POST", body });
+      const payload = (await response.json().catch(() => null)) as { markdown?: string; html?: string; filename?: string; error?: string } | null;
+      if (!response.ok || !payload?.markdown) throw new Error(payload?.error || "Could not convert the file.");
+      setParsedDocument({ markdown: payload.markdown, html: payload.html || "", filename: payload.filename || file.name });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Could not convert the file.");
+    } finally {
+      setParseBusy(false);
+    }
+  };
+
+  const downloadParsed = (format: "markdown" | "html") => {
+    if (!parsedDocument) return;
+    const content = format === "markdown" ? parsedDocument.markdown : parsedDocument.html;
+    const blob = new Blob([content], { type: format === "markdown" ? "text/markdown" : "text/html" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${parsedDocument.filename.replace(/\.[^.]+$/, "")}.${format === "markdown" ? "md" : "html"}`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleSave = async () => {
@@ -355,6 +386,26 @@ export function Toolbar() {
             const f = e.target.files?.[0];
             if (f) handleImport(f);
             e.target.value = "";
+          }}
+        />
+        <button
+          onClick={() => parseRef.current?.click()}
+          title="Convert a document with LlamaParse"
+          disabled={parseBusy}
+          className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-slate-600 transition-all hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 active:scale-95 disabled:opacity-60"
+        >
+          {parseBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FilePlus className="h-4 w-4" />}
+          <span className="hidden font-display text-[10px] font-semibold uppercase tracking-wider lg:inline">Parse MD</span>
+        </button>
+        <input
+          ref={parseRef}
+          type="file"
+          accept=".md,.markdown,text/markdown"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void handleParse(file);
+            event.target.value = "";
           }}
         />
 
@@ -519,6 +570,22 @@ export function Toolbar() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {parsedDocument && (
+        <Dialog open onOpenChange={(open) => !open && setParsedDocument(null)}>
+          <DialogContent className="max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-display text-base font-bold tracking-wide text-slate-800">Document converted</DialogTitle>
+              <DialogDescription className="text-xs text-slate-500">{parsedDocument.filename} is available as Markdown and HTML.</DialogDescription>
+            </DialogHeader>
+            <pre className="max-h-72 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">{parsedDocument.markdown}</pre>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => downloadParsed("markdown")} className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700">Download Markdown</button>
+              <button type="button" onClick={() => downloadParsed("html")} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50">Download HTML</button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Publish dialog */}
       <PublishMetaDialog
