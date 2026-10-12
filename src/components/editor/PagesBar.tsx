@@ -178,7 +178,7 @@ export function PagesBar() {
             Ctrl K
           </kbd>
         </button>
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-2 py-1.5 shadow-sm">
+          <div className="flex items-center gap-2 rounded-2xl border border-white/80 bg-white/70 px-2.5 py-1.5 shadow-[0_8px_20px_-14px_rgba(15,23,42,0.4)] backdrop-blur-sm">
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
             <span>Transition</span>
@@ -231,7 +231,7 @@ export function PagesBar() {
             </Popover>
           </label>
           {currentTransition === "zoom" && (
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">
+            <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-2.5 py-1.5 shadow-inner shadow-blue-100/60">
               <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">
                 Zoom
               </span>

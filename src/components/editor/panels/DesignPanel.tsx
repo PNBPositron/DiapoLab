@@ -79,16 +79,19 @@ function SectionRow({
 
 export function DesignPanel() {
   return (
-    <div className="flex flex-col gap-3 p-2 text-slate-800">
-      {/* Section Header */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-          Slide Attributes
-        </span>
+    <div className="flex flex-col gap-3 p-1 text-slate-800">
+      <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">Design system</p>
+            <h2 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">Shape your slide</h2>
+          </div>
+          <div className="grid size-8 place-items-center rounded-xl bg-slate-900 text-white shadow-sm"><Palette className="size-4" /></div>
+        </div>
+        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">Tune the canvas, brand language, and background from one place.</p>
       </div>
 
-      {/* Unified Inset Surface */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.03)] divide-y divide-slate-100/80">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)] divide-y divide-slate-100/80">
         <SectionRow
           title="Canvas format"
           subtitle="16:9 Presentation (1920 × 1080)"

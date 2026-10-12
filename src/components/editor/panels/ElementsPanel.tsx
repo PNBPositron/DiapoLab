@@ -35,6 +35,14 @@ const POPULAR_ICON_NAMES = [
   "Pause", "PenTool", "Phone", "Play", "Plus", "RefreshCw", "Save", "Search", "Send", "Settings",
   "Share2", "Shield", "ShoppingCart", "Sidebar", "Star", "Sun", "Tag", "ThumbsUp", "Trash2", "Twitter",
   "Upload", "User", "Users", "Video", "X", "XCircle", "Zap", "ZoomIn", "ZoomOut",
+  "Airplay", "Anchor", "Apple", "BadgeCheck", "BarChart3", "Battery", "Bluetooth", "BookMarked", "Box", "Building2",
+  "Cake", "ChartLine", "ChartPie", "CheckCheck", "CircleDashed", "Clock3", "CloudSun", "Code2", "Coffee", "Contact",
+  "Cpu", "Diamond", "Disc3", "DollarSign", "DownloadCloud", "FileCheck", "FilePlus2", "FolderOpen", "Gift", "Globe2",
+  "Hammer", "Hash", "Headphones", "History", "Inbox", "Laptop", "Lightbulb", "ListChecks", "Map", "Megaphone",
+  "MessageSquare", "MessagesSquare", "MonitorPlay", "Palette", "PanelLeft", "Paperclip", "Pin", "Podcast", "Printer",
+  "Rocket", "Route", "ScanLine", "SendHorizontal", "Server", "ShieldCheck", "SlidersHorizontal", "Sparkles", "SquareStack",
+  "Store", "Table2", "Tablet", "Terminal", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "TriangleAlert",
+  "Truck", "Tv", "Umbrella", "Unlock", "UserCheck", "UserPlus", "WalletCards", "Wifi", "Wind", "Wrench",
 ] as const;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
