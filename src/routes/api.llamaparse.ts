@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/llamaparse")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LLAMA_PARSE_API_KEY;
+        const apiKey = process.env.api;
         if (!apiKey) return Response.json({ error: "LlamaParse is not configured." }, { status: 503 });
 
         const incoming = await request.formData().catch(() => null);
