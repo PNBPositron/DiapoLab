@@ -19,6 +19,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as TIdRouteImport } from './routes/t.$id'
@@ -77,6 +78,11 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLlamaparseRoute = ApiLlamaparseRouteImport.update({
+  id: '/api/llamaparse',
+  path: '/api/llamaparse',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSlideAnalysisRoute = ApiSlideAnalysisRouteImport.update({
   id: '/api/slide-analysis',
   path: '/api/slide-analysis',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
   TIdRoute: typeof TIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/llamaparse': {
+      id: '/api/llamaparse'
+      path: '/api/llamaparse'
+      fullPath: '/api/llamaparse'
+      preLoaderRoute: typeof ApiLlamaparseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/slide-analysis': {
       id: '/api/slide-analysis'
       path: '/api/slide-analysis'
@@ -359,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
   TIdRoute: TIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
