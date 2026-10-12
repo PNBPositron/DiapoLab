@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const GROQ_TEXT_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+const GROQ_TEXT_MODEL = "qwen/qwen3-32b";
 const GEMINI_MODEL = GROQ_TEXT_MODEL;
-const GROQ_VISION_MODEL = "meta-llama/llama-4-maverick-17b-128e-instruct";
+const GROQ_VISION_MODEL = "qwen/qwen2.5-vl-32b-instruct";
 const pickModel = (hasImage = false) => (hasImage ? GROQ_VISION_MODEL : GROQ_TEXT_MODEL);
 
 type CohereMessage = {

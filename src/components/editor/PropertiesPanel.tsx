@@ -848,13 +848,49 @@ export function PropertiesPanel() {
                   />
                 </Field>
                 {(el.fillSource ?? "color") === "color" && (
-                  <ModernColorPicker
-                    label="Fill Color"
-                    value={el.fill}
-                    onChange={(c) => update(el.id, { fill: c })}
-                    opacity={el.opacity ?? 1}
-                    onOpacityChange={(v) => update(el.id, { opacity: v })}
-                  />
+                  <>
+                    <ModernColorPicker
+                      label="Fill Color"
+                      value={el.fill}
+                      onChange={(c) => update(el.id, { fill: c })}
+                      opacity={el.opacity ?? 1}
+                      onOpacityChange={(v) => update(el.id, { opacity: v })}
+                    />
+                    <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-medium text-slate-600">Gradient fill</span>
+                        <button
+                          type="button"
+                          onClick={() => update(el.id, { gradient: el.gradient ? undefined : { from: el.fill, to: "#6366f1", angle: 90, type: "linear" } })}
+                          className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600 transition hover:border-sky-300 hover:text-sky-700"
+                        >
+                          {el.gradient ? "Remove" : "Add"}
+                        </button>
+                      </div>
+                      {el.gradient && (
+                        <>
+                          <SegmentedControl
+                            value={el.gradient.type ?? "linear"}
+                            onChange={(type) => update(el.id, { gradient: { ...el.gradient!, type: type as ShapeGradient["type"] } })}
+                            options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
+                              <input type="color" value={el.gradient.from} onChange={(e) => update(el.id, { gradient: { ...el.gradient!, from: e.target.value } })} className="size-6 cursor-pointer border-0 bg-transparent p-0" aria-label="Gradient start color" />
+                              Start
+                            </label>
+                            <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
+                              <input type="color" value={el.gradient.to} onChange={(e) => update(el.id, { gradient: { ...el.gradient!, to: e.target.value } })} className="size-6 cursor-pointer border-0 bg-transparent p-0" aria-label="Gradient end color" />
+                              End
+                            </label>
+                          </div>
+                          {(el.gradient.type ?? "linear") === "linear" && (
+                            <SliderWithInput label="Angle" min={0} max={360} value={el.gradient.angle} unit="°" onChange={(angle) => update(el.id, { gradient: { ...el.gradient!, angle } })} />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </>
                 )}
                 <ModernColorPicker
                   label="Stroke Color"
