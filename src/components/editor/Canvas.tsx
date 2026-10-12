@@ -172,7 +172,7 @@ export function Canvas() {
       </div>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-border bg-card p-1 text-card-foreground shadow-sm">
+      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-2xl border border-white/70 bg-white/90 p-1.5 text-slate-700 shadow-[0_14px_34px_-16px_rgba(15,23,42,0.38),0_2px_8px_rgba(15,23,42,0.08)] backdrop-blur-xl">
         <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom out" aria-label="Zoom out" disabled={scale <= 0.1} onClick={() => changeZoom(scale - 0.1)}><Minus /></Button>
         <output aria-label="Preview zoom" className="min-w-12 text-center font-mono text-xs">{Math.round(scale * 100)}%</output>
         <Button variant="ghost" size="icon" className="h-7 w-7" title="Zoom in" aria-label="Zoom in" disabled={scale >= 3} onClick={() => changeZoom(scale + 0.1)}><Plus /></Button>
