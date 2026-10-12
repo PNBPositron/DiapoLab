@@ -18,18 +18,28 @@ export const Route = createFileRoute("/api/llamaparse")({
         form.append("file", file, file.name);
         form.append("result_type", "markdown");
         form.append("language", "en");
+        form.append("parse_mode", "parse_page_with_layout");
 
         const upload = await fetch(`${LLAMA_PARSE_URL}/upload`, {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
           body: form,
         });
-        const uploadPayload = (await upload.json().catch(() => null)) as { id?: string; error?: string } | null;
-        if (!upload.ok || !uploadPayload?.id) {
-          return Response.json({ error: uploadPayload?.error || "LlamaParse could not accept the file." }, { status: 502 });
+        const uploadText = await upload.text();
+        const uploadPayload = parseApiPayload(uploadText) as {
+          id?: string;
+          job_id?: string;
+          error?: string | { message?: string };
+          detail?: string;
+        } | null;
+        const jobId = uploadPayload?.id ?? uploadPayload?.job_id;
+        if (!upload.ok || !jobId) {
+          const providerError = typeof uploadPayload?.error === "string" ? uploadPayload.error : uploadPayload?.error?.message;
+          return Response.json(
+            { error: providerError || uploadPayload?.detail || `LlamaParse upload failed (${upload.status}). Check the document type and API key.` },
+            { status: 502 },
+          );
         }
-
-        const jobId = uploadPayload.id;
         for (let attempt = 0; attempt < 30; attempt += 1) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           const statusResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}`, {
@@ -41,11 +51,16 @@ export const Route = createFileRoute("/api/llamaparse")({
           }
           if (status?.status === "SUCCESS") {
             const resultResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}/result/markdown`, {
-              headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
+              headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json, text/plain" },
             });
-            const result = (await resultResponse.json().catch(() => null)) as { markdown?: string; error?: string } | null;
-            if (!resultResponse.ok || !result?.markdown) return Response.json({ error: result?.error || "LlamaParse returned no markdown." }, { status: 502 });
-            return Response.json({ markdown: result.markdown, html: markdownToHtml(result.markdown), filename: file.name });
+            const resultText = await resultResponse.text();
+            const result = parseApiPayload(resultText) as { markdown?: string; text?: string; error?: string } | string | null;
+            const markdown = typeof result === "string" ? result : result?.markdown ?? result?.text;
+            if (!resultResponse.ok || !markdown) {
+              const error = typeof result === "object" && result?.error ? result.error : "LlamaParse returned no markdown.";
+              return Response.json({ error }, { status: 502 });
+            }
+            return Response.json({ markdown, html: markdownToHtml(markdown), filename: file.name });
           }
         }
 
@@ -54,6 +69,14 @@ export const Route = createFileRoute("/api/llamaparse")({
     },
   },
 });
+
+function parseApiPayload(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value.trim();
+  }
+}
 
 function markdownToHtml(markdown: string) {
   return markdown

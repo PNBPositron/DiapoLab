@@ -162,7 +162,33 @@
   .editor-side-panel .panel-content {
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
+    gap: 1rem;
+    min-width: 0;
+    color: #1e293b;
+  }
+
+  /* Give every panel a consistent visual rhythm, regardless of its internal controls. */
+  .editor-side-panel .panel-content > :is(section, [class*="rounded"], [class*="border"]),
+  .editor-side-panel > :is(section, [class*="rounded"], [class*="border"]) {
+    border-color: rgba(148, 163, 184, 0.24);
+    border-radius: 0.875rem;
+  }
+
+  .editor-side-panel h2,
+  .editor-side-panel h3 {
+    letter-spacing: -0.01em;
+  }
+
+  .editor-side-panel label {
+    color: #475569;
+  }
+
+  .editor-side-panel button:not(:disabled):focus-visible,
+  .editor-side-panel input:focus-visible,
+  .editor-side-panel textarea:focus-visible,
+  .editor-side-panel select:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.45);
+    outline-offset: 2px;
   }
 
   .editor-side-panel .panel-intro {
