@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   LayoutTemplate,
   RefreshCw,
+  FileText,
+  Upload,
 } from "lucide-react";
 import { generateAiTemplate, type AiStyle } from "@/lib/ai-templates.functions";
 import { useEditor, type Page } from "@/store/editor";
@@ -41,6 +43,7 @@ export function AiPanel() {
   const [style, setStyle] = useState<AiStyle>("auto");
   const [slideCount, setSlideCount] = useState(3);
   const [busy, setBusy] = useState(false);
+  const [parsing, setParsing] = useState(false);
   const [status, setStatus] = useState<{ type: "error" | "success"; message: string } | null>(null);
 
   const activePage = pages[currentIndex];
@@ -146,6 +149,27 @@ export function AiPanel() {
     }
   };
 
+  const importDocument = async (file: File) => {
+    if (parsing) return;
+    setParsing(true);
+    setStatus(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const response = await fetch("/api/llamaparse", { method: "POST", body: form });
+      const payload = (await response.json()) as { markdown?: string; error?: string };
+      if (!response.ok || !payload.markdown) throw new Error(payload.error || "Could not parse the document.");
+      const importedPages = markdownToPages(payload.markdown);
+      if (!importedPages.length) throw new Error("No slide content was found in this document.");
+      loadPages(importedPages);
+      setStatus({ type: "success", message: `Imported ${importedPages.length} slides from ${file.name}.` });
+    } catch (error) {
+      setStatus({ type: "error", message: error instanceof Error ? error.message : "Document import failed." });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 text-xs">
       {/* Header with Title and Mode Switcher */}
@@ -198,6 +222,34 @@ export function AiPanel() {
           </button>
         </div>
       </div>
+
+      <section className="rounded-xl border border-sky-200 bg-sky-50/70 p-3">
+        <div className="flex items-start gap-2">
+          <FileText className="mt-0.5 size-4 shrink-0 text-sky-600" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-sky-950">Import a document</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-sky-800/75">
+              Upload a PDF or PowerPoint file. LlamaParse extracts its structure, then DiapoLab
+              creates native editable slides in the Positron design format.
+            </p>
+            <label className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-sky-200 bg-white px-3 py-2 text-[11px] font-semibold text-sky-800 shadow-xs transition hover:border-sky-400 hover:bg-sky-50">
+              {parsing ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+              <span>{parsing ? "Parsing document..." : "Choose PDF or PPTX"}</span>
+              <input
+                type="file"
+                accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.pptx,application/vnd.ms-powerpoint,.ppt"
+                className="hidden"
+                disabled={parsing}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void importDocument(file);
+                  event.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+        </div>
+      </section>
 
       {/* Status Banner */}
       {status && (
@@ -399,4 +451,17 @@ export function AiPanel() {
       </div>
     </div>
   );
+}
+
+function markdownToPages(markdown: string): Page[] {
+  const blocks = markdown.replace(/\r/g, "").split(/\n(?=#{1,3}\s+)/).map((block) => block.trim()).filter(Boolean);
+  return blocks.map((block, index) => {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    const heading = lines.find((line) => /^#{1,3}\s+/.test(line))?.replace(/^#{1,3}\s+/, "") || `Imported slide ${index + 1}`;
+    const body = lines.filter((line) => !/^#{1,3}\s+/.test(line)).map((line) => line.replace(/^[-*+]\s+/, "• ").replace(/^\d+[.)]\s+/, "")).join("\n").slice(0, 1800);
+    const id = `imported-${Date.now()}-${index}`;
+    const title = { id: `${id}-title`, type: "text" as const, x: 120, y: 100, width: 1680, height: 110, rotation: 0, text: heading, fontSize: 64, color: "#0f172a", fontWeight: 700, fontFamily: "Inter", align: "left" as const };
+    const content = body ? [{ id: `${id}-body`, type: "text" as const, x: 140, y: 270, width: 1550, height: 570, rotation: 0, text: body, fontSize: 30, color: "#334155", fontWeight: 400, fontFamily: "Inter", align: "left" as const, lineHeight: 1.45 }] : [];
+    return { id, bgColor: index % 2 ? "#f8fafc" : "#ffffff", duration: 4, elements: [title, ...content] };
+  });
 }
