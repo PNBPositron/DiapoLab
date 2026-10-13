@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSettings, DEFAULT_BRAND_KIT, type BrandKit } from "@/store/settings";
 import { WandSparkles, Check, Layers, RotateCcw } from "lucide-react";
-import { useEditor } from "@/store/editor";
+import { EDITOR_COLOR_PALETTE, useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { Dropdown } from "../ui/Dropdown";
@@ -19,21 +19,33 @@ export function BrandKitPanel() {
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
   const currentPage = useEditor((s) => s.pages[s.currentIndex]);
   const adaptToSlide = () => {
-    const background = currentPage?.bgColor || brandKit.bg;
-    const firstColor = currentPage?.elements.find((element) => "color" in element)?.color;
-    const next = { ...brandKit, bg: background, text: firstColor || brandKit.text };
+    if (!currentPage) return;
+    const colors = currentPage.elements.flatMap((element) => {
+      const values = ["color", "fill", "stroke", "accentColor", "bgColor", "fgColor", "backgroundColor"] as const;
+      return values.flatMap((key) => {
+        const value = element[key as keyof typeof element];
+        return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value) ? [value] : [];
+      });
+    });
+    const unique = [...new Set(colors)];
+    const background = currentPage.bgColor || brandKit.bg;
+    const text = unique.find((color) => color !== background) || brandKit.text;
+    const next = {
+      ...brandKit,
+      primary: unique[0] || brandKit.primary,
+      secondary: unique[1] || unique[0] || brandKit.secondary,
+      accent: unique[2] || unique[1] || unique[0] || brandKit.accent,
+      bg: background,
+      text,
+    };
     setBrandKit(next);
-    applyBrandKit(next, "slide");
   };
   const [generating, setGenerating] = useState(false);
   const [openKey, setOpenKey] = useState<keyof BrandKit | null>(null);
 
   const generateRandomKit = () => {
     setGenerating(true);
-    const colors = Array.from(
-      { length: 5 },
-      () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`
-    );
+    const colors = [...EDITOR_COLOR_PALETTE].sort(() => Math.random() - 0.5).slice(0, 5);
     setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
     window.setTimeout(() => setGenerating(false), 180);
   };
