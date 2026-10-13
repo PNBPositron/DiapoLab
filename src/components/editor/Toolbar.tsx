@@ -300,9 +300,8 @@ export function Toolbar() {
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
-          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 shadow-[0_5px_16px_rgba(79,70,229,0.32)] ring-1 ring-white/70 transition-all group-hover:-translate-y-0.5 group-hover:shadow-[0_8px_22px_rgba(79,70,229,0.42)]">
-            <Presentation aria-hidden="true" className="size-[18px] text-white drop-shadow-sm" strokeWidth={2.25} />
-            <span aria-hidden="true" className="absolute inset-x-2 bottom-1 h-px rounded-full bg-white/70" />
+          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-white shadow-[0_5px_16px_rgba(79,70,229,0.24)] ring-1 ring-slate-200 transition-all group-hover:-translate-y-0.5 group-hover:shadow-[0_8px_22px_rgba(79,70,229,0.34)]">
+            <img src="/favicon.ico" alt="DiapoLab" className="size-8 object-contain drop-shadow-sm" />
           </div>
           <span className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors group-hover:text-blue-600">
             DIAPOLAB
