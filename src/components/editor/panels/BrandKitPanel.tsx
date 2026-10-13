@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSettings, DEFAULT_BRAND_KIT, type BrandKit } from "@/store/settings";
 import { WandSparkles, Check, Layers, RotateCcw } from "lucide-react";
-import { useEditor } from "@/store/editor";
+import { EDITOR_COLOR_PALETTE, useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { Dropdown } from "../ui/Dropdown";
@@ -17,15 +17,35 @@ const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
 export function BrandKitPanel() {
   const { brandKit, setBrandKit, resetBrandKit } = useSettings();
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
+  const currentPage = useEditor((s) => s.pages[s.currentIndex]);
+  const adaptToSlide = () => {
+    if (!currentPage) return;
+    const colors = currentPage.elements.flatMap((element) => {
+      const values = ["color", "fill", "stroke", "accentColor", "bgColor", "fgColor", "backgroundColor"] as const;
+      return values.flatMap((key) => {
+        const value = element[key as keyof typeof element];
+        return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value) ? [value] : [];
+      });
+    });
+    const unique = [...new Set(colors)];
+    const background = currentPage.bgColor || brandKit.bg;
+    const text = unique.find((color) => color !== background) || brandKit.text;
+    const next = {
+      ...brandKit,
+      primary: unique[0] || brandKit.primary,
+      secondary: unique[1] || unique[0] || brandKit.secondary,
+      accent: unique[2] || unique[1] || unique[0] || brandKit.accent,
+      bg: background,
+      text,
+    };
+    setBrandKit(next);
+  };
   const [generating, setGenerating] = useState(false);
   const [openKey, setOpenKey] = useState<keyof BrandKit | null>(null);
 
   const generateRandomKit = () => {
     setGenerating(true);
-    const colors = Array.from(
-      { length: 5 },
-      () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`
-    );
+    const colors = [...EDITOR_COLOR_PALETTE].sort(() => Math.random() - 0.5).slice(0, 5);
     setBrandKit({ primary: colors[0], secondary: colors[1], accent: colors[2], bg: colors[4], text: colors[3] });
     window.setTimeout(() => setGenerating(false), 180);
   };
@@ -134,8 +154,21 @@ export function BrandKitPanel() {
 
       {/* Application */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Apply to</div>
+        <button
+          type="button"
+          onClick={adaptToSlide}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px] font-semibold text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
+        >
+          <WandSparkles className="size-3.5" /> Adapt presets to slide look
+        </button>
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Apply brand kit</div>
         <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={adaptToSlide}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-[11px] font-semibold text-indigo-700 shadow-2xs transition hover:border-indigo-300 hover:bg-indigo-100"
+          >
+            <WandSparkles className="size-3.5" /> Adapt to slide
+          </button>
           <button
             onClick={() => applyBrandKit(brandKit, "slide")}
             className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50"

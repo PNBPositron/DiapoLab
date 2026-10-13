@@ -23,6 +23,7 @@ import {
   Presentation,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
+import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import {
@@ -61,6 +62,14 @@ function useClickOutside<T extends HTMLElement>(handler: () => void) {
   return ref;
 }
 
+function hueToHex(hue: number) {
+  const h = ((hue % 360) + 360) % 360;
+  const c = 0.82;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return `#${[r, g, b].map((value) => Math.round((value + 0.09) * 255).toString(16).padStart(2, "0")).join("")}`;
+}
+
 export function Toolbar() {
   const {
     undo,
@@ -80,6 +89,8 @@ export function Toolbar() {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { appAccent, iconHue, setAppAccent, setIconHue } = useSettings();
+  const [brandMenuOpen, setBrandMenuOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -299,15 +310,26 @@ export function Toolbar() {
     <header className="sticky top-0 z-30 flex h-[4.25rem] w-full items-center justify-between bg-transparent px-4">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
-        <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
-          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 shadow-[0_5px_16px_rgba(79,70,229,0.32)] ring-1 ring-white/70 transition-all group-hover:-translate-y-0.5 group-hover:shadow-[0_8px_22px_rgba(79,70,229,0.42)]">
-            <Presentation aria-hidden="true" className="size-[18px] text-white drop-shadow-sm" strokeWidth={2.25} />
-            <span aria-hidden="true" className="absolute inset-x-2 bottom-1 h-px rounded-full bg-white/70" />
-          </div>
-          <span className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors group-hover:text-blue-600">
-            DIAPOLAB
-          </span>
-        </Link>
+        <div className="relative flex items-center gap-2.5">
+          <button
+            type="button"
+            aria-label="Customize app accent and icon hue"
+            aria-expanded={brandMenuOpen}
+            onClick={() => setBrandMenuOpen((open) => !open)}
+            className="group relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-white shadow-[0_5px_16px_rgba(79,70,229,0.24)] ring-1 ring-slate-200 transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(79,70,229,0.34)]" style={{ boxShadow: `0 5px 16px ${appAccent}44` }}
+          >
+            <img src="/favicon.ico" alt="DiapoLab" className="size-8 object-contain drop-shadow-sm" style={{ filter: `hue-rotate(${iconHue}deg)` }} />
+          </button>
+          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
+          {brandMenuOpen && (
+            <div className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.45)]">
+              <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">App appearance</div>
+              <label className="flex items-center justify-between gap-3 text-xs text-slate-600">Accent <input type="color" value={appAccent} onChange={(event) => setAppAccent(event.target.value)} className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" /></label>
+              <label className="mt-3 block text-xs text-slate-600">Icon hue <input type="range" min="-180" max="180" value={iconHue} onChange={(event) => { const hue = Number(event.target.value); setIconHue(hue); setAppAccent(hueToHex((hue + 250) % 360)); }} className="mt-2 w-full accent-indigo-600" /></label>
+              <div className="mt-2 flex justify-between text-[10px] text-slate-400"><span>-180°</span><span>{iconHue}°</span><span>180°</span></div>
+            </div>
+          )}
+        </div>
 
         {/* Decorative vertical divider */}
         <div className="hidden h-5 w-px bg-slate-200 md:block" />

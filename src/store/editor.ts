@@ -821,6 +821,11 @@ export const solidThemeBg = (uiStyle: UiStyle): string => {
 };
 
 // Map a UI style pack onto chart colors so charts match UI components.
+export const EDITOR_COLOR_PALETTE = [
+  "#2b6bff", "#7df9ff", "#ff0080", "#ffd84a", "#00c853", "#b16bff",
+  "#0a0f1f", "#ffffff", "#1b2233", "#e2231a", "#f5f3ee", "#0d0d0d",
+] as const;
+
 export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
   const t = UI_STYLE_THEMES[uiStyle];
   const palettes: Record<UiStyle, string[]> = {
