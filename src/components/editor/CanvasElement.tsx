@@ -338,7 +338,7 @@ export function CanvasElement({
       }}
       className={
         [
-          presenting && !morph && element.animation && element.animation !== "none"
+          !morph && element.animation && element.animation !== "none"
             ? `el-anim-${element.animation}`
             : "",
           hovered && interaction?.hoverEffect === "glitch" ? "el-hover-glitch" : "",
@@ -354,6 +354,10 @@ export function CanvasElement({
         height: element.height,
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
+        animation:
+          presenting && !morph && element.animation && element.animation !== "none"
+            ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) both`
+            : undefined,
         transition: morph
           ? undefined
           : element.hoverTilt && presenting

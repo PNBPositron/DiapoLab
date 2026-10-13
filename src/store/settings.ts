@@ -51,10 +51,14 @@ type SettingsState = {
   panelStiffness: number;
   reduceMotion: boolean;
   brandKit: BrandKit;
+  appAccent: string;
+  iconHue: number;
   customThemes: CustomTheme[];
   addCustomTheme: (t: CustomTheme) => void;
   removeCustomTheme: (id: string) => void;
   setBrandKit: (patch: Partial<BrandKit>) => void;
+  setAppAccent: (value: string) => void;
+  setIconHue: (value: number) => void;
   resetBrandKit: () => void;
   setAutoHidePanel: (v: boolean) => void;
   setEditorTheme: (v: string) => void;
@@ -104,6 +108,8 @@ export const useSettings = create<SettingsState>()(
       panelStiffness: DEFAULT_PANEL_STIFFNESS,
       reduceMotion: true,
       brandKit: { ...DEFAULT_BRAND_KIT },
+      appAccent: "#4f46e5",
+      iconHue: 0,
       customThemes: [],
       addCustomTheme: (t) =>
         set((s) => ({ customThemes: [...s.customThemes.filter((x) => x.id !== t.id), t] })),
@@ -113,6 +119,8 @@ export const useSettings = create<SettingsState>()(
           editorTheme: s.editorTheme === `custom:${id}` ? DEFAULT_EDITOR_THEME : s.editorTheme,
         })),
       setBrandKit: (patch) => set((s) => ({ brandKit: { ...s.brandKit, ...patch } })),
+      setAppAccent: (appAccent) => set({ appAccent }),
+      setIconHue: (iconHue) => set({ iconHue }),
       resetBrandKit: () => set({ brandKit: { ...DEFAULT_BRAND_KIT } }),
       setAutoHidePanel: (autoHidePanel) => set({ autoHidePanel }),
       setEditorTheme: (editorTheme) => set({ editorTheme }),
