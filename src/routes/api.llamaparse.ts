@@ -34,7 +34,7 @@ export const Route = createFileRoute("/api/llamaparse")({
         } | null;
         const jobId = uploadPayload?.id ?? uploadPayload?.job_id;
         if (!upload.ok || !jobId) {
-          const providerError = typeof uploadPayload?.error === "string" ? uploadPayload.error : uploadPayload?.error?.message;
+          const providerError = formatProviderError(uploadPayload?.error);
           return Response.json(
             { error: providerError || uploadPayload?.detail || `LlamaParse upload failed (${upload.status}). Check the document type and API key.` },
             { status: 502 },
@@ -76,6 +76,21 @@ function parseApiPayload(value: string): unknown {
   } catch {
     return value.trim();
   }
+}
+
+function formatProviderError(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return undefined;
+  const error = value as Record<string, unknown>;
+  for (const key of ["message", "detail", "error", "reason"]) {
+    const candidate = error[key];
+    if (typeof candidate === "string") return candidate;
+    if (candidate && typeof candidate === "object") {
+      const nested = formatProviderError(candidate);
+      if (nested) return nested;
+    }
+  }
+  return undefined;
 }
 
 function markdownToHtml(markdown: string) {

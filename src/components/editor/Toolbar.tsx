@@ -20,6 +20,7 @@ import {
   Sparkles,
   CheckCircle2,
   Sliders,
+  Presentation,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { saveDesign, publishAsTemplate } from "@/lib/designs";
@@ -299,12 +300,9 @@ export function Toolbar() {
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
-          <div className="relative overflow-hidden rounded-xl shadow-md ring-1 ring-black/5 transition-all group-hover:shadow-indigo-500/20 group-hover:ring-indigo-500/30">
-            <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/polotno-JAeUumHqjSvGEic3tLQLr71QMjjUej.png"
-              alt="DiapoLab flask logo"
-              className="size-9 object-cover"
-            />
+          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-500 shadow-md ring-1 ring-indigo-500/20 transition-all group-hover:shadow-indigo-500/30 group-hover:ring-indigo-400/50">
+            <Presentation aria-hidden="true" className="size-[18px] text-white" strokeWidth={2.25} />
+            <span aria-hidden="true" className="absolute inset-x-2 bottom-1 h-px rounded-full bg-white/60" />
           </div>
           <span className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors group-hover:text-blue-600">
             DIAPOLAB
