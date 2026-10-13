@@ -300,7 +300,7 @@ export function Toolbar() {
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 transition-transform active:scale-95">
-          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-500 shadow-md ring-1 ring-indigo-500/20 transition-all group-hover:shadow-indigo-500/30 group-hover:ring-indigo-400/50">
+          <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl bg-white shadow-[0_4px_14px_rgba(30,41,59,0.18)] ring-1 ring-slate-200 transition-shadow group-hover:shadow-[0_6px_18px_rgba(37,99,235,0.24)]">
             <Presentation aria-hidden="true" className="size-[18px] text-white" strokeWidth={2.25} />
             <span aria-hidden="true" className="absolute inset-x-2 bottom-1 h-px rounded-full bg-white/60" />
           </div>
