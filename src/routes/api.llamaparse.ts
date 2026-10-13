@@ -45,9 +45,9 @@ export const Route = createFileRoute("/api/llamaparse")({
           const statusResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}`, {
             headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
           });
-          const status = (await statusResponse.json().catch(() => null)) as { status?: string; error?: string } | null;
-          if (["ERROR", "FAILED", "CANCELLED"].includes(status?.status ?? "")) {
-            return Response.json({ error: status?.error || "LlamaParse failed to process the file." }, { status: 502 });
+          const status = (await statusResponse.json().catch(() => null)) as Record<string, unknown> | null;
+          if (["ERROR", "FAILED", "CANCELLED"].includes(String(status?.status ?? "").toUpperCase())) {
+            return Response.json({ error: formatProviderError(status?.error) || formatProviderError(status?.detail) || "LlamaParse failed to process the file." }, { status: 502 });
           }
           if (status?.status === "SUCCESS") {
             const resultResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}/result/markdown`, {
@@ -56,9 +56,9 @@ export const Route = createFileRoute("/api/llamaparse")({
             const resultText = await resultResponse.text();
             const result = parseApiPayload(resultText) as { markdown?: string; text?: string; error?: string } | string | null;
             const markdown = typeof result === "string" ? result : result?.markdown ?? result?.text;
-            if (!resultResponse.ok || !markdown) {
-              const error = typeof result === "object" && result?.error ? result.error : "LlamaParse returned no markdown.";
-              return Response.json({ error }, { status: 502 });
+            if (!resultResponse.ok || typeof markdown !== "string" || !markdown.trim()) {
+              const error = typeof result === "object" && result?.error ? formatProviderError(result.error) : undefined;
+              return Response.json({ error: error || "LlamaParse returned no markdown." }, { status: 502 });
             }
             return Response.json({ markdown, html: markdownToHtml(markdown), filename: file.name });
           }

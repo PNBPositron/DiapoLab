@@ -804,8 +804,30 @@ export function PropertiesPanel() {
                       onOpacityChange={(v) => update(el.id, { opacity: v })}
                     />
                   )}
-                  <Field label="Shape Mask">
-                    <Dropdown
+                <Field label="Replace image">
+                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50">
+                    <Upload className="size-3.5" aria-hidden="true" />
+                    Choose another image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          if (typeof reader.result === "string") update(el.id, { src: reader.result });
+                        };
+                        reader.readAsDataURL(file);
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                </Field>
+
+                <Field label="Shape Mask">
+                  <Dropdown
                       value={el.maskShape ?? ""}
                       options={MASK_OPTIONS}
                       onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
