@@ -173,8 +173,16 @@
 .slide-transition-slide { animation: slide-slide-in 700ms ease both; will-change: transform; }
 .slide-transition-zoom { animation: slide-zoom-in 700ms ease both; transform-origin: center center; will-change: transform; }
 .slide-transition-flip { animation: slide-flip-in 700ms ease both; will-change: transform; }
-.slide-transition-glitch { animation: slide-glitch-in 620ms steps(8, end) both; }
-/* ============================================================
+ .slide-transition-glitch { animation: slide-glitch-in 620ms steps(8, end) both; }
+  .slide-transition-tv { animation: slide-tv-in 760ms steps(8, end) both; transform-origin: center; }
+  .slide-transition-neon { animation: slide-neon-in 820ms ease-out both; }
+  .slide-transition-cube { animation: slide-cube-in 760ms cubic-bezier(.22,1,.36,1) both; transform-origin: 50% 50%; }
+  .slide-transition-blur { animation: slide-blur-in 780ms cubic-bezier(.22,1,.36,1) both; }
+  @keyframes slide-tv-in { 0% { opacity: 0; transform: scaleY(.02) scaleX(1.1); filter: brightness(2) saturate(2); } 35% { opacity: 1; transform: scaleY(.8) scaleX(1); } 55% { transform: scaleY(.96); } 100% { transform: scaleY(1); filter: none; } }
+  @keyframes slide-neon-in { 0% { opacity: 0; filter: brightness(3) saturate(2) blur(12px); box-shadow: 0 0 80px #67e8f9; } 60% { opacity: 1; filter: brightness(1.3) saturate(1.4) blur(1px); } 100% { filter: none; box-shadow: none; } }
+  @keyframes slide-cube-in { from { opacity: 0; transform: perspective(1200px) rotateY(-75deg) translateX(8%); } to { opacity: 1; transform: perspective(1200px) rotateY(0) translateX(0); } }
+  @keyframes slide-blur-in { from { opacity: 0; filter: blur(24px); transform: scale(1.08); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+  /* ============================================================
    PARALLAX TRANSITIONS — layers move at different speeds.
    Depth driven by nth-child so every layer lags differently.
    ============================================================ */
@@ -286,7 +294,12 @@
 .transition-mini-stage[data-transition="slide"] { animation: selector-slide 1.8s ease infinite; }
 .transition-mini-stage[data-transition="zoom"] { animation: selector-zoom 1.8s ease infinite; }
 .transition-mini-stage[data-transition="flip"] { animation: selector-flip 1.8s ease infinite; }
-.transition-mini-stage[data-transition="glitch"] { animation: selector-glitch 1.8s steps(4) infinite; }
+  .transition-mini-stage[data-transition="glitch"] { animation: selector-glitch 1.8s steps(4) infinite; }
+  .transition-mini-stage[data-transition="tv"] { animation: selector-tv 1.8s steps(6) infinite; }
+  .transition-mini-stage[data-transition="neon"] { animation: selector-neon 1.8s ease infinite; }
+  .transition-mini-stage[data-transition="cube"] { animation: selector-cube 1.8s ease infinite; }
+  .transition-mini-stage[data-transition="blur"] { animation: selector-blur 1.8s ease infinite; }
+
 .transition-mini-stage[data-transition="morph"] .transition-mini-mark { animation: selector-morph 1.8s ease-in-out infinite alternate; }
 .transition-mini-stage[data-transition="parallax-left"] > * { animation: selector-slide 1.8s ease infinite; }
 .transition-mini-stage[data-transition="parallax-up"] > * { animation: selector-up 1.8s ease infinite; }
@@ -298,6 +311,11 @@
 @keyframes selector-up { 0%, 10% { transform: translateY(65px); opacity: 0; } 55%, 100% { transform: translateY(0); opacity: 1; } }
 @keyframes selector-zoom { 0%, 10% { transform: scale(.5); opacity: 0; } 55%, 100% { transform: scale(1); opacity: 1; } }
 @keyframes selector-flip { 0%, 10% { transform: perspective(500px) rotateY(-90deg); opacity: 0; } 55%, 100% { transform: perspective(500px) rotateY(0); opacity: 1; } }
-@keyframes selector-glitch { 0%, 10% { clip-path: inset(25% 0 45%); transform: translateX(-5px); } 20% { clip-path: inset(55% 0 10%); transform: translateX(5px); } 40%, 100% { clip-path: inset(0); transform: none; } }
+  @keyframes selector-glitch { 0%, 10% { clip-path: inset(25% 0 45%); transform: translateX(-5px); } 20% { clip-path: inset(55% 0 10%); transform: translateX(5px); } 40%, 100% { clip-path: inset(0); transform: none; } }
+  @keyframes selector-tv { 0%, 10% { transform: scaleY(.04); opacity: .3; } 35% { transform: scaleY(.8); opacity: 1; } 55%, 100% { transform: scaleY(1); } }
+  @keyframes selector-neon { 0%, 10% { filter: brightness(2) blur(5px); opacity: .2; } 55%, 100% { filter: none; opacity: 1; } }
+  @keyframes selector-cube { 0%, 10% { transform: perspective(240px) rotateY(-65deg); opacity: 0; } 55%, 100% { transform: perspective(240px) rotateY(0); opacity: 1; } }
+  @keyframes selector-blur { 0%, 10% { filter: blur(8px); opacity: 0; } 55%, 100% { filter: blur(0); opacity: 1; } }
+
 @keyframes selector-morph { from { width: 26px; border-radius: 6px; transform: translateX(0); } to { width: 70px; border-radius: 18px; transform: translateX(70px); } }
 @media (prefers-reduced-motion: reduce) { .transition-mini-stage, .transition-mini-stage > * { animation: none !important; } .selector-grid .selector-option:hover { transform: none; } }

@@ -1,4 +1,4 @@
-import { useEditor, type SlideTransition } from "@/store/editor";
+import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { useState, useEffect } from "react";
@@ -15,6 +15,12 @@ import {
   Layers,
   ChevronDown,
   Search,
+  MonitorPlay,
+  Sparkles,
+  Box,
+  Cloudy,
+  RotateCw,
+  CircleDot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,6 +35,10 @@ const transitionIcons = {
   flip: FlipHorizontal,
   morph: Shapes,
   glitch: Zap,
+  tv: MonitorPlay,
+  neon: Sparkles,
+  cube: Box,
+  blur: Cloudy,
   "parallax-left": MoveLeft,
   "parallax-up": MoveUp,
   "parallax-depth": Layers,
@@ -42,6 +52,10 @@ const transitionOptions: SlideTransition[] = [
   "flip",
   "morph",
   "glitch",
+  "tv",
+  "neon",
+  "cube",
+  "blur",
   "parallax-left",
   "parallax-up",
   "parallax-depth",
@@ -63,6 +77,9 @@ export function PagesBar() {
     setTransition,
     setTransitionZoom,
     setPresenting,
+    selectedId,
+    elements,
+    update,
   } = useEditor();
 
   // ⌘K / Ctrl+K — toggle command palette
@@ -200,6 +217,26 @@ export function PagesBar() {
                 className="selector-panel space-y-3 rounded-xl p-3"
               >
                 <PanelHeader title="Slide transition" />
+                {selectedId && (
+                  <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Selected object motion</span>
+                      <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                    </div>
+                    <OptionGrid
+                      columns={3}
+                      label="Object animations"
+                      value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
+                      onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
+                      options={( [
+                        ["none", "None", Ban], ["fade-up", "Fade", Blend], ["pop", "Pop", Sparkles],
+                        ["glitch", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
+                        ["move-up", "Rise", MoveUp], ["move-down", "Drop", ChevronDown], ["blur-in", "Blur", Cloudy],
+                        ["spin-in", "Spin", RotateCw], ["bounce-in", "Bounce", CircleDot],
+                      ] as const).map(([value, label, icon]) => ({ value, label, icon }))}
+                    />
+                  </div>
+                )}
                 <div
                   className="transition-mini"
                   role="img"
