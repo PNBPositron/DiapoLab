@@ -16,7 +16,18 @@ export type ElementBase = {
   shadow?: ElementShadow;
 };
 
-export type ElementAnimation = "none" | "fade-up" | "pop" | "glitch" | "move-left" | "move-right" | "move-up" | "move-down";
+export type ElementAnimation =
+  | "none"
+  | "fade-up"
+  | "pop"
+  | "glitch"
+  | "move-left"
+  | "move-right"
+  | "move-up"
+  | "move-down"
+  | "blur-in"
+  | "spin-in"
+  | "bounce-in";
 export type SlideTransition =
   | "none"
   | "fade"
@@ -25,6 +36,10 @@ export type SlideTransition =
   | "zoom"
   | "flip"
   | "morph"
+  | "tv"
+  | "neon"
+  | "cube"
+  | "blur"
   | "parallax-left"
   | "parallax-up"
   | "parallax-depth";

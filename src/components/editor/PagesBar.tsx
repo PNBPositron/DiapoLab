@@ -15,6 +15,12 @@ import {
   Layers,
   ChevronDown,
   Search,
+  MonitorPlay,
+  Sparkles,
+  Box,
+  Cloudy,
+  RotateCw,
+  CircleDot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,6 +35,10 @@ const transitionIcons = {
   flip: FlipHorizontal,
   morph: Shapes,
   glitch: Zap,
+  tv: MonitorPlay,
+  neon: Sparkles,
+  cube: Box,
+  blur: Cloudy,
   "parallax-left": MoveLeft,
   "parallax-up": MoveUp,
   "parallax-depth": Layers,
@@ -42,6 +52,10 @@ const transitionOptions: SlideTransition[] = [
   "flip",
   "morph",
   "glitch",
+  "tv",
+  "neon",
+  "cube",
+  "blur",
   "parallax-left",
   "parallax-up",
   "parallax-depth",
@@ -209,21 +223,18 @@ export function PagesBar() {
                       <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Selected object motion</span>
                       <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
                     </div>
-                    <select
-                      aria-label="Selected object animation"
+                    <OptionGrid
+                      columns={3}
+                      label="Object animations"
                       value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
-                      onChange={(event) => update(selectedId, { animation: event.target.value as ElementAnimation })}
-                      className="h-8 w-full rounded-lg border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                    >
-                      <option value="none">No animation</option>
-                      <option value="fade-up">Fade up</option>
-                      <option value="pop">Pop spring</option>
-                      <option value="glitch">Digital glitch</option>
-                      <option value="move-left">Move left</option>
-                      <option value="move-right">Move right</option>
-                      <option value="move-up">Move up</option>
-                      <option value="move-down">Move down</option>
-                    </select>
+                      onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
+                      options={( [
+                        ["none", "None", Ban], ["fade-up", "Fade", Blend], ["pop", "Pop", Sparkles],
+                        ["glitch", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
+                        ["move-up", "Rise", MoveUp], ["move-down", "Drop", ChevronDown], ["blur-in", "Blur", Cloudy],
+                        ["spin-in", "Spin", RotateCw], ["bounce-in", "Bounce", CircleDot],
+                      ] as const).map(([value, label, icon]) => ({ value, label, icon }))}
+                    />
                   </div>
                 )}
                 <div
