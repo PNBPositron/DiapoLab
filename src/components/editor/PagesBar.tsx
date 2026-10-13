@@ -1,4 +1,4 @@
-import { useEditor, type SlideTransition } from "@/store/editor";
+import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { useState, useEffect } from "react";
@@ -63,6 +63,9 @@ export function PagesBar() {
     setTransition,
     setTransitionZoom,
     setPresenting,
+    selectedId,
+    elements,
+    update,
   } = useEditor();
 
   // ⌘K / Ctrl+K — toggle command palette
@@ -200,6 +203,29 @@ export function PagesBar() {
                 className="selector-panel space-y-3 rounded-xl p-3"
               >
                 <PanelHeader title="Slide transition" />
+                {selectedId && (
+                  <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Selected object motion</span>
+                      <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                    </div>
+                    <select
+                      aria-label="Selected object animation"
+                      value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
+                      onChange={(event) => update(selectedId, { animation: event.target.value as ElementAnimation })}
+                      className="h-8 w-full rounded-lg border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    >
+                      <option value="none">No animation</option>
+                      <option value="fade-up">Fade up</option>
+                      <option value="pop">Pop spring</option>
+                      <option value="glitch">Digital glitch</option>
+                      <option value="move-left">Move left</option>
+                      <option value="move-right">Move right</option>
+                      <option value="move-up">Move up</option>
+                      <option value="move-down">Move down</option>
+                    </select>
+                  </div>
+                )}
                 <div
                   className="transition-mini"
                   role="img"
