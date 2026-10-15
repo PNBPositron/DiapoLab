@@ -41,7 +41,15 @@ export async function importJSONFile(file: File): Promise<void> {
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const JPEG_QUALITY = 0.92;
+const JPEG_QUALITY = 0.96;
+const EXPORT_PIXEL_RATIO = 2.5;
+
+async function waitForExportReady() {
+  if (document.fonts?.ready) await document.fonts.ready;
+  const images = Array.from(document.querySelectorAll<HTMLImageElement>("#canvas-export img"));
+  await Promise.all(images.map((image) => image.decode?.().catch(() => undefined)));
+  await wait(80);
+}
 
 async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]> {
   const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
@@ -50,15 +58,16 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
   const shots: string[] = [];
   for (let i = 0; i < pages.length; i++) {
     setCurrentPage(i);
-    // wait for React paint + scale fit
+    // Wait for React paint, fonts, and remote image assets before capturing.
     await wait(120);
+    await waitForExportReady();
     const node = document.getElementById("canvas-export");
     if (!node) continue;
     node.dataset.exporting = "true";
     const options = {
       width: canvasW,
       height: canvasH,
-      pixelRatio: 2,
+      pixelRatio: EXPORT_PIXEL_RATIO,
       style: { transform: "none", left: "0", top: "0", margin: "0" },
     };
     // JPEG has no alpha channel, so give it a white base for any transparent areas.
@@ -76,15 +85,18 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
 export async function exportPNG(name: string) {
   const { canvasW, canvasH } = useEditor.getState();
   useEditor.getState().select(null);
-  await wait(50);
+  await wait(80);
+  await waitForExportReady();
   const node = document.getElementById("canvas-export");
   if (!node) return;
   node.dataset.exporting = "true";
   const dataUrl = await toPng(node, {
     width: canvasW,
     height: canvasH,
-    pixelRatio: 2,
-    style: { transform: "none", left: "0", top: "0", margin: "0" },
+    pixelRatio: EXPORT_PIXEL_RATIO,
+    cacheBust: true,
+    backgroundColor: "#ffffff00",
+    style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
   delete node.dataset.exporting;
   const link = document.createElement("a");
