@@ -43,16 +43,5 @@ export default defineConfig(({ mode }) => {
         supabasePublishableKey,
       ),
     },
-    // TanStack's SSR/client entrypoints are resolved by the router runtime.
-    // Excluding them prevents Vite from serving stale optimized-dependency
-    // URLs after a lockfile or package-version change.
-    optimizeDeps: {
-      exclude: [
-        "@tanstack/react-start",
-        "@tanstack/react-router",
-        "@tanstack/router-core",
-        "@tanstack/history",
-      ],
-    },
   };
 });
