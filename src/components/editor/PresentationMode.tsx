@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
 
@@ -89,6 +90,7 @@ export function PresentationMode() {
     page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
       ? `slide-transition-${page.transition}`
       : "";
+  const preset = transitionPreset(page.transition);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
@@ -106,8 +108,12 @@ export function PresentationMode() {
             } as React.CSSProperties
           }
         >
-          <div
+          <AnimatePresence initial={false} mode="sync">
+          <motion.div
             key={`slide-${currentIndex}`}
+            initial={preset.initial}
+            animate={preset.animate}
+            transition={preset.transition}
             onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
             className={`absolute left-0 top-0 cursor-pointer overflow-hidden border border-teal ${transition}`}
             style={
@@ -139,11 +145,23 @@ export function PresentationMode() {
                 <CanvasElement key={el.id} element={el} scale={scale} />
               ),
             )}
-          </div>
+          </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>
   );
+}
+
+function transitionPreset(name: string | undefined) {
+  const ease = [0.22, 1, 0.36, 1] as const;
+  if (name === "slide-left") return { initial: { x: "100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
+  if (name === "slide-right") return { initial: { x: "-100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
+  if (name === "slide-up") return { initial: { y: "100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
+  if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
+  if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.48, ease } };
+  if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
+  return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };
 }
 
 /**
