@@ -117,9 +117,9 @@ export function PresentationMode() {
             className="absolute left-0 top-0 overflow-hidden border border-teal"
             style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
           >
-            <AnimatePresence initial={false} mode="sync">
+            <AnimatePresence initial mode="sync">
               <motion.div
-                key={`slide-${currentIndex}`}
+                key={`slide-${currentIndex}-${page.transition ?? "none"}`}
                 initial={preset.initial}
                 animate={preset.animate}
                 transition={preset.transition}
