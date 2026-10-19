@@ -86,8 +86,13 @@ export function PresentationMode() {
   if (!presenting || !page) return null;
 
   const morphing = page.transition === "morph";
+  const motionTransitionNames = new Set(["tv", "neon", "cube"]);
   const transition =
-    page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
+    page.transition &&
+    page.transition !== "none" &&
+    !morphing &&
+    page.transition !== "zoom" &&
+    !motionTransitionNames.has(page.transition)
       ? `slide-transition-${page.transition}`
       : "";
   const preset = transitionPreset(page.transition);
@@ -108,45 +113,51 @@ export function PresentationMode() {
             } as React.CSSProperties
           }
         >
-          <AnimatePresence initial={false} mode="sync">
-          <motion.div
-            key={`slide-${currentIndex}`}
-            initial={preset.initial}
-            animate={preset.animate}
-            transition={preset.transition}
-            onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
-            className={`absolute left-0 top-0 cursor-pointer overflow-hidden border border-teal ${transition}`}
-            style={
-              {
-                width: canvasW,
-                height: canvasH,
-                backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
-                backgroundImage: page.bgImage
-                  ? `url(${page.bgImage})`
-                  : page.bgColor.includes("gradient(")
-                    ? page.bgColor
-                    : undefined,
-                backgroundSize: page.bgFit ?? "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                transform: `scale(${scale})`,
-                transformOrigin: "top left",
-                "--fit": scale,
-                transition: morphing ? "background-color 620ms ease" : undefined,
-              } as React.CSSProperties
-            }
+          <div
+            className="absolute left-0 top-0 overflow-hidden border border-teal"
+            style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
           >
-            {page.elements.map((el) =>
-              morphing ? (
-                <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
-                  <CanvasElement element={el} scale={scale} morph />
-                </MorphItem>
-              ) : (
-                <CanvasElement key={el.id} element={el} scale={scale} />
-              ),
-            )}
-          </motion.div>
-          </AnimatePresence>
+            <AnimatePresence initial mode="sync">
+              <motion.div
+                key={`slide-${currentIndex}-${page.transition ?? "none"}`}
+                initial={preset.initial}
+                animate={preset.animate}
+                transition={preset.transition}
+                onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
+                className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}`}
+                style={
+                  {
+                    width: canvasW,
+                    height: canvasH,
+                    backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+                    backgroundImage: page.bgImage
+                      ? `url(${page.bgImage})`
+                      : page.bgColor.includes("gradient(")
+                        ? page.bgColor
+                        : undefined,
+                    backgroundSize: page.bgFit ?? "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    "--fit": scale,
+                    transformStyle: "preserve-3d",
+                    perspective: page.transition === "cube" ? 1200 : undefined,
+                    transition: morphing ? "background-color 620ms ease" : undefined,
+                  } as React.CSSProperties
+                }
+              >
+                {page.elements.map((el) =>
+                  morphing ? (
+                    <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
+                      <CanvasElement element={el} scale={scale} morph />
+                    </MorphItem>
+                  ) : (
+                    <CanvasElement key={el.id} element={el} scale={scale} />
+                  ),
+                )}
+                <TransitionFx name={page.transition} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
@@ -161,7 +172,70 @@ function transitionPreset(name: string | undefined) {
   if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
   if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.48, ease } };
   if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
+  if (name === "tv") {
+    return {
+      // A CRT powers on from a bright horizontal line without enlarging the slide.
+      initial: { opacity: 0, clipPath: "inset(49.5% 0 49.5% 0)", filter: "brightness(3) saturate(1.8) contrast(1.25)" },
+      animate: {
+        opacity: [0, 1, 1, 1],
+        clipPath: ["inset(49.5% 0 49.5% 0)", "inset(10% 0 10% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
+        filter: ["brightness(3) saturate(1.8) contrast(1.25)", "brightness(1.6) saturate(1.35) contrast(1.1)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+      },
+      transition: { duration: 0.82, times: [0, 0.34, 0.72, 1], ease },
+    };
+  }
+  if (name === "neon") {
+    return {
+      // Digital signal lock: RGB-like horizontal jitter and scanline flashes, no zoom.
+      initial: { opacity: 0, x: 0, clipPath: "inset(0 0 100% 0)", filter: "brightness(2.4) saturate(2.8) contrast(1.5)" },
+      animate: {
+        opacity: [0, 1, 1, 1, 1],
+        x: [0, -14, 11, -6, 0],
+        clipPath: ["inset(0 0 100% 0)", "inset(0 0 58% 0)", "inset(18% 0 28% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
+        filter: ["brightness(2.4) saturate(2.8) contrast(1.5)", "brightness(1.7) saturate(2.2) contrast(1.4)", "brightness(1.35) saturate(1.6) contrast(1.15)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+      },
+      transition: { duration: 0.78, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
+    };
+  }
+  if (name === "cube") {
+    return {
+      initial: { opacity: 0, rotateY: -18, x: "2%", transformPerspective: 1200 },
+      animate: { opacity: [0, 1, 1], rotateY: [-18, 3, 0], x: ["2%", "-0.5%", "0%"], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
+      transition: { duration: 0.86, times: [0, 0.72, 1], ease },
+    };
+  }
   return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };
+}
+
+function TransitionFx({ name }: { name?: string }) {
+  if (name === "tv") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20"
+        initial={{ opacity: 1, scaleY: 0.02, filter: "brightness(3)" }}
+        animate={{ opacity: [1, 0.95, 0.7, 0], scaleY: [0.02, 0.18, 1, 1], filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"] }}
+        transition={{ duration: 0.82, times: [0, 0.24, 0.68, 1], ease: "easeOut" }}
+        style={{ background: "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)", mixBlendMode: "screen", transformOrigin: "center" }}
+      />
+    );
+  }
+  if (name === "neon") {
+    return (
+      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.78, ease: "linear" }}>
+        {["18%", "43%", "67%", "82%"].map((top, index) => (
+          <motion.div key={top} className="absolute left-[-8%] h-[3px] w-[116%]" style={{ top, background: index % 2 ? "#22d3ee" : "#f0abfc", boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`, mixBlendMode: "screen" }} initial={{ x: "-8%", scaleX: 0.3 }} animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }} transition={{ duration: 0.62, delay: index * 0.035, ease: "linear" }} />
+        ))}
+        <motion.div className="absolute inset-0" style={{ background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)" }} animate={{ opacity: [1, 0.2, 1, 0] }} transition={{ duration: 0.7, ease: "linear" }} />
+      </motion.div>
+    );
+  }
+  if (name === "cube") {
+    return (
+      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70" initial={{ opacity: 1, rotateY: -14, scale: 0.96 }} animate={{ opacity: 0, rotateY: 0, scale: 1 }} transition={{ duration: 0.86, ease: "easeOut" }} style={{ transformOrigin: "center", transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)" }} />
+    );
+  }
+  return null;
 }
 
 /**
