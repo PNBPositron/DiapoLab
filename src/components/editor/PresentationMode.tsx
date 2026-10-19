@@ -168,22 +168,33 @@ function transitionPreset(name: string | undefined) {
   if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
   if (name === "tv") {
     return {
-      initial: { opacity: 0, scaleY: 0.015, scaleX: 1.04, filter: "brightness(2.8) saturate(1.8)" },
-      animate: { opacity: [0, 1, 1, 1], scaleY: [0.015, 0.82, 1.04, 1], scaleX: [1.04, 1, 1.01, 1], filter: ["brightness(2.8) saturate(1.8)", "brightness(1.4) saturate(1.25)", "brightness(1)", "brightness(1)"], originY: 0.5 },
-      transition: { duration: 0.78, times: [0, 0.28, 0.58, 1], ease },
+      // A CRT powers on from a bright horizontal line without enlarging the slide.
+      initial: { opacity: 0, clipPath: "inset(49.5% 0 49.5% 0)", filter: "brightness(3) saturate(1.8) contrast(1.25)" },
+      animate: {
+        opacity: [0, 1, 1, 1],
+        clipPath: ["inset(49.5% 0 49.5% 0)", "inset(10% 0 10% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
+        filter: ["brightness(3) saturate(1.8) contrast(1.25)", "brightness(1.6) saturate(1.35) contrast(1.1)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+      },
+      transition: { duration: 0.82, times: [0, 0.34, 0.72, 1], ease },
     };
   }
   if (name === "neon") {
     return {
-      initial: { opacity: 0, scale: 1.025, filter: "brightness(3) saturate(2.2) blur(14px)" },
-      animate: { opacity: [0, 1, 1], scale: [1.025, 1.008, 1], filter: ["brightness(3) saturate(2.2) blur(14px)", "brightness(1.5) saturate(1.5) blur(1px)", "brightness(1) saturate(1) blur(0px)"], originX: 0.5, originY: 0.5 },
-      transition: { duration: 0.86, times: [0, 0.52, 1], ease },
+      // Digital signal lock: RGB-like horizontal jitter and scanline flashes, no zoom.
+      initial: { opacity: 0, x: 0, clipPath: "inset(0 0 100% 0)", filter: "brightness(2.4) saturate(2.8) contrast(1.5)" },
+      animate: {
+        opacity: [0, 1, 1, 1, 1],
+        x: [0, -14, 11, -6, 0],
+        clipPath: ["inset(0 0 100% 0)", "inset(0 0 58% 0)", "inset(18% 0 28% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
+        filter: ["brightness(2.4) saturate(2.8) contrast(1.5)", "brightness(1.7) saturate(2.2) contrast(1.4)", "brightness(1.35) saturate(1.6) contrast(1.15)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+      },
+      transition: { duration: 0.78, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
     };
   }
   if (name === "cube") {
     return {
-      initial: { opacity: 0, rotateY: -32, x: "4%", scale: 0.94, transformPerspective: 1200 },
-      animate: { opacity: [0, 1, 1], rotateY: [ -32, 5, 0 ], x: ["4%", "-1%", "0%"], scale: [0.94, 1.01, 1], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
+      initial: { opacity: 0, rotateY: -18, x: "2%", transformPerspective: 1200 },
+      animate: { opacity: [0, 1, 1], rotateY: [-18, 3, 0], x: ["2%", "-0.5%", "0%"], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
       transition: { duration: 0.86, times: [0, 0.72, 1], ease },
     };
   }
