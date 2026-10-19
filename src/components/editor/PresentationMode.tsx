@@ -114,43 +114,46 @@ export function PresentationMode() {
           }
         >
           <AnimatePresence initial={false} mode="sync">
-          <motion.div
-            key={`slide-${currentIndex}`}
-            initial={preset.initial}
-            animate={preset.animate}
-            transition={preset.transition}
-            onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
-            className={`absolute left-0 top-0 cursor-pointer overflow-hidden border border-teal ${transition}`}
-            style={
-              {
-                width: canvasW,
-                height: canvasH,
-                backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
-                backgroundImage: page.bgImage
-                  ? `url(${page.bgImage})`
-                  : page.bgColor.includes("gradient(")
-                    ? page.bgColor
-                    : undefined,
-                backgroundSize: page.bgFit ?? "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                transform: `scale(${scale})`,
-                transformOrigin: "top left",
-                "--fit": scale,
-                transition: morphing ? "background-color 620ms ease" : undefined,
-              } as React.CSSProperties
-            }
-          >
-            {page.elements.map((el) =>
-              morphing ? (
-                <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
-                  <CanvasElement element={el} scale={scale} morph />
-                </MorphItem>
-              ) : (
-                <CanvasElement key={el.id} element={el} scale={scale} />
-              ),
-            )}
-          </motion.div>
+            <div
+              className="absolute left-0 top-0 overflow-hidden border border-teal"
+              style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
+            >
+              <motion.div
+                key={`slide-${currentIndex}`}
+                initial={preset.initial}
+                animate={preset.animate}
+                transition={preset.transition}
+                onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
+                className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}`}
+                style={
+                  {
+                    width: canvasW,
+                    height: canvasH,
+                    backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+                    backgroundImage: page.bgImage
+                      ? `url(${page.bgImage})`
+                      : page.bgColor.includes("gradient(")
+                        ? page.bgColor
+                        : undefined,
+                    backgroundSize: page.bgFit ?? "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    "--fit": scale,
+                    transition: morphing ? "background-color 620ms ease" : undefined,
+                  } as React.CSSProperties
+                }
+              >
+                {page.elements.map((el) =>
+                  morphing ? (
+                    <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
+                      <CanvasElement element={el} scale={scale} morph />
+                    </MorphItem>
+                  ) : (
+                    <CanvasElement key={el.id} element={el} scale={scale} />
+                  ),
+                )}
+              </motion.div>
+            </div>
           </AnimatePresence>
         </div>
       </div>
