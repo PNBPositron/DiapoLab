@@ -86,8 +86,13 @@ export function PresentationMode() {
   if (!presenting || !page) return null;
 
   const morphing = page.transition === "morph";
+  const motionTransitionNames = new Set(["tv", "neon", "cube"]);
   const transition =
-    page.transition && page.transition !== "none" && !morphing && page.transition !== "zoom"
+    page.transition &&
+    page.transition !== "none" &&
+    !morphing &&
+    page.transition !== "zoom" &&
+    !motionTransitionNames.has(page.transition)
       ? `slide-transition-${page.transition}`
       : "";
   const preset = transitionPreset(page.transition);
@@ -161,6 +166,27 @@ function transitionPreset(name: string | undefined) {
   if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
   if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.48, ease } };
   if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
+  if (name === "tv") {
+    return {
+      initial: { opacity: 0, scaleY: 0.015, scaleX: 1.04, filter: "brightness(2.8) saturate(1.8)" },
+      animate: { opacity: [0, 1, 1, 1], scaleY: [0.015, 0.82, 1.04, 1], scaleX: [1.04, 1, 1.01, 1], filter: ["brightness(2.8) saturate(1.8)", "brightness(1.4) saturate(1.25)", "brightness(1)", "brightness(1)"], originY: 0.5 },
+      transition: { duration: 0.78, times: [0, 0.28, 0.58, 1], ease },
+    };
+  }
+  if (name === "neon") {
+    return {
+      initial: { opacity: 0, scale: 1.025, filter: "brightness(3) saturate(2.2) blur(14px)" },
+      animate: { opacity: [0, 1, 1], scale: [1.025, 1.008, 1], filter: ["brightness(3) saturate(2.2) blur(14px)", "brightness(1.5) saturate(1.5) blur(1px)", "brightness(1) saturate(1) blur(0px)"], originX: 0.5, originY: 0.5 },
+      transition: { duration: 0.86, times: [0, 0.52, 1], ease },
+    };
+  }
+  if (name === "cube") {
+    return {
+      initial: { opacity: 0, rotateY: -32, x: "4%", scale: 0.94, transformPerspective: 1200 },
+      animate: { opacity: [0, 1, 1], rotateY: [ -32, 5, 0 ], x: ["4%", "-1%", "0%"], scale: [0.94, 1.01, 1], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
+      transition: { duration: 0.86, times: [0, 0.72, 1], ease },
+    };
+  }
   return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };
 }
 
