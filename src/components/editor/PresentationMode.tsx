@@ -139,6 +139,8 @@ export function PresentationMode() {
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     "--fit": scale,
+                    transformStyle: "preserve-3d",
+                    perspective: page.transition === "cube" ? 1200 : undefined,
                     transition: morphing ? "background-color 620ms ease" : undefined,
                   } as React.CSSProperties
                 }
@@ -152,6 +154,7 @@ export function PresentationMode() {
                     <CanvasElement key={el.id} element={el} scale={scale} />
                   ),
                 )}
+                <TransitionFx name={page.transition} />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -202,6 +205,37 @@ function transitionPreset(name: string | undefined) {
     };
   }
   return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };
+}
+
+function TransitionFx({ name }: { name?: string }) {
+  if (name === "tv") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20"
+        initial={{ opacity: 1, scaleY: 0.02, filter: "brightness(3)" }}
+        animate={{ opacity: [1, 0.95, 0.7, 0], scaleY: [0.02, 0.18, 1, 1], filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"] }}
+        transition={{ duration: 0.82, times: [0, 0.24, 0.68, 1], ease: "easeOut" }}
+        style={{ background: "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)", mixBlendMode: "screen", transformOrigin: "center" }}
+      />
+    );
+  }
+  if (name === "neon") {
+    return (
+      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.78, ease: "linear" }}>
+        {["18%", "43%", "67%", "82%"].map((top, index) => (
+          <motion.div key={top} className="absolute left-[-8%] h-[3px] w-[116%]" style={{ top, background: index % 2 ? "#22d3ee" : "#f0abfc", boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`, mixBlendMode: "screen" }} initial={{ x: "-8%", scaleX: 0.3 }} animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }} transition={{ duration: 0.62, delay: index * 0.035, ease: "linear" }} />
+        ))}
+        <motion.div className="absolute inset-0" style={{ background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)" }} animate={{ opacity: [1, 0.2, 1, 0] }} transition={{ duration: 0.7, ease: "linear" }} />
+      </motion.div>
+    );
+  }
+  if (name === "cube") {
+    return (
+      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70" initial={{ opacity: 1, rotateY: -14, scale: 0.96 }} animate={{ opacity: 0, rotateY: 0, scale: 1 }} transition={{ duration: 0.86, ease: "easeOut" }} style={{ transformOrigin: "center", transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)" }} />
+    );
+  }
+  return null;
 }
 
 /**
