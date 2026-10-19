@@ -113,11 +113,11 @@ export function PresentationMode() {
             } as React.CSSProperties
           }
         >
-          <AnimatePresence initial={false} mode="sync">
-            <div
-              className="absolute left-0 top-0 overflow-hidden border border-teal"
-              style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
-            >
+          <div
+            className="absolute left-0 top-0 overflow-hidden border border-teal"
+            style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
+          >
+            <AnimatePresence initial={false} mode="sync">
               <motion.div
                 key={`slide-${currentIndex}`}
                 initial={preset.initial}
@@ -153,8 +153,8 @@ export function PresentationMode() {
                   ),
                 )}
               </motion.div>
-            </div>
-          </AnimatePresence>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
