@@ -15,7 +15,7 @@ async function chatComplete(
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  const apiKey = process.env.GROQ_KEY?.trim().replace(/^['"]|['"]$/g, "");
+  const apiKey = (process.env.GROQ_KEY_2?.trim() || process.env.GROQ_KEY?.trim())?.replace(/^['"]|['"]$/g, "");
   if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY.");
 
   const hasImage = messages.some(

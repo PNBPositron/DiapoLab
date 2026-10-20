@@ -16,7 +16,7 @@ export const Route = createFileRoute("/api/slide-analysis")({
         const question = body.question?.trim() || "Analyze this slide and suggest concrete improvements.";
         const wantsEdit = /\b(edit|change|update|move|resize|delete|remove|add|rewrite|modify)\b/i.test(question);
 
-        const apiKey = process.env.GROQ_KEY;
+        const apiKey = process.env.GROQ_KEY_2?.trim() || process.env.GROQ_KEY?.trim();
         if (!apiKey) return Response.json({ error: "The slide assistant is not configured." }, { status: 503 });
 
         const messages: ChatMessage[] = [

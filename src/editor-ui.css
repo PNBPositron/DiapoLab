@@ -318,8 +318,8 @@
   transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
 .zoom-dock button:hover:not(:disabled) {
-  background: #eef2ff;
-  color: #4338ca;
+  background: #f7ebe6;
+  color: #a9432b;
   transform: translateY(-1px);
 }
 .zoom-dock button:active:not(:disabled) { transform: scale(0.94); }
@@ -338,6 +338,17 @@
 }
 
 /* Shared editor chrome: quiet surfaces, consistent rhythm, clear focus. */
+.editor-ui > header,
+.editor-ui > nav,
+.editor-ui > .editor-toolbar,
+.editor-ui .pages-bar,
+.editor-ui .timeline-bar {
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  border-color: color-mix(in srgb, var(--teal) 12%, transparent);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+.editor-ui .timeline-bar { box-shadow: 0 -1px 0 color-mix(in srgb, var(--teal) 8%, transparent); }
 .editor-ui .brutal-border,
 .editor-ui .brutal-border-2 {
   border-color: var(--border);
