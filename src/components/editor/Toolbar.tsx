@@ -17,8 +17,8 @@ import {
   Share2,
   Upload,
   Settings,
-  Sparkles,
   CheckCircle2,
+  Sparkles,
   Sliders,
   Presentation,
 } from "lucide-react";
@@ -33,6 +33,7 @@ import {
   exportPPTX,
   exportGIF,
   exportHTML,
+  exportMarkdown,
   exportJSON,
   importJSONFile,
 } from "@/lib/export";
@@ -115,14 +116,14 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json">(null);
+  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json">(null);
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
   const parseRef = useRef<HTMLInputElement>(null);
 
-  const runExport = async (kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "json") => {
+  const runExport = async (kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json") => {
     setExportOpen(false);
     setExporting(kind);
     try {
@@ -131,7 +132,8 @@ export function Toolbar() {
       else if (kind === "pdf") await exportPDF(n);
       else if (kind === "pdf-print") exportPDFPrint(n);
       else if (kind === "pptx") await exportPPTX(n);
-      else if (kind === "html") await exportHTML(n);
+      else if (kind === "html") exportHTML(n);
+      else if (kind === "markdown") exportMarkdown(n);
       else if (kind === "json") exportJSON(n);
       else await exportGIF(n);
     } catch (e) {
@@ -377,18 +379,6 @@ export function Toolbar() {
           </button>
         </div>
 
-        {/* Gemini AI button (purple accents / gradient) */}
-        <button
-          onClick={() => setAssistantOpen(true)}
-          title="Groq Vision slide assistant"
-          className="group flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-purple-700 transition-all hover:border-purple-200 hover:bg-purple-50 hover:shadow-purple-500/10 active:scale-95"
-        >
-          <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
-          <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-purple-800">
-            Assistant
-          </span>
-        </button>
-
         {/* Import JSON */}
         <button
           onClick={() => importRef.current?.click()}
@@ -478,7 +468,7 @@ export function Toolbar() {
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
-              {(["png", "pdf-print", "pdf", "pptx", "html", "json", "gif"] as const).map((k) => (
+              {(["png", "pdf-print", "pdf", "pptx", "html", "markdown", "json", "gif"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -743,16 +733,6 @@ function LargeModernHamburger({
             title="New design"
             subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
-          />
-
-          <MenuCardItem
-            icon={Sparkles}
-            iconColor="text-purple-600"
-            iconBg="bg-gradient-to-br from-purple-50 to-indigo-50 group-hover:from-purple-100 group-hover:to-indigo-100"
-            title="Gemini assistant"
-            subtitle="Smart critique & touch-ups"
-            badge="AI"
-            onClick={() => handleAction(onAssistant)}
           />
 
           {isAuthenticated && (

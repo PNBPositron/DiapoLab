@@ -1387,6 +1387,9 @@ export function PropertiesPanel() {
                     { value: "move-right", label: "Move Right" },
                     { value: "move-up", label: "Move Up" },
                     { value: "move-down", label: "Move Down" },
+                    { value: "blur-in", label: "Blur In" },
+                    { value: "spin-in", label: "Spin In" },
+                    { value: "bounce-in", label: "Bounce In" },
                   ]}
                   onChange={(v) => update(el.id, { animation: v as any })}
                 />

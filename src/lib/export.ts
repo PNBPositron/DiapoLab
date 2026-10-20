@@ -178,6 +178,24 @@ export async function exportPPTX(name: string) {
   await pptx.writeFile({ fileName: `${name || "positron"}-${Date.now()}.pptx` });
 }
 
+export function exportMarkdown(name: string) {
+  const { pages, designName } = useEditor.getState();
+  const lines = [`# ${designName || name || "DiapoLab presentation"}`, ""];
+  pages.forEach((page, index) => {
+    lines.push(`## Slide ${index + 1}`, "");
+    page.elements.forEach((element) => {
+      if (element.type === "text") lines.push(element.text, "");
+    });
+  });
+  const blob = new Blob([lines.join("\\n")], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${name || "positron"}-${Date.now()}.md`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 export function exportHTML(name: string) {
   const { pages, canvasW, canvasH } = useEditor.getState();
   if (pages.length === 0) return;

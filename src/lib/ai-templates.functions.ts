@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const GROQ_TEXT_MODEL = "qwen/qwen3-32b";
+const GROQ_TEXT_MODEL = "qwen/qwen3.8-27b";
 const GEMINI_MODEL = GROQ_TEXT_MODEL;
 const GROQ_VISION_MODEL = "qwen/qwen2.5-vl-32b-instruct";
 const pickModel = (hasImage = false) => (hasImage ? GROQ_VISION_MODEL : GROQ_TEXT_MODEL);
@@ -15,8 +15,11 @@ async function chatComplete(
   messages: CohereMessage[],
   extra: Record<string, unknown> = {},
 ): Promise<string> {
-  const apiKey = process.env.GROQ_KEY?.trim().replace(/^['"]|['"]$/g, "");
-  if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY.");
+  const apiKey = (process.env.GROQ_KEY_2?.trim() || process.env.GROQ_KEY?.trim())?.replace(
+    /^['"]|['"]$/g,
+    "",
+  );
+  if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY_2.");
 
   const hasImage = messages.some(
     (m) =>
@@ -54,7 +57,8 @@ async function chatComplete(
     }),
   });
   if (res.status === 429) throw new Error("AI rate limit hit. Try again in a moment.");
-  if (res.status === 401 || res.status === 403) throw new Error("AI authentication failed. Check GROQ_KEY.");
+  if (res.status === 401 || res.status === 403)
+    throw new Error("AI authentication failed. Check GROQ_KEY.");
   if (!res.ok) throw new Error(`AI error ${res.status}: ${await res.text()}`);
   const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
   const content = json.choices?.[0]?.message?.content?.trim();
@@ -210,8 +214,10 @@ export type AiStyle =
 
 const STYLE_GUIDES: Record<AiStyle, string> = {
   auto: "AUTO-DETECT STYLE. Read the user's prompt carefully, then pick the most appropriate visual style.",
-  cyberpunk: "CYBERPUNK / NEOBRUTALIST. Palette: ink #0a0f1f, neon teal #7df9ff, electric blue #4d7cff.",
-  liquid_glass: "LIQUID GLASS. Deep gradient backgrounds (indigo→violet→cyan), translucent surfaces.",
+  cyberpunk:
+    "CYBERPUNK / NEOBRUTALIST. Palette: ink #0a0f1f, neon teal #7df9ff, electric blue #4d7cff.",
+  liquid_glass:
+    "LIQUID GLASS. Deep gradient backgrounds (indigo→violet→cyan), translucent surfaces.",
   minimal: "SWISS MINIMALIST. Paper #f5f3ee, ink #0d0d0d, single accent. Massive negative space.",
   editorial: "EDITORIAL / MAGAZINE. Warm off-white #f8f4ec, deep ink #1a1a1a, gold #c9a84c.",
   brutalist: "RAW BRUTALIST. Stark white #ffffff, pure black #000000, saturated accent.",
@@ -300,10 +306,36 @@ export const generateAiTemplate = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data }): Promise<AiDeck> => {
+    const compactTemplate = Array.isArray(data.template)
+      ? data.template
+          .slice(0, 10)
+          .map((page, pageIndex) => {
+            const source = (page && typeof page === "object" ? page : {}) as {
+              bgColor?: string;
+              elements?: Array<Record<string, unknown>>;
+            };
+            const elements = Array.isArray(source.elements) ? source.elements : [];
+            const outline = elements
+              .slice(0, 32)
+              .map((element, elementIndex) => {
+                const type = typeof element.type === "string" ? element.type : "unknown";
+                const text =
+                  typeof element.text === "string" ? ` text="${element.text.slice(0, 140)}"` : "";
+                return `${elementIndex + 1}:${type}${text}`;
+              })
+              .join("; ");
+            return `Slide ${pageIndex + 1} background=${source.bgColor ?? "#ffffff"} elements=${elements.length}: ${outline}`;
+          })
+          .join("\n")
+          .slice(0, 9000)
+      : "";
+    const templateContext = compactTemplate
+      ? `\n\nSource template outline (not raw JSON). Preserve its useful story, slide count, and content while creating a fresh editable deck:\n${compactTemplate}`
+      : "";
     const userContent: Array<Record<string, unknown>> = [
       {
         type: "text",
-        text: `Create a ${data.slideCount}-slide presentation deck. Topic: ${data.prompt}`,
+        text: `Create a ${data.slideCount}-slide presentation deck. Topic: ${data.prompt}${templateContext}`,
       },
     ];
     if (data.imageDataUrl) {

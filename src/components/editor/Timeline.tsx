@@ -71,7 +71,7 @@ export function Timeline() {
   const fmt = (s: number) => `${Math.floor(s).toString().padStart(2, "0")}:${Math.floor((s % 1) * 100).toString().padStart(2, "0")}`;
 
   return (
-    <div className="flex items-center gap-3 border-t border-teal/30 bg-ink px-3 py-2">
+    <div className="timeline-bar flex items-center gap-3 border-t border-teal/30 bg-transparent px-3 py-2">
       <span className="font-display text-[10px] tracking-[0.2em] text-teal/70">VIDEO</span>
       <div className="flex items-center gap-1">
         <IconBtn onClick={() => { setT(0); setCurrentPage(0); }} title="Restart">
