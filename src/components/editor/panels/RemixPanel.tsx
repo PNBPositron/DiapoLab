@@ -24,11 +24,12 @@ export function RemixPanel() {
     try {
       const deck = await generateAiTemplate({
         data: {
-          prompt: `${prompt}. Remix the public template “${selected.name}” while keeping its core story and visual direction.`,
+          prompt: `${prompt}. Remix the public template “${selected.name}” while keeping its core story and visual direction. Use the supplied template JSON as the source deck: preserve useful content and structure, then apply the requested changes.`,
           style: "auto" as AiStyle,
           slideCount: Math.max(1, selected.pages.length),
           width: canvasW,
           height: canvasH,
+          template: selected.pages,
         },
       });
       const stamp = Date.now();

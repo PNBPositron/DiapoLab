@@ -300,10 +300,13 @@ export const generateAiTemplate = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data }): Promise<AiDeck> => {
+    const templateContext = data.template
+      ? `\n\nSource template slideshow JSON (use this as editable input; preserve its content and structure where useful):\n${JSON.stringify(data.template).slice(0, 120_000)}`
+      : "";
     const userContent: Array<Record<string, unknown>> = [
       {
         type: "text",
-        text: `Create a ${data.slideCount}-slide presentation deck. Topic: ${data.prompt}`,
+        text: `Create a ${data.slideCount}-slide presentation deck. Topic: ${data.prompt}${templateContext}`,
       },
     ];
     if (data.imageDataUrl) {

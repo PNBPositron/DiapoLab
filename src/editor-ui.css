@@ -280,7 +280,7 @@
 .editor-side-panel {
   width: 280px;
   padding: 12px;
-  background: color-mix(in srgb, var(--selector-surface) 38%, transparent);
+  background: var(--selector-surface);
   color: var(--selector-ink);
   border-color: color-mix(in srgb, var(--selector-border) 55%, transparent);
   box-shadow: var(--selector-panel-shadow);
@@ -318,8 +318,8 @@
   transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
 }
 .zoom-dock button:hover:not(:disabled) {
-  background: #f7ebe6;
-  color: #a9432b;
+  background: #eff6ff;
+  color: #2563eb;
   transform: translateY(-1px);
 }
 .zoom-dock button:active:not(:disabled) { transform: scale(0.94); }
