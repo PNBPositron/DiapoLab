@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const GROQ_TEXT_MODEL = "qwen/qwen3-32b";
+const GROQ_TEXT_MODEL = "qwen/qwen3.8-27b";
 const GEMINI_MODEL = GROQ_TEXT_MODEL;
 const GROQ_VISION_MODEL = "qwen/qwen2.5-vl-32b-instruct";
 const pickModel = (hasImage = false) => (hasImage ? GROQ_VISION_MODEL : GROQ_TEXT_MODEL);
@@ -16,7 +16,7 @@ async function chatComplete(
   extra: Record<string, unknown> = {},
 ): Promise<string> {
   const apiKey = (process.env.GROQ_KEY_2?.trim() || process.env.GROQ_KEY?.trim())?.replace(/^['"]|['"]$/g, "");
-  if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY.");
+  if (!apiKey) throw new Error("AI is not configured. Set GROQ_KEY_2.");
 
   const hasImage = messages.some(
     (m) =>
