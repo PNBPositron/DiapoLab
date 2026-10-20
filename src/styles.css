@@ -48,8 +48,8 @@
   --selector-ink: oklch(0.28 0.035 257);
   --selector-subtle: oklch(0.55 0.035 257);
   --selector-border: oklch(0.91 0.014 255);
-  --selector-accent: oklch(0.58 0.19 35);
-  --selector-active: oklch(0.96 0.035 35);
+--selector-accent: oklch(0.58 0.19 255);
+ --selector-active: oklch(0.96 0.035 255);
   --selector-shadow: 0 3px 10px oklch(0.28 0.035 257 / 0.07);
   --selector-panel-shadow: 0 12px 32px oklch(0.28 0.035 257 / 0.14);
   --radius: 0.75rem;
@@ -60,8 +60,8 @@
   --grid: rgba(71, 68, 64, 0.12);
   --teal: #242321;
   --teal-deep: #706d67;
-  --blue: #d95f3f;
-  --blue-deep: #a9432b;
+  --blue: #2563eb;
+  --blue-deep: #1d4ed8;
   --background: var(--paper);
   --foreground: var(--teal);
   --card: var(--surface);

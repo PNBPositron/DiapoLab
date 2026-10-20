@@ -300,8 +300,14 @@ export const generateAiTemplate = createServerFn({ method: "POST" })
     },
   )
   .handler(async ({ data }): Promise<AiDeck> => {
-    const templateContext = data.template
-      ? `\n\nSource template slideshow JSON (use this as editable input; preserve its content and structure where useful):\n${JSON.stringify(data.template).slice(0, 120_000)}`
+    const compactTemplate = data.template
+      ? JSON.stringify(data.template, (_key, value) => {
+          if (_key === "id" || _key === "duration" || _key === "animation") return undefined;
+          return value;
+        })
+      : "";
+    const templateContext = compactTemplate
+      ? `\n\nSource template slideshow JSON (editable source deck; preserve its content and structure where useful). Apply edits without returning the source JSON verbatim:\n${compactTemplate.slice(0, 48_000)}`
       : "";
     const userContent: Array<Record<string, unknown>> = [
       {
