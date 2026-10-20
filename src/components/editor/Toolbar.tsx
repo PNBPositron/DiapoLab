@@ -377,18 +377,6 @@ export function Toolbar() {
           </button>
         </div>
 
-        {/* Gemini AI button (purple accents / gradient) */}
-        <button
-          onClick={() => setAssistantOpen(true)}
-          title="Groq Vision slide assistant"
-          className="group flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-purple-700 transition-all hover:border-purple-200 hover:bg-purple-50 hover:shadow-purple-500/10 active:scale-95"
-        >
-          <Sparkles className="h-4 w-4 text-purple-600 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" strokeWidth={2.2} />
-          <span className="font-display text-[10px] font-semibold uppercase tracking-wider text-purple-800">
-            Assistant
-          </span>
-        </button>
-
         {/* Import JSON */}
         <button
           onClick={() => importRef.current?.click()}

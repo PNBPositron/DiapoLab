@@ -24,12 +24,12 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden bg-white" style={{ background: "linear-gradient(180deg, #ffffff 0%, #ffffff 60%, #f5f9ff 100%)" }}>
+    <div className="relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900" style={{ background: "radial-gradient(circle at 50% -20%, #ffffff 0%, #f8fbff 42%, #eef4fb 100%)" }}>
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="relative flex-1 overflow-hidden bg-transparent">
+        <main className="relative flex-1 overflow-hidden border-x border-slate-200/70 bg-white/30 shadow-inner">
           <div
             className="pointer-events-none absolute inset-0 opacity-35"
             style={{
@@ -39,6 +39,7 @@ function Editor() {
               maskImage: "radial-gradient(ellipse at center, black 30%, transparent 82%)",
             }}
           />
+          <div className="pointer-events-none absolute left-5 top-4 z-10 hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-slate-400 shadow-sm backdrop-blur md:flex"><span className="size-1.5 rounded-full bg-emerald-500" />Live canvas</div>
           <Canvas />
         </main>
         <PropertiesPanel />
