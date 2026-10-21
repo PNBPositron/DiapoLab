@@ -28,6 +28,7 @@ import { saveDesign, publishAsTemplate } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import {
   exportPNG,
+  exportJPG,
   exportPDF,
   exportPDFPrint,
   exportPPTX,
@@ -114,18 +115,19 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json">(null);
+  const [exporting, setExporting] = useState<null | "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json">(null);
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
 
-  const runExport = async (kind: "png" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json") => {
+  const runExport = async (kind: "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json") => {
     setExportOpen(false);
     setExporting(kind);
     try {
       const n = designName || "positron";
       if (kind === "png") await exportPNG(n);
+      else if (kind === "jpg") await exportJPG(n);
       else if (kind === "pdf") await exportPDF(n);
       else if (kind === "pdf-print") exportPDFPrint(n);
       else if (kind === "pptx") await exportPPTX(n);
@@ -426,7 +428,7 @@ export function Toolbar() {
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
-              {(["png", "pdf-print", "pdf", "pptx", "html", "markdown", "json", "gif"] as const).map((k) => (
+              {(["png", "jpg", "pdf-print", "pdf", "pptx", "html", "markdown", "json", "gif"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -472,7 +474,7 @@ export function Toolbar() {
         onClick={() => setAssistantOpen(true)}
         aria-label="Open Qwen chatbot"
         title="Ask Qwen"
-        className="fixed bottom-5 right-5 z-40 flex size-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-300/40 transition hover:scale-105 hover:bg-purple-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-200"
+        className="fixed bottom-5 right-5 z-[80] flex size-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-300/40 transition hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
       >
         <Sparkles className="size-5" />
       </button>

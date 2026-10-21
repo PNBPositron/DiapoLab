@@ -82,6 +82,30 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
   return shots;
 }
 
+export async function exportJPG(name: string) {
+  const { canvasW, canvasH } = useEditor.getState();
+  useEditor.getState().select(null);
+  await wait(120);
+  await waitForExportReady();
+  const node = document.getElementById("canvas-export");
+  if (!node) return;
+  node.dataset.exporting = "true";
+  const dataUrl = await toJpeg(node, {
+    width: canvasW,
+    height: canvasH,
+    pixelRatio: EXPORT_PIXEL_RATIO,
+    cacheBust: true,
+    quality: JPEG_QUALITY,
+    backgroundColor: "#ffffff",
+    style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
+  });
+  delete node.dataset.exporting;
+  const link = document.createElement("a");
+  link.download = `${name || "positron"}-${Date.now()}.jpg`;
+  link.href = dataUrl;
+  link.click();
+}
+
 export async function exportPNG(name: string) {
   const { canvasW, canvasH } = useEditor.getState();
   useEditor.getState().select(null);

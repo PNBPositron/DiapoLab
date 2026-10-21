@@ -549,7 +549,10 @@ export function CanvasElement({
           style={{ width: "100%", height: "100%", objectFit: element.fit ?? "cover", display: "block", borderRadius:  element.cornerRadius ?? 0 }}
         />
       )}
-      {element.type === "image" && (
+      {element.type === "image" && element.src.toLowerCase().startsWith("data:video/") && (
+        <video src={element.src} autoPlay loop muted playsInline controls={useEditor.getState().presenting} style={{ width: "100%", height: "100%", objectFit: element.fit ?? "cover", display: "block" }} />
+      )}
+      {element.type === "image" && !element.src.toLowerCase().startsWith("data:video/") && (
         <div
           style={{
             position: "relative",
