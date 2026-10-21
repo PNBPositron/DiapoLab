@@ -101,7 +101,7 @@ export function PagesBar() {
   const thumbH = ratio >= 1 ? 116 / ratio : 116 * ratio;
 
   return (
-    <div className="flex h-[94px] shrink-0 items-center gap-3 border-t border-slate-200/80 bg-slate-50/95 px-3 py-2 text-slate-700 shadow-[0_-8px_24px_-22px_rgba(15,23,42,0.45)] backdrop-blur">
+    <div className="pages-bar flex h-[94px] shrink-0 items-center gap-3 border-t border-transparent bg-transparent px-3 py-2 text-slate-700 shadow-none backdrop-blur-none">
       <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         Pages
       </span>

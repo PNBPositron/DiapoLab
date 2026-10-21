@@ -13,7 +13,7 @@
   }
 
   .editor-ui {
-    background: transparent !important;
+    background: #ffffff !important;
   }
 
   .editor-tool-rail > button {
@@ -352,7 +352,14 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-.editor-ui .timeline-bar { box-shadow: none; background: transparent; }
+.editor-ui .pages-bar,
+.editor-ui .timeline-bar {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 .editor-ui .brutal-border,
 .editor-ui .brutal-border-2 {
   border-color: var(--border);

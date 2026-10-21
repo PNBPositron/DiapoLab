@@ -187,8 +187,12 @@ export function exportPDFPrint(name: string) {
 export async function exportPPTX(name: string) {
   const { pages, canvasW, canvasH } = useEditor.getState();
   if (pages.length === 0) return;
-  const PptxGenJS = (await import("pptxgenjs")).default;
+  const pptxModule = await import("pptxgenjs");
+  const PptxGenJS = pptxModule.default;
   const pptx = new PptxGenJS();
+  // PptxGenJS 4 exposes ShapeType inconsistently between ESM and browser bundles.
+  // Use the public enum when available and keep the documented string fallback.
+  const rectangleShape = (pptxModule as typeof pptxModule & { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
   const wIn = canvasW / 96;
   const hIn = canvasH / 96;
   const px = (value: number) => value / 96;
@@ -215,7 +219,7 @@ export async function exportPPTX(name: string) {
           rotate: element.rotation,
         });
       } else if (element.type === "shape") {
-        slide.addShape(PptxGenJS.ShapeType.rect, {
+        slide.addShape(rectangleShape as never, {
           ...box,
           fill: { color: element.fill.replace("#", "") },
           line: { color: element.stroke.replace("#", ""), width: Math.max(0.5, element.strokeWidth / 2) },
