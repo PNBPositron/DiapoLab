@@ -298,10 +298,19 @@
   }
 }
 
-/* The editor UI uses one readable typeface; slide text keeps its own design font. */
-.editor-ui,
-.editor-ui * {
-  font-family: Inter, system-ui, sans-serif !important;
+/* Keep editor chrome readable without overriding slide element font families. */
+.editor-ui {
+  font-family: Inter, system-ui, sans-serif;
+}
+.editor-ui > header,
+.editor-ui > nav,
+.editor-ui > aside,
+.editor-ui > footer,
+.editor-ui button,
+.editor-ui input,
+.editor-ui textarea,
+.editor-ui select {
+  font-family: Inter, system-ui, sans-serif;
 }
 
 /* The selector kit owns its color and interaction states, rather than the

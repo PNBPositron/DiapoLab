@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
+import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Scan } from "lucide-react";
 
@@ -12,6 +13,10 @@ export function Canvas() {
   const [zoom, setZoom] = useState<number | null>(null);
   const scale = zoom ?? fitScale;
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
+
+  useEffect(() => {
+    void ensureFontsForPages(pages);
+  }, [pages]);
 
   useEffect(() => {
     const fit = () => {
