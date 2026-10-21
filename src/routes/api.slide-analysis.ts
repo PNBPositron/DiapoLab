@@ -5,7 +5,7 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 const SYSTEM_EDIT =
   "You are a presentation editor. Analyze the slide and return JSON only with keys text and edits. edits must be an array of safe operations using only {type:'update', id:string, patch:object}, {type:'delete', id:string}, or {type:'addText', text:string, x:number, y:number, width:number, height:number}. Only edit when explicitly requested. Preserve existing element IDs and never invent IDs.";
 const SYSTEM_ANALYSIS =
-  "You are a concise, practical presentation art director. Analyze the supplied live slide outline (not raw JSON) and give a short diagnosis followed by 3-5 actionable suggestions.";
+  "You are a concise presentation coach. Reply in plain language with one short diagnosis and up to three practical suggestions. Keep it under 80 words. No markdown tables.";
 
 type SlideLike = { id?: string; bgColor?: string; elements?: Array<Record<string, unknown>> };
 

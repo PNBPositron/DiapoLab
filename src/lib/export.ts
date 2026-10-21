@@ -82,6 +82,30 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
   return shots;
 }
 
+export async function exportJPG(name: string) {
+  const { canvasW, canvasH } = useEditor.getState();
+  useEditor.getState().select(null);
+  await wait(120);
+  await waitForExportReady();
+  const node = document.getElementById("canvas-export");
+  if (!node) return;
+  node.dataset.exporting = "true";
+  const dataUrl = await toJpeg(node, {
+    width: canvasW,
+    height: canvasH,
+    pixelRatio: EXPORT_PIXEL_RATIO,
+    cacheBust: true,
+    quality: JPEG_QUALITY,
+    backgroundColor: "#ffffff",
+    style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
+  });
+  delete node.dataset.exporting;
+  const link = document.createElement("a");
+  link.download = `${name || "positron"}-${Date.now()}.jpg`;
+  link.href = dataUrl;
+  link.click();
+}
+
 export async function exportPNG(name: string) {
   const { canvasW, canvasH } = useEditor.getState();
   useEditor.getState().select(null);
@@ -161,20 +185,52 @@ export function exportPDFPrint(name: string) {
 }
 
 export async function exportPPTX(name: string) {
-  const { canvasW, canvasH } = useEditor.getState();
-  const shots = await captureAllPages();
-  if (shots.length === 0) return;
-  const PptxGenJS = (await import("pptxgenjs")).default;
+  const { pages, canvasW, canvasH } = useEditor.getState();
+  if (pages.length === 0) return;
+  const pptxModule = await import("pptxgenjs");
+  const PptxGenJS = pptxModule.default;
   const pptx = new PptxGenJS();
-  // Slide size in inches at 96dpi
+  // PptxGenJS 4 exposes ShapeType inconsistently between ESM and browser bundles.
+  // Use the public enum when available and keep the documented string fallback.
+  const rectangleShape = (pptxModule as typeof pptxModule & { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
   const wIn = canvasW / 96;
   const hIn = canvasH / 96;
+  const px = (value: number) => value / 96;
   pptx.defineLayout({ name: "POS", width: wIn, height: hIn });
   pptx.layout = "POS";
-  shots.forEach((src) => {
+  for (const page of pages) {
     const slide = pptx.addSlide();
-    slide.addImage({ data: src, x: 0, y: 0, w: wIn, h: hIn });
-  });
+    slide.background = { color: page.bgColor?.replace("#", "") || "FFFFFF" };
+    for (const element of page.elements) {
+      const box = { x: px(element.x), y: px(element.y), w: px(element.width), h: px(element.height) };
+      if (element.type === "text") {
+        slide.addText(element.text, {
+          ...box,
+          fontFace: element.fontFamily || "Arial",
+          fontSize: Math.max(6, element.fontSize * 0.75),
+          bold: element.fontWeight >= 600,
+          italic: element.italic,
+          color: element.color.replace("#", ""),
+          align: element.align,
+          breakLine: false,
+          margin: 0,
+          fit: "shrink",
+          valign: "mid",
+          rotate: element.rotation,
+        });
+      } else if (element.type === "shape") {
+        slide.addShape(rectangleShape as never, {
+          ...box,
+          fill: { color: element.fill.replace("#", "") },
+          line: { color: element.stroke.replace("#", ""), width: Math.max(0.5, element.strokeWidth / 2) },
+          rotate: element.rotation,
+        });
+      } else if ((element.type === "image" || element.type === "video") && element.src) {
+        // PPTX supports still images natively; videos are retained as a poster/frame when possible.
+        slide.addImage({ data: element.src, ...box, transparency: 0, rotate: element.rotation });
+      }
+    }
+  }
   await pptx.writeFile({ fileName: `${name || "positron"}-${Date.now()}.pptx` });
 }
 
