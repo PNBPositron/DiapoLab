@@ -37,9 +37,13 @@ export function SlideThumbnail({
   // the browser has finished resolving the web fonts.
   useEffect(() => {
     let alive = true;
-    ensureFontsForPages([{ elements: page.elements.flatMap((element) =>
-      "fontFamily" in element && element.fontFamily ? [{ fontFamily: element.fontFamily }] : []
-    ) }]).finally(() => {
+    ensureFontsForPages([
+      {
+        elements: page.elements.flatMap((element) =>
+          "fontFamily" in element && element.fontFamily ? [{ fontFamily: element.fontFamily }] : [],
+        ),
+      },
+    ]).finally(() => {
       if (alive) setFontTick((t) => t + 1);
     });
     document.fonts.ready.then(() => {
@@ -62,7 +66,7 @@ export function SlideThumbnail({
         style={{
           width: canvasW,
           height: canvasH,
-          backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+          backgroundColor: page.bgColor,
           backgroundImage: page.bgImage
             ? `url(${page.bgImage})`
             : page.bgColor.includes("gradient(")

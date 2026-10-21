@@ -2,9 +2,8 @@
   /* Modern side-panel design system: opaque surface, soft layered shadows,
      subtle borders, spring-like hover/press states, refined typography. */
 
-  .editor-side-panel,
-  .editor-side-panel * {
-    font-family: Inter, system-ui, sans-serif !important;
+  .editor-side-panel {
+    font-family: Inter, system-ui, sans-serif;
   }
 
   .editor-tool-rail {
@@ -13,7 +12,15 @@
   }
 
   .editor-ui {
-    background: #ffffff !important;
+    background: transparent !important;
+  }
+
+  .toolbar,
+  .pages-bar {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .editor-tool-rail > button {
@@ -58,7 +65,10 @@
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 0.75rem;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .brutal-border:hover,
@@ -118,7 +128,10 @@
     border-radius: 0.625rem;
     background: rgba(248, 250, 252, 0.8);
     color: #334155;
-    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel input:not([type="color"]):hover,
@@ -143,14 +156,20 @@
 
   .editor-side-panel button {
     border-radius: 0.625rem;
-    transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+    transition:
+      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button,
   .editor-side-panel .grid > label {
-    transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    transition:
+      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button:hover,
@@ -158,9 +177,12 @@
     transform: translateY(-1px);
   }
 
-  .editor-side-panel .font-mono,
+  .editor-side-panel .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+
   .editor-side-panel .font-display {
-    font-family: Inter, system-ui, sans-serif !important;
+    font-family: "Manrope", Inter, system-ui, sans-serif;
   }
 
   .editor-side-panel .panel-content {
@@ -223,8 +245,11 @@
     border-color: rgba(148, 163, 184, 0.22);
     background: #ffffff;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+    transition:
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      background-color 200ms ease;
   }
 
   .editor-side-panel .panel-choice-grid > button:hover,
@@ -273,10 +298,19 @@
   }
 }
 
-/* The editor UI uses one readable typeface; slide text keeps its own design font. */
-.editor-ui,
-.editor-ui * {
-  font-family: Inter, system-ui, sans-serif !important;
+/* Keep editor chrome readable without overriding slide element font families. */
+.editor-ui {
+  font-family: Inter, system-ui, sans-serif;
+}
+.editor-ui > header,
+.editor-ui > nav,
+.editor-ui > aside,
+.editor-ui > footer,
+.editor-ui button,
+.editor-ui input,
+.editor-ui textarea,
+.editor-ui select {
+  font-family: Inter, system-ui, sans-serif;
 }
 
 /* The selector kit owns its color and interaction states, rather than the
@@ -291,11 +325,23 @@
   overflow-x: hidden;
   scrollbar-gutter: stable;
 }
-.editor-side-panel > div { padding-left: 0; padding-right: 0; }
-.editor-side-panel .selector-grid > .selector-option { border-radius: 12px; }
-.editor-side-panel .selector-chips > .selector-chip { border-radius: 999px; }
-.editor-side-panel .selector-grid > .selector-option-art { transform: none; }
-.editor-side-panel .selector-option-art > svg { width: 36px; height: 36px; }
+.editor-side-panel > div {
+  padding-left: 0;
+  padding-right: 0;
+}
+.editor-side-panel .selector-grid > .selector-option {
+  border-radius: 12px;
+}
+.editor-side-panel .selector-chips > .selector-chip {
+  border-radius: 999px;
+}
+.editor-side-panel .selector-grid > .selector-option-art {
+  transform: none;
+}
+.editor-side-panel .selector-option-art > svg {
+  width: 36px;
+  height: 36px;
+}
 .editor-inspector {
   color: var(--selector-ink);
   background: var(--selector-surface);
@@ -303,30 +349,46 @@
   box-shadow: var(--selector-panel-shadow);
 }
 .editor-inspector input:not([type="color"]):not([type="radio"]):not([type="range"]),
-.editor-inspector textarea, .editor-inspector select {
+.editor-inspector textarea,
+.editor-inspector select {
   min-width: 0;
   max-width: 100%;
   background: var(--selector-muted);
   border-color: var(--selector-border);
   color: var(--selector-ink);
 }
-.editor-inspector .inspector-section { border-color: var(--selector-border); }
-.editor-inspector .inspector-section > button { padding: 10px 2px; }
-.editor-inspector .inspector-section > div { padding: 10px 2px; border: 0; }
-.editor-side-panel .selector-search input { border: 0; box-shadow: none; }
+.editor-inspector .inspector-section {
+  border-color: var(--selector-border);
+}
+.editor-inspector .inspector-section > button {
+  padding: 10px 2px;
+}
+.editor-inspector .inspector-section > div {
+  padding: 10px 2px;
+  border: 0;
+}
+.editor-side-panel .selector-search input {
+  border: 0;
+  box-shadow: none;
+}
 
 /* Modern floating canvas zoom dock. */
 .zoom-dock button {
   border-radius: 0.75rem;
   color: #64748b;
-  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 .zoom-dock button:hover:not(:disabled) {
   background: #eff6ff;
   color: #2563eb;
   transform: translateY(-1px);
 }
-.zoom-dock button:active:not(:disabled) { transform: scale(0.94); }
+.zoom-dock button:active:not(:disabled) {
+  transform: scale(0.94);
+}
 .zoom-dock output {
   border-radius: 0.625rem;
   background: #f8fafc;
@@ -377,16 +439,43 @@
   outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
   outline-offset: 2px;
 }
-.editor-ui .bg-paper { background: var(--paper); }
-.editor-ui .bg-ink { background: var(--surface); color: var(--teal); }
-.editor-ui .bg-surface { background: var(--surface); color: var(--teal); }
-.editor-ui .bg-surface-2 { background: var(--surface-2); color: var(--teal); }
-.editor-ui .text-teal { color: var(--teal); }
-.editor-ui .text-teal\/70 { color: color-mix(in srgb, var(--teal) 70%, transparent); }
-.editor-ui .text-teal\/60 { color: color-mix(in srgb, var(--teal) 60%, transparent); }
+.editor-ui .bg-paper {
+  background: var(--paper);
+}
+.editor-ui .bg-ink {
+  background: var(--surface);
+  color: var(--teal);
+}
+.editor-ui .bg-surface {
+  background: var(--surface);
+  color: var(--teal);
+}
+.editor-ui .bg-surface-2 {
+  background: var(--surface-2);
+  color: var(--teal);
+}
+.editor-ui .text-teal {
+  color: var(--teal);
+}
+.editor-ui .text-teal\/70 {
+  color: color-mix(in srgb, var(--teal) 70%, transparent);
+}
+.editor-ui .text-teal\/60 {
+  color: color-mix(in srgb, var(--teal) 60%, transparent);
+}
 .editor-ui .border-teal\/20,
 .editor-ui .border-teal\/25,
-.editor-ui .border-teal\/30 { border-color: color-mix(in srgb, var(--teal) 16%, transparent); }
-.editor-ui .bg-blue { background: var(--blue); color: var(--primary-foreground); }
-.editor-ui .bg-teal { background: var(--teal); color: var(--ink); }
-.editor-ui .font-mono { font-family: var(--font-mono); }
+.editor-ui .border-teal\/30 {
+  border-color: color-mix(in srgb, var(--teal) 16%, transparent);
+}
+.editor-ui .bg-blue {
+  background: var(--blue);
+  color: var(--primary-foreground);
+}
+.editor-ui .bg-teal {
+  background: var(--teal);
+  color: var(--ink);
+}
+.editor-ui .font-mono {
+  font-family: var(--font-mono);
+}

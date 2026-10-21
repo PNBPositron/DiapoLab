@@ -1,6 +1,7 @@
 import { toJpeg, toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
 import { buildInteractiveHTML, buildPrintHTML } from "@/lib/export-html";
+import { ensureFontsForPages } from "@/lib/fontLoader";
 
 export function exportJSON(name: string) {
   const { pages, canvasW, canvasH, designName } = useEditor.getState();
@@ -54,6 +55,7 @@ async function waitForExportReady() {
 async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]> {
   const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
   select(null);
+  await ensureFontsForPages(pages);
   const original = currentIndex;
   const shots: string[] = [];
   for (let i = 0; i < pages.length; i++) {
@@ -119,7 +121,7 @@ export async function exportPNG(name: string) {
     height: canvasH,
     pixelRatio: EXPORT_PIXEL_RATIO,
     cacheBust: true,
-    backgroundColor: "#ffffff00",
+    backgroundColor: "#ffffff",
     style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
   delete node.dataset.exporting;
@@ -190,9 +192,10 @@ export async function exportPPTX(name: string) {
   const pptxModule = await import("pptxgenjs");
   const PptxGenJS = pptxModule.default;
   const pptx = new PptxGenJS();
-  // PptxGenJS 4 exposes ShapeType inconsistently between ESM and browser bundles.
-  // Use the public enum when available and keep the documented string fallback.
-  const rectangleShape = (pptxModule as typeof pptxModule & { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
+  // The browser bundle exposes shape types on the presentation instance.
+  // Falling back to the documented string keeps exports compatible across versions.
+  const rectangleShape =
+    (pptx as PptxGenJS & { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
   const wIn = canvasW / 96;
   const hIn = canvasH / 96;
   const px = (value: number) => value / 96;
@@ -202,7 +205,12 @@ export async function exportPPTX(name: string) {
     const slide = pptx.addSlide();
     slide.background = { color: page.bgColor?.replace("#", "") || "FFFFFF" };
     for (const element of page.elements) {
-      const box = { x: px(element.x), y: px(element.y), w: px(element.width), h: px(element.height) };
+      const box = {
+        x: px(element.x),
+        y: px(element.y),
+        w: px(element.width),
+        h: px(element.height),
+      };
       if (element.type === "text") {
         slide.addText(element.text, {
           ...box,
@@ -222,7 +230,10 @@ export async function exportPPTX(name: string) {
         slide.addShape(rectangleShape as never, {
           ...box,
           fill: { color: element.fill.replace("#", "") },
-          line: { color: element.stroke.replace("#", ""), width: Math.max(0.5, element.strokeWidth / 2) },
+          line: {
+            color: element.stroke.replace("#", ""),
+            width: Math.max(0.5, element.strokeWidth / 2),
+          },
           rotate: element.rotation,
         });
       } else if ((element.type === "image" || element.type === "video") && element.src) {
@@ -312,7 +323,10 @@ export async function exportGIF(
     const { data } = ctx.getImageData(0, 0, W, H);
     const palette = quantize(data, 256);
     const index = applyPalette(data, palette);
-    enc.writeFrame(index, W, H, { palette, delay: Math.max(200, Math.round((pages[i].duration || 3) * 1000)) });
+    enc.writeFrame(index, W, H, {
+      palette,
+      delay: Math.max(200, Math.round((pages[i].duration || 3) * 1000)),
+    });
     await new Promise((r) => setTimeout(r, 0));
   }
   enc.finish();

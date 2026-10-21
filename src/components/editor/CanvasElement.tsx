@@ -36,7 +36,7 @@ const maskClipPath = (kind?: string) => {
     octagon: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
     star: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 100%, 50% 73%, 21% 100%, 32% 57%, 2% 35%, 39% 35%)",
     heart: "polygon(50% 100%, 8% 45%, 8% 20%, 25% 5%, 50% 25%, 75% 5%, 92% 20%, 92% 45%)",
-    blob: "path(\"M37 6 C62 -2 92 16 94 42 C96 66 78 92 52 95 C26 98 6 80 5 54 C4 30 14 12 37 6 Z\")",
+    blob: 'path("M37 6 C62 -2 92 16 94 42 C96 66 78 92 52 95 C26 98 6 80 5 54 C4 30 14 12 37 6 Z")',
   };
   return kind ? clips[kind] : undefined;
 };
@@ -424,7 +424,11 @@ export function CanvasElement({
                   : hovered && interaction?.hoverEffect === "gradient" && interaction.hoverGradient
                     ? gradientCss(interaction.hoverGradient)
                     : undefined,
-            backgroundSize: knockout ? bgFill!.backgroundSize : element.imageOverlay ? "cover" : undefined,
+            backgroundSize: knockout
+              ? bgFill!.backgroundSize
+              : element.imageOverlay
+                ? "cover"
+                : undefined,
             backgroundPosition: knockout
               ? bgFill!.backgroundPosition
               : element.imageOverlay
@@ -516,7 +520,15 @@ export function CanvasElement({
               {/* Slide-bg knockout: an overlay clipped by the shape's own
                   silhouette, painted with the page background (aligned). */}
               {useSlideBg && (
-                <div aria-hidden="true" style={{ position: "absolute", inset: 0, ...bgFill, clipPath: `url("#shape-silhouette-${element.id}")` }} />
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    ...bgFill,
+                    clipPath: `url("#shape-silhouette-${element.id}")`,
+                  }}
+                />
               )}
               {!isOverlay && (
                 <ShapeRender
@@ -546,11 +558,30 @@ export function CanvasElement({
           autoPlay
           playsInline
           controls={useEditor.getState().presenting}
-          style={{ width: "100%", height: "100%", objectFit: element.fit ?? "cover", display: "block", borderRadius:  element.cornerRadius ?? 0 }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: element.fit ?? "cover",
+            display: "block",
+            borderRadius: element.cornerRadius ?? 0,
+          }}
         />
       )}
       {element.type === "image" && element.src.toLowerCase().startsWith("data:video/") && (
-        <video src={element.src} autoPlay loop muted playsInline controls={useEditor.getState().presenting} style={{ width: "100%", height: "100%", objectFit: element.fit ?? "cover", display: "block" }} />
+        <video
+          src={element.src}
+          autoPlay
+          loop
+          muted
+          playsInline
+          controls={useEditor.getState().presenting}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: element.fit ?? "cover",
+            display: "block",
+          }}
+        />
       )}
       {element.type === "image" && !element.src.toLowerCase().startsWith("data:video/") && (
         <div
@@ -560,7 +591,9 @@ export function CanvasElement({
             height: "100%",
             borderRadius: maskPath ? 0 : (element.cornerRadius ?? 0),
             overflow: "hidden",
-            clipPath: maskClipPath(element.maskShape) ?? (maskPath ? `url("#img-mask-${element.id}")` : undefined),
+            clipPath:
+              maskClipPath(element.maskShape) ??
+              (maskPath ? `url("#img-mask-${element.id}")` : undefined),
             border:
               !maskPath && element.borderWidth && element.borderWidth > 0
                 ? `${element.borderWidth}px solid ${element.borderColor ?? "#000000"}`
@@ -595,9 +628,7 @@ export function CanvasElement({
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-                filter: [filterCss(element.filters)]
-                  .filter(Boolean)
-                  .join(" "),
+                filter: [filterCss(element.filters)].filter(Boolean).join(" "),
                 opacity: element.opacity ?? 1,
               }}
             />
@@ -623,7 +654,9 @@ export function CanvasElement({
                 transformOrigin: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
                 transform: `scale(${(element.flipX ? -1 : 1) * (element.cropZoom ?? 1)}, ${(element.flipY ? -1 : 1) * (element.cropZoom ?? 1)})`,
                 filter: [
-                  element.assetKind === "icon" && element.tint ? `brightness(0) drop-shadow(0 0 0 ${element.tint})` : "",
+                  element.assetKind === "icon" && element.tint
+                    ? `brightness(0) drop-shadow(0 0 0 ${element.tint})`
+                    : "",
                   filterCss(element.filters),
                 ]
                   .filter(Boolean)
@@ -661,7 +694,26 @@ export function CanvasElement({
       {element.type === "icon" &&
         (() => {
           if (element.src) {
-            return <div aria-hidden="true" style={{ width: "100%", height: "100%", display: "block", backgroundColor: element.color, maskImage: `url("${element.src}")`, maskSize: "contain", maskPosition: "center", maskRepeat: "no-repeat", WebkitMaskImage: `url("${element.src}")`, WebkitMaskSize: "contain", WebkitMaskPosition: "center", WebkitMaskRepeat: "no-repeat", opacity: 1 }} />;
+            return (
+              <div
+                aria-hidden="true"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "block",
+                  backgroundColor: element.color,
+                  maskImage: `url("${element.src}")`,
+                  maskSize: "contain",
+                  maskPosition: "center",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskImage: `url("${element.src}")`,
+                  WebkitMaskSize: "contain",
+                  WebkitMaskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  opacity: 1,
+                }}
+              />
+            );
           }
           const Comp =
             (
@@ -793,12 +845,15 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     chanRef.current?.postMessage({ type: "reset" });
   };
 
-  const glassStyle = element.effect === "liquid_glass" ? {
-    backdropFilter: "blur(14px) saturate(160%)",
-    WebkitBackdropFilter: "blur(14px) saturate(160%)",
-    background: "linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08))",
-    boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.55), 0 18px 40px rgba(0,0,0,0.22)",
-  } : {};
+  const glassStyle =
+    element.effect === "liquid_glass"
+      ? {
+          backdropFilter: "blur(14px) saturate(160%)",
+          WebkitBackdropFilter: "blur(14px) saturate(160%)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.32), rgba(255,255,255,0.08))",
+          boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.55), 0 18px 40px rgba(0,0,0,0.22)",
+        }
+      : {};
 
   return (
     <div
@@ -808,7 +863,10 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         ...glassStyle,
         width: "100%",
         height: "100%",
-        background: element.effect === "liquid_glass" && !theme ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : element.bgColor,
+        background:
+          element.effect === "liquid_glass" && !theme
+            ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))"
+            : element.bgColor,
         color: element.fgColor,
         padding: "5%",
         display: "flex",
@@ -841,7 +899,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                   overflow: "hidden",
                   background: theme?.bg ?? "rgba(255,255,255,0.06)",
                   color: element.fgColor,
-                  border: `2px solid ${mine ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  border: `2px solid ${mine ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
                   borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(15px, 3%)",
@@ -897,12 +955,12 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             const isCorrect = opt.id === element.correctId;
             const showResult = picked !== null;
             const bg = !showResult
-              ? theme?.bg ?? "rgba(255,255,255,0.06)"
+              ? (theme?.bg ?? "rgba(255,255,255,0.06)")
               : isCorrect
                 ? "#16a34a"
                 : isPicked
                   ? "#dc2626"
-                  : theme?.bg ?? "rgba(255,255,255,0.04)";
+                  : (theme?.bg ?? "rgba(255,255,255,0.04)");
             return (
               <button
                 key={opt.id}
@@ -911,7 +969,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                 style={{
                   background: bg,
                   color: showResult && (isCorrect || isPicked) ? "#ffffff" : element.fgColor,
-                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : theme?.border ?? "rgba(255,255,255,0.18)"}`,
+                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
                   borderRadius: theme?.radius ?? 12,
                   padding: "0 16px",
                   fontSize: "max(16px, 3.2%)",
@@ -1099,12 +1157,27 @@ function ChartRender({ element }: { element: ChartElement }) {
       style={{
         width: "100%",
         height: "100%",
-        background: element.effect === "liquid_glass" ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))" : bgColor,
+        background:
+          element.effect === "liquid_glass"
+            ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))"
+            : bgColor,
         borderRadius: theme ? theme.radius : 12,
-        border: element.effect === "liquid_glass" ? "1px solid rgba(255,255,255,0.45)" : theme ? `${theme.borderWidth}px solid ${theme.border}` : "none",
-        boxShadow: element.effect === "liquid_glass" ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)" : theme ? theme.shadow : "none",
-        backdropFilter: element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
-        WebkitBackdropFilter: element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
+        border:
+          element.effect === "liquid_glass"
+            ? "1px solid rgba(255,255,255,0.45)"
+            : theme
+              ? `${theme.borderWidth}px solid ${theme.border}`
+              : "none",
+        boxShadow:
+          element.effect === "liquid_glass"
+            ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)"
+            : theme
+              ? theme.shadow
+              : "none",
+        backdropFilter:
+          element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
+        WebkitBackdropFilter:
+          element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
         overflow: "hidden",
         padding: "2%",
         boxSizing: "border-box",
@@ -1193,7 +1266,10 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
   return (
     <button
       onMouseDown={(e) => interactive && e.stopPropagation()}
-      onClick={(event) => { if (interactive) event.stopPropagation(); onClick(); }}
+      onClick={(event) => {
+        if (interactive) event.stopPropagation();
+        onClick();
+      }}
       style={{
         width: "100%",
         height: "100%",
