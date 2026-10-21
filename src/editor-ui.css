@@ -8,12 +8,12 @@
   }
 
   .editor-tool-rail {
-    background: #ffffff !important;
+    background: transparent !important;
     border: 0;
   }
 
   .editor-ui {
-    background: #ffffff !important;
+    background: transparent !important;
   }
 
   .editor-tool-rail > button {
