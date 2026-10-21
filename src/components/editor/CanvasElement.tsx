@@ -537,6 +537,18 @@ export function CanvasElement({
           </defs>
         </svg>
       )}
+      {element.type === "video" && (
+        <video
+          src={element.src}
+          poster={element.poster}
+          muted={element.muted ?? true}
+          loop={element.loop ?? true}
+          autoPlay
+          playsInline
+          controls={useEditor.getState().presenting}
+          style={{ width: "100%", height: "100%", objectFit: element.fit ?? "cover", display: "block", borderRadius:  element.cornerRadius ?? 0 }}
+        />
+      )}
       {element.type === "image" && (
         <div
           style={{
