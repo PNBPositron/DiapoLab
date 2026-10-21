@@ -10,7 +10,7 @@ import {
   Camera,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newIcon, newImage, useEditor } from "@/store/editor";
+import { newIcon, newImage, newVideo, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 
@@ -156,7 +156,18 @@ export function ElementsPanel() {
     setUploading(true);
     setUrlError(null);
     try {
-      add(newImage(await prepareImage(file)));
+      if (file.type.startsWith("video/")) {
+        if (file.size > 25 * 1024 * 1024) throw new Error("Video files must be smaller than 25 MB.");
+        const reader = new FileReader();
+        const src = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(String(reader.result));
+          reader.onerror = () => reject(new Error("Could not read the video."));
+          reader.readAsDataURL(file);
+        });
+        add(newVideo(src));
+      } else {
+        add(newImage(await prepareImage(file)));
+      }
     } catch (error) {
       setUrlError(error instanceof Error ? error.message : "Upload failed.");
     } finally {
@@ -170,8 +181,8 @@ export function ElementsPanel() {
       <div className="panel-intro">Drop in visual building blocks for your slide.</div>
 
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-3 text-xs font-semibold text-card-foreground transition-colors hover:bg-accent">
-        <ImagePlus className="size-4" /> {uploading ? "Preparing image…" : "Upload image"}
-        <input type="file" accept="image/*" className="sr-only" disabled={uploading} onChange={(event) => {
+        <ImagePlus className="size-4" /> {uploading ? "Preparing media…" : "Upload image, GIF or video"}
+        <input type="file" accept="image/*,video/*" className="sr-only" disabled={uploading} onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) void addFile(file);
           event.target.value = "";

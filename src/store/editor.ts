@@ -214,6 +214,15 @@ export type ImageElement = ElementBase & {
   gradientOpacity?: number; // 0..1
 };
 
+export type VideoElement = ElementBase & {
+  type: "video";
+  src: string;
+  poster?: string;
+  fit?: "cover" | "contain" | "fill";
+  muted?: boolean;
+  loop?: boolean;
+};
+
 export type IconElement = ElementBase & {
   type: "icon";
   name: string; // lucide icon name in PascalCase
@@ -560,6 +569,7 @@ export type AnyElement =
   | TextElement
   | ShapeElement
   | ImageElement
+  | VideoElement
   | IconElement
   | QuizElement
   | ChartElement
@@ -721,6 +731,20 @@ export const newImage = (src: string, overrides: Partial<ImageElement> = {}): Im
   height: 480,
   rotation: 0,
   src,
+  ...overrides,
+});
+
+export const newVideo = (src: string, overrides: Partial<VideoElement> = {}): VideoElement => ({
+  id: uid(),
+  type: "video",
+  x: 200,
+  y: 200,
+  width: 640,
+  height: 360,
+  rotation: 0,
+  src,
+  muted: true,
+  loop: true,
   ...overrides,
 });
 
