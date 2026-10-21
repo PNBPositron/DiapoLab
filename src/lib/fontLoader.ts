@@ -10,29 +10,49 @@ const loadedFonts = new Set<string>();
 /** Extract the first, clean font family name from a CSS font-family value. */
 export function parseFirstFamily(raw: string): string | null {
   const first = raw.split(",")[0] ?? "";
-  const clean = first.replace(/["']/g, "").replace(/!important/gi, "").trim();
+  const clean = first
+    .replace(/["']/g, "")
+    .replace(/!important/gi, "")
+    .trim();
   if (!clean) return null;
   const generics = [
-    "serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui",
-    "ui-serif", "ui-monospace", "arial", "helvetica", "times", "georgia",
-    "courier", "verdana", "tahoma", "impact", "comic sans ms",
+    "serif",
+    "sans-serif",
+    "monospace",
+    "cursive",
+    "fantasy",
+    "system-ui",
+    "ui-serif",
+    "ui-monospace",
+    "arial",
+    "helvetica",
+    "times",
+    "georgia",
+    "courier",
+    "verdana",
+    "tahoma",
+    "impact",
+    "comic sans ms",
   ];
   if (generics.includes(clean.toLowerCase())) return null;
   return clean;
 }
 
 /** Inject the Google Fonts stylesheet for a family (idempotent). */
-function injectStylesheet(family: string) {
+function injectStylesheet(family: string): Promise<void> {
   const key = family.toLowerCase();
-  if (loadedLinks.has(key)) return;
+  if (loadedLinks.has(key)) return Promise.resolve();
   loadedLinks.add(key);
 
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  const q = family.replaceAll(" ", "+");
-  // NO weights requested → Google serves whatever the family has. Never 400s.
-  link.href = `https://fonts.googleapis.com/css2?family=${q}&display=swap`;
-  document.head.appendChild(link);
+  return new Promise((resolve) => {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.onload = () => resolve();
+    link.onerror = () => resolve();
+    // Request the family without weights so single-weight Google families remain valid.
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, "+")}&display=swap`;
+    document.head.appendChild(link);
+  });
 }
 
 /**
@@ -47,7 +67,7 @@ export async function ensureFontFamily(family?: string | null) {
   const name = parseFirstFamily(clean);
   if (!name) return;
 
-  injectStylesheet(name);
+  await injectStylesheet(name);
 
   const key = name.toLowerCase();
   if (loadedFonts.has(key)) return;
