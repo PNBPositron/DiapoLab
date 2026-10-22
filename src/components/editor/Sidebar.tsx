@@ -18,7 +18,7 @@ const TOOLS = [
   { id: "home", label: "Home", icon: Home },
   { id: "text", label: "Text", icon: Type },
   { id: "elements", label: "Elements", icon: Shapes },
-  { id: "unsplash", label: "Photos", icon: Camera },
+  { id: "unsplash", label: "Unsplash", icon: Camera },
   { id: "illustrations", label: "Illus.", icon: Image },
   { id: "components", label: "Presets", icon: Layers },
   { id: "design", label: "Design", icon: Palette },
