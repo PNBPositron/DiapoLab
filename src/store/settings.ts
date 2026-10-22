@@ -82,7 +82,6 @@ export type CustomTheme = { id: string; name: string; tokens: ThemeTokens };
 
 export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> = [
   { id: "everest", label: "Light", hint: "fixed light editor chrome" },
-  { id: "obsidian", label: "Dark", hint: "fixed dark editor chrome" },
 ];
 
 // Everest is a fixed light palette. It deliberately does not depend on slide colors.
@@ -152,7 +151,7 @@ export const useSettings = create<SettingsState>()(
           customThemes: previous?.customThemes ?? [],
           // Replace all legacy slide-dependent theme values with the fixed light theme.
           editorTheme:
-            previousTheme === "auto" || previousTheme === "auto-light" || previousTheme === "auto-dark"
+            previousTheme === "auto" || previousTheme === "auto-light" || previousTheme === "auto-dark" || previousTheme === "obsidian"
               ? DEFAULT_EDITOR_THEME
               : previousTheme ?? DEFAULT_EDITOR_THEME,
           reduceMotion: true,
