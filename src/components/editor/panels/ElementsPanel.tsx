@@ -13,6 +13,7 @@ import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, newVideo, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
+import { PanelHeader } from "../ui/selectors";
 
 type ElementSection = "shapes" | "icons" | null;
 
@@ -121,21 +122,7 @@ export function ElementsPanel() {
 
   return (
     <div className="panel-content">
-      {/* Header card */}
-      <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">Elements</p>
-            <h2 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">Building blocks</h2>
-          </div>
-          <div className="grid size-8 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
-            <Sparkles className="size-4" />
-          </div>
-        </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
-          Drop images, shapes and icons onto your slide.
-        </p>
-      </div>
+      <PanelHeader kicker="Elements" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
 
       {/* Upload zone */}
       <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-slate-300/90 bg-white/70 px-3 py-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.25)]">
