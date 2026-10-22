@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const mcpUnavailable = () =>
-  new Response(JSON.stringify({ error: "MCP is not available on this deployment" }), {
-    status: 501,
-    headers: { "content-type": "application/json" },
+const oauthProtectedResource = ({ request }: { request: Request }) => {
+  const origin = new URL(request.url).origin;
+  return Response.json({
+    resource: `${origin}/.mcp`,
+    scopes_supported: [],
+    bearer_methods_supported: ["header"],
   });
+};
 
 export const Route = createFileRoute("/.well-known/oauth-protected-resource")({
   server: {
-    handlers: { ANY: mcpUnavailable },
+    handlers: { GET: oauthProtectedResource },
   },
 });

@@ -520,20 +520,18 @@
 }
 
 .editor-tool-rail > button {
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    0 8px 20px -14px rgba(15, 23, 42, 0.4);
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: #64748b;
 }
 
 .editor-tool-rail > button:hover,
 .editor-tool-rail > button:focus-visible {
-  border-color: rgba(147, 197, 253, 0.9);
-  background: #ffffff;
+  border-color: transparent;
+  background: transparent;
   color: #2563eb;
-  box-shadow: 0 8px 18px -10px rgba(37, 99, 235, 0.35);
+  box-shadow: none;
 }
 
 .editor-ui .pages-bar {
@@ -562,6 +560,13 @@
 .editor-ui > header button,
 .editor-ui > nav button {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 18px -14px rgba(15, 23, 42, 0.35);
+}
+
+.editor-ui .editor-tool-rail > button:hover,
+.editor-ui .editor-tool-rail > button:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .editor-ui .toolbar button:hover,
