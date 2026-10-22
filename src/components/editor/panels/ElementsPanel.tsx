@@ -5,7 +5,9 @@ import {
   Shapes,
   Star,
   Search,
-  ImagePlus,
+  UploadCloud,
+  Loader2,
+  Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, newVideo, useEditor } from "@/store/editor";
@@ -41,51 +43,32 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_
   return Icon ? [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }] : [];
 });
 
-/* Modern tile: frosted white card, gradient icon chip, blue accent when active. */
+/* Refined tile: frosted card, gradient chip, subtle lift + blue glow on hover. */
 function ActionTile({
   Icon,
   label,
   active = false,
   onClick,
-  asLabel = false,
-  children,
 }: {
   Icon: LucideIcon;
   label: string;
   active?: boolean;
   onClick?: () => void;
-  asLabel?: boolean;
-  children?: React.ReactNode;
 }) {
-  const base =
-    "group relative flex h-[5.5rem] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]";
   const state = active
     ? "border-blue-500/50 bg-blue-50/80 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.35),0_8px_20px_-8px_rgba(59,130,246,0.45)]"
-    : "border-slate-200/80 bg-white/80 shadow-[0_1px_2px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-[0_10px_24px_-8px_rgba(15,23,42,0.18)]";
+    : "border-slate-200/80 bg-white/80 shadow-[0_1px_2px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)]";
   const chip = active
     ? "bg-linear-to-tr from-blue-500 to-indigo-600 text-white shadow-xs"
     : "bg-slate-100/80 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600";
-  const inner = (
-    <>
+  return (
+    <button onClick={onClick} className={`group relative flex h-20 flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:translate-y-0 active:scale-[0.97] ${state}`}>
       <span className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}>
         <Icon className="size-4" />
       </span>
-      <span className="text-[10px] font-semibold tracking-wide text-slate-600 uppercase group-hover:text-slate-800">
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-600 group-hover:text-slate-800">
         {label}
       </span>
-      {children}
-    </>
-  );
-  if (asLabel) {
-    return (
-      <label className={`${base} ${state}`}>
-        {inner}
-      </label>
-    );
-  }
-  return (
-    <button onClick={onClick} className={`${base} ${state}`}>
-      {inner}
     </button>
   );
 }
@@ -138,11 +121,31 @@ export function ElementsPanel() {
 
   return (
     <div className="panel-content">
-      {/* No panel header — the panel starts directly with its content. */}
-      <div className="panel-intro">Drop in visual building blocks for your slide.</div>
+      {/* Header card */}
+      <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">Elements</p>
+            <h2 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">Building blocks</h2>
+          </div>
+          <div className="grid size-8 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+            <Sparkles className="size-4" />
+          </div>
+        </div>
+        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+          Drop images, shapes and icons onto your slide.
+        </p>
+      </div>
 
-      <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card px-3 py-3 text-xs font-semibold text-card-foreground transition-colors hover:bg-accent">
-        <ImagePlus className="size-4" /> {uploading ? "Preparing media…" : "Upload image, GIF or video"}
+      {/* Upload zone */}
+      <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-slate-300/90 bg-white/70 px-3 py-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.25)]">
+        <span className="grid size-9 place-items-center rounded-xl bg-slate-100/80 text-slate-500 transition-colors group-hover:bg-blue-100 group-hover:text-blue-600">
+          {uploading ? <Loader2 className="size-4 animate-spin" /> : <UploadCloud className="size-4" />}
+        </span>
+        <span className="text-xs font-semibold text-slate-700">
+          {uploading ? "Preparing media…" : "Upload image, GIF or video"}
+        </span>
+        <span className="text-[9px] text-slate-400">Images, GIFs & videos · video ≤ 25 MB</span>
         <input type="file" accept="image/*,video/*" className="sr-only" disabled={uploading} onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) void addFile(file);
@@ -176,6 +179,7 @@ export function ElementsPanel() {
         )}
       </div>
 
+      {/* Section tiles */}
       <div className="panel-action-grid">
         <ActionTile
           Icon={Shapes}
@@ -212,7 +216,7 @@ export function ElementsPanel() {
                 key={name}
                 title={`Add ${label}`}
                 onClick={() => add(newIcon(name))}
-                className="group flex h-20 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-slate-200/80 bg-white/70 text-slate-500 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:text-blue-600 hover:shadow-[0_8px_18px_-6px_rgba(15,23,42,0.15)] active:translate-y-0 active:scale-[0.97]"
+                className="group flex h-20 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-slate-200/80 bg-white/70 text-slate-500 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:text-blue-600 hover:shadow-[0_10px_22px_-8px_rgba(37,99,235,0.28)] active:translate-y-0 active:scale-[0.97]"
               >
                 <Icon className="size-6 transition-transform duration-200 group-hover:scale-110" strokeWidth={2} />
                 <span className="w-full truncate px-1.5 text-[8px] font-medium text-slate-400 group-hover:text-slate-600">
