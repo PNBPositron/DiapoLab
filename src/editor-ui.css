@@ -549,6 +549,16 @@
   box-shadow: 0 10px 22px -14px rgba(37, 99, 235, 0.32);
 }
 
+/* Toolbar flyout menus (hamburger, export, user): no per-button shadow,
+   it renders as a white line under each menu item. */
+.editor-ui .toolbar-flyout > button,
+.editor-ui .toolbar-flyout button {
+  box-shadow: none;
+}
+.editor-ui .toolbar-flyout button:hover {
+  box-shadow: none;
+}
+
 /* Sidebar tool rail: fully transparent buttons, no white card, no shadow. */
 .editor-ui nav.editor-tool-rail > button,
 .editor-ui nav.editor-tool-rail > button:hover,
