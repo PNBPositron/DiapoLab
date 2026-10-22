@@ -5,6 +5,7 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 import { loadEnv } from "vite";
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
@@ -29,6 +30,11 @@ export default defineConfig(({ mode }) => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   return {
+    vite: {
+      // Emits the MCP server routes (POST /mcp + /.well-known/oauth-protected-resource)
+      // from src/lib/mcp/index.ts at build time.
+      plugins: [mcpPlugin()],
+    },
     tanstackStart: {
       server: { entry: "server" },
     },
