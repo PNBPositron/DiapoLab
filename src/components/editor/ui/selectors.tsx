@@ -11,8 +11,34 @@ export type SelectorOption<T extends string> = {
   preview?: ReactNode;
 };
 
-export function PanelHeader({ title, children }: { title: string; children?: ReactNode }) {
-  return <div className="selector-header"><h3>{title}</h3>{children}</div>;
+/**
+ * Shared panel header card — blue kicker, title, description and a dark
+ * icon chip, matching the Elements panel design language.
+ */
+export function PanelHeader({ title, kicker, description, icon: Icon, children }: {
+  title: string;
+  kicker?: string;
+  description?: string;
+  icon?: LucideIcon;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {kicker && <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">{kicker}</p>}
+          <h3 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
+          {description && <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{description}</p>}
+          {children}
+        </div>
+        {Icon && (
+          <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+            <Icon className="size-4" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function SearchField({ value, onChange, placeholder = "Search options…" }: {
