@@ -548,3 +548,15 @@
 .editor-ui > nav button:hover {
   box-shadow: 0 10px 22px -14px rgba(37, 99, 235, 0.32);
 }
+
+/* Sidebar tool rail: fully transparent buttons, no white card, no shadow. */
+.editor-ui nav.editor-tool-rail > button,
+.editor-ui nav.editor-tool-rail > button:hover,
+.editor-ui nav.editor-tool-rail > button:focus-visible,
+.editor-ui nav.editor-tool-rail > button:active {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
