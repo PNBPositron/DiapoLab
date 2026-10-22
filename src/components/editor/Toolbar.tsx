@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { newText, useEditor } from "@/store/editor";
 import {
@@ -376,8 +377,10 @@ export function Toolbar() {
       </div>
 
 
-      {/* Settings dialog (moved from sidebar) */}
-      {settingsDialogOpen && <SettingsDialog onClose={() => setSettingsDialogOpen(false)} />}
+      {/* Settings dialog (moved from sidebar) — portaled to body so the
+          sticky/backdrop-blur header does not become its containing block */}
+      {settingsDialogOpen &&
+        createPortal(<SettingsDialog onClose={() => setSettingsDialogOpen(false)} />, document.body)}
 
       {/* Publish dialog */}
       <PublishMetaDialog
