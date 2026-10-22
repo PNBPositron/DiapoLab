@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Camera } from "lucide-react";
 import { newImage, useEditor } from "@/store/editor";
+import { PanelHeader } from "../ui/selectors";
 
 type UnsplashPhoto = {
   id: string;
@@ -54,7 +55,7 @@ export function UnsplashPanel() {
 
   return (
     <div className="panel-content">
-      <div className="panel-intro">Free photos from Unsplash creators.</div>
+      <PanelHeader kicker="Unsplash" title="Photos" description="Free photos from Unsplash creators — click to add, or set as background." icon={Camera} />
 
       <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-400 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.14)]">
         <Search className="size-4" />
