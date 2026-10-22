@@ -496,7 +496,7 @@ function LargeModernHamburger({
 
       {/* Expanded dropdown — fully opaque, wider, spring entrance */}
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_24px_56px_-12px_rgba(15,23,42,0.24)] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
+        <div className="toolbar-flyout absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_24px_56px_-12px_rgba(15,23,42,0.24)] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
           {/* CREATE & AI SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
             <span className="size-1.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" />
