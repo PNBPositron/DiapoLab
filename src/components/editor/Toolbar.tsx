@@ -367,7 +367,7 @@ export function Toolbar() {
           onSettings={() => navigate({ to: "/settings" })}
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
-                  onClear={clear}
+          onClear={clear}
           publishing={publishing}
           isAuthenticated={!!user}
         />
