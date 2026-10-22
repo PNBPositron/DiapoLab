@@ -479,3 +479,13 @@
 .editor-ui .font-mono {
   font-family: var(--font-mono);
 }
+
+/* The editor shell sits on a white workspace; only controls and panels float. */
+.editor-ui,
+.editor-ui main {
+  background-color: #ffffff !important;
+}
+
+.editor-ui main > .pointer-events-none.absolute.inset-0 {
+  opacity: 0.18;
+}
