@@ -246,7 +246,7 @@ export function ComponentsPanel() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
-      <PanelHeader title="Components" />
+      <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets and charts onto the slide." icon={Blocks} />
       <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
         { value: "interfaces", label: "Frames", icon: MonitorCog },
         { value: "ui", label: "Widgets", icon: Blocks },
