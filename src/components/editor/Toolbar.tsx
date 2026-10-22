@@ -32,7 +32,6 @@ import {
   exportPDFPrint,
   exportPPTX,
   exportGIF,
-  exportHTML,
   exportMarkdown,
   exportJSON,
   importJSONFile,
@@ -100,13 +99,13 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json">(null);
+  const [exporting, setExporting] = useState<null | "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "markdown" | "json">(null);
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
 
-  const runExport = async (kind: "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "html" | "markdown" | "json") => {
+  const runExport = async (kind: "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "markdown" | "json") => {
     setExportOpen(false);
     setExporting(kind);
     try {
@@ -116,7 +115,6 @@ export function Toolbar() {
       else if (kind === "pdf") await exportPDF(n);
       else if (kind === "pdf-print") exportPDFPrint(n);
       else if (kind === "pptx") await exportPPTX(n);
-      else if (kind === "html") exportHTML(n);
       else if (kind === "markdown") exportMarkdown(n);
       else if (kind === "json") exportJSON(n);
       else await exportGIF(n);
@@ -337,7 +335,7 @@ export function Toolbar() {
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
-              {(["png", "jpg", "pdf-print", "pdf", "pptx", "html", "markdown", "json", "gif"] as const).map((k) => (
+              {(["png", "jpg", "pdf-print", "pdf", "pptx", "markdown", "json", "gif"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -351,8 +349,6 @@ export function Toolbar() {
                       ? "Vector · selectable"
                       : k === "gif"
                       ? "Animated"
-                      : k === "html"
-                      ? "Interactive"
                       : k === "json"
                       ? "Source file"
                       : "All slides"}
@@ -519,8 +515,8 @@ function LargeModernHamburger({
           {isAuthenticated && (
             <MenuCardItem
               icon={publishing ? Loader2 : Share2}
-              title={publishing ? "Publishing…" : "Publish template"}
-              subtitle="Generate a public share link"
+              title={publishing ? "Publishing…" : "Copy private link"}
+              subtitle="Share this slideshow privately"
               disabled={publishing}
               onClick={() => handleAction(onShare)}
             />
