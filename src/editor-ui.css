@@ -564,3 +564,49 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+
+
+/* ── Minimal floating chrome pass ─────────────────────────────────────────
+   One consistent elevation scale, hairline borders, generous radii.
+   Panels float over the white workspace instead of sitting on it. */
+.editor-side-panel,
+.editor-inspector {
+  border-radius: 1.25rem;
+  border-color: rgba(226, 232, 240, 0.7);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 24px 48px -20px rgba(15, 23, 42, 0.16);
+}
+
+/* Calmer cards inside panels: hairline border, no double shadow. */
+.editor-ui .brutal-border,
+.editor-ui .brutal-border-2 {
+  box-shadow: none;
+}
+.editor-side-panel .brutal-border,
+.editor-side-panel .brutal-border-2 {
+  box-shadow: none;
+}
+
+/* Discreet focus: thin ring instead of a heavy outline. */
+.editor-ui button:focus-visible,
+.editor-ui input:focus-visible,
+.editor-ui textarea:focus-visible,
+.editor-ui select:focus-visible {
+  outline: 1.5px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+
+/* Hover lift kept minimal everywhere in the chrome. */
+.editor-side-panel .panel-choice-grid > button:hover,
+.editor-side-panel .panel-action-grid > button:hover,
+.editor-side-panel .panel-action-grid > label:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.12);
+}
+
+/* Floating zoom dock. */
+.zoom-dock {
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 16px 32px -18px rgba(15, 23, 42, 0.2);
+}
