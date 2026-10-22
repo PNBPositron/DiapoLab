@@ -6,6 +6,9 @@ import { PresentationMode } from "@/components/editor/PresentationMode";
 
 export const Route = createFileRoute("/t/$id")({
   component: SharedTemplate,
+  validateSearch: (search: Record<string, unknown>) => ({
+    share: typeof search.share === "string" ? search.share : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Shared deck — DiapoLab" },
@@ -20,6 +23,7 @@ export const Route = createFileRoute("/t/$id")({
 
 function SharedTemplate() {
   const { id } = Route.useParams();
+  const { share } = Route.useSearch();
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [ready, setReady] = useState(false);
@@ -27,6 +31,25 @@ function SharedTemplate() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      if (share) {
+        const { data, error: rpcError } = await supabase.rpc("get_shared_design", {
+          p_design_id: id,
+          p_token: share,
+        });
+        if (cancelled) return;
+        if (rpcError || !data) {
+          setError("This private link is invalid or has been revoked.");
+          return;
+        }
+        const shared = data as { name: string; canvas_w: number; canvas_h: number; pages: Page[] };
+        const st = useEditor.getState();
+        st.setCanvasSize(shared.canvas_w, shared.canvas_h);
+        st.loadPages(shared.pages);
+        st.setDesignMeta({ id: null, name: shared.name });
+        setName(shared.name);
+        setReady(true);
+        return;
+      }
       const { data, error: err } = await supabase
         .from("public_templates")
         .select("name, canvas_w, canvas_h, pages")
@@ -48,7 +71,7 @@ function SharedTemplate() {
       cancelled = true;
       useEditor.getState().setPresenting(false);
     };
-  }, [id]);
+  }, [id, share]);
 
   return (
     <div className="grid min-h-screen place-items-center bg-ink p-8">
