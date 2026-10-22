@@ -277,6 +277,24 @@ export function CanvasElement({
     const startX = e.clientX;
     const startY = e.clientY;
     const { x, y, width, height } = element;
+    // Smart-guide targets while resizing (same targets as dragging).
+    const st = useEditor.getState();
+    const others = st.elements.filter((o) => o.id !== element.id);
+    const vTargets: number[] = [0, st.canvasW / 2, st.canvasW];
+    const hTargets: number[] = [0, st.canvasH / 2, st.canvasH];
+    for (const o of others) {
+      vTargets.push(o.x, o.x + o.width / 2, o.x + o.width);
+      hTargets.push(o.y, o.y + o.height / 2, o.y + o.height);
+    }
+    const THRESH = 6 / scale;
+    const snapTo = (val: number, targets: number[]): { v: number; hit: number | null } => {
+      let best: { v: number; hit: number | null; d: number } = { v: val, hit: null, d: THRESH };
+      for (const t of targets) {
+        const d = Math.abs(val - t);
+        if (d < best.d) best = { v: t, hit: t, d };
+      }
+      return { v: best.v, hit: best.hit };
+    };
     const onMove = (m: MouseEvent) => {
       const dx = (m.clientX - startX) / scale;
       const dy = (m.clientY - startY) / scale;
@@ -304,11 +322,56 @@ export function CanvasElement({
         nw = Math.max(20, width - dx);
         nh = Math.max(20, height - dy);
       }
+      // Snap the edges being resized onto nearby targets (other elements + canvas).
+      const edgesV: Array<{ edge: "l" | "r"; pos: number }> = [];
+      if (handle.includes("w")) edgesV.push({ edge: "l", pos: nx });
+      if (handle.includes("e")) edgesV.push({ edge: "r", pos: nx + nw });
+      const edgesH: Array<{ edge: "t" | "b"; pos: number }> = [];
+      if (handle.includes("n")) edgesH.push({ edge: "t", pos: ny });
+      if (handle.includes("s")) edgesH.push({ edge: "b", pos: ny + nh });
+      const vHits = new Set<number>();
+      const hHits = new Set<number>();
+      let bestV: { edge: "l" | "r"; shift: number; hit: number } | null = null;
+      for (const ed of edgesV) {
+        const s = snapTo(ed.pos, vTargets);
+        if (s.hit !== null && (bestV === null || Math.abs(s.v - ed.pos) < Math.abs(bestV.shift))) {
+          bestV = { edge: ed.edge, shift: s.v - ed.pos, hit: s.hit };
+        }
+      }
+      if (bestV) {
+        if (bestV.edge === "l") {
+          nx += bestV.shift;
+          nw -= bestV.shift;
+        } else {
+          nw += bestV.shift;
+        }
+      }
+      let bestH: { edge: "t" | "b"; shift: number; hit: number } | null = null;
+      for (const ed of edgesH) {
+        const s = snapTo(ed.pos, hTargets);
+        if (s.hit !== null && (bestH === null || Math.abs(s.v - ed.pos) < Math.abs(bestH.shift))) {
+          bestH = { edge: ed.edge, shift: s.v - ed.pos, hit: s.hit };
+        }
+      }
+      if (bestH) {
+        if (bestH.edge === "t") {
+          ny += bestH.shift;
+          nh -= bestH.shift;
+        } else {
+          nh += bestH.shift;
+        }
+      }
+      nw = Math.max(20, nw);
+      nh = Math.max(20, nh);
+      if (bestV) vHits.add(bestV.hit);
+      if (bestH) hHits.add(bestH.hit);
+      useEditor.getState().setGuides({ v: [...vHits], h: [...hHits] });
       update(element.id, { x: nx, y: ny, width: nw, height: nh });
     };
     const onUp = () => {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
+      useEditor.getState().setGuides({ v: [], h: [] });
     };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
