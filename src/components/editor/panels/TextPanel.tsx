@@ -95,7 +95,7 @@ export function TextPanel() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-3 text-slate-800">
-      <PanelHeader title="Text & fonts" />
+      <PanelHeader kicker="Text" title="Text & fonts" description="Insert styled headings or pick a font from the library." icon={Type} />
       {/* Quick Add Presets */}
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
