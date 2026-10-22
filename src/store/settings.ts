@@ -21,7 +21,7 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   illustrations: "Illus.",
   design: "Design",
   ai: "AI",
-  unsplash: "Photos",
+  unsplash: "Unsplash",
   "my-designs": "Projects",
 };
 
