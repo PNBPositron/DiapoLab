@@ -11,6 +11,7 @@ import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
+import { PanelHeader } from "../ui/selectors";
 
 interface SectionConfig {
   id: string;
@@ -82,16 +83,7 @@ function SectionRow({
 export function DesignPanel() {
   return (
     <div className="flex flex-col gap-3 p-1 text-slate-800">
-      <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white to-slate-50 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">Design system</p>
-            <h2 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">Shape your slide</h2>
-          </div>
-          <div className="grid size-8 place-items-center rounded-xl bg-slate-900 text-white shadow-sm"><Palette className="size-4" /></div>
-        </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">Tune the canvas, brand language, and background from one place.</p>
-      </div>
+      <PanelHeader kicker="Design" title="Shape your slide" description="Tune the canvas, brand language, and background from one place." icon={Palette} />
 
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)] divide-y divide-slate-100/80">
         <SectionRow
