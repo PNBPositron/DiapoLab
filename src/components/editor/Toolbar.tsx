@@ -229,7 +229,7 @@ export function Toolbar() {
           </button>
           <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
           {brandMenuOpen && (
-            <div className="absolute left-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.45)]">
+            <div className="toolbar-flyout absolute left-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.45)]">
               <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">App appearance</div>
               <label className="flex items-center justify-between gap-3 text-xs text-slate-600">Accent <input type="color" value={appAccent} onChange={(event) => setAppAccent(event.target.value)} className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" /></label>
               <label className="mt-3 block text-xs text-slate-600">Icon hue <input type="range" min="-180" max="180" value={iconHue} onChange={(event) => { const hue = Number(event.target.value); setIconHue(hue); setAppAccent(hueToHex((hue + 250) % 360)); }} className="mt-2 w-full accent-indigo-600" /></label>
@@ -348,7 +348,7 @@ export function Toolbar() {
           </button>
 
           {exportOpen && (
-            <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="toolbar-flyout absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in zoom-in-95">
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
@@ -682,7 +682,7 @@ function UserMenu({ email }: { email: string }) {
         <UserIcon className="h-4 w-4" strokeWidth={2.2} />
       </button>
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
+        <div className="toolbar-flyout absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
