@@ -25,6 +25,7 @@ import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
+import { SettingsDialog } from "./SettingsDialog";
 import {
   exportPNG,
   exportJPG,
@@ -89,6 +90,7 @@ export function Toolbar() {
   const [publishing, setPublishing] = useState(false);
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
@@ -364,7 +366,7 @@ export function Toolbar() {
 
         {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
         <LargeModernHamburger
-          onSettings={() => navigate({ to: "/settings" })}
+          onSettings={() => setSettingsDialogOpen(true)}
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
           onClear={clear}
@@ -373,6 +375,9 @@ export function Toolbar() {
         />
       </div>
 
+
+      {/* Settings dialog (moved from sidebar) */}
+      {settingsDialogOpen && <SettingsDialog onClose={() => setSettingsDialogOpen(false)} />}
 
       {/* Publish dialog */}
       <PublishMetaDialog
@@ -533,14 +538,12 @@ function LargeModernHamburger({
             </span>
           </div>
 
-          {isAuthenticated && (
-            <MenuCardItem
-              icon={Settings}
-              title="Settings"
-              subtitle="Account & editing preferences"
-              onClick={() => handleAction(onSettings)}
-            />
-          )}
+          <MenuCardItem
+            icon={Settings}
+            title="Settings"
+            subtitle="Editing preferences & appearance"
+            onClick={() => handleAction(onSettings)}
+          />
 
             <MenuCardItem
             icon={Github}
