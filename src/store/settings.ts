@@ -10,6 +10,7 @@ export type PanelId =
   | "illustrations"
   | "design"
   | "ai"
+  | "unsplash"
   | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
@@ -20,6 +21,7 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   illustrations: "Illus.",
   design: "Design",
   ai: "AI",
+  unsplash: "Photos",
   "my-designs": "Projects",
 };
 
@@ -95,6 +97,7 @@ const ALL_ON: Record<PanelId, boolean> = {
   illustrations: true,
   design: true,
   ai: true,
+  unsplash: true,
   "my-designs": true,
 };
 
