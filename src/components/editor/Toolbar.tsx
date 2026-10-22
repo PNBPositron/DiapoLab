@@ -21,14 +21,12 @@ import {
   CheckCircle2,
   Sliders,
   Presentation,
-  History,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
-import { saveDesign, publishAsTemplate, createPrivateShare, saveDesignVersion } from "@/lib/designs";
+import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import { SettingsDialog } from "./SettingsDialog";
-import { HistoryDialog } from "./HistoryDialog";
 import { importPPTXFile } from "@/lib/import-pptx";
 import {
   exportPNG,
@@ -95,7 +93,6 @@ export function Toolbar() {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
-  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
@@ -160,10 +157,6 @@ export function Toolbar() {
       });
       setDesignMeta({ id: saved.id, name: saved.name });
       setSavedAt(Date.now());
-      // Keep a version snapshot (non-blocking — never fail the save because of it)
-      saveDesignVersion({ designId: saved.id, pages, canvas_w: canvasW, canvas_h: canvasH }).catch((e) =>
-        console.warn("Snapshot skipped:", e)
-      );
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Failed to save");
@@ -389,7 +382,6 @@ export function Toolbar() {
         {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
         <LargeModernHamburger
           onSettings={() => setSettingsDialogOpen(true)}
-          onHistory={() => setHistoryDialogOpen(true)}
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
           onClear={clear}
@@ -404,12 +396,6 @@ export function Toolbar() {
       {settingsDialogOpen &&
         createPortal(<SettingsDialog onClose={() => setSettingsDialogOpen(false)} />, document.body)}
 
-      {/* Version history dialog — portaled for the same sticky-header reason */}
-      {historyDialogOpen &&
-        createPortal(
-          <HistoryDialog designId={useEditor.getState().designId} onClose={() => setHistoryDialogOpen(false)} />,
-          document.body
-        )}
 
       {/* Publish dialog */}
       <PublishMetaDialog
@@ -466,7 +452,6 @@ export function Toolbar() {
  */
 function LargeModernHamburger({
   onSettings,
-  onHistory,
   onNewDesign,
   onShare,
   onClear,
@@ -475,7 +460,6 @@ function LargeModernHamburger({
   isAuthenticated,
 }: {
   onSettings: () => void;
-  onHistory: () => void;
   onNewDesign: () => void;
   onShare: () => void;
   onClear: () => void;
@@ -579,14 +563,6 @@ function LargeModernHamburger({
             onClick={() => handleAction(onSettings)}
           />
 
-          {isAuthenticated && (
-            <MenuCardItem
-              icon={History}
-              title="Version history"
-              subtitle="Browse, snapshot & restore versions"
-              onClick={() => handleAction(onHistory)}
-            />
-          )}
 
             <MenuCardItem
             icon={Github}
