@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, X, Check, Sparkles, User, Filter, Boxes, PenTool } from "lucide-react";
+import { Search, X, Check, Sparkles, User, Filter, Boxes } from "lucide-react";
 import { newImage, useEditor } from "@/store/editor";
 import { useSettings } from "@/store/settings";
 
@@ -67,27 +67,10 @@ function displayName(file: string): string {
     .replace(/\.(svg|png)$/i, "")
     .replace(/^3dicons-/, "")
     .replace(/-dynamic-color$/, "")
-    .replace(/_[a-z0-9]{4}$/, "")
-    .replaceAll("_", " ")
     .replaceAll("-", " ");
 }
 
-const UNDRAW = [
-  "presentation1_tqkp.svg",
-  "charts_jj6t.svg",
-  "data_trends_b0wg.svg",
-  "business_plan_5i9d.svg",
-  "team_ih79.svg",
-  "collaboration2_8og0.svg",
-  "brainstorming_49d4.svg",
-  "analytics_5pgy.svg",
-  "target_kriv.svg",
-  "goal_0v5v.svg",
-  "welcome_3gvl.svg",
-  "checklist_7q37.svg",
-];
-
-type Collection = "Highlights" | "Transhumans" | "Icons" | "unDraw";
+type Collection = "Highlights" | "Transhumans" | "Icons";
 
 export function IllustrationsPanel() {
   const { add } = useEditor();
@@ -100,13 +83,7 @@ export function IllustrationsPanel() {
 
   const filteredFiles = useMemo(() => {
     const pool =
-      activeTab === "Highlights"
-        ? HIGHLIGHTS
-        : activeTab === "Transhumans"
-        ? TRANSHUMANS
-        : activeTab === "unDraw"
-        ? UNDRAW
-        : ICONS;
+      activeTab === "Highlights" ? HIGHLIGHTS : activeTab === "Transhumans" ? TRANSHUMANS : ICONS;
     if (!searchQuery.trim()) return pool;
 
     const query = searchQuery.trim().toLowerCase();
@@ -119,14 +96,11 @@ export function IllustrationsPanel() {
   const handleInsert = (file: string) => {
     const isHighlight = activeTab === "Highlights";
     const isIcon = activeTab === "Icons";
-    const isUndraw = activeTab === "unDraw";
-    const src = `/illustrations/${
-      isHighlight ? "" : isUndraw ? "undraw/" : isIcon ? "icons/" : "transhumans/"
-    }${file}`;
+    const src = `/illustrations/${isHighlight ? "" : isIcon ? "icons/" : "transhumans/"}${file}`;
 
     add(
       newImage(src, {
-        illustrationFormat: isHighlight || isUndraw ? "svg" : "png",
+        illustrationFormat: isHighlight ? "svg" : "png",
         fit: "contain",
         ...(isHighlight ? { tint: isDark ? "#ffffff" : "#0f172a" } : {}),
       })
@@ -170,20 +144,6 @@ export function IllustrationsPanel() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("unDraw")}
-          title="unDraw"
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "unDraw"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <PenTool className="size-3.5" />
-          <span>unDraw</span>
-        </button>
-
-        <button
-          type="button"
           onClick={() => setActiveTab("Icons")}
           title="3D Icons"
           className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
@@ -205,7 +165,7 @@ export function IllustrationsPanel() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={`Search ${
-            activeTab === "Icons" ? "3d icons" : activeTab === "Transhumans" ? "transhumans" : activeTab === "unDraw" ? "unDraw scenes" : "highlights"
+            activeTab === "Icons" ? "3d icons" : activeTab === "Transhumans" ? "transhumans" : "highlights"
           }...`}
           className="w-full rounded-lg border border-slate-200/80 bg-slate-50/60 py-1.5 pl-8 pr-7 text-xs text-slate-800 placeholder-slate-400 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-850/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
         />
@@ -232,13 +192,7 @@ export function IllustrationsPanel() {
           <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-0.5 pb-2 max-h-[calc(100vh-240px)]">
             {filteredFiles.map((file) => {
               const src = `/illustrations/${
-                activeTab === "Transhumans"
-                  ? "transhumans/"
-                  : activeTab === "Icons"
-                  ? "icons/"
-                  : activeTab === "unDraw"
-                  ? "undraw/"
-                  : ""
+                activeTab === "Transhumans" ? "transhumans/" : activeTab === "Icons" ? "icons/" : ""
               }${file}`;
               const name = displayName(file);
               const isAdded = recentlyAdded === file;
