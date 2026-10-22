@@ -228,7 +228,6 @@ export function Toolbar() {
             <div className="toolbar-flyout absolute left-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.45)]">
               <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">App appearance</div>
               <label className="flex items-center justify-between gap-3 text-xs text-slate-600">Accent <input type="color" value={appAccent} onChange={(event) => setAppAccent(event.target.value)} className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" /></label>
-</div>
             </div>
           )}
         </div>
