@@ -65,6 +65,19 @@ export async function deleteDesign(id: string) {
   if (error) throw error;
 }
 
+export async function createPrivateShare(designId: string): Promise<string> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) throw new Error("Sign in to create a private link");
+  const token = crypto.randomUUID().replaceAll("-", "");
+  const { error } = await (supabase as any).from("design_shares").insert({
+    design_id: designId,
+    user_id: userData.user.id,
+    token,
+  });
+  if (error) throw error;
+  return token;
+}
+
 /* ---------------- Public templates ---------------- */
 
 export type PublicTemplate = {

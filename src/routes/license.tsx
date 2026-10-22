@@ -25,7 +25,25 @@ export const Route = createFileRoute("/license")({
 
 function LicensePage() {
   return (
-    <LegalShell title="MIT License" subtitle="permissive open source · copyright (c) 2026">
+    <LegalShell
+      title="MIT License"
+      subtitle="permissive open source · copyright (c) 2026"
+    >
+      <section className="brutal-border-2 bg-surface p-5">
+        <p className="mb-4 max-w-2xl font-mono text-[12px] leading-relaxed text-teal/80">
+          DiapoLab is free software for creating, remixing, exporting, and sharing presentations.
+          You can use the editor in personal and commercial projects without asking permission.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {["Use commercially", "Modify and remix", "Redistribute"].map((item) => (
+            <div key={item} className="border border-teal/20 bg-white/70 p-3">
+              <span className="font-display text-[11px] font-bold uppercase tracking-[0.16em] text-teal">
+                {item}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="brutal-border-2 bg-surface p-4">
         <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">In short</h2>
         <ul className="space-y-1 font-mono text-[12px] text-teal/70">
