@@ -18,13 +18,12 @@ import {
   Upload,
   Settings,
   CheckCircle2,
-  Sparkles,
   Sliders,
   Presentation,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
-import { saveDesign, publishAsTemplate } from "@/lib/designs";
+import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import {
   exportPNG,
@@ -38,13 +37,6 @@ import {
   exportJSON,
   importJSONFile,
 } from "@/lib/export";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 // Hook to close menus on outside click
 function useClickOutside<T extends HTMLElement>(handler: () => void) {
@@ -101,13 +93,6 @@ export function Toolbar() {
   const [publishError, setPublishError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
-  const [assistantOpen, setAssistantOpen] = useState(false);
-  const [assistantInput, setAssistantInput] = useState("");
-  const [assistantBusy, setAssistantBusy] = useState(false);
-  const [assistantError, setAssistantError] = useState<string | null>(null);
-  const [assistantMessages, setAssistantMessages] = useState<
-    Array<{ role: "user" | "assistant"; text: string }>
-  >([]);
 
   useEffect(() => {
     if (!savedAt) return;
@@ -140,83 +125,6 @@ export function Toolbar() {
       alert(e instanceof Error ? e.message : "Export failed");
     } finally {
       setExporting(null);
-    }
-  };
-
-  const askAssistant = async (question = assistantInput) => {
-    const page = pages[currentIndex];
-    if (!question.trim() || !page || assistantBusy) return;
-    setAssistantBusy(true);
-    setAssistantError(null);
-    setAssistantMessages((current) => [...current, { role: "user", text: question.trim() }]);
-    setAssistantInput("");
-    try {
-      const response = await fetch("/api/slide-analysis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page, slideshow: pages, canEdit: true, question }),
-      });
-      const payload = (await response.json()) as {
-        text?: string;
-        error?: string;
-        edits?: Array<{
-          type: string;
-          id?: string;
-          patch?: Record<string, unknown>;
-          text?: string;
-          x?: number;
-          y?: number;
-        }>;
-      };
-      if (!response.ok || !payload.text)
-        throw new Error(payload.error || "Could not analyze this slide.");
-
-      if (payload.edits?.length) {
-        const activeEdits = payload.edits.filter((edit) => edit.type === "addText" || edit.id);
-        const nextPages = pages.map((slide, slideIndex) =>
-          slideIndex !== currentIndex
-            ? slide
-            : {
-                ...slide,
-                elements: [
-                  ...slide.elements.flatMap((element) => {
-                    const edits = activeEdits.filter((edit) => edit.id === element.id);
-                    if (edits.some((edit) => edit.type === "delete")) return [];
-                    const update = edits.find((edit) => edit.type === "update");
-                    return update?.patch ? [{ ...element, ...update.patch }] : [element];
-                  }),
-                  ...activeEdits
-                    .filter((edit) => edit.type === "addText" && typeof edit.text === "string")
-                     .map((edit) => newText({
-                       text: edit.text ?? "",
-                       x: edit.x ?? 120,
-                       y: edit.y ?? 120,
-                       fontSize: 48,
-                       color: "#0b1736",
-                       width: 420,
-                       height: 100,
-                       fontWeight: 700,
-                     })),
-                ],
-              }
-        );
-        loadPages(nextPages);
-      }
-      setAssistantMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          text: payload.edits?.length
-            ? `${payload.text}\n\nApplied ${payload.edits.length} requested change${
-                payload.edits.length > 1 ? "s" : ""
-              }.`
-            : payload.text!,
-        },
-      ]);
-    } catch (error) {
-      setAssistantError(error instanceof Error ? error.message : "Could not analyze this slide.");
-    } finally {
-      setAssistantBusy(false);
     }
   };
 
@@ -255,9 +163,10 @@ export function Toolbar() {
     if (!designId) await handleSave();
     const id = useEditor.getState().designId;
     if (!id) return;
-    const link = `${window.location.origin}/t/${id}?access=private`;
-    await navigator.clipboard.writeText(link);
-    alert("Private link copied to clipboard.");
+    const token = await createPrivateShare(id);
+    const link = `${window.location.origin}/t/${id}?share=${token}`;
+    setShareLink(link);
+    await navigator.clipboard.writeText(link).catch(() => {});
   };
 
   const handlePublish = () => {
@@ -463,93 +372,11 @@ export function Toolbar() {
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
                   onClear={clear}
-          onAssistant={() => setAssistantOpen(true)}
           publishing={publishing}
           isAuthenticated={!!user}
         />
       </div>
 
-      <button
-        type="button"
-        onClick={() => setAssistantOpen(true)}
-        aria-label="Open Qwen chatbot"
-        title="Ask Qwen"
-        className="fixed bottom-5 right-5 z-[80] flex size-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-300/40 transition hover:scale-105 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-      >
-        <Sparkles className="size-5" />
-      </button>
-
-      {/* Qwen Chatbot Dialog */}
-      <Dialog open={assistantOpen} onOpenChange={setAssistantOpen}>
-        <DialogContent className="max-w-lg rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-display text-base font-bold tracking-wide text-slate-800">
-              <Sparkles className="size-5 text-purple-600" />
-              Qwen Chatbot · Groq
-            </DialogTitle>
-          </DialogHeader>
-          <div className="font-mono text-[11px] text-slate-400">
-            Current slide: {pages[currentIndex]?.elements.length ?? 0} elements · {canvasW}×{canvasH}px
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {["Analyze this slide", "Improve hierarchy", "Make it more engaging"].map((question) => (
-              <button
-                key={question}
-                type="button"
-                onClick={() => void askAssistant(question)}
-                className="rounded-lg border border-purple-100 bg-purple-50/50 px-3 py-1.5 font-display text-[10px] font-medium tracking-wide text-purple-700 transition-colors hover:bg-purple-100"
-              >
-                {question}
-              </button>
-            ))}
-          </div>
-          <div className="mt-3 max-h-64 space-y-2.5 overflow-y-auto">
-            {assistantMessages.length === 0 && (
-              <p className="rounded-xl border border-dashed border-slate-200 p-4 text-center font-mono text-xs text-slate-400">
-                Ask for a slide analysis, a text touch-up, or a layout suggestion.
-              </p>
-            )}
-            {assistantMessages.map((m, i) => (
-              <div
-                key={`${m.role}-${i}`}
-                className={`rounded-xl border p-3 font-mono text-xs leading-relaxed ${
-                  m.role === "user"
-                    ? "border-slate-200 bg-slate-50 text-slate-700"
-                    : "border-purple-100 bg-purple-50/70 text-purple-950"
-                }`}
-              >
-                {m.text}
-              </div>
-            ))}
-            {assistantError && (
-              <p role="alert" className="font-mono text-xs text-red-500">
-                {assistantError}
-              </p>
-            )}
-          </div>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              void askAssistant();
-            }}
-            className="mt-3 flex gap-2"
-          >
-            <input
-              value={assistantInput}
-              onChange={(event) => setAssistantInput(event.target.value)}
-              placeholder="What would you like to improve on this slide?..."
-              className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2 font-mono text-xs text-slate-700 placeholder:text-slate-400 focus:border-purple-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
-            />
-            <button
-              type="submit"
-              disabled={assistantBusy}
-              className="rounded-xl bg-purple-600 px-4 py-2 font-display text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-purple-700 active:scale-95 disabled:opacity-60"
-            >
-              {assistantBusy ? "…" : "Send"}
-            </button>
-          </form>
-        </DialogContent>
-      </Dialog>
 
       {/* Publish dialog */}
       <PublishMetaDialog
