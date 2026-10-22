@@ -8,11 +8,11 @@ import {
   Type,
   Square,
   BarChart3,
-  HelpCircle,
-  Keyboard,
+  Bug,
+  Command,
   Sparkles,
   Globe,
-  Layers,
+  Scissors,
   Copy,
   Trash2,
   Undo2,
@@ -20,9 +20,28 @@ import {
   Play,
   Plus,
   FileUp,
-  WandSparkles,
+  Palette,
+  MousePointerClick,
+  MousePointer2,
+  TextCursorInput,
+  History,
+  Repeat2,
+  Eraser,
+  Presentation,
+  Heading1,
+  Frame,
+  LineChart,
+  Droplets,
+  Box,
+  Wand2,
+  Shuffle,
+  Zap,
+  Link2,
+  MousePointerSquareDashed,
   ExternalLink,
   FolderGit2,
+  BookOpen,
+  Command as CommandIcon,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -41,6 +60,14 @@ type Command = {
   run?: () => void;
   href?: string;
   keywords?: string;
+};
+
+const GROUP_ICONS: Record<CommandGroup, React.ReactNode> = {
+  Actions: <Zap className="size-2.5" />,
+  Insert: <Plus className="size-2.5" />,
+  Shortcuts: <Command className="size-2.5" />,
+  Features: <Sparkles className="size-2.5" />,
+  Links: <Link2 className="size-2.5" />,
 };
 
 /* ------------------------------------------------------------------ */
@@ -131,7 +158,7 @@ export function CommandPalette({
         id: "clear-slide",
         label: "Clear current slide",
         group: "Actions",
-        icon: <Trash2 className="size-4" />,
+        icon: <Eraser className="size-4" />,
         keywords: "clear empty reset slide",
         run: () => store.clear(),
       },
@@ -148,7 +175,7 @@ export function CommandPalette({
         label: "Start presentation",
         group: "Actions",
         shortcut: ["Ctrl", "↵"],
-        icon: <Play className="size-4" />,
+        icon: <Presentation className="size-4" />,
         keywords: "present play fullscreen slideshow",
         run: () => store.setPresenting(true),
       },
@@ -159,7 +186,7 @@ export function CommandPalette({
         id: "insert-text",
         label: "Insert text",
         group: "Insert",
-        icon: <Type className="size-4" />,
+        icon: <Heading1 className="size-4" />,
         keywords: "add text title heading paragraph",
         run: () =>
           store.add({
@@ -203,7 +230,7 @@ export function CommandPalette({
         id: "insert-chart",
         label: "Insert chart",
         group: "Insert",
-        icon: <BarChart3 className="size-4" />,
+        icon: <LineChart className="size-4" />,
         keywords: "add chart bar graph data",
         run: () =>
           store.add({
@@ -237,7 +264,7 @@ export function CommandPalette({
         label: "Toggle command palette",
         group: "Shortcuts",
         shortcut: ["Ctrl", "K"],
-        icon: <Keyboard className="size-4" />,
+        icon: <CommandIcon className="size-4" />,
         keywords: "command palette search menu",
         run: () => onOpenChange(!open),
       },
@@ -246,7 +273,7 @@ export function CommandPalette({
         label: "Delete selected element",
         group: "Shortcuts",
         shortcut: ["Del"],
-        icon: <Keyboard className="size-4" />,
+        icon: <Trash2 className="size-4" />,
         keywords: "delete remove",
       },
       {
@@ -254,7 +281,7 @@ export function CommandPalette({
         label: "Duplicate selected element",
         group: "Shortcuts",
         shortcut: ["Ctrl", "D"],
-        icon: <Keyboard className="size-4" />,
+        icon: <Copy className="size-4" />,
         keywords: "duplicate copy",
       },
       {
@@ -262,7 +289,7 @@ export function CommandPalette({
         label: "Undo last change",
         group: "Shortcuts",
         shortcut: ["Ctrl", "Z"],
-        icon: <Keyboard className="size-4" />,
+        icon: <History className="size-4" />,
         keywords: "undo history",
       },
       {
@@ -270,7 +297,7 @@ export function CommandPalette({
         label: "Redo",
         group: "Shortcuts",
         shortcut: ["Ctrl", "⇧", "Z"],
-        icon: <Keyboard className="size-4" />,
+        icon: <Repeat2 className="size-4" />,
         keywords: "redo",
       },
       {
@@ -278,7 +305,7 @@ export function CommandPalette({
         label: "Add element to selection",
         group: "Shortcuts",
         shortcut: ["⇧", "Click"],
-        icon: <Keyboard className="size-4" />,
+        icon: <MousePointerSquareDashed className="size-4" />,
         keywords: "multi select group",
       },
       {
@@ -286,7 +313,7 @@ export function CommandPalette({
         label: "Edit text inline",
         group: "Shortcuts",
         shortcut: ["Double-click", "text"],
-        icon: <Keyboard className="size-4" />,
+        icon: <TextCursorInput className="size-4" />,
         keywords: "edit text inline",
       },
       {
@@ -294,7 +321,7 @@ export function CommandPalette({
         label: "Play presentation",
         group: "Shortcuts",
         shortcut: ["Ctrl", "↵"],
-        icon: <Keyboard className="size-4" />,
+        icon: <Play className="size-4" />,
         keywords: "present play",
       },
     ];
@@ -304,7 +331,7 @@ export function CommandPalette({
         id: "ft-brand",
         label: "Brand Kit — colors & fonts",
         group: "Features",
-        icon: <WandSparkles className="size-4" />,
+        icon: <Palette className="size-4" />,
         hint: "Left panel → Brand Kit",
         keywords: "brand kit palette fonts theme identity",
       },
@@ -312,7 +339,7 @@ export function CommandPalette({
         id: "ft-masks",
         label: "Shape masks — text, shapes, images",
         group: "Features",
-        icon: <Layers className="size-4" />,
+        icon: <Scissors className="size-4" />,
         hint: "Inspector → Shape Mask",
         keywords: "mask clip hexagon circle knockout silhouette",
       },
@@ -320,7 +347,7 @@ export function CommandPalette({
         id: "ft-slidebg",
         label: "Slide-background knockout fill",
         group: "Features",
-        icon: <Layers className="size-4" />,
+        icon: <Frame className="size-4" />,
         hint: "Inspector → Fill → Slide BG",
         keywords: "knockout background frosted window",
       },
@@ -328,7 +355,7 @@ export function CommandPalette({
         id: "ft-glass",
         label: "Liquid Glass effect",
         group: "Features",
-        icon: <Sparkles className="size-4" />,
+        icon: <Droplets className="size-4" />,
         hint: "Select a shape → Effect",
         keywords: "glass blur translucent liquid effect",
       },
@@ -336,7 +363,7 @@ export function CommandPalette({
         id: "ft-3d",
         label: "3D transforms & interactive tilt",
         group: "Features",
-        icon: <Layers className="size-4" />,
+        icon: <Box className="size-4" />,
         hint: "Inspector → 3D Transform",
         keywords: "3d perspective rotate tilt",
       },
@@ -344,7 +371,7 @@ export function CommandPalette({
         id: "ft-morph",
         label: "Morph slide transition",
         group: "Features",
-        icon: <Sparkles className="size-4" />,
+        icon: <Shuffle className="size-4" />,
         hint: "PagesBar → Transition → Morph",
         keywords: "transition morph tween animation",
       },
@@ -352,7 +379,7 @@ export function CommandPalette({
         id: "ft-interaction",
         label: "Click interactions — jump to slide",
         group: "Features",
-        icon: <Play className="size-4" />,
+        icon: <MousePointerClick className="size-4" />,
         hint: "Inspector → Interaction",
         keywords: "interactive link navigation click jump",
       },
@@ -360,7 +387,7 @@ export function CommandPalette({
         id: "ft-ai",
         label: "AI panel",
         group: "Features",
-        icon: <Sparkles className="size-4" />,
+        icon: <Wand2 className="size-4" />,
         hint: "Left panel → AI",
         keywords: "ai generate redesign magic",
       },
@@ -387,7 +414,7 @@ export function CommandPalette({
         id: "lk-issues",
         label: "Report a bug / feature request",
         group: "Links",
-        icon: <HelpCircle className="size-4" />,
+        icon: <Bug className="size-4" />,
         href: "https://github.com/PNBPositron/DiapoLab/issues",
         keywords: "issue bug feedback report",
       },
@@ -400,12 +427,12 @@ export function CommandPalette({
         keywords: "app live deploy site",
       },
       {
-        id: "lk-docs",
-        label: "Help & documentation",
+        id: "lk-wiki",
+        label: "Wiki — help & documentation",
         group: "Links",
-        icon: <HelpCircle className="size-4" />,
-        href: "https://github.com/PNBPositron/DiapoLab#readme",
-        keywords: "help docs documentation readme",
+        icon: <BookOpen className="size-4" />,
+        href: "/wiki",
+        keywords: "wiki help docs documentation guide faq",
       },
     ];
 
@@ -443,7 +470,7 @@ export function CommandPalette({
   if (!open) return null;
 
   const runCommand = (c: Command) => {
-    if (c.href) window.open(c.href, "_blank", "noopener,noreferrer");
+    if (c.href) window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
     else c.run?.();
     onOpenChange(false);
   };
@@ -469,7 +496,7 @@ export function CommandPalette({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/30 p-4 pt-[10vh] backdrop-blur-[4px] animate-in fade-in duration-150"
+      className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/40 p-4 pt-[10vh] backdrop-blur-md animate-in fade-in duration-150"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onOpenChange(false);
       }}
@@ -479,37 +506,44 @@ export function CommandPalette({
         aria-modal="true"
         aria-label="Command palette"
         onKeyDown={onKeyDown}
-        className="w-full max-w-[560px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_64px_-16px_rgba(15,23,42,0.3)] animate-in slide-in-from-top-3 zoom-in-95 duration-150"
+        className="w-full max-w-[600px] overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-[0_32px_90px_-20px_rgba(15,23,42,0.45),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-xl animate-in slide-in-from-top-4 zoom-in-95 duration-200"
       >
-        {/* Search bar — clean, no border, blue search icon */}
-        <div className="flex items-center gap-3 px-5">
-          <Search className="size-4 shrink-0 text-blue-500" />
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search commands…"
-            className="h-14 min-w-0 flex-1 bg-transparent text-[15px] text-slate-800 outline-none placeholder:text-slate-400"
+        {/* Brand + search bar */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-slate-50 via-white to-blue-50/60 px-5">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-60"
+            style={{ backgroundImage: "radial-gradient(circle at 92% 20%, rgba(37,99,235,0.16) 0%, transparent 60%)" }}
           />
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="grid size-6 shrink-0 place-items-center rounded-md text-slate-300 transition hover:bg-slate-100 hover:text-slate-500"
-            title="Close (Esc)"
-          >
-            <kbd className="font-mono text-[10px] font-medium">ESC</kbd>
-          </button>
+          <div className="relative flex items-center gap-3 py-4">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)]">
+              <Search className="size-4" />
+            </span>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search commands, features, shortcuts…"
+              className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-800 outline-none placeholder:text-slate-400"
+            />
+            <kbd className="shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
+              ESC
+            </kbd>
+          </div>
         </div>
 
-        {/* Thin divider under search */}
-        <div className="h-px bg-slate-100" />
+        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[54vh] overflow-y-auto p-2">
+        <div ref={listRef} className="max-h-[52vh] overflow-y-auto p-2.5">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-12 text-slate-400">
-              <Search className="size-6" />
-              <p className="text-xs font-medium">No results for “{query}”</p>
+            <div className="flex flex-col items-center justify-center gap-3 py-14">
+              <span className="grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-300">
+                <Search className="size-5" />
+              </span>
+              <div className="text-center">
+                <p className="text-xs font-semibold text-slate-500">No results for “{query}”</p>
+                <p className="mt-1 text-[11px] text-slate-400">Try “insert”, “theme”, “present”…</p>
+              </div>
             </div>
           ) : (
             filtered.map((c, i) => {
@@ -519,7 +553,8 @@ export function CommandPalette({
               return (
                 <div key={c.id}>
                   {showHeader && (
-                    <div className="px-3 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                      <span className="text-blue-400">{GROUP_ICONS[c.group]}</span>
                       {c.group}
                     </div>
                   )}
@@ -527,15 +562,15 @@ export function CommandPalette({
                     type="button"
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => runCommand(c)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors duration-75 ${
-                      active ? "bg-blue-50" : "text-slate-700 hover:bg-slate-50"
+                    className={`flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-all duration-75 ${
+                      active ? "bg-blue-50/80 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.18)]" : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <span
-                      className={`grid size-8 shrink-0 place-items-center rounded-lg transition-colors ${
+                      className={`grid size-9 shrink-0 place-items-center rounded-xl border transition-all ${
                         active
-                          ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30"
-                          : "bg-slate-100 text-slate-500"
+                          ? "border-blue-600 bg-blue-600 text-white shadow-[0_6px_14px_rgba(37,99,235,0.4)]"
+                          : "border-slate-100 bg-slate-50 text-slate-500"
                       }`}
                     >
                       {c.icon}
@@ -582,7 +617,7 @@ export function CommandPalette({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 border-t border-slate-100 px-4 py-2 text-[10px] text-slate-400">
+        <div className="flex items-center gap-4 border-t border-slate-100 bg-slate-50/70 px-4 py-2 text-[10px] text-slate-400">
           <span className="flex items-center gap-1">
             <ArrowUp className="size-3" />
             <ArrowDown className="size-3" /> navigate
