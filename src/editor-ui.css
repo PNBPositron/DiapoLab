@@ -694,18 +694,18 @@ html[data-editor-theme="obsidian"] .text-slate-300:not(#canvas-export *) {
   color: #94a3b8 !important;
 }
 
-html[data-editor-theme="obsidian"] .hover\\:text-slate-900:hover:not(#canvas-export *),
-html[data-editor-theme="obsidian"] .hover\\:text-slate-700:hover:not(#canvas-export *) {
+html[data-editor-theme="obsidian"] .hover\:text-slate-900:hover:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .hover\:text-slate-700:hover:not(#canvas-export *) {
   color: #f1f5f9 !important;
 }
 
 /* Borders */
 html[data-editor-theme="obsidian"] .border-slate-100:not(#canvas-export *),
 html[data-editor-theme="obsidian"] .border-slate-200:not(#canvas-export *),
-html[data-editor-theme="obsidian"] .border-slate-200\\/60:not(#canvas-export *),
-html[data-editor-theme="obsidian"] .border-slate-200\\/70:not(#canvas-export *),
-html[data-editor-theme="obsidian"] .border-slate-200\\/80:not(#canvas-export *),
-html[data-editor-theme="obsidian"] .border-slate-200\\/90:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\/60:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\/70:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\/80:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\/90:not(#canvas-export *),
 html[data-editor-theme="obsidian"] .border-slate-300:not(#canvas-export *) {
   border-color: rgba(148, 163, 184, 0.18) !important;
 }
