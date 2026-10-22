@@ -163,7 +163,7 @@ export function TemplatesPanel() {
 
   return (
     <div className="space-y-4">
-      <PanelHeader title="Templates" />
+      <PanelHeader kicker="Templates" title="Start from a deck" description="Browse community templates, then load one onto your canvas in a click." icon={LayoutGrid} />
 
       {error && (
         <div className="mx-4 flex items-start justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
