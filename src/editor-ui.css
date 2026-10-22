@@ -643,3 +643,132 @@
   transform: translateY(-1px) scale(1.03);
   transition-duration: 90ms;
 }
+
+/* ── Dark mode ("obsidian" editor theme) ───────────────────────────────────
+   Activated by html[data-editor-theme="obsidian"] (Settings → Editor theme
+   → Dark). This section is unlayered, so it beats Tailwind's layered
+   utilities and remaps the light chrome classes to dark surfaces.
+   Everything inside #canvas-export (the actual slide) is excluded via
+   :not(#canvas-export *) so slide content keeps its true colors. */
+
+html[data-editor-theme="obsidian"] .editor-ui {
+  background-color: #0b1220 !important;
+}
+
+html[data-editor-theme="obsidian"] .editor-ui main {
+  background-color: #0d1526 !important;
+}
+
+/* Surfaces */
+html[data-editor-theme="obsidian"] .bg-white:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-white\/80:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-white\/70:not(#canvas-export *) {
+  background-color: #0f172a !important;
+}
+
+html[data-editor-theme="obsidian"] .bg-slate-50:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-50\/80:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-50\/40:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-50\/60:not(#canvas-export *) {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+}
+
+html[data-editor-theme="obsidian"] .bg-slate-100:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-100\/90:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-100\/80:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .bg-slate-100\/60:not(#canvas-export *) {
+  background-color: rgba(51, 65, 85, 0.6) !important;
+}
+
+/* Ink / text */
+html[data-editor-theme="obsidian"] .text-slate-900:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .text-slate-800:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .text-slate-700:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .text-slate-600:not(#canvas-export *) {
+  color: #e2e8f0 !important;
+}
+
+html[data-editor-theme="obsidian"] .text-slate-500:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .text-slate-400:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .text-slate-300:not(#canvas-export *) {
+  color: #94a3b8 !important;
+}
+
+html[data-editor-theme="obsidian"] .hover\\:text-slate-900:hover:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .hover\\:text-slate-700:hover:not(#canvas-export *) {
+  color: #f1f5f9 !important;
+}
+
+/* Borders */
+html[data-editor-theme="obsidian"] .border-slate-100:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\\/60:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\\/70:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\\/80:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-200\\/90:not(#canvas-export *),
+html[data-editor-theme="obsidian"] .border-slate-300:not(#canvas-export *) {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+/* Panels, inspector, dialogs */
+html[data-editor-theme="obsidian"] .editor-side-panel,
+html[data-editor-theme="obsidian"] .editor-inspector {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 24px 48px -20px rgba(0, 0, 0, 0.7) !important;
+}
+
+html[data-editor-theme="obsidian"] .editor-side-panel input:not([type="color"]),
+html[data-editor-theme="obsidian"] .editor-side-panel textarea,
+html[data-editor-theme="obsidian"] .editor-side-panel select {
+  background: rgba(30, 41, 59, 0.7) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+html[data-editor-theme="obsidian"] .editor-side-panel input:not([type="color"]):focus,
+html[data-editor-theme="obsidian"] .editor-side-panel textarea:focus,
+html[data-editor-theme="obsidian"] .editor-side-panel select:focus {
+  background: #0b1220 !important;
+}
+
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-content { color: #e2e8f0 !important; }
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-intro { color: #94a3b8 !important; }
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-section-label { color: #64748b !important; }
+html[data-editor-theme="obsidian"] .editor-side-panel label { color: #cbd5e1 !important; }
+
+/* Cards inside panels: slightly lighter surface */
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-choice-grid > button,
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-action-grid > button,
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-action-grid > label {
+  background: #111c33 !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-choice-grid > button:hover,
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-action-grid > button:hover,
+html[data-editor-theme="obsidian"] .editor-side-panel .panel-action-grid > label:hover {
+  background: #16233d !important;
+}
+
+/* Tool rail */
+html[data-editor-theme="obsidian"] .editor-tool-rail > button { color: #94a3b8 !important; }
+html[data-editor-theme="obsidian"] .editor-tool-rail > button:hover,
+html[data-editor-theme="obsidian"] .editor-tool-rail > button:focus-visible { color: #60a5fa !important; }
+
+/* Zoom dock */
+html[data-editor-theme="obsidian"] .zoom-dock {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+html[data-editor-theme="obsidian"] .zoom-dock button { color: #94a3b8; }
+html[data-editor-theme="obsidian"] .zoom-dock button:hover:not(:disabled) { background: rgba(37, 99, 235, 0.18); color: #93c5fd; }
+html[data-editor-theme="obsidian"] .zoom-dock output { background: rgba(30, 41, 59, 0.8); color: #e2e8f0; }
+html[data-editor-theme="obsidian"] .zoom-dock span { border-left-color: rgba(148, 163, 184, 0.2); }
+
+/* Scrollbars */
+html[data-editor-theme="obsidian"] .editor-side-panel::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); }
+html[data-editor-theme="obsidian"] .editor-side-panel::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
