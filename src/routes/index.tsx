@@ -29,7 +29,7 @@ function Editor() {
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="relative flex-1 overflow-hidden border-x border-slate-200/70 bg-white">
+        <main className="relative flex-1 overflow-hidden border-x-0 bg-white">
           <div
             className="pointer-events-none absolute inset-0 opacity-35"
             style={{
