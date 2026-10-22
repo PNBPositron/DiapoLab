@@ -365,11 +365,11 @@ export function PropertiesPanel() {
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
     <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
-      <div className="pointer-events-auto flex items-center gap-1 rounded-2xl border border-slate-200/90 bg-white/90 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.12)] backdrop-blur-xl">
+      <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/70 bg-white/85 p-1.5 shadow-[0_20px_50px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/5 backdrop-blur-2xl">
         {/* Type badge */}
-        <div className="flex items-center gap-1.5 rounded-xl bg-slate-100/80 px-2.5 py-1.5">
-          <Layers className="size-3.5 text-sky-600" />
-          <span className="text-[10px] font-bold tracking-wider text-slate-600 uppercase">
+        <div className="flex items-center gap-1.5 rounded-full bg-slate-900/95 px-3 py-1.5 shadow-sm">
+          <span className="size-1.5 rounded-full bg-sky-400" />
+          <span className="text-[10px] font-bold tracking-wider text-white uppercase">
             {el.type}
           </span>
         </div>
@@ -493,9 +493,25 @@ export function PropertiesPanel() {
         )}
 
         {/* Universal actions */}
+        {/* Layer order */}
+        <button
+          onClick={() => bringForward(el.id)}
+          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          title="Bring forward"
+        >
+          <ArrowUp className="size-3.5" />
+        </button>
+        <button
+          onClick={() => sendBackward(el.id)}
+          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          title="Send backward"
+        >
+          <ArrowDown className="size-3.5" />
+        </button>
+
         <button
           onClick={() => duplicate(el.id)}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           title="Duplicate"
         >
           <Copy className="size-3.5" />
@@ -503,7 +519,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
           title="Rotate 90°"
         >
           <RotateCcw className="size-3.5" />
@@ -511,20 +527,20 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => remove(el.id)}
-          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 active:scale-90"
+          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 active:scale-90"
           title="Delete"
         >
           <Trash2 className="size-3.5" />
         </button>
 
-        <div className="mx-0.5 h-4 w-px bg-slate-200" />
+        <div className="mx-0.5 h-5 w-px bg-slate-200/80" />
 
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
-          className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition ${
+          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition active:scale-95 ${
             advancedOpen
-              ? "bg-sky-600 text-white shadow-xs"
-              : "bg-slate-900 text-white hover:bg-slate-800"
+              ? "bg-sky-600 text-white shadow-[0_6px_16px_rgba(14,165,233,0.4)]"
+              : "bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.4)] hover:brightness-110"
           }`}
         >
           <Sliders className="size-3.5" />
