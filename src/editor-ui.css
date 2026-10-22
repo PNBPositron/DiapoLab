@@ -519,6 +519,22 @@
   gap: 1rem;
 }
 
+/* Slide thumbnail bar: transparent on the white app background,
+   no white cards or per-button shadows. */
+.editor-ui .pages-bar > .flex.min-w-0 > .group > button,
+.editor-ui .pages-bar > .flex.min-w-0 > button,
+.editor-ui .pages-bar > .flex.shrink-0 > button,
+.editor-ui .pages-bar > .flex.shrink-0 > div,
+.editor-ui .pages-bar button {
+  background: transparent;
+  box-shadow: none;
+}
+.editor-ui .pages-bar > .flex.min-w-0 > .group > button:hover,
+.editor-ui .pages-bar > .flex.min-w-0 > button:hover,
+.editor-ui .pages-bar > .flex.shrink-0 > button:hover {
+  box-shadow: none;
+}
+
 .editor-ui .pages-bar > .flex.min-w-0 > .group > button {
   background: #ffffff;
   box-shadow:
