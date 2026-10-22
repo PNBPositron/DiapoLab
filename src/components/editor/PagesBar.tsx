@@ -129,7 +129,7 @@ export function PagesBar() {
                   {i + 1}
                 </span>
               </button>
-              <div className="absolute -right-1 -top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <div className="absolute -bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 {i > 0 && (
                   <button
                     onClick={() => movePage(i, i - 1)}
