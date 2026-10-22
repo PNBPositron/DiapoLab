@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, Palette, LayoutTemplate } from "lucide-react";
+import { Loader2, Palette, LayoutTemplate, Search, Sparkles, ArrowRight, ArrowUpRight, Calendar, Layers, BookOpen, Sparkle } from "lucide-react";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 import { listPublicThemes, themeCssVars, CUSTOM_THEME_PREFIX, type PublicTheme } from "@/lib/themes";
@@ -35,6 +35,7 @@ function Marketplace() {
   const [tab, setTab] = useState<Tab>("templates");
   const [templates, setTemplates] = useState<PublicTemplate[] | null>(null);
   const [themes, setThemes] = useState<PublicTheme[] | null>(null);
+  const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addCustomTheme, setEditorTheme, editorTheme } = useSettings();
@@ -58,66 +59,160 @@ function Marketplace() {
     setEditorTheme(`${CUSTOM_THEME_PREFIX}${t.id}`);
   };
 
-  return (
-    <div className="min-h-screen bg-ink px-6 py-10">
-      <div className="mx-auto max-w-6xl">
-        <Link to="/" className="font-mono text-[11px] text-teal/60 underline hover:text-teal">
-          &lt; back to editor
-        </Link>
-        <h1 className="mt-4 font-display text-2xl tracking-[0.2em] text-teal">▸ MARKETPLACE</h1>
-        <p className="mb-6 font-mono text-[11px] text-teal/50">
-          &gt; community templates and editor themes · free to use and remix
-        </p>
+  const q = query.trim().toLowerCase();
+  const filteredTemplates = (templates ?? []).filter(
+    (t) => !q || t.name.toLowerCase().includes(q),
+  );
+  const filteredThemes = (themes ?? []).filter(
+    (t) => !q || t.name.toLowerCase().includes(q),
+  );
 
-        <div className="mb-6 flex gap-2">
+  const counts: Record<Tab, number> = {
+    templates: templates?.length ?? 0,
+    themes: themes?.length ?? 0,
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50/60">
+      {/* Hero header */}
+      <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/40 to-slate-100">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 85% -10%, rgba(37,99,235,0.18) 0%, transparent 55%), radial-gradient(circle at 10% 110%, rgba(99,102,241,0.12) 0%, transparent 45%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-6xl px-6 py-12">
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 shadow-sm backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
+            >
+              <ArrowLeft /> back to editor
+            </Link>
+            <Link
+              to="/wiki"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 shadow-sm backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
+            >
+              <BookOpen className="size-3.5" /> wiki
+            </Link>
+          </div>
+          <div className="mt-6 flex items-center gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]">
+              <Sparkles className="size-5" />
+            </span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">DiapoLab</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Marketplace</h1>
+            </div>
+          </div>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
+            Community-made templates and editor themes. Everything is free — load it,
+            remix it, make it yours.
+          </p>
+
+          {/* Search */}
+          <div className="mt-6 flex max-w-md items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
+            <Search className="size-4 shrink-0 text-slate-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search the marketplace…"
+              className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="shrink-0 text-[10px] font-medium text-slate-400 transition hover:text-slate-600"
+              >
+                clear
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        {/* Tabs */}
+        <div className="mb-6 flex items-center gap-2">
           {(
             [
-              ["templates", "TEMPLATES", LayoutTemplate],
-              ["themes", "THEMES", Palette],
+              ["templates", "Templates", LayoutTemplate],
+              ["themes", "Themes", Palette],
             ] as Array<[Tab, string, typeof Palette]>
           ).map(([id, label, Icon]) => (
             <button
               key={id}
               onClick={() => setTab(id)}
-              className={`brutal-border brutal-press flex items-center gap-2 px-4 py-2 font-display text-[11px] tracking-[0.2em] ${
-                tab === id ? "bg-blue text-ink" : "bg-surface text-teal/70"
+              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-all ${
+                tab === id
+                  ? "border-blue-600 bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.3)]"
+                  : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
               }`}
             >
-              <Icon className="h-3.5 w-3.5" /> {label}
+              <Icon className="size-3.5" /> {label}
+              <span
+                className={`rounded-full px-1.5 py-0.5 font-mono text-[9px] ${
+                  tab === id ? "bg-white/20 text-white" : "bg-slate-100 text-slate-400"
+                }`}
+              >
+                {counts[id]}
+              </span>
             </button>
           ))}
         </div>
 
-        {error && <p className="mb-4 font-mono text-[11px] text-[#ff0080]">! {error}</p>}
+        {error && (
+          <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-600">
+            ! {error}
+          </div>
+        )}
 
         {tab === "templates" ? (
           templates === null ? (
             <Loading />
-          ) : templates.length === 0 ? (
-            <Empty text="no templates published yet — be the first" />
+          ) : filteredTemplates.length === 0 ? (
+            <Empty
+              icon={<LayoutTemplate className="size-5" />}
+              title="No templates found"
+              text={templates.length === 0 ? "Nothing published yet — be the first to share a deck from the editor toolbar." : `No template matches “${query}”.`}
+            />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {templates.map((t) => (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredTemplates.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => useTemplate(t)}
-                  className="brutal-border-2 group bg-surface p-2 text-left transition-colors hover:border-blue"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_16px_40px_-12px_rgba(37,99,235,0.25)]"
                 >
-                  <div className="aspect-video w-full overflow-hidden border border-teal/25 bg-ink">
+                  <div className="relative aspect-video w-full overflow-hidden border-b border-slate-100 bg-slate-100">
                     {t.pages?.[0] ? (
                       <SlideThumbnail
                         page={t.pages[0] as Page}
                         canvasW={t.canvas_w}
                         canvasH={t.canvas_h}
-                        className="h-full w-full"
+                        className="h-full w-full transition-transform duration-300 group-hover:scale-[1.04]"
                       />
                     ) : null}
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition-all duration-200 group-hover:bg-slate-950/30 group-hover:opacity-100">
+                      <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+                        Use template <ArrowUpRight className="size-3 text-blue-600" />
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-2 font-display text-[11px] tracking-[0.15em] text-teal">
-                    {t.name}
-                  </div>
-                  <div className="font-mono text-[9px] text-teal/50">
-                    {t.pages?.length ?? 0} slides · {new Date(t.created_at).toLocaleDateString()}
+                  <div className="flex items-center justify-between gap-2 px-4 py-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-xs font-semibold text-slate-800" title={t.name}>
+                        {t.name}
+                      </div>
+                      <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
+                        <Layers className="size-2.5" /> {t.pages?.length ?? 0} slides
+                        <span className="mx-1">·</span>
+                        <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <ArrowRight className="size-4 shrink-0 text-slate-200 transition-all group-hover:translate-x-0.5 group-hover:text-blue-500" />
                   </div>
                 </button>
               ))}
@@ -125,77 +220,135 @@ function Marketplace() {
           )
         ) : themes === null ? (
           <Loading />
-        ) : themes.length === 0 ? (
-          <Empty text="no themes published yet — build one in settings" />
+        ) : filteredThemes.length === 0 ? (
+          <Empty
+            icon={<Palette className="size-5" />}
+            title="No themes found"
+            text={themes.length === 0 ? "No themes published yet — build one in settings and share it." : `No theme matches “${query}”.`}
+          />
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {themes.map((t) => {
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredThemes.map((t) => {
               const active = editorTheme === `${CUSTOM_THEME_PREFIX}${t.id}`;
               const vars = themeCssVars(t.tokens);
               return (
-                <div key={t.id} className="brutal-border-2 bg-surface p-3">
-                  <div
-                    className="mb-3 h-24 border border-teal/25 p-2"
-                    style={{ background: t.tokens.paper }}
-                  >
+                <div
+                  key={t.id}
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_16px_40px_-12px_rgba(37,99,235,0.25)]"
+                >
+                  {/* Preview */}
+                  <div className="border-b border-slate-100 p-4" style={{ background: t.tokens.paper }}>
                     <div
-                      className="flex h-full flex-col justify-between p-2"
+                      className="flex h-24 flex-col justify-between rounded-xl p-3 shadow-md"
                       style={{ background: t.tokens.ink }}
                     >
                       <span
-                        className="font-display text-[10px] tracking-[0.2em]"
+                        className="text-[11px] font-semibold uppercase tracking-[0.25em]"
                         style={{ color: t.tokens.teal }}
                       >
-                        Aa DIAPOLAB
+                        Aa DiapoLab
                       </span>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1.5">
                         {Object.values(vars)
                           .slice(0, 6)
                           .map((c, i) => (
-                            <span key={i} className="h-4 w-4 border border-black/20" style={{ background: c }} />
+                            <span
+                              key={i}
+                              className="size-4 rounded-full border border-black/10 shadow-sm"
+                              style={{ background: c }}
+                            />
                           ))}
                       </div>
                     </div>
                   </div>
-                  <div className="font-display text-[11px] tracking-[0.15em] text-teal">{t.name}</div>
-                  <div className="mb-2 font-mono text-[9px] text-teal/50">
-                    {new Date(t.created_at).toLocaleDateString()}
+                  <div className="px-4 py-3.5">
+                    <div className="truncate text-xs font-semibold text-slate-800" title={t.name}>
+                      {t.name}
+                    </div>
+                    <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
+                      <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
+                    </div>
+                    <button
+                      onClick={() => useTheme(t)}
+                      className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-[11px] font-semibold transition-all active:scale-[0.98] ${
+                        active
+                          ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+                          : "bg-blue-600 text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] hover:bg-blue-700"
+                      }`}
+                    >
+                      {active ? (
+                        <>✓ Active in editor</>
+                      ) : (
+                        <>
+                          <Sparkle className="size-3.5" /> Use theme
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => useTheme(t)}
-                    className={`brutal-border brutal-press w-full px-3 py-1.5 font-display text-[10px] tracking-[0.2em] ${
-                      active ? "bg-blue text-ink" : "bg-surface-2 text-teal/80"
-                    }`}
-                  >
-                    {active ? "ACTIVE" : "USE THEME"}
-                  </button>
                 </div>
               );
             })}
           </div>
         )}
 
-        <nav className="mt-12 flex gap-4 border-t border-teal/20 pt-6 font-mono text-[11px] text-teal/60">
-          <Link to="/privacypolicy" className="underline hover:text-teal">
-            privacy
-          </Link>
-          <Link to="/license" className="underline hover:text-teal">
-            license
-          </Link>
+        {/* Footer nav */}
+        <nav className="mt-14 flex flex-wrap gap-2 border-t border-slate-200 pt-6">
+          {[
+            { to: "/" as const, label: "Editor" },
+            { to: "/wiki" as const, label: "Wiki" },
+            { to: "/privacypolicy" as const, label: "Privacy policy" },
+            { to: "/license" as const, label: "License" },
+          ].map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
-      </div>
+      </main>
     </div>
+  );
+}
+
+function ArrowLeft() {
+  return (
+    <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </svg>
   );
 }
 
 function Loading() {
   return (
-    <div className="flex items-center gap-2 font-mono text-[11px] text-teal/60">
-      <Loader2 className="h-3.5 w-3.5 animate-spin" /> loading…
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="aspect-video w-full animate-pulse bg-gradient-to-br from-slate-100 to-slate-50" />
+          <div className="space-y-2 px-4 py-3.5">
+            <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+            <div className="h-2 w-1/3 animate-pulse rounded bg-slate-100" />
+          </div>
+        </div>
+      ))}
+      <div className="col-span-full flex items-center justify-center gap-2 py-4 text-xs text-slate-400">
+        <Loader2 className="size-3.5 animate-spin text-blue-500" /> loading…
+      </div>
     </div>
   );
 }
 
-function Empty({ text }: { text: string }) {
-  return <p className="font-mono text-[11px] text-teal/50">&gt; {text}</p>;
+function Empty({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white/60 py-16 text-center">
+      <span className="grid size-12 place-items-center rounded-2xl bg-blue-50 text-blue-400">{icon}</span>
+      <div>
+        <p className="text-sm font-semibold text-slate-600">{title}</p>
+        <p className="mt-1 max-w-sm text-xs text-slate-400">{text}</p>
+      </div>
+    </div>
+  );
 }
