@@ -1,6 +1,6 @@
 import { toJpeg, toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
-import { buildInteractiveHTML, buildPrintHTML } from "@/lib/export-html";
+import { buildPrintHTML } from "@/lib/export-html";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 
 export function exportJSON(name: string) {
@@ -260,21 +260,6 @@ export function exportMarkdown(name: string) {
   link.href = url;
   link.download = `${name || "positron"}-${Date.now()}.md`;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-export function exportHTML(name: string) {
-  const { pages, canvasW, canvasH } = useEditor.getState();
-  if (pages.length === 0) return;
-  // Build a fully interactive, standalone HTML presentation from the
-  // design data (real DOM elements, navigation, links, quizzes).
-  const html = buildInteractiveHTML({ pages, canvasW, canvasH, name: name || "positron" });
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${name || "positron"}-${Date.now()}.html`;
-  a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 

@@ -29,7 +29,7 @@ function LicensePage() {
       title="MIT License"
       subtitle="permissive open source · copyright (c) 2026"
     >
-      <section className="brutal-border-2 bg-surface p-5">
+      <section className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.5)] sm:p-7">
         <p className="mb-4 max-w-2xl font-mono text-[12px] leading-relaxed text-teal/80">
           DiapoLab is free software for creating, remixing, exporting, and sharing presentations.
           You can use the editor in personal and commercial projects without asking permission.
@@ -44,7 +44,7 @@ function LicensePage() {
           ))}
         </div>
       </section>
-      <section className="brutal-border-2 bg-surface p-4">
+      <section className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.5)] sm:p-7">
         <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">In short</h2>
         <ul className="space-y-1 font-mono text-[12px] text-teal/70">
           <li>&gt; use it commercially, privately, or in your own product</li>
@@ -53,7 +53,7 @@ function LicensePage() {
           <li>&gt; no warranty and no liability</li>
         </ul>
       </section>
-      <section className="brutal-border-2 bg-surface p-4">
+      <section className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.5)] sm:p-7">
         <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">Full text</h2>
         <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-teal/70">{`MIT License
 
@@ -77,7 +77,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`}</pre>
       </section>
-      <section className="brutal-border-2 bg-surface p-4">
+      <section className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.5)] sm:p-7">
         <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">
           Community content
         </h2>

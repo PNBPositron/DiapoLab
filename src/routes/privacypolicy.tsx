@@ -77,17 +77,21 @@ export function LegalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-ink px-6 py-12">
-      <div className="mx-auto max-w-3xl">
-        <Link to="/" className="font-mono text-[11px] text-teal/60 underline hover:text-teal">
-          &lt; back to editor
-        </Link>
-        <h1 className="mt-4 font-display text-2xl tracking-[0.2em] text-teal">
-          ▸ {title.toUpperCase()}
-        </h1>
-        <p className="mb-8 font-mono text-[11px] text-teal/50">{subtitle}</p>
-        <div className="space-y-6">{children}</div>
-        <nav className="mt-12 flex gap-4 border-t border-teal/20 pt-6 font-mono text-[11px] text-teal/60">
+    <div className="min-h-screen bg-white px-5 py-8 text-slate-900 sm:px-8 sm:py-14">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-8 flex items-center justify-between">
+          <Link to="/" className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-700">
+            &lt; back to editor
+          </Link>
+          <span className="rounded-full bg-blue-50 px-3 py-1.5 font-display text-[9px] font-semibold uppercase tracking-[0.18em] text-blue-700">DiapoLab / docs</span>
+        </div>
+        <div className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_24px_70px_-35px_rgba(15,23,42,0.35)] sm:p-10">
+          <p className="mb-3 font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-600">DiapoLab documentation</p>
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
+          <p className="mt-3 font-mono text-[11px] text-slate-500">{subtitle}</p>
+        </div>
+        <div className="space-y-5">{children}</div>
+        <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pt-6 font-mono text-[11px] text-slate-500">
           <Link to="/privacypolicy" className="underline hover:text-teal">
             privacy
           </Link>
@@ -105,9 +109,9 @@ export function LegalShell({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="brutal-border-2 bg-surface p-4">
-      <h2 className="mb-2 font-display text-[12px] tracking-[0.2em] text-teal">{title}</h2>
-      <div className="space-y-2 font-mono text-[12px] leading-relaxed text-teal/70">{children}</div>
+    <section className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.5)] transition-shadow hover:shadow-[0_22px_60px_-32px_rgba(37,99,235,0.22)] sm:p-7">
+      <h2 className="mb-3 font-display text-[12px] font-semibold uppercase tracking-[0.16em] text-blue-700">{title}</h2>
+      <div className="space-y-2 font-mono text-[12px] leading-relaxed text-slate-600">{children}</div>
     </section>
   );
 }
