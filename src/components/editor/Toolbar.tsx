@@ -21,6 +21,10 @@ import {
   CheckCircle2,
   Sliders,
   Presentation,
+  LayoutTemplate,
+  BookOpen,
+  Scale,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
@@ -463,6 +467,7 @@ function LargeModernHamburger({
 }) {
   const [open, setOpen] = useState(false);
   const menuRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -569,6 +574,50 @@ function LargeModernHamburger({
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+          {/* SEPARATOR */}
+          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+          {/* EXPLORE SECTION */}
+          <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
+            <span className="size-1.5 rounded-full bg-blue-400" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+              Explore
+            </span>
+          </div>
+
+          <MenuCardItem
+            icon={LayoutTemplate}
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+            title="Marketplace"
+            subtitle="Community templates & themes"
+            onClick={() => handleAction(() => navigate({ to: "/marketplace" }))}
+          />
+          <MenuCardItem
+            icon={BookOpen}
+            iconColor="text-indigo-600"
+            iconBg="bg-indigo-50 group-hover:bg-indigo-100/80"
+            title="Wiki"
+            subtitle="Guides, shortcuts & FAQ"
+            onClick={() => handleAction(() => navigate({ to: "/wiki" }))}
+          />
+          <MenuCardItem
+            icon={Scale}
+            iconColor="text-amber-600"
+            iconBg="bg-amber-50 group-hover:bg-amber-100/80"
+            title="License"
+            subtitle="Terms & usage rights"
+            onClick={() => handleAction(() => navigate({ to: "/license" }))}
+          />
+          <MenuCardItem
+            icon={ShieldCheck}
+            iconColor="text-emerald-600"
+            iconBg="bg-emerald-50 group-hover:bg-emerald-100/80"
+            title="Privacy policy"
+            subtitle="How your data is handled"
+            onClick={() => handleAction(() => navigate({ to: "/privacypolicy" }))}
+          />
 
           {/* DANGER SECTION */}
           <MenuCardItem
