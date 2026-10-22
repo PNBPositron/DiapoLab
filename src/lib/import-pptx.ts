@@ -18,11 +18,6 @@ const px = (emu: string | undefined | null): number =>
 
 const ptToPx = (pt: number): number => Math.round(pt * (96 / 72));
 
-const asXPath = (el: Element | Document, tag: string): string => {
-  const prefix = el instanceof Element ? "" : "";
-  return prefix + tag;
-};
-
 function children(node: Element | Document, local: string): Element[] {
   const doc = node instanceof Document ? node : node.ownerDocument;
   if (!doc) return [];
@@ -51,11 +46,11 @@ function firstChildByLocal(root: Element, local: string): Element | null {
   return null;
 }
 
-function parseXml(zip: JSZip, path: string): Document | null {
+async function parseXml(zip: JSZip, path: string): Promise<Document | null> {
   const entry = zip.file(path);
   if (!entry) return null;
-  const parser = new DOMParser();
-  return parser.parseFromString(entry.async("string") as unknown as string, "application/xml");
+  const xml = await entry.async("string");
+  return new DOMParser().parseFromString(xml, "application/xml");
 }
 
 function attrColor(el: Element | null): string | undefined {
@@ -67,18 +62,17 @@ function attrColor(el: Element | null): string | undefined {
 
 type Xfrm = { x: number; y: number; width: number; height: number; rotation: number };
 
-function parseXfrm(sp: Element): Xfrm | null {
+function parseXfrm(sp: Element): Partial<Xfrm> {
   const xfrm = firstChildByLocal(sp, "xfrm");
-  if (!xfrm) return null;
+  if (!xfrm) return {};
   const off = firstChildByLocal(xfrm, "off");
   const ext = firstChildByLocal(xfrm, "ext");
   const x = px(off?.getAttribute("x"));
   const y = px(off?.getAttribute("y"));
   const width = px(ext?.getAttribute("cx"));
   const height = px(ext?.getAttribute("cy"));
-  if (!width && !height) return null;
-  const rot = Number(xfrm.getAttribute("rot") ?? 0) / 60000;
-  return { x, y, width: width || 200, height: height || 60, rotation: rot };
+  const rotation = Number(xfrm.getAttribute("rot") ?? 0) / 60000;
+  return { x, y, width: width || 200, height: height || 60, rotation };
 }
 
 function parseTextBody(sp: Element): { text: string; fontSize: number; color: string; bold: boolean; align: "left" | "center" | "right"; } | null {
@@ -148,9 +142,9 @@ async function mediaToDataUrl(zip: JSZip, relId: string, rels: Map<string, strin
   return `data:${mime};base64,${base64}`;
 }
 
-function parseRels(zip: JSZip, slidePath: string): Map<string, string> {
+async function parseRels(zip: JSZip, slidePath: string): Promise<Map<string, string>> {
   const relPath = slidePath.replace("slides/", "slides/_rels/") + ".rels";
-  const doc = parseXml(zip, relPath);
+  const doc = await parseXml(zip, relPath);
   const map = new Map<string, string>();
   if (!doc) return map;
   for (const rel of Array.from(doc.getElementsByTagName("*"))) {
@@ -166,7 +160,7 @@ export async function importPPTXFile(file: File): Promise<void> {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
 
   // Slide size
-  const presDoc = parseXml(zip, "ppt/presentation.xml");
+  const presDoc = await parseXml(zip, "ppt/presentation.xml");
   if (!presDoc) throw new Error("Invalid PPTX: missing presentation.xml");
   let canvasW = 1920;
   let canvasH = 1080;
@@ -179,7 +173,7 @@ export async function importPPTXFile(file: File): Promise<void> {
   }
 
   // Slide order from sldIdLst + presentation rels
-  const presRels = parseRels(zip, "ppt/presentation.xml");
+  const presRels = await parseRels(zip, "ppt/presentation.xml");
   const slideIds = Array.from(presDoc.getElementsByTagName("*")).filter(
     (el) => el.localName === "sldId",
   );
@@ -204,9 +198,9 @@ export async function importPPTXFile(file: File): Promise<void> {
 
   const pages: Page[] = [];
   for (const slidePath of slideFiles) {
-    const doc = parseXml(zip, slidePath);
+    const doc = await parseXml(zip, slidePath);
     if (!doc) continue;
-    const rels = parseRels(zip, slidePath);
+    const rels = await parseRels(zip, slidePath);
     const elements: AnyElement[] = [];
 
     // spTree holds sp (text/shape) and pic (picture) nodes
