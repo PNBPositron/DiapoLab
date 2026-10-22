@@ -672,6 +672,9 @@ type State = {
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
   setPageDuration: (index: number, seconds: number) => void;
+  // Master style: push the current page's look to the whole deck
+  applyBackgroundToDeck: () => void;
+  applyTransitionToDeck: () => void;
   // cloud
   setDesignMeta: (meta: { id: string | null; name: string }) => void;
   setDesignName: (name: string) => void;
@@ -1483,6 +1486,31 @@ export const useEditor = create<State>((set, get) => {
       if (index < 0 || index >= pages.length) return;
       const d = Math.max(0.2, Math.min(60, seconds));
       const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
+      set(syncCurrent(next, currentIndex));
+    },
+
+    // ---- Master style: current page becomes the deck-wide template ----
+    applyBackgroundToDeck: () => {
+      pushHistory();
+      const { pages, currentIndex } = get();
+      const src = pages[currentIndex];
+      const next = pages.map((p) => ({
+        ...p,
+        bgColor: src.bgColor,
+        bgImage: src.bgImage,
+        bgFit: src.bgFit,
+      }));
+      set(syncCurrent(next, currentIndex));
+    },
+    applyTransitionToDeck: () => {
+      pushHistory();
+      const { pages, currentIndex } = get();
+      const src = pages[currentIndex];
+      const next = pages.map((p) => ({
+        ...p,
+        transition: src.transition,
+        transitionZoom: src.transitionZoom,
+      }));
       set(syncCurrent(next, currentIndex));
     },
 
