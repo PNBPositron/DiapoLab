@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import {
   ChevronRight,
+  Clapperboard,
   Maximize2,
   Palette,
   Sparkles,
@@ -9,6 +10,7 @@ import {
 import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
+import { MasterStylePanel } from "./MasterStylePanel";
 
 interface SectionConfig {
   id: string;
@@ -121,6 +123,16 @@ export function DesignPanel() {
           iconColor="text-violet-600"
         >
           <ColorPanel />
+        </SectionRow>
+
+        <SectionRow
+          title="Master style"
+          subtitle="Push this slide's style deck-wide"
+          Icon={Clapperboard}
+          iconBg="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40"
+          iconColor="text-emerald-600"
+        >
+          <MasterStylePanel />
         </SectionRow>
       </div>
     </div>
