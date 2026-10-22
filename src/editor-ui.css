@@ -409,29 +409,10 @@
 .editor-ui > .editor-toolbar,
 .editor-ui .pages-bar,
 .editor-ui .timeline-bar {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* The workspace is one uninterrupted white field. Chrome controls float on it;
-   only the controls themselves receive a surface, border, and shadow. */
-.editor-ui > header,
-.editor-ui > nav,
-.editor-ui > .editor-toolbar,
-.editor-ui > footer,
-.editor-ui .pages-bar,
-.editor-ui .timeline-bar {
-  isolation: isolate;
-}
-
-.editor-ui .pages-bar > .flex.min-w-0 > .group > button,
-.editor-ui .pages-bar > .flex.min-w-0 > button,
-.editor-ui .pages-bar > .flex.shrink-0 > button,
-.editor-ui .pages-bar > .flex.shrink-0 > div {
-  background: #ffffff;
+  background: transparent;
+  border-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .editor-ui .pages-bar,
 .editor-ui .timeline-bar {
@@ -520,18 +501,20 @@
 }
 
 .editor-tool-rail > button {
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 8px 20px -14px rgba(15, 23, 42, 0.4);
   color: #64748b;
 }
 
 .editor-tool-rail > button:hover,
 .editor-tool-rail > button:focus-visible {
-  border-color: transparent;
-  background: transparent;
+  border-color: rgba(147, 197, 253, 0.9);
+  background: #ffffff;
   color: #2563eb;
-  box-shadow: none;
+  box-shadow: 0 8px 18px -10px rgba(37, 99, 235, 0.35);
 }
 
 .editor-ui .pages-bar {
@@ -560,13 +543,6 @@
 .editor-ui > header button,
 .editor-ui > nav button {
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 18px -14px rgba(15, 23, 42, 0.35);
-}
-
-.editor-ui .editor-tool-rail > button:hover,
-.editor-ui .editor-tool-rail > button:focus-visible {
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
 }
 
 .editor-ui .toolbar button:hover,
