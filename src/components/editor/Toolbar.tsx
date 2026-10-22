@@ -161,13 +161,22 @@ export function Toolbar() {
   };
 
   const handlePrivateShare = async () => {
-    if (!designId) await handleSave();
-    const id = useEditor.getState().designId;
-    if (!id) return;
-    const token = await createPrivateShare(id);
-    const link = `${window.location.origin}/t/${id}?share=${token}`;
-    setShareLink(link);
-    await navigator.clipboard.writeText(link).catch(() => {});
+    if (publishing) return;
+    setPublishing(true);
+    try {
+      if (!designId) await handleSave();
+      const id = useEditor.getState().designId;
+      if (!id) throw new Error("Could not save the design");
+      const token = await createPrivateShare(id);
+      const link = `${window.location.origin}/t/${id}?share=${token}`;
+      setShareLink(link);
+      await navigator.clipboard.writeText(link).catch(() => {});
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Failed to create the private link");
+    } finally {
+      setPublishing(false);
+    }
   };
 
   const handlePublish = () => {
