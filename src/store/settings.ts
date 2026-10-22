@@ -84,6 +84,7 @@ export type CustomTheme = { id: string; name: string; tokens: ThemeTokens };
 
 export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> = [
   { id: "everest", label: "Light", hint: "fixed light editor chrome" },
+  { id: "obsidian", label: "Dark", hint: "fixed dark editor chrome" },
 ];
 
 // Everest is a fixed light palette. It deliberately does not depend on slide colors.
