@@ -52,7 +52,7 @@ export function RemixPanel() {
 
   return (
     <div className="space-y-4">
-      <PanelHeader title="Remix with AI" />
+      <PanelHeader kicker="Remix" title="Remix with AI" description="Pick a public template, describe a direction, get an editable remix." icon={WandSparkles} />
       <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-sky-50 p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-600/20"><WandSparkles className="size-4" /></div>
