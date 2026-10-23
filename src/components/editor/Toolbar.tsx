@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Sliders,
   Presentation,
+  Puzzle,
   LayoutTemplate,
   BookOpen,
   Scale,
@@ -402,7 +403,7 @@ export function Toolbar() {
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
           onClear={clear}
-          onAssistant={() => setTool("ai")}
+          onAssistant={() => setTool("plugins")}
           publishing={publishing}
           isAuthenticated={!!user}
         />
@@ -544,7 +545,7 @@ function LargeModernHamburger({
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
             <span className="size-1.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" />
             <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-              Create & AI
+              Create
             </span>
           </div>
 
@@ -553,6 +554,15 @@ function LargeModernHamburger({
             title="New design"
             subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
+          />
+
+          <MenuCardItem
+            icon={Puzzle}
+            iconColor="text-indigo-600"
+            iconBg="bg-indigo-50 group-hover:bg-indigo-100/80"
+            title="Plugins"
+            subtitle="Import & manage widget packs"
+            onClick={() => handleAction(onAssistant)}
           />
 
           {isAuthenticated && (
@@ -612,7 +622,7 @@ function LargeModernHamburger({
             iconColor="text-blue-600"
             iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="Marketplace"
-            subtitle="Community templates & themes"
+            subtitle="Community templates & plugins"
             onClick={() => handleAction(() => navigate({ to: "/marketplace" }))}
           />
           <MenuCardItem
