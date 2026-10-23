@@ -56,23 +56,94 @@ import {
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
 import { Button } from "@/components/ui/button";
+import { pathFor } from "./ShapeRender";
 
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
 ).sort();
 
-const MASK_OPTIONS = [
+const MASK_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "", label: "None" },
   { value: "circle", label: "Circle" },
   { value: "hexagon", label: "Hexagon" },
+  { value: "pentagon", label: "Pentagon" },
+  { value: "octagon", label: "Octagon" },
   { value: "triangle", label: "Triangle" },
   { value: "diamond", label: "Diamond" },
   { value: "star", label: "Star" },
   { value: "heart", label: "Heart" },
-  { value: "pentagon", label: "Pentagon" },
-  { value: "octagon", label: "Octagon" },
   { value: "blob", label: "Blob" },
-] as const;
+  { value: "moon", label: "Moon" },
+  { value: "wave", label: "Wave" },
+  { value: "leaf", label: "Leaf" },
+  { value: "flower", label: "Flower" },
+  { value: "starburst", label: "Starburst" },
+  { value: "shield", label: "Shield" },
+  { value: "drop", label: "Drop" },
+  { value: "cross", label: "Cross" },
+  { value: "capsule", label: "Capsule" },
+  { value: "semicircle", label: "Semicircle" },
+  { value: "quarter_circle", label: "Quarter" },
+  { value: "chevron", label: "Chevron" },
+  { value: "cloud", label: "Cloud" },
+  { value: "ticket", label: "Ticket" },
+  { value: "bookmark", label: "Bookmark" },
+  { value: "lightning", label: "Lightning" },
+  { value: "speech", label: "Speech" },
+  { value: "ribbon", label: "Ribbon" },
+  { value: "gear", label: "Gear" },
+];
+
+/** Visual grid picker for image/shape/text masks — real SVG previews per shape. */
+function MaskPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="grid grid-cols-6 gap-1.5">
+      {MASK_OPTIONS.map((opt) => {
+        const active = value === opt.value;
+        const d = opt.value ? pathFor(opt.value as never) : null;
+        const fill = active ? "#0284c7" : "#475569";
+        return (
+          <button
+            key={opt.label}
+            type="button"
+            title={opt.label}
+            aria-label={"Shape mask: " + opt.label}
+            aria-pressed={active}
+            onClick={() => onChange(opt.value)}
+            className={
+              "grid aspect-square place-items-center rounded-lg border transition " +
+              (active
+                ? "border-sky-500 bg-sky-50/60 ring-2 ring-sky-500/20"
+                : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50")
+            }
+          >
+            {!opt.value ? (
+              <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
+                <rect x="10" y="10" width="80" height="80" rx="10" fill="none" stroke="#94a3b8" strokeWidth="7" strokeDasharray="12 10" />
+              </svg>
+            ) : d ? (
+              <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
+                <path d={d} fill={fill} />
+              </svg>
+            ) : opt.value === "circle" ? (
+              <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
+                <circle cx="50" cy="50" r="46" fill={fill} />
+              </svg>
+            ) : opt.value === "triangle" ? (
+              <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
+                <polygon points="50,4 96,96 4,96" fill={fill} />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
+                <polygon points="50,3 61,35 98,35 68,57 79,97 50,73 21,97 32,57 2,35 39,35" fill={fill} />
+              </svg>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 const SHAPE_EFFECTS: Array<{ value: ShapeElement["effect"]; label: string }> = [
   { value: "none", label: "None" },
@@ -1015,9 +1086,8 @@ export function PropertiesPanel() {
             {el.type === "image" && (
               <Section title="Image Filters & Adjustments">
                 <Field label="Shape Mask">
-                  <Dropdown
+                  <MaskPicker
                     value={el.maskShape ?? ""}
-                    options={MASK_OPTIONS}
                     onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
                   />
                 </Field>
