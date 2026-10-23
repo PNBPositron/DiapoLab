@@ -223,6 +223,9 @@ export type VideoElement = ElementBase & {
   fit?: "cover" | "contain" | "fill";
   muted?: boolean;
   loop?: boolean;
+  /** trim window in seconds — playback starts at "start" and loops/pauses at "end" */
+  start?: number;
+  end?: number;
 };
 
 export type IconElement = ElementBase & {
