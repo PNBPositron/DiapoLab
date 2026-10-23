@@ -50,7 +50,7 @@ import {
   Eye,
   EyeOff,
   X,
-  ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash,
+  ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash, Crop, SlidersHorizontal,
 } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
@@ -343,6 +343,7 @@ export function PropertiesPanel() {
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [colorPaletteOpen, setColorPaletteOpen] = useState(false);
+  const [imageFilterOpen, setImageFilterOpen] = useState(false);
   const [jsonDraft, setJsonDraft] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
 
@@ -355,6 +356,7 @@ export function PropertiesPanel() {
   useEffect(() => {
     setAdvancedOpen(false);
     setColorPaletteOpen(false);
+    setImageFilterOpen(false);
     setJsonError(null);
     const current = useEditor.getState().elements.find((e) => e.id === selectedId);
     setJsonDraft(current ? JSON.stringify(current, null, 2) : "");
@@ -488,6 +490,25 @@ export function PropertiesPanel() {
               >
                 <Plus className="size-3" />
               </button>
+            </div>
+          </>
+        )}
+
+        {el.type === "shape" && (
+          <div className="relative">
+            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Shape color">
+              <div className="size-4 rounded-md border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
+            </button>
+            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
+          </div>
+        )}
+
+        {el.type === "image" && (
+          <>
+            <button type="button" onClick={() => update(el.id, { cropZoom: el.cropZoom && el.cropZoom > 1 ? 1 : 1.15 })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Crop image"><Crop className="size-3.5" /></button>
+            <div className="relative">
+              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Image filter"><ImageFilter className="size-3.5" /></button>
+              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-lg border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-sky-300 hover:bg-sky-50">{preset.name}</button>)}</div>}
             </div>
           </>
         )}

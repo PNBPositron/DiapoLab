@@ -13,6 +13,8 @@ import {
   RefreshCw,
   FileText,
   Upload,
+  Braces,
+  Copy,
 } from "lucide-react";
 import { generateAiTemplate, type AiStyle } from "@/lib/ai-templates.functions";
 import { useEditor, type Page } from "@/store/editor";
@@ -183,7 +185,7 @@ export function AiPanel() {
               <h2 className="text-xs font-semibold tracking-wide text-slate-900 uppercase">
                 AI Studio
               </h2>
-              <p className="text-[10px] text-slate-400">Powered by Groq</p>
+              <p className="text-[10px] text-slate-400">Prompt with structured JSON</p>
             </div>
           </div>
         </div>
@@ -222,6 +224,18 @@ export function AiPanel() {
           </button>
         </div>
       </div>
+
+      <section className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-3">
+        <div className="flex items-start gap-2">
+          <Braces className="mt-0.5 size-4 shrink-0 text-indigo-600" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-indigo-950">Give an LLM a slide schema</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-indigo-900/75">Describe slides as JSON: the model can create, duplicate, and edit native elements without guessing the editor format.</p>
+            <pre className="mt-2 max-h-36 overflow-auto rounded-lg bg-slate-950 p-2.5 font-mono text-[9px] leading-relaxed text-indigo-100">{`{\n  "canvas": { "width": 1920, "height": 1080 },\n  "pages": [{\n    "background": "#F8FAFC",\n    "elements": [{\n      "type": "text", "text": "Launch plan",\n      "x": 120, "y": 120, "width": 900,\n      "fontSize": 64, "color": "#0F172A"\n    }]\n  }]\n}`}</pre>
+            <p className="mt-2 text-[10px] leading-relaxed text-indigo-900/70">Keep coordinates in the canvas bounds and return valid JSON only. Add more elements using the editor&apos;s element properties.</p>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-sky-200 bg-sky-50/70 p-3">
         <div className="flex items-start gap-2">
