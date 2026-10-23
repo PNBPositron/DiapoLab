@@ -19,6 +19,7 @@ import {
   PanelBottom,
   PanelLeft,
   Plus,
+  Puzzle,
   Quote,
   Rows3,
   Search,
@@ -47,6 +48,7 @@ import {
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
+import { usePlugins, instantiateWidget } from "@/lib/plugins";
 
 type PresetSection = "interfaces" | "ui" | "elements";
 
@@ -168,6 +170,10 @@ export function ComponentsPanel() {
   const [search, setSearch] = useState("");
 
   const selected = elements.find((element) => element.id === selectedId);
+  const plugins = usePlugins((s) => s.plugins);
+  const pluginWidgets = plugins
+    .filter((p) => p.enabled)
+    .flatMap((p) => p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })));
 
   const ELEMENT_PRESETS = [
     {
@@ -267,6 +273,27 @@ export function ComponentsPanel() {
             </span>
           </div>
           <OptionGrid label="Charts and quiz" options={filteredElements.map(e => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))} onChange={label => { const preset = filteredElements.find(e => e.label === label); if (preset) add(preset.create()); }} />
+
+          {pluginWidgets.length > 0 && (
+            <div className="mt-3 flex flex-col gap-2">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500 uppercase">
+                <Puzzle className="size-3" /> Plugin blocks ({pluginWidgets.length})
+              </span>
+              <OptionGrid
+                label="Plugin widgets"
+                options={pluginWidgets.map(({ key, pluginName, widget }) => ({
+                  value: key,
+                  label: widget.name,
+                  icon: Puzzle,
+                  title: widget.description || `from ${pluginName}`,
+                }))}
+                onChange={(key) => {
+                  const entry = pluginWidgets.find((w) => w.key === key);
+                  if (entry) instantiateWidget(entry.widget).forEach((el) => add(el));
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
