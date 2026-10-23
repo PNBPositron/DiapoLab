@@ -298,6 +298,7 @@ function PluginRow({
       >
         <Trash2 className="size-3.5" />
       </button>
+      )}
     </div>
   );
 }
