@@ -13,6 +13,30 @@ export type PluginWidget = {
   elements: AnyElement[] | (() => AnyElement[]);
 };
 
+/**
+ * An APP is an interactive mini-tool shipped by a plugin (e.g. a paint
+ * studio). Apps run inside the editor and produce canvas elements.
+ * Currently supported: type "paint" (freehand drawing pad).
+ */
+export type PluginApp = {
+  id?: string;
+  name: string;
+  description?: string;
+  type: "paint";
+  config?: {
+    /** swatches shown in the color picker (any CSS color) */
+    colors?: string[];
+    defaultColor?: string;
+    /** brush sizes in px (palette on screen) */
+    brushSizes?: number[];
+    /** paint canvas background — "transparent" for none */
+    bg?: string;
+    /** export size in canvas pixels (slide is 1920x1080) */
+    width?: number;
+    height?: number;
+  };
+};
+
 /** A plugin as stored on the device once imported. */
 export type EditorPlugin = {
   id: string;
@@ -22,6 +46,7 @@ export type EditorPlugin = {
   description?: string;
   enabled: boolean;
   widgets: PluginWidget[];
+  apps?: PluginApp[];
   importedAt: number;
 };
 
@@ -59,6 +84,36 @@ function normalizeWidgets(raw: unknown): PluginWidget[] {
     throw new Error("No valid widgets found. Each widget needs a \u201Cname\u201D and an \u201Celements\u201D array.");
   }
   return widgets;
+}
+
+const MAX_APPS = 10;
+
+function normalizeApps(raw: unknown): PluginApp[] {
+  if (!Array.isArray(raw)) return [];
+  const apps: PluginApp[] = [];
+  for (const a of raw.slice(0, MAX_APPS)) {
+    if (!a || typeof a !== "object") continue;
+    const app = a as Record<string, unknown>;
+    const name = typeof app.name === "string" && app.name.trim() ? app.name.trim() : null;
+    const type = app.type === "paint" ? "paint" : null;
+    if (!name || !type) continue;
+    const cfg = (app.config ?? {}) as Record<string, unknown>;
+    apps.push({
+      id: typeof app.id === "string" ? app.id : undefined,
+      name,
+      description: typeof app.description === "string" ? app.description : undefined,
+      type,
+      config: {
+        colors: Array.isArray(cfg.colors) ? (cfg.colors as unknown[]).filter((x) => typeof x === "string").slice(0, 12) as string[] : undefined,
+        defaultColor: typeof cfg.defaultColor === "string" ? cfg.defaultColor : undefined,
+        brushSizes: Array.isArray(cfg.brushSizes) ? (cfg.brushSizes as unknown[]).filter((x) => typeof x === "number").slice(0, 6) as number[] : undefined,
+        bg: typeof cfg.bg === "string" ? cfg.bg : undefined,
+        width: typeof cfg.width === "number" ? Math.min(3840, Math.max(64, Math.round(cfg.width))) : undefined,
+        height: typeof cfg.height === "number" ? Math.min(2160, Math.max(64, Math.round(cfg.height))) : undefined,
+      },
+    });
+  }
+  return apps;
 }
 
 /**
@@ -105,6 +160,7 @@ export function evaluatePluginCode(code: string): PluginMeta {
     version: typeof raw.version === "string" ? raw.version : undefined,
     description: typeof raw.description === "string" ? raw.description : undefined,
     widgets: normalizeWidgets(raw.widgets),
+    apps: normalizeApps(raw.apps),
   };
 }
 
@@ -117,6 +173,18 @@ export const SAMPLE_PLUGIN_CODE = `diapolabPlugin({
   author: "DiapoLab",
   version: "1.0.0",
   description: "Two ready-to-drop widget presets.",
+  apps: [
+    {
+      name: "Quick paint",
+      description: "Doodle on a pad, insert it as an image",
+      type: "paint",
+      config: {
+        colors: ["#2563eb", "#ff0080", "#ffd84a", "#059669", "#111827"],
+        defaultColor: "#2563eb",
+        bg: "#f8fafc",
+      },
+    },
+  ],
   widgets: [
     {
       name: "Section header",
