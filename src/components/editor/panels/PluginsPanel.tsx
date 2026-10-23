@@ -6,7 +6,7 @@ import { usePlugins, instantiateWidget, SAMPLE_PLUGIN_CODE, type EditorPlugin } 
 import { PanelHeader } from "../ui/selectors";
 
 export function PluginsPanel() {
-  const add = useEditor((s) => s.add);
+  const addGroup = useEditor((s) => s.addGroup);
   const plugins = usePlugins((s) => s.plugins);
   const removePlugin = usePlugins((s) => s.removePlugin);
   const togglePlugin = usePlugins((s) => s.togglePlugin);
@@ -94,7 +94,7 @@ export function PluginsPanel() {
                   <button
                     key={key}
                     title={widget.description || `from ${pluginName}`}
-                    onClick={() => instantiateWidget(widget).forEach((el) => add(el))}
+                    onClick={() => addGroup(instantiateWidget(widget))}
                     className="group flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50/40 hover:shadow-[0_10px_24px_-10px_rgba(79,70,229,0.35)] active:scale-[0.97]"
                   >
                     <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
