@@ -621,6 +621,22 @@ export function CanvasElement({
           autoPlay
           playsInline
           controls={useEditor.getState().presenting}
+          onLoadedMetadata={(e) => {
+            // trim window: start playback at "start"
+            if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
+              e.currentTarget.currentTime = element.start;
+            }
+          }}
+          onTimeUpdate={(e) => {
+            // trim window: loop (or pause) when reaching "end"
+            const v = e.currentTarget;
+            const s = element.start ?? 0;
+            const t = element.end;
+            if (t !== undefined && t > s && v.currentTime >= t) {
+              if (v.loop) v.currentTime = s;
+              else v.pause();
+            }
+          }}
           style={{
             width: "100%",
             height: "100%",
