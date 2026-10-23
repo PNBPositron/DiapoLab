@@ -15,15 +15,19 @@ export function isEmbeddedImage(value: string | undefined) {
 
 /** Resize and encode once on import, before the image enters design history or persistence. */
 export async function prepareImage(file: File, maxSide = 1920): Promise<string> {
-  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
-    throw new Error("Choose a PNG, JPEG, WebP, GIF or other raster image.");
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Choose an image file.");
   }
   if (file.size > 25 * 1024 * 1024) throw new Error("Image too large (max 25 MB).");
   const url = URL.createObjectURL(file);
   try {
     const image = new Image();
     image.src = url;
-    await image.decode();
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Could not read this image."));
+      if (image.complete && image.naturalWidth > 0) resolve();
+    });
     let scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
     if (!image.naturalWidth || !image.naturalHeight) throw new Error("Could not read this image.");
     for (let attempt = 0; attempt < 5; attempt++) {

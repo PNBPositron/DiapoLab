@@ -18,6 +18,7 @@ import {
   type ButtonAction,
   type UiStyle,
 } from "@/store/editor";
+import { prepareImage } from "@/lib/image-assets";
 import { ColorPicker } from "./ColorPicker";
 import { Dropdown } from "./ui/Dropdown";
 import {
@@ -849,15 +850,16 @@ export function PropertiesPanel() {
                       type="file"
                       accept="image/*"
                       className="sr-only"
-                      onChange={(event) => {
+                      onChange={async (event) => {
                         const file = event.target.files?.[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                          if (typeof reader.result === "string") update(el.id, { src: reader.result });
-                        };
-                        reader.readAsDataURL(file);
                         event.currentTarget.value = "";
+                        if (!file) return;
+                        try {
+                          const src = await prepareImage(file);
+                          update(el.id, { src, illustrationFormat: undefined });
+                        } catch (error) {
+                          window.alert(error instanceof Error ? error.message : "Could not import this image.");
+                        }
                       }}
                     />
                   </label>
