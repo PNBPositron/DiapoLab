@@ -13,18 +13,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as LicenseRouteImport } from './routes/license'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
-import { Route as McpRouteImport } from './routes/mcp'
+import { Route as McpGuideRouteImport } from './routes/mcp-guide'
 import { Route as PrivacypolicyRouteImport } from './routes/privacypolicy'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as WikiRouteImport } from './routes/wiki'
 import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as TIdRouteImport } from './routes/t.$id'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,9 +44,9 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
   path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
+const McpGuideRoute = McpGuideRouteImport.update({
+  id: '/mcp-guide',
+  path: '/mcp-guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacypolicyRoute = PrivacypolicyRouteImport.update({
@@ -66,18 +64,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const WikiRoute = WikiRouteImport.update({
+  id: '/wiki',
+  path: '/wiki',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLlamaparseRoute = ApiLlamaparseRouteImport.update({
   id: '/api/llamaparse',
   path: '/api/llamaparse',
@@ -103,48 +94,38 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
-  '/mcp': typeof McpRoute
+  '/mcp-guide': typeof McpGuideRoute
   '/privacypolicy': typeof PrivacypolicyRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/wiki': typeof WikiRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
-  '/mcp': typeof McpRoute
+  '/mcp-guide': typeof McpGuideRoute
   '/privacypolicy': typeof PrivacypolicyRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/wiki': typeof WikiRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,18 +133,16 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
-  '/mcp': typeof McpRoute
+  '/mcp-guide': typeof McpGuideRoute
   '/privacypolicy': typeof PrivacypolicyRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/wiki': typeof WikiRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,54 +151,48 @@ export interface FileRouteTypes {
     | '/auth'
     | '/license'
     | '/marketplace'
-    | '/mcp'
+    | '/mcp-guide'
     | '/privacypolicy'
     | '/settings'
     | '/sitemap.xml'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
+    | '/wiki'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/license'
     | '/marketplace'
-    | '/mcp'
+    | '/mcp-guide'
     | '/privacypolicy'
     | '/settings'
     | '/sitemap.xml'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
+    | '/wiki'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/license'
     | '/marketplace'
-    | '/mcp'
+    | '/mcp-guide'
     | '/privacypolicy'
     | '/settings'
     | '/sitemap.xml'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
+    | '/wiki'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
     | '/.lovable/oauth/consent'
-    | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,17 +200,15 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LicenseRoute: typeof LicenseRoute
   MarketplaceRoute: typeof MarketplaceRoute
-  McpRoute: typeof McpRoute
+  McpGuideRoute: typeof McpGuideRoute
   PrivacypolicyRoute: typeof PrivacypolicyRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
-  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  WikiRoute: typeof WikiRoute
   ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
   TIdRoute: typeof TIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
-  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -270,11 +241,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
+    '/mcp-guide': {
+      id: '/mcp-guide'
+      path: '/mcp-guide'
+      fullPath: '/mcp-guide'
+      preLoaderRoute: typeof McpGuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacypolicy': {
@@ -298,18 +269,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/wiki': {
+      id: '/wiki'
+      path: '/wiki'
+      fullPath: '/wiki'
+      preLoaderRoute: typeof WikiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/llamaparse': {
@@ -347,13 +311,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -372,18 +329,15 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LicenseRoute: LicenseRoute,
   MarketplaceRoute: MarketplaceRoute,
-  McpRoute: McpRoute,
+  McpGuideRoute: McpGuideRoute,
   PrivacypolicyRoute: PrivacypolicyRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
-  Char91DotwellKnownChar93OauthProtectedResourceRoute:
-    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  WikiRoute: WikiRoute,
   ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
   TIdRoute: TIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
-  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -12,7 +12,9 @@
   "mcp": {
     "server": {
       "name": "positron-studio-mcp",
-      "version": "0.1.0",
+      "protocol": "streamable-http",
+      "oauth": {"authorization_server": "https://ixohivvtozrrmanfpdyr.supabase.co/auth/v1"},
+      "version": "0.3.0",
       "title": "DiapoLab"
     },
     "tools": [

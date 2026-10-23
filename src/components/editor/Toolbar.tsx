@@ -25,12 +25,14 @@ import {
   BookOpen,
   Scale,
   ShieldCheck,
+  Search,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import { SettingsDialog } from "./SettingsDialog";
+import { CommandPalette } from "./CommandPalette";
 import { importPPTXFile } from "@/lib/import-pptx";
 import {
   exportPNG,
@@ -83,6 +85,7 @@ export function Toolbar() {
   const navigate = useNavigate();
   const { appAccent, setAppAccent } = useSettings();
   const [brandMenuOpen, setBrandMenuOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -165,11 +168,14 @@ export function Toolbar() {
     if (publishing) return;
     setPublishing(true);
     try {
-      if (!designId) await handleSave();
-      const id = useEditor.getState().designId;
+      let id = useEditor.getState().designId;
+      if (!id) {
+        await handleSave();
+        id = useEditor.getState().designId;
+      }
       if (!id) throw new Error("Could not save the design");
       const token = await createPrivateShare(id);
-      const link = `${window.location.origin}/t/${id}?share=${token}`;
+      const link = `${window.location.origin}/t/${encodeURIComponent(id)}?share=${encodeURIComponent(token)}`;
       setShareLink(link);
       await navigator.clipboard.writeText(link).catch(() => {});
     } catch (e) {
@@ -261,6 +267,18 @@ export function Toolbar() {
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
       <div className="flex items-center gap-1 rounded-2xl border border-slate-200/60 bg-white/70 p-1 shadow-[0_2px_12px_rgba(15,23,42,0.05)] backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setPaletteOpen(true)}
+          title="Search commands (Ctrl+K)"
+          aria-label="Search commands and features"
+          className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-[11px] font-medium text-slate-600 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-95"
+        >
+          <Search className="size-4" />
+          <span className="hidden lg:inline">SEARCH</span>
+          <kbd className="hidden rounded-md border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[9px] text-slate-400 sm:inline">Ctrl K</kbd>
+        </button>
+
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl p-0.5">
           <button
@@ -441,6 +459,7 @@ export function Toolbar() {
           </div>
         </div>
       )}
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </header>
   );
 }

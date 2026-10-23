@@ -14,7 +14,6 @@ import {
   MoveUp,
   Layers,
   ChevronDown,
-  Search,
   MonitorPlay,
   Sparkles,
   Box,
@@ -25,7 +24,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
-import { CommandPalette } from "./CommandPalette";
 
 const transitionIcons = {
   none: Ban,
@@ -63,7 +61,6 @@ const transitionOptions: SlideTransition[] = [
 
 export function PagesBar() {
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
-  const [paletteOpen, setPaletteOpen] = useState(false);
   const {
     pages,
     currentIndex,
@@ -181,20 +178,6 @@ export function PagesBar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        {/* ⌘K — Search commands */}
-        <button
-          onClick={() => setPaletteOpen(true)}
-          title="Search commands (Ctrl+K)"
-          aria-label="Search commands and features"
-          className="group flex shrink-0 items-center gap-2 rounded-xl border border-slate-200/90 bg-white/85 px-3 py-2 text-[10px] font-medium text-slate-500 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 hover:shadow-md"
-          type="button"
-        >
-          <Search className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
-          <span className="hidden sm:inline">Search</span>
-          <kbd className="rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[9px] text-slate-500">
-            Ctrl K
-          </kbd>
-        </button>
           <div className="flex items-center gap-2 rounded-2xl border border-white/80 bg-white/70 px-2.5 py-1.5 shadow-[0_8px_20px_-14px_rgba(15,23,42,0.4)] backdrop-blur-sm">
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -300,8 +283,7 @@ export function PagesBar() {
         </button>
       </div>
 
-      {/* ⌘K command palette */}
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+
     </div>
   );
 }
