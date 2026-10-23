@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useEditor, type AnyElement, type VideoElement } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
 import {
@@ -18,6 +18,8 @@ import {
   ImageDown,
   Check,
   Scissors,
+  Gauge,
+  RotateCcw,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -57,9 +59,22 @@ export function VideoAppDialog({
   const [fit, setFit] = useState<VideoElement["fit"]>("contain");
   const [poster, setPoster] = useState<string | undefined>(undefined);
   const [dims, setDims] = useState({ w: 16, h: 9 });
+  const [rate, setRate] = useState(1);
+  const [volume, setVolume] = useState(1);
+  const [cur, setCur] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // apply playback rate & volume to the preview
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.playbackRate = rate;
+  }, [rate, src]);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.volume = volume;
+  }, [volume, src]);
 
   const onFile = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -107,6 +122,7 @@ export function VideoAppDialog({
       }
     }
     if (v.currentTime < start - 0.5) v.currentTime = start;
+    setCur(v.currentTime);
   };
 
   const capturePoster = () => {
@@ -144,6 +160,7 @@ export function VideoAppDialog({
       fit,
       muted,
       loop,
+      ...(rate !== 1 ? { rate } : {}),
       ...(start > 0.05 || (end > 0 && duration > 0 && end < duration - 0.05)
         ? { start, end }
         : {}),
@@ -214,7 +231,7 @@ export function VideoAppDialog({
                   {fileName}
                 </span>
                 <span className="shrink-0 text-[10px] font-semibold tabular-nums text-slate-400">
-                  {fmt(start)} – {fmt(end)} · {fmt(duration)}
+                  {fmt(cur)} / {fmt(duration)}
                 </span>
               </div>
 
@@ -228,6 +245,44 @@ export function VideoAppDialog({
                     </span>
                   )}
                 </span>
+                <div className="mb-1.5 flex flex-wrap items-center gap-1">
+                  <button
+                    onClick={() => {
+                      const v = videoRef.current;
+                      if (!v) return;
+                      const t = Math.max(0, Math.min(v.currentTime, end - 0.1));
+                      setStart(t);
+                    }}
+                    title="Set the trim start at the current frame"
+                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[9px] font-semibold text-slate-500 transition hover:border-indigo-300 hover:text-indigo-600"
+                  >
+                    Start = playhead
+                  </button>
+                  <button
+                    onClick={() => {
+                      const v = videoRef.current;
+                      if (!v) return;
+                      const t = Math.min(duration, Math.max(v.currentTime, start + 0.1));
+                      setEnd(t);
+                    }}
+                    title="Set the trim end at the current frame"
+                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[9px] font-semibold text-slate-500 transition hover:border-indigo-300 hover:text-indigo-600"
+                  >
+                    End = playhead
+                  </button>
+                  <button
+                    onClick={() => {
+                      setStart(0);
+                      setEnd(duration);
+                    }}
+                    disabled={!trimmed}
+                    title="Reset the trim window to the full clip"
+                    className="ml-auto flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[9px] font-semibold text-slate-400 transition hover:border-rose-300 hover:text-rose-500 disabled:opacity-40"
+                  >
+                    <RotateCcw className="size-2.5" />
+                    Reset
+                  </button>
+                </div>
                 <label className="flex items-center gap-2 text-[10px] font-medium text-slate-500">
                   start
                   <input
@@ -302,6 +357,34 @@ export function VideoAppDialog({
                     {f}
                   </button>
                 ))}
+                <span className="mx-0.5 h-4 w-px bg-slate-200" />
+                <Gauge className="size-3 text-slate-400" title="Playback speed" />
+                {[0.5, 1, 1.5, 2].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRate(r)}
+                    title={`Play at ${r}× speed`}
+                    className={`rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition-all ${
+                      rate === r
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
+                    }`}
+                  >
+                    ×{r}
+                  </button>
+                ))}
+                {!muted && (
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={volume}
+                    onChange={(e) => setVolume(Number(e.target.value))}
+                    title="Preview volume"
+                    className="h-1 w-16 cursor-pointer accent-indigo-600"
+                  />
+                )}
                 <button
                   onClick={capturePoster}
                   title="Use the current frame as poster (shown before playback)"
@@ -317,7 +400,7 @@ export function VideoAppDialog({
               </div>
 
               <p className="text-[9px] leading-relaxed text-slate-400">
-                The clip plays inside the selected window{trimmed ? " (trim applied)" : ""} while
+                The clip plays inside the selected window{trimmed ? " (trim applied)" : ""}{rate !== 1 ? ` at ${rate}× speed` : ""} while
                 presenting. Videos are local to this browser session — export the deck or keep the
                 tab open to keep them.
               </p>
