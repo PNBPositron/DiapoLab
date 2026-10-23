@@ -14,6 +14,8 @@ export type ElementBase = {
   animation?: ElementAnimation;
   interaction?: ElementInteraction;
   shadow?: ElementShadow;
+  /** elements sharing a groupId are selected & moved together (plugin widgets) */
+  groupId?: string;
 };
 
 export type ElementAnimation =
@@ -632,6 +634,12 @@ type State = {
   toggleSelect: (id: string) => void;
   removeSelected: () => void;
   duplicateSelected: () => void;
+  /** insert several elements as one group (one history entry, all selected) */
+  addGroup: (els: AnyElement[]) => void;
+  /** group the current multi-selection so it moves as one block */
+  groupSelected: () => void;
+  /** strip the group link from the current selection */
+  ungroupSelected: () => void;
   add: (el: AnyElement) => void;
   update: (id: string, patch: Partial<AnyElement>) => void;
   remove: (id: string) => void;
@@ -1295,7 +1303,20 @@ export const useEditor = create<State>((set, get) => {
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
       set({ selectedId: clone.id, selectedIds: [clone.id] });
     },
-    select: (selectedId) => set({ selectedId, selectedIds: selectedId ? [selectedId] : [] }),
+    select: (selectedId) => {
+      if (!selectedId) {
+        set({ selectedId: null, selectedIds: [] });
+        return;
+      }
+      // Clicking one member of a group selects the whole group,
+      // so drags, nudges, delete and duplicate apply to all of it.
+      const el = get().elements.find((e) => e.id === selectedId);
+      const gid = el?.groupId;
+      const ids = gid
+        ? get().elements.filter((e) => e.groupId === gid).map((e) => e.id)
+        : [selectedId];
+      set({ selectedId, selectedIds: ids });
+    },
     toggleSelect: (id) => {
       const { selectedIds } = get();
       const next = selectedIds.includes(id)
@@ -1316,18 +1337,58 @@ export const useEditor = create<State>((set, get) => {
       const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
       if (!ids.length) return;
       pushHistory();
+      // duplicated groups stay grouped, but as a NEW independent group
+      const groupRemap = new Map<string, string>();
       const clones = elements
         .filter((e) => ids.includes(e.id))
-        .map((e) => ({
-          ...(JSON.parse(JSON.stringify(e)) as AnyElement),
-          id: uid(),
-          x: e.x + 30,
-          y: e.y + 30,
-        }));
+        .map((e) => {
+          const clone = {
+            ...(JSON.parse(JSON.stringify(e)) as AnyElement),
+            id: uid(),
+            x: e.x + 30,
+            y: e.y + 30,
+          };
+          if (e.groupId) {
+            if (!groupRemap.has(e.groupId)) groupRemap.set(e.groupId, uid());
+            clone.groupId = groupRemap.get(e.groupId);
+          }
+          return clone;
+        });
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...clones] }));
       set({ selectedIds: clones.map((c) => c.id), selectedId: clones[clones.length - 1]?.id ?? null });
     },
 
+    addGroup: (els) => {
+      if (!els.length) return;
+      pushHistory();
+      const gid = uid();
+      const tagged = els.map(
+        (el) => ({ ...el, id: uid(), groupId: gid }) as AnyElement,
+      );
+      updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...tagged] }));
+      set({ selectedId: tagged[tagged.length - 1].id, selectedIds: tagged.map((e) => e.id) });
+    },
+    groupSelected: () => {
+      const { selectedIds } = get();
+      if (selectedIds.length < 2) return;
+      pushHistory();
+      const gid = uid();
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) => (selectedIds.includes(e.id) ? ({ ...e, groupId: gid } as AnyElement) : e)),
+      }));
+    },
+    ungroupSelected: () => {
+      const { selectedIds } = get();
+      if (!selectedIds.length) return;
+      pushHistory();
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          selectedIds.includes(e.id) ? ({ ...e, groupId: undefined } as AnyElement) : e,
+        ),
+      }));
+    },
     add: (el) => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, el] }));
