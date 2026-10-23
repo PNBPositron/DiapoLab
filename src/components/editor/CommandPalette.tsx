@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
-import { usePlugins, instantiateWidget } from "@/lib/plugins";
+import { usePlugins, allPlugins, instantiateWidget } from "@/lib/plugins";
 import {
   Search,
   CornerDownLeft,
@@ -508,8 +508,9 @@ export function CommandPalette({
     ];
 
     /* Plugin content — widgets become insertable, apps open their tool */
-    const pluginsState = usePlugins.getState();
-    const pluginCmds: Command[] = pluginsState.plugins
+    // preinstalled plugins (Paint…) + user-imported ones
+    const pluginList = allPlugins(usePlugins.getState().plugins);
+    const pluginCmds: Command[] = pluginList
       .filter((p) => p.enabled)
       .flatMap((p) => [
         ...p.widgets.map((w, i) => ({
