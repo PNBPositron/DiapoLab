@@ -20,6 +20,8 @@ import {
   Check,
   Droplets,
   PaintBucket,
+  SprayCan,
+  Type,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -29,7 +31,7 @@ import {
 /* doodle is rasterized to a PNG and inserted as an image element.     */
 /* ------------------------------------------------------------------ */
 
-type Tool = "brush" | "eraser" | "line" | "rect" | "ellipse" | "arrow";
+type Tool = "brush" | "eraser" | "spray" | "line" | "rect" | "ellipse" | "arrow" | "text";
 const SHAPE_TOOLS: Tool[] = ["line", "rect", "ellipse", "arrow"];
 
 type Stroke = {
@@ -40,6 +42,8 @@ type Stroke = {
   filled: boolean;
   erase: boolean;
   points: Array<{ x: number; y: number }>;
+  /** text content — only for the "text" tool */
+  text?: string;
 };
 
 const DEFAULT_COLORS = ["#0a0f1f", "#2563eb", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
@@ -48,10 +52,12 @@ const DEFAULT_SIZES = [4, 8, 16, 28, 48];
 const TOOLS: Array<{ tool: Tool; label: string; Icon: typeof Brush }> = [
   { tool: "brush", label: "Brush", Icon: Brush },
   { tool: "eraser", label: "Eraser", Icon: Eraser },
+  { tool: "spray", label: "Spray", Icon: SprayCan },
   { tool: "line", label: "Line", Icon: Minus },
   { tool: "rect", label: "Rectangle", Icon: Square },
   { tool: "ellipse", label: "Ellipse", Icon: Circle },
   { tool: "arrow", label: "Arrow", Icon: MoveUpRight },
+  { tool: "text", label: "Text", Icon: Type },
 ];
 
 /** Paints one stroke onto a 2D context at the given scale. */
@@ -104,6 +110,25 @@ function paintStroke(ctx: CanvasRenderingContext2D, s: Stroke, sx: number, sy: n
       ctx.lineTo(p1.x * sx - head * Math.cos(ang + Math.PI / 6), p1.y * sy - head * Math.sin(ang + Math.PI / 6));
       ctx.stroke();
     }
+  } else if (s.tool === "spray") {
+    // airbrush: scatter dots along the recorded points
+    ctx.fillStyle = s.color;
+    const r = s.size * sx * 0.75;
+    for (const pt of s.points) {
+      const n = Math.max(4, s.size);
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = Math.sqrt(Math.random()) * r;
+        ctx.beginPath();
+        ctx.arc(pt.x * sx + Math.cos(a) * d, pt.y * sy + Math.sin(a) * d, Math.max(0.4, 0.8 * sx), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (s.tool === "text" && s.text) {
+    ctx.font = `900 ${Math.max(14, s.size * 2.4) * sx}px "Archivo Black", Inter, system-ui, sans-serif`;
+    ctx.textBaseline = "top";
+    ctx.fillStyle = s.color;
+    ctx.fillText(s.text, p0.x * sx, p0.y * sy);
   } else if (s.tool === "rect") {
     const x = Math.min(p0.x, p1.x) * sx;
     const y = Math.min(p0.y, p1.y) * sy;
@@ -150,6 +175,8 @@ export function PaintAppDialog({
   const [filled, setFilled] = useState(false);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[]>([]);
+  // pending text placement — active with the "text" tool
+  const [textDraft, setTextDraft] = useState<{ x: number; y: number; value: string } | null>(null);
   // live drawing state lives in refs — pointer moves never re-render React
   const drawing = useRef(false);
   const padRef = useRef<HTMLCanvasElement>(null);
@@ -211,6 +238,21 @@ export function PaintAppDialog({
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = size * sx;
+    if (tool === "spray") {
+      pts.push(p);
+      const r = size * sx * 0.75;
+      ctx.fillStyle = color;
+      const dots = Math.max(4, size);
+      for (let k = 0; k < dots; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = Math.sqrt(Math.random()) * r;
+        ctx.beginPath();
+        ctx.arc(p.x * sx + Math.cos(a) * d, p.y * sy + Math.sin(a) * d, Math.max(0.4, 0.8 * sx), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+      return;
+    }
     ctx.beginPath();
     if (pts.length === 1) {
       ctx.arc(p.x * sx, p.y * sy, Math.max(0.5, (size * sx) / 2), 0, Math.PI * 2);
@@ -241,6 +283,10 @@ export function PaintAppDialog({
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     const p = pos(e);
     startRef.current = p;
+    if (tool === "text") {
+      setTextDraft({ x: p.x, y: p.y, value: "" });
+      return;
+    }
     if (SHAPE_TOOLS.includes(tool)) {
       shapeToRef.current = p;
     } else {
@@ -289,6 +335,50 @@ export function PaintAppDialog({
       return r.slice(0, -1);
     });
   };
+
+  /** Commit the pending text draft as a stroke. */
+  const commitText = () => {
+    if (!textDraft) return;
+    const value = textDraft.value.trim();
+    if (value) {
+      setStrokes((prev) => [
+        ...prev,
+        {
+          tool: "text",
+          color,
+          size,
+          opacity: opacity / 100,
+          filled: false,
+          erase: false,
+          points: [{ x: textDraft.x, y: textDraft.y }],
+          text: value,
+        },
+      ]);
+      setRedoStack([]);
+    }
+    setTextDraft(null);
+  };
+
+  // Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y while the pad is open
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && k === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+      } else if ((e.ctrlKey || e.metaKey) && k === "y") {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, strokes, redoStack]);
 
   const insert = () => {
     const out = document.createElement("canvas");
@@ -357,7 +447,7 @@ export function PaintAppDialog({
             ))}
             <button
               title={filled ? "Shape fill: ON" : "Shape fill: OFF"}
-              disabled={tool === "line" || tool === "arrow" || tool === "brush" || tool === "eraser"}
+              disabled={tool === "line" || tool === "arrow" || tool === "brush" || tool === "eraser" || tool === "spray" || tool === "text"}
               onClick={() => setFilled((f) => !f)}
               className={`grid size-9 place-items-center rounded-lg border transition-all disabled:opacity-30 ${
                 filled
@@ -412,7 +502,7 @@ export function PaintAppDialog({
           </div>
 
           {/* Pad — height capped so the dialog always fits the screen */}
-          <div className="mx-auto w-full" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
+          <div className="relative mx-auto w-full" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
             <canvas
               ref={padRef}
               width={dispW}
@@ -422,10 +512,34 @@ export function PaintAppDialog({
               onPointerUp={onPointerUp}
               onPointerLeave={onPointerUp}
               className={`block w-full touch-none rounded-xl border-2 border-dashed border-slate-300 bg-white shadow-inner ${
-                tool === "eraser" ? "cursor-cell" : "cursor-crosshair"
+                tool === "eraser" ? "cursor-cell" : tool === "text" ? "cursor-text" : "cursor-crosshair"
               }`}
               style={{ background: transparent ? "repeating-conic-gradient(#f1f5f9 0% 25%, #ffffff 0% 50%) 50% / 24px 24px" : undefined }}
             />
+            {textDraft && (
+              <input
+                autoFocus
+                value={textDraft.value}
+                onChange={(e) => setTextDraft((d) => (d ? { ...d, value: e.target.value } : d))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitText();
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setTextDraft(null);
+                  }
+                }}
+                onBlur={() => textDraft.value.trim() && commitText()}
+                placeholder="Type…"
+                className="absolute z-10 rounded-md border-2 border-indigo-500 bg-white/95 px-1.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-lg outline-none"
+                style={{
+                  left: `${(textDraft.x / dispW) * 100}%`,
+                  top: `${(textDraft.y / dispH) * 100}%`,
+                  minWidth: 120,
+                }}
+              />
+            )}
           </div>
 
           {/* Palette + actions */}
