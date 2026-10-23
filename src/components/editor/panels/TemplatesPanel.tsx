@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal } from "lucide-react";
+import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, Rocket, Crown } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -14,6 +14,7 @@ import {
 import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 import { ensureFontsForPages } from "@/lib/fontLoader";
+import { importPPTXFile } from "@/lib/import-pptx";
 
 /* ------------------------------------------------------------------ */
 /* Style definitions                                                    */
@@ -89,6 +90,7 @@ export function TemplatesPanel() {
   const [showAll, setShowAll] = useState(false);
   const [sortBy, setSortBy] = useState<"likes" | "recent">("likes");
   const [query, setQuery] = useState("");
+  const [importingPptx, setImportingPptx] = useState(false);
   const [styleFilter, setStyleFilter] = useState<"all" | TemplateStyle>("all");
   const [creatorFilter, setCreatorFilter] = useState("all");
   const [licenseFilter, setLicenseFilter] = useState("all");
@@ -113,7 +115,27 @@ export function TemplatesPanel() {
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
-  const filteredCommunity = filterTemplates(community, {
+    const sortedCommunity = sortTemplates(community, likeCounts, "likes");
+  const featured = sortedCommunity[0] ?? null;
+
+  const importPptx = async (file: File) => {
+    setImportingPptx(true);
+    try {
+      await importPPTXFile(file);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "PPTX import failed");
+    } finally {
+      setImportingPptx(false);
+    }
+  };
+
+  const loadTemplate = (c: PublicTemplate) => {
+    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
+    useEditor.getState().loadPages(c.pages as Page[]);
+    useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
+  };
+
+const filteredCommunity = filterTemplates(community, {
     query,
     style: styleFilter,
     creator: creatorFilter,
@@ -164,6 +186,81 @@ export function TemplatesPanel() {
   return (
     <div className="space-y-4">
       <PanelHeader kicker="Templates" title="Start from a deck" description="Browse community templates, then load one onto your canvas in a click." icon={LayoutGrid} />
+
+      {/* ── Quick start ─────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-2 px-4">
+        <button
+          onClick={() => useEditor.getState().newDesign()}
+          className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.97]"
+        >
+          <span className="grid size-8 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+            <FilePlus2 className="size-4" />
+          </span>
+          <span className="text-[10px] font-semibold text-slate-700">Blank deck</span>
+        </button>
+
+        <label className={`group flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
+          <span className="grid size-8 place-items-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+            {importingPptx ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
+          </span>
+          <span className="text-[10px] font-semibold text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
+          <input
+            type="file"
+            accept=".pptx"
+            className="sr-only"
+            disabled={importingPptx}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void importPptx(file);
+              event.target.value = "";
+            }}
+          />
+        </label>
+
+        <button
+          onClick={() => useEditor.getState().setPresenting(true)}
+          className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.97]"
+        >
+          <span className="grid size-8 place-items-center rounded-lg bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+            <Presentation className="size-4" />
+          </span>
+          <span className="text-[10px] font-semibold text-slate-700">Present</span>
+        </button>
+      </div>
+
+      {/* ── Featured deck ───────────────────────────── */}
+      {featured && featured.pages?.[0] && (
+        <div className="px-4">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            <Crown className="size-3 text-amber-400" /> Featured deck
+          </div>
+          <button
+            onClick={() => loadTemplate(featured)}
+            className="group relative block w-full overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_16px_36px_-12px_rgba(37,99,235,0.3)]"
+            title={`Load ${featured.name}`}
+          >
+            <div className="relative w-full overflow-hidden">
+              <SlideThumbnail
+                page={featured.pages[0] as Page}
+                canvasW={featured.canvas_w}
+                canvasH={featured.canvas_h}
+                className="aspect-video min-h-[150px] w-full transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
+                <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+                  <Rocket className="size-3 text-blue-600" /> Use this deck
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+              <span className="truncate text-xs font-semibold text-slate-800">{featured.name}</span>
+              <span className="flex shrink-0 items-center gap-1 text-[9px] font-medium text-rose-400">
+                <Heart className="size-2.5" /> {likeCounts[featured.id] ?? 0}
+              </span>
+            </div>
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mx-4 flex items-start justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
@@ -318,11 +415,7 @@ export function TemplatesPanel() {
                   liked={likedIds.has(c.id)}
                   canLike={!!user}
                   onLike={() => toggleLike(c.id)}
-                  onLoad={() => {
-                    if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
-                    useEditor.getState().loadPages(c.pages as Page[]);
-                    useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
-                  }}
+                  onLoad={() => loadTemplate(c)}
                 />
               ))}
           </div>
@@ -612,9 +705,7 @@ function AllTemplatesDialog({
                 canLike={canLike}
                 onLike={() => toggleLike(c.id)}
                 onLoad={() => {
-                  if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
-                  useEditor.getState().loadPages(c.pages as Page[]);
-                  useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
+                  loadTemplate(c);
                   onOpenChange(false);
                 }}
               />
