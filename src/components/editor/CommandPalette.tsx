@@ -36,6 +36,8 @@ import {
   Puzzle,
   Brush,
   Clapperboard,
+  Image as ImageIcon,
+  Shapes,
   History as HistoryIcon,
   Shuffle,
   Zap,
@@ -527,7 +529,16 @@ export function CommandPalette({
           id: `pa-${p.id}-${i}`,
           label: `Open ${a.name}`,
           group: "Plugins" as CommandGroup,
-          icon: a.type === "video" ? <Clapperboard className="size-4" /> : <Brush className="size-4" />,
+          icon:
+            a.type === "video" ? (
+              <Clapperboard className="size-4" />
+            ) : a.type === "image" ? (
+              <ImageIcon className="size-4" />
+            ) : a.type === "icon" ? (
+              <Shapes className="size-4" />
+            ) : (
+              <Brush className="size-4" />
+            ),
           hint: `app · ${p.name}`,
           keywords: `plugin app ${a.type} ${a.name} ${p.name}`,
           run: () => {
