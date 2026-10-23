@@ -11,6 +11,8 @@ import {
   Sparkles,
   Globe,
   Scissors,
+  Group,
+  Ungroup,
   Copy,
   Trash2,
   Undo2,
@@ -138,6 +140,24 @@ export function CommandPalette({
         run: () => {
           if (store.selectedId) store.duplicate(store.selectedId);
         },
+      },
+      {
+        id: "group",
+        label: "Group selection",
+        group: "Actions",
+        icon: <Group className="size-4" />,
+        hint: store.selectedIds.length > 1 ? store.selectedIds.length + " elements selected" : "select 2+ elements first (shift+click)",
+        keywords: "group bind block together move",
+        run: () => store.groupSelected(),
+      },
+      {
+        id: "ungroup",
+        label: "Ungroup selection",
+        group: "Actions",
+        icon: <Ungroup className="size-4" />,
+        hint: "removes the group link",
+        keywords: "ungroup split detach separate",
+        run: () => store.ungroupSelected(),
       },
       {
         id: "delete",
