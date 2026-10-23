@@ -23,7 +23,38 @@ const svgFilterUrl = (inner: string) =>
     `<svg xmlns="http://www.w3.org/2000/svg"><filter id="f" x="0" y="0" width="100%" height="100%">${inner}</filter></svg>`,
   )}")`;
 
-const filterCss = (f?: ImageFilters) => {
+/** Advanced live effects as inline SVG filter primitives (order matters). */
+const advancedEffects = (f?: ImageFilters): Array<{ key: string; inner: string }> => {
+  const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
+  const list: Array<{ key: string; inner: string }> = [];
+  if ((v.posterize ?? 0) >= 2) {
+    const n = Math.min(16, Math.round(v.posterize!));
+    const steps = Array.from({ length: n }, (_, i) => (i / (n - 1)).toFixed(3)).join(" ");
+    list.push({
+      key: "posterize",
+      inner: `<feComponentTransfer><feFuncR type="discrete" tableValues="${steps}"/><feFuncG type="discrete" tableValues="${steps}"/><feFuncB type="discrete" tableValues="${steps}"/></feComponentTransfer>`,
+    });
+  }
+  if ((v.glitch ?? 0) > 0) {
+    list.push({
+      key: "glitch",
+      inner: `<feTurbulence type="fractalNoise" baseFrequency="0.015 0.12" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(v.glitch! * 0.9).toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>`,
+    });
+  }
+  if ((v.pixelate ?? 0) >= 2) {
+    const p = Math.min(40, Math.round(v.pixelate!));
+    list.push({
+      key: "pixelate",
+      inner: `<feFlood x="${p / 2}" y="${p / 2}" height="${p}" width="${p}"/><feComposite width="${p * 2}" height="${p * 2}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${p / 2}"/>`,
+    });
+  }
+  return list;
+};
+
+const filterCss = (
+  f?: ImageFilters,
+  advancedUrl?: (key: string, inner: string) => string,
+) => {
   const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
   const temp = v.temperature ?? 0;
   const parts = [
@@ -32,17 +63,10 @@ const filterCss = (f?: ImageFilters) => {
     temp > 0 ? `sepia(${(temp * 0.35).toFixed(1)}%) saturate(106%)` : "",
     temp < 0 ? `hue-rotate(${(temp * 0.15).toFixed(1)}deg) saturate(110%)` : "",
   ];
-  if ((v.posterize ?? 0) >= 2) {
-    const n = Math.min(16, Math.round(v.posterize!));
-    const steps = Array.from({ length: n }, (_, i) => (i / (n - 1)).toFixed(3)).join(" ");
-    parts.push(svgFilterUrl(`<feComponentTransfer><feFuncR type="discrete" tableValues="${steps}"/><feFuncG type="discrete" tableValues="${steps}"/><feFuncB type="discrete" tableValues="${steps}"/></feComponentTransfer>`));
-  }
-  if ((v.glitch ?? 0) > 0) {
-    parts.push(svgFilterUrl(`<feTurbulence type="fractalNoise" baseFrequency="0.015 0.12" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(v.glitch! * 0.9).toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>`));
-  }
-  if ((v.pixelate ?? 0) >= 2) {
-    const p = Math.min(40, Math.round(v.pixelate!));
-    parts.push(svgFilterUrl(`<feFlood x="${p / 2}" y="${p / 2}" height="${p}" width="${p}"/><feComposite width="${p * 2}" height="${p * 2}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${p / 2}"/>`));
+  for (const e of advancedEffects(v)) {
+    // Inline <filter> defs referenced by url(#id) are the reliable cross-browser
+    // path; the data-URI form is only kept as fallback for callers without defs.
+    parts.push(advancedUrl ? advancedUrl(e.key, e.inner) : svgFilterUrl(e.inner));
   }
   return parts.filter(Boolean).join(" ");
 };
@@ -716,6 +740,25 @@ export function CanvasElement({
               </defs>
             </svg>
           )}
+          {/* Inline SVG filter defs for advanced effects (glitch, pixelate, posterize).
+              Referenced as url(#img-fx-…) — far more reliable than data-URI filters. */}
+          {advancedEffects(element.filters).length > 0 && (
+            <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
+              <defs>
+                {advancedEffects(element.filters).map((e) => (
+                  <filter
+                    key={e.key}
+                    id={`img-fx-${D}{element.id}-${D}{e.key}`}
+                    x="0"
+                    y="0"
+                    width="100%"
+                    height="100%"
+                    dangerouslySetInnerHTML={{ __html: e.inner }}
+                  />
+                ))}
+              </defs>
+            </svg>
+          )}
           {element.illustrationFormat === "svg" && element.tint ? (
             <div
               aria-hidden="true"
@@ -732,7 +775,11 @@ export function CanvasElement({
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-                filter: [filterCss(element.filters)].filter(Boolean).join(" "),
+                filter: [
+                  filterCss(element.filters, (key) => `url("#img-fx-${element.id}-${key}")`),
+                ]
+                  .filter(Boolean)
+                  .join(" "),
                 opacity: element.opacity ?? 1,
               }}
             />
@@ -761,7 +808,7 @@ export function CanvasElement({
                   element.assetKind === "icon" && element.tint
                     ? `brightness(0) drop-shadow(0 0 0 ${element.tint})`
                     : "",
-                  filterCss(element.filters),
+                  filterCss(element.filters, (key) => `url("#img-fx-${element.id}-${key}")`),
                 ]
                   .filter(Boolean)
                   .join(" "),
