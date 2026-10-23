@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
-import { usePlugins, instantiateWidget, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins";
+import { usePlugins, instantiateWidget, SAMPLE_PLUGIN_CODE, type EditorPlugin, type PluginApp } from "@/lib/plugins";
 import { PanelHeader } from "../ui/selectors";
+import { PaintAppDialog } from "../paint/PaintApp";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -12,6 +13,7 @@ export function PluginsPanel() {
   const togglePlugin = usePlugins((s) => s.togglePlugin);
 
   const [importOpen, setImportOpen] = useState(false);
+  const [appOpen, setAppOpen] = useState<PluginApp | null>(null);
   const [pluginCode, setPluginCode] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
@@ -31,6 +33,22 @@ export function PluginsPanel() {
   const enabledWidgets = plugins
     .filter((p) => p.enabled)
     .flatMap((p) => p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })));
+
+  const enabledApps = plugins
+    .filter((p) => p.enabled)
+    .flatMap((p) => (p.apps ?? []).map((a, i) => ({ key: `${p.id}:app:${i}`, pluginName: p.name, app: a })));
+
+  // The command palette can request an app by name (diapolab:open-app event).
+  useEffect(() => {
+    const onOpenApp = (e: Event) => {
+      const appName = (e as CustomEvent).detail?.appName;
+      if (!appName) return;
+      const found = enabledApps.find((x) => x.app.name === appName);
+      if (found) setAppOpen(found.app);
+    };
+    window.addEventListener("diapolab:open-app", onOpenApp);
+    return () => window.removeEventListener("diapolab:open-app", onOpenApp);
+  }, [enabledApps]);
 
   return (
     <div className="space-y-4">
@@ -83,6 +101,38 @@ export function PluginsPanel() {
             </div>
           </div>
 
+          {/* Apps */}
+          {enabledApps.length > 0 && (
+            <div>
+              <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
+                <Brush className="size-2.5" /> Apps ({enabledApps.length})
+              </span>
+              <div className="space-y-2">
+                {enabledApps.map(({ key, pluginName, app }) => (
+                  <button
+                    key={key}
+                    title={app.description || `from ${pluginName}`}
+                    onClick={() => setAppOpen(app)}
+                    className="group flex items-center gap-2.5 rounded-xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white px-2.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-[0_10px_24px_-10px_rgba(79,70,229,0.45)] active:scale-[0.98]"
+                  >
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white text-indigo-600 shadow-sm transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                      <Brush className="size-3.5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[11px] font-semibold text-slate-800">{app.name}</span>
+                      <span className="block truncate text-[9px] text-slate-400">
+                        {app.description || `interactive app · ${pluginName}`}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-1 rounded-lg bg-white px-2 py-1 text-[9px] font-bold text-indigo-600 shadow-sm">
+                      <Play className="size-2.5" /> Open
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Widgets */}
           {enabledWidgets.length > 0 && (
             <div>
@@ -111,6 +161,9 @@ export function PluginsPanel() {
           )}
         </div>
       )}
+
+      {/* Plugin app (e.g. paint) */}
+      {appOpen && <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />}
 
       {/* Import dialog */}
       <Dialog open={importOpen} onOpenChange={setImportOpen}>
@@ -199,6 +252,7 @@ function PluginRow({
         </div>
         <div className="truncate text-[9px] text-slate-400">
           {plugin.widgets.length} widget{plugin.widgets.length === 1 ? "" : "s"}
+          {plugin.apps?.length ? ` · ${plugin.apps.length} app${plugin.apps.length > 1 ? "s" : ""}` : ""}
           {plugin.author ? ` · ${plugin.author}` : ""}
         </div>
       </div>
