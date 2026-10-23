@@ -18,7 +18,7 @@ const PANEL_OPTIONS = [
   { id: "illustrations", label: "Illustrations", icon: Image, hint: "Vector art" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },
-  { id: "ai", label: "Remix", icon: WandSparkles, hint: "AI tweaks" },
+  { id: "ai", label: "AI", icon: WandSparkles, hint: "Generate with JSON" }
 ] as const;
 
 export function WelcomeDialog() {
@@ -26,7 +26,7 @@ export function WelcomeDialog() {
   const [step, setStep] = useState<Step>(0);
 
   // Step 1 — format
-  const [format, setFormat] = useState<{ name: string; w: number; h: number }>(CANVAS_PRESETS[4] as { name: string; w: number; h: number });
+  const [format, setFormat] = useState<{ name: string; w: number; h: number }>(CANVAS_PRESETS.find((preset) => preset.name === "Slide 16:9") as { name: string; w: number; h: number });
 
   // Step 2 — template
   const [useTemplate, setUseTemplate] = useState(false);

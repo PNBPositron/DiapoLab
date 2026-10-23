@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as LicenseRouteImport } from './routes/license'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as McpGuideRouteImport } from './routes/mcp-guide'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LicenseRoute = LicenseRouteImport.update({
@@ -98,6 +104,7 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/home': typeof HomeRoute
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
   '/mcp-guide': typeof McpGuideRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/home': typeof HomeRoute
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
   '/mcp-guide': typeof McpGuideRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/home': typeof HomeRoute
   '/license': typeof LicenseRoute
   '/marketplace': typeof MarketplaceRoute
   '/mcp-guide': typeof McpGuideRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/home'
     | '/license'
     | '/marketplace'
     | '/mcp-guide'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/home'
     | '/license'
     | '/marketplace'
     | '/mcp-guide'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/home'
     | '/license'
     | '/marketplace'
     | '/mcp-guide'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
+  HomeRoute: typeof HomeRoute
   LicenseRoute: typeof LicenseRoute
   MarketplaceRoute: typeof MarketplaceRoute
   McpGuideRoute: typeof McpGuideRoute
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/license': {
@@ -327,6 +347,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
+  HomeRoute: HomeRoute,
   LicenseRoute: LicenseRoute,
   MarketplaceRoute: MarketplaceRoute,
   McpGuideRoute: McpGuideRoute,
