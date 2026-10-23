@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
-import { usePlugins, instantiateWidget, SAMPLE_PLUGIN_CODE, type EditorPlugin, type PluginApp } from "@/lib/plugins";
+import {
+  usePlugins,
+  allPlugins,
+  instantiateWidget,
+  SAMPLE_PLUGIN_CODE,
+  type EditorPlugin,
+  type PluginApp,
+} from "@/lib/plugins";
 import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
 
@@ -30,11 +37,13 @@ export function PluginsPanel() {
     }
   };
 
-  const enabledWidgets = plugins
+  // preinstalled plugins (Paint…) merged with user-imported ones
+  const all = allPlugins(plugins);
+  const enabledWidgets = all
     .filter((p) => p.enabled)
     .flatMap((p) => p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })));
 
-  const enabledApps = plugins
+  const enabledApps = all
     .filter((p) => p.enabled)
     .flatMap((p) => (p.apps ?? []).map((a, i) => ({ key: `${p.id}:app:${i}`, pluginName: p.name, app: a })));
 
@@ -69,7 +78,7 @@ export function PluginsPanel() {
         </button>
       </div>
 
-      {plugins.length === 0 ? (
+      {all.length === 0 ? (
         <div className="mx-4 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-10 text-center">
           <span className="grid size-11 place-items-center rounded-xl bg-indigo-50 text-indigo-500">
             <PackageOpen className="size-5" />
@@ -87,13 +96,14 @@ export function PluginsPanel() {
           {/* Installed plugins */}
           <div>
             <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
-              <Layers className="size-2.5" /> Installed ({plugins.length})
+              <Layers className="size-2.5" /> Installed ({all.length})
             </span>
             <div className="space-y-2">
-              {plugins.map((p) => (
+              {all.map((p) => (
                 <PluginRow
                   key={p.id}
                   plugin={p}
+                  builtin={p.id.startsWith("builtin-")}
                   onToggle={() => togglePlugin(p.id)}
                   onRemove={() => removePlugin(p.id)}
                 />
@@ -226,10 +236,12 @@ export function PluginsPanel() {
 
 function PluginRow({
   plugin,
+  builtin,
   onToggle,
   onRemove,
 }: {
   plugin: EditorPlugin;
+  builtin?: boolean;
   onToggle: () => void;
   onRemove: () => void;
 }) {
@@ -247,8 +259,13 @@ function PluginRow({
         <Puzzle className="size-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[11px] font-semibold text-slate-800" title={plugin.name}>
-          {plugin.name}
+        <div className="flex items-center gap-1.5 truncate text-[11px] font-semibold text-slate-800" title={plugin.name}>
+          <span className="truncate">{plugin.name}</span>
+          {builtin && (
+            <span className="shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+              Built-in
+            </span>
+          )}
         </div>
         <div className="truncate text-[9px] text-slate-400">
           {plugin.widgets.length} widget{plugin.widgets.length === 1 ? "" : "s"}
@@ -256,6 +273,7 @@ function PluginRow({
           {plugin.author ? ` · ${plugin.author}` : ""}
         </div>
       </div>
+      {!builtin && (
       <button
         onClick={onToggle}
         role="switch"
@@ -271,6 +289,8 @@ function PluginRow({
           }`}
         />
       </button>
+      )}
+      {!builtin && (
       <button
         onClick={onRemove}
         title="Remove plugin"
