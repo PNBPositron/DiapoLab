@@ -522,7 +522,7 @@ export function CommandPalette({
               placeholder="Search commands, features, shortcuts…"
               className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-800 outline-none placeholder:text-slate-400"
             />
-            <kbd className="shrink-0 rounded-lg border border-slate-200 bg-white px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
+            <kbd className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
               ESC
             </kbd>
           </div>
@@ -595,7 +595,7 @@ export function CommandPalette({
                             className={`rounded-md border px-1.5 py-0.5 font-mono text-[9px] font-medium ${
                               active
                                 ? "border-blue-200 bg-blue-100/60 text-blue-700"
-                                : "border-slate-200 bg-white text-slate-500"
+                                : "border-slate-200 bg-slate-50/80 text-slate-500"
                             }`}
                           >
                             {k}
@@ -623,7 +623,7 @@ export function CommandPalette({
             <CornerDownLeft className="size-3" /> run
           </span>
           <span className="ml-auto flex items-center gap-1">
-            <kbd className="rounded border border-slate-200 bg-white px-1 font-mono">
+            <kbd className="rounded border border-slate-200 bg-slate-50 px-1 font-mono">
               Ctrl K
             </kbd>
             toggle
