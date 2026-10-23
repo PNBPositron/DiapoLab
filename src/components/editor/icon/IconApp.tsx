@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
 import {
@@ -7,14 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Shapes, Check } from "lucide-react";
+import * as Lucide from "lucide-react";
+import { Shapes, Check, Search, Sparkles } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* Icon app — the built-in icon maker.                                  */
-/* Pick a shape (square, rounded, circle, triangle, star, hexagon,     */
-/* diamond, heart, bolt, shield…), tune the foreground/background      */
-/* colors, padding and corner radius, choose the export size — then    */
-/* insert it on the slide as a crisp PNG.                               */
+/* Two sources: built-in shapes, or ANY Lucide icon (searchable).      */
+/* Tune the icon/plate colors, stroke weight, padding, export size —   */
+/* then insert it on the slide as a crisp PNG.                          */
 /* ------------------------------------------------------------------ */
 
 type ShapeDef = { id: string; label: string; path: string };
@@ -41,39 +41,30 @@ const SHAPES: ShapeDef[] = [
   { id: "ticket", label: "Ticket", path: "M8 26 A8 8 0 0 0 16 34 A8 8 0 0 1 16 66 A8 8 0 0 0 8 74 H40 V66 H60 V74 H92 A8 8 0 0 0 84 66 A8 8 0 0 1 84 34 A8 8 0 0 0 92 26 Z" },
 ];
 
+const NON_ICONS = new Set([
+  "Icon",
+  "DynamicIcon",
+  "createLucideIcon",
+  "LucideIcon",
+  "LucideProps",
+  "icons",
+]);
+
+/** Every Lucide icon component, name-sorted (PascalCase names only). */
+const LUCIDE_LIST: Array<{ name: string; Comp: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string; style?: React.CSSProperties }> }> = Object.entries(Lucide)
+  .filter(
+    ([name, val]) =>
+      typeof val === "function" &&
+      /^[A-Z]/.test(name) &&
+      !NON_ICONS.has(name),
+  )
+  .map(([name, Comp]) => ({ name, Comp: Comp as never }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
 const FG_DEFAULT = "#2563eb";
 const BG_SWATCHES = ["transparent", "#f8fafc", "#0a0f1f", "#2563eb", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
 const FG_SWATCHES = ["#ffffff", "#0a0f1f", "#2563eb", "#7df9ff", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
 const EXPORT_SIZES = [128, 256, 512, 1024];
-
-/** Render the icon to a canvas and return a PNG data URL. */
-function renderIcon(
-  shape: ShapeDef,
-  fg: string,
-  bg: string | "transparent",
-  padPct: number,
-  outSize: number,
-): string {
-  const c = document.createElement("canvas");
-  c.width = outSize;
-  c.height = outSize;
-  const ctx = c.getContext("2d");
-  if (!ctx) return "";
-  if (bg !== "transparent") {
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, outSize, outSize);
-  }
-  const inner = outSize * (1 - padPct / 100);
-  const scale = inner / 100;
-  const off = (outSize - inner) / 2;
-  ctx.save();
-  ctx.translate(off, off);
-  ctx.scale(scale, scale);
-  ctx.fillStyle = fg;
-  ctx.fill(new Path2D(shape.path));
-  ctx.restore();
-  return c.toDataURL("image/png");
-}
 
 export function IconAppDialog({
   app,
@@ -88,31 +79,99 @@ export function IconAppDialog({
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
 
+  const [mode, setMode] = useState<"lucide" | "shape">("lucide");
+  const [query, setQuery] = useState("");
+  const [iconName, setIconName] = useState("Sparkles");
   const [shapeId, setShapeId] = useState("rounded");
   const [fg, setFg] = useState(FG_DEFAULT);
   const [bg, setBg] = useState<string | "transparent">("transparent");
+  const [strokeW, setStrokeW] = useState(2);
   const [padPct, setPadPct] = useState(10);
   const [outSize, setOutSize] = useState(512);
 
   const shape = SHAPES.find((s) => s.id === shapeId) ?? SHAPES[0];
+  const LucideIcon = useMemo(
+    () => LUCIDE_LIST.find((i) => i.name === iconName)?.Comp ?? Sparkles,
+    [iconName],
+  );
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = q
+      ? LUCIDE_LIST.filter((i) => i.name.toLowerCase().includes(q))
+      : LUCIDE_LIST;
+    return list.slice(0, 96);
+  }, [query]);
+
+  /** Paint the plate + the prepared image on a square canvas → PNG. */
+  const placeOnPlate = (draw: (ctx: CanvasRenderingContext2D) => void, done: (url: string) => void) => {
+    const c = document.createElement("canvas");
+    c.width = outSize;
+    c.height = outSize;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    if (bg !== "transparent") {
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, outSize, outSize);
+    }
+    draw(ctx);
+    done(c.toDataURL("image/png"));
+  };
 
   const insert = () => {
-    const src = renderIcon(shape, fg, bg, padPct, outSize);
-    if (!src) return;
-    const w = Math.min(480, Math.round(canvasW * 0.25));
-    add({
-      type: "image",
-      id: crypto.randomUUID(),
-      x: Math.round((canvasW - w) / 2),
-      y: Math.round((canvasH - w) / 2),
-      width: w,
-      height: w,
-      rotation: 0,
-      src,
-      fit: "contain",
-    } as unknown as AnyElement);
-    onOpenChange(false);
+    const place = (dataUrl: string) => {
+      const w = Math.min(480, Math.round(canvasW * 0.25));
+      add({
+        type: "image",
+        id: crypto.randomUUID(),
+        x: Math.round((canvasW - w) / 2),
+        y: Math.round((canvasH - w) / 2),
+        width: w,
+        height: w,
+        rotation: 0,
+        src: dataUrl,
+        fit: "contain",
+      } as unknown as AnyElement);
+      onOpenChange(false);
+    };
+
+    if (mode === "shape") {
+      placeOnPlate((ctx) => {
+        const inner = outSize * (1 - padPct / 100);
+        const scale = inner / 100;
+        const off = (outSize - inner) / 2;
+        ctx.save();
+        ctx.translate(off, off);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = fg;
+        ctx.fill(new Path2D(shape.path));
+        ctx.restore();
+      }, place);
+      return;
+    }
+
+    // Lucide: serialize the live preview SVG, rasterize it onto the plate.
+    const svgEl = previewRef.current?.querySelector("svg");
+    if (!svgEl) return;
+    const clone = svgEl.cloneNode(true) as SVGElement;
+    clone.setAttribute("stroke", fg);
+    clone.setAttribute("color", fg);
+    clone.setAttribute("width", "512");
+    clone.setAttribute("height", "512");
+    clone.removeAttribute("class");
+    const svgStr = new XMLSerializer().serializeToString(clone);
+    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr);
+    const img = new Image();
+    img.onload = () => {
+      placeOnPlate((ctx) => {
+        const inner = outSize * (1 - padPct / 100);
+        const off = (outSize - inner) / 2;
+        ctx.drawImage(img, off, off, inner, inner);
+      }, place);
+    };
+    img.src = url;
   };
+
+  const previewRef = useRef<HTMLDivElement>(null);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,37 +191,102 @@ export function IconAppDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-3 p-4">
-          {/* live preview */}
+          {/* live preview (also the SVG source for the Lucide rasterizer) */}
           <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)_50%/16px_16px] p-4">
-            <svg viewBox="0 0 100 100" className="size-32">
-              {bg !== "transparent" && (
-                <rect x="0" y="0" width="100" height="100" fill={bg} />
+            <div
+              ref={previewRef}
+              className="grid place-items-center"
+              style={{
+                width: 128,
+                height: 128,
+                background: bg === "transparent" ? undefined : bg,
+                borderRadius: bg === "transparent" ? 0 : 16,
+              }}
+            >
+              {mode === "lucide" ? (
+                <LucideIcon size={128 * (1 - padPct / 100)} strokeWidth={strokeW} style={{ color: fg }} />
+              ) : (
+                <svg viewBox="0 0 100 100" width={128} height={128}>
+                  <g transform={`translate(${padPct / 2} ${padPct / 2}) scale(${(100 - padPct) / 100})`}>
+                    <path d={shape.path} fill={fg} />
+                  </g>
+                </svg>
               )}
-              <g transform={`translate(${padPct / 2} ${padPct / 2}) scale(${(100 - padPct) / 100})`}>
-                <path d={shape.path} fill={fg} />
-              </g>
-            </svg>
+            </div>
           </div>
 
-          {/* shape grid */}
-          <div className="grid grid-cols-6 gap-1.5 rounded-xl border border-slate-200 p-2.5">
-            {SHAPES.map((s) => (
+          {/* mode tabs */}
+          <div className="flex items-center gap-1.5">
+            {(["lucide", "shape"] as const).map((m) => (
               <button
-                key={s.id}
-                title={s.label}
-                onClick={() => setShapeId(s.id)}
-                className={`grid aspect-square place-items-center rounded-lg border p-1.5 transition-all ${
-                  shapeId === s.id
-                    ? "border-indigo-600 bg-indigo-50"
-                    : "border-slate-200 bg-white hover:border-indigo-300"
+                key={m}
+                onClick={() => setMode(m)}
+                className={`rounded-lg border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-all ${
+                  mode === m
+                    ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
                 }`}
               >
-                <svg viewBox="0 0 100 100" className="size-full">
-                  <path d={s.path} fill={shapeId === s.id ? "#4f46e5" : "#94a3b8"} />
-                </svg>
+                {m === "lucide" ? `Lucide icons (${LUCIDE_LIST.length})` : "Shapes"}
               </button>
             ))}
           </div>
+
+          {mode === "lucide" ? (
+            <>
+              {/* search */}
+              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5">
+                <Search className="size-3.5 shrink-0 text-slate-400" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={`Search ${LUCIDE_LIST.length} icons… (rocket, check, star, play…)`}
+                  className="w-full bg-transparent text-[11px] font-medium text-slate-700 outline-none placeholder:text-slate-300"
+                />
+                <span className="shrink-0 text-[9px] font-semibold text-slate-400 tabular-nums">
+                  {matches.length}+
+                </span>
+              </label>
+
+              {/* icon grid */}
+              <div className="grid max-h-40 grid-cols-8 gap-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
+                {matches.map(({ name, Comp }) => (
+                  <button
+                    key={name}
+                    title={name}
+                    onClick={() => setIconName(name)}
+                    className={`grid aspect-square place-items-center rounded-lg border transition-all ${
+                      iconName === name
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                        : "border-transparent text-slate-400 hover:border-slate-200 hover:text-slate-600"
+                    }`}
+                  >
+                    <Comp size={16} strokeWidth={strokeW} />
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            /* shape grid */
+            <div className="grid grid-cols-6 gap-1.5 rounded-xl border border-slate-200 p-2.5">
+              {SHAPES.map((s) => (
+                <button
+                  key={s.id}
+                  title={s.label}
+                  onClick={() => setShapeId(s.id)}
+                  className={`grid aspect-square place-items-center rounded-lg border p-1.5 transition-all ${
+                    shapeId === s.id
+                      ? "border-indigo-600 bg-indigo-50"
+                      : "border-slate-200 bg-white hover:border-indigo-300"
+                  }`}
+                >
+                  <svg viewBox="0 0 100 100" className="size-full">
+                    <path d={s.path} fill={shapeId === s.id ? "#4f46e5" : "#94a3b8"} />
+                  </svg>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* colors */}
           <div className="flex flex-wrap items-center gap-3">
@@ -225,8 +349,23 @@ export function IconAppDialog({
             </span>
           </div>
 
-          {/* padding + export size */}
+          {/* stroke + padding + export size */}
           <div className="flex flex-wrap items-center gap-3">
+            {mode === "lucide" && (
+              <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
+                Stroke
+                <input
+                  type="range"
+                  min={1}
+                  max={4}
+                  step={0.25}
+                  value={strokeW}
+                  onChange={(e) => setStrokeW(Number(e.target.value))}
+                  className="h-1 w-16 cursor-pointer accent-indigo-600"
+                />
+                <span className="w-6 tabular-nums">{strokeW}</span>
+              </label>
+            )}
             <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
               Padding
               <input
@@ -235,7 +374,7 @@ export function IconAppDialog({
                 max={40}
                 value={padPct}
                 onChange={(e) => setPadPct(Number(e.target.value))}
-                className="h-1 w-24 cursor-pointer accent-indigo-600"
+                className="h-1 w-20 cursor-pointer accent-indigo-600"
               />
               <span className="w-7 tabular-nums">{padPct}%</span>
             </label>
@@ -264,7 +403,10 @@ export function IconAppDialog({
             </button>
           </div>
           <p className="text-[9px] leading-relaxed text-slate-400">
-            The icon is exported as a crisp {outSize}×{outSize} PNG — the shape stays sharp at any size on the slide.
+            {mode === "lucide"
+              ? `Selected: ${iconName}. The `
+              : "The "}
+            icon is exported as a crisp {outSize}×{outSize} PNG — it stays sharp at any size on the slide.
           </p>
         </div>
       </DialogContent>
