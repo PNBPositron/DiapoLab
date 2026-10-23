@@ -233,7 +233,7 @@ export async function importPPTXFile(file: File): Promise<void> {
         const kind = parseShapeKind(node);
         if (kind && box) {
           const fillEl = firstChildByLocal(node, "spPr");
-          const solid = fillEl ? Array.from(fillEl.getElementsByTagName("*")).find((e) => e.localName === "solidFill") : null;
+          const solid = fillEl ? Array.from(fillEl.getElementsByTagName("*")).find((e) => e.localName === "solidFill") ?? null : null;
           elements.push(
             newShape(kind, {
               ...box,

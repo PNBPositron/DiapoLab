@@ -15,7 +15,7 @@ export function Canvas() {
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
 
   useEffect(() => {
-    void ensureFontsForPages(pages);
+    void ensureFontsForPages(pages.map((page) => ({ elements: page.elements.filter((element): element is Extract<typeof element, { fontFamily?: string }> => "fontFamily" in element) })));
   }, [pages]);
 
   useEffect(() => {

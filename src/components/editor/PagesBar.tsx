@@ -1,7 +1,7 @@
 import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/editor";
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Ban,
   Blend,
@@ -78,18 +78,6 @@ export function PagesBar() {
     elements,
     update,
   } = useEditor();
-
-  // ⌘K / Ctrl+K — toggle command palette
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setPaletteOpen((v) => !v);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   const currentTransition: SlideTransition = pages[currentIndex]?.transition ?? "none";
   const currentZoom = pages[currentIndex]?.transitionZoom ?? 0.5;

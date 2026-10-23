@@ -626,7 +626,7 @@ export function CanvasElement({
             height: "100%",
             objectFit: element.fit ?? "cover",
             display: "block",
-            borderRadius: element.cornerRadius ?? 0,
+            borderRadius: 0,
           }}
         />
       )}
