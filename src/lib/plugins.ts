@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AnyElement } from "@/store/editor";
+// (widget-pack element groups below are plain AnyElement literals —
+// ids are placeholders, replaced on insert by instantiateWidget)
 
 /* ------------------------------------------------------------------ */
 /* Plugin model                                                        */
@@ -288,8 +290,131 @@ export const WIDGET_PACK_APPS: PluginApp[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Preinstalled widget packs — ready-to-drop element groups            */
+/* (texts, shapes…) in five styles: glitch, terminal, digital, glass,  */
+/* modern. Each widget lands as one grouped block on the canvas.       */
+/* ------------------------------------------------------------------ */
+
+/** Drop-in widget groups for the "Widget packs" preinstalled plugin. */
+export const WIDGET_PACK_ELEMENTS: PluginWidget[] = [
+  // ---- GLITCH ----------------------------------------------------------
+  {
+    name: "Glitch · Title",
+    description: "RGB-split heading with scan slices",
+    elements: [
+      { id: "w", type: "text", x: 120, y: 200, width: 1100, height: 150, rotation: 0, text: "SYSTEM FAILURE", fontSize: 104, color: "#00ffff", fontWeight: 900, fontFamily: "Archivo Black", align: "left", letterSpacing: 0.06, opacity: 0.9 },
+      { id: "w", type: "text", x: 112, y: 208, width: 1100, height: 150, rotation: 0, text: "SYSTEM FAILURE", fontSize: 104, color: "#ff0080", fontWeight: 900, fontFamily: "Archivo Black", align: "left", letterSpacing: 0.06, opacity: 0.9 },
+      { id: "w", type: "text", x: 116, y: 204, width: 1100, height: 150, rotation: 0, text: "SYSTEM FAILURE", fontSize: 104, color: "#ffffff", fontWeight: 900, fontFamily: "Archivo Black", align: "left", letterSpacing: 0.06 },
+      { id: "w", type: "shape", x: 118, y: 248, width: 420, height: 10, rotation: 0, shape: "rect", fill: "#7df9ff", stroke: "transparent", strokeWidth: 0, opacity: 0.9 },
+      { id: "w", type: "shape", x: 240, y: 306, width: 300, height: 6, rotation: 0, shape: "rect", fill: "#ff0080", stroke: "transparent", strokeWidth: 0, opacity: 0.8 },
+    ],
+  },
+  {
+    name: "Glitch · Badge",
+    description: "Dark plate + glitched monospace label",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 140, width: 460, height: 140, rotation: 0, shape: "rect", fill: "#0a0f1f", stroke: "#ff0080", strokeWidth: 3, effect: "glitch" },
+      { id: "w", type: "text", x: 176, y: 176, width: 400, height: 70, rotation: 0, text: "ERROR_404", fontSize: 44, color: "#7df9ff", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left", letterSpacing: 0.08 },
+      { id: "w", type: "text", x: 180, y: 180, width: 400, height: 70, rotation: 0, text: "ERROR_404", fontSize: 44, color: "#ff0080", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left", letterSpacing: 0.08, opacity: 0.7 },
+    ],
+  },
+  // ---- TERMINAL --------------------------------------------------------
+  {
+    name: "Terminal · Window",
+    description: "macOS-style terminal with prompt lines",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 140, width: 720, height: 420, rotation: 0, shape: "rect", fill: "#0a0f1f", stroke: "#1e293b", strokeWidth: 3, cornerRadius: 18 },
+      { id: "w", type: "shape", x: 140, y: 140, width: 720, height: 56, rotation: 0, shape: "rect", fill: "#1e293b", stroke: "transparent", strokeWidth: 0 },
+      { id: "w", type: "shape", x: 164, y: 162, width: 16, height: 16, rotation: 0, shape: "circle", fill: "#ff5f57", stroke: "transparent", strokeWidth: 0 },
+      { id: "w", type: "shape", x: 190, y: 162, width: 16, height: 16, rotation: 0, shape: "circle", fill: "#febc2e", stroke: "transparent", strokeWidth: 0 },
+      { id: "w", type: "shape", x: 216, y: 162, width: 16, height: 16, rotation: 0, shape: "circle", fill: "#28c840", stroke: "transparent", strokeWidth: 0 },
+      { id: "w", type: "text", x: 260, y: 156, width: 400, height: 30, rotation: 0, text: "bash — 80×24", fontSize: 18, color: "#94a3b8", fontWeight: 500, fontFamily: "'JetBrains Mono', monospace", align: "left" },
+      { id: "w", type: "text", x: 168, y: 220, width: 660, height: 36, rotation: 0, text: "$ npm run dev", fontSize: 22, color: "#4ade80", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left" },
+      { id: "w", type: "text", x: 168, y: 258, width: 660, height: 36, rotation: 0, text: "✓ ready in 412ms", fontSize: 22, color: "#e2e8f0", fontWeight: 400, fontFamily: "'JetBrains Mono', monospace", align: "left" },
+      { id: "w", type: "text", x: 168, y: 296, width: 660, height: 36, rotation: 0, text: "$ _", fontSize: 22, color: "#4ade80", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left" },
+    ],
+  },
+  {
+    name: "Terminal · Prompt",
+    description: "Inline command line with cursor",
+    elements: [
+      { id: "w", type: "text", x: 140, y: 150, width: 700, height: 60, rotation: 0, text: "> type your command_", fontSize: 40, color: "#4ade80", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left", letterSpacing: 0.04 },
+      { id: "w", type: "shape", x: 140, y: 216, width: 620, height: 4, rotation: 0, shape: "rect", fill: "#1e293b", stroke: "transparent", strokeWidth: 0 },
+    ],
+  },
+  // ---- DIGITAL ---------------------------------------------------------
+  {
+    name: "Digital · Stat card",
+    description: "Neon stat panel, Orbitron numerals",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 140, width: 560, height: 340, rotation: 0, shape: "rect", fill: "#0a0f1f", stroke: "#7df9ff", strokeWidth: 2, effect: "neon" },
+      { id: "w", type: "text", x: 180, y: 190, width: 480, height: 130, rotation: 0, text: "98.6%", fontSize: 110, color: "#7df9ff", fontWeight: 900, fontFamily: "'Orbitron', sans-serif", align: "left", letterSpacing: 0.04 },
+      { id: "w", type: "shape", x: 182, y: 340, width: 300, height: 5, rotation: 0, shape: "rect", fill: "#7df9ff", stroke: "transparent", strokeWidth: 0, opacity: 0.7 },
+      { id: "w", type: "text", x: 180, y: 370, width: 480, height: 60, rotation: 0, text: "UPTIME — ALL SYSTEMS", fontSize: 26, color: "#7df9ff", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left", letterSpacing: 0.24 },
+    ],
+  },
+  {
+    name: "Digital · Badge",
+    description: "Neon hexagon chip with status",
+    elements: [
+      { id: "w", type: "shape", x: 160, y: 140, width: 220, height: 220, rotation: 0, shape: "hexagon", fill: "#052e2b", stroke: "#7df9ff", strokeWidth: 4, effect: "neon" },
+      { id: "w", type: "text", x: 140, y: 380, width: 260, height: 40, rotation: 0, text: "SYS ONLINE", fontSize: 24, color: "#7df9ff", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "center", letterSpacing: 0.18 },
+    ],
+  },
+  // ---- GLASS -----------------------------------------------------------
+  {
+    name: "Glass · Card",
+    description: "Frosted translucent card + copy",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 140, width: 640, height: 380, rotation: 0, shape: "rect", fill: "rgba(255,255,255,0.18)", stroke: "rgba(255,255,255,0.6)", strokeWidth: 2, cornerRadius: 32, effect: "liquid_glass" },
+      { id: "w", type: "text", x: 184, y: 190, width: 560, height: 70, rotation: 0, text: "Frosted headline", fontSize: 46, color: "#ffffff", fontWeight: 800, fontFamily: "Inter", align: "left" },
+      { id: "w", type: "text", x: 184, y: 270, width: 560, height: 130, rotation: 0, text: "A translucent glass panel that floats over any background — the blur is applied by the liquid-glass effect.", fontSize: 22, color: "rgba(255,255,255,0.85)", fontWeight: 400, fontFamily: "Inter", align: "left", lineHeight: 1.5 },
+    ],
+  },
+  {
+    name: "Glass · Pill badge",
+    description: "Capsule chip with centered label",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 150, width: 360, height: 110, rotation: 0, shape: "capsule", fill: "rgba(255,255,255,0.22)", stroke: "rgba(255,255,255,0.65)", strokeWidth: 2, effect: "liquid_glass" },
+      { id: "w", type: "text", x: 140, y: 175, width: 360, height: 60, rotation: 0, text: "DROPLETS", fontSize: 32, color: "#ffffff", fontWeight: 800, fontFamily: "Inter", align: "center", letterSpacing: 0.12 },
+    ],
+  },
+  // ---- MODERN ----------------------------------------------------------
+  {
+    name: "Modern · Section header",
+    description: "Accent bar + title + subtitle",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 160, width: 160, height: 16, rotation: 0, shape: "rect", fill: "#2563eb", stroke: "transparent", strokeWidth: 0, cornerRadius: 8 },
+      { id: "w", type: "text", x: 140, y: 196, width: 900, height: 120, rotation: 0, text: "Section title", fontSize: 72, color: "#0f172a", fontWeight: 900, fontFamily: "Archivo Black", align: "left" },
+      { id: "w", type: "text", x: 144, y: 322, width: 760, height: 50, rotation: 0, text: "A short supporting sentence goes here.", fontSize: 26, color: "#64748b", fontWeight: 500, fontFamily: "Inter", align: "left" },
+    ],
+  },
+  {
+    name: "Modern · Stat",
+    description: "White stat tile, big number + trend",
+    elements: [
+      { id: "w", type: "shape", x: 140, y: 140, width: 460, height: 300, rotation: 0, shape: "rect", fill: "#ffffff", stroke: "#e2e8f0", strokeWidth: 2, cornerRadius: 28, shadow: { x: 0, y: 18, blur: 40, color: "rgba(15,23,42,0.14)" } },
+      { id: "w", type: "text", x: 184, y: 184, width: 380, height: 120, rotation: 0, text: "12.4k", fontSize: 88, color: "#0f172a", fontWeight: 900, fontFamily: "Archivo Black", align: "left" },
+      { id: "w", type: "text", x: 188, y: 320, width: 380, height: 50, rotation: 0, text: "+18% this month", fontSize: 24, color: "#059669", fontWeight: 700, fontFamily: "Inter", align: "left" },
+      { id: "w", type: "text", x: 188, y: 368, width: 380, height: 40, rotation: 0, text: "ACTIVE USERS", fontSize: 18, color: "#94a3b8", fontWeight: 700, fontFamily: "Inter", align: "left", letterSpacing: 0.14 },
+    ],
+  },
+];
+
 /** Plugins that ship with the editor. Never stored, never removable. */
 export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
+  {
+    id: "builtin-widget-packs",
+    name: "Widget packs",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Preinstalled packs — glitch, terminal, digital, glass & modern text/shape groups.",
+    enabled: true,
+    widgets: WIDGET_PACK_ELEMENTS,
+    apps: [],
+    importedAt: 0,
+  },
   {
     id: "builtin-paint",
     name: "Paint",
