@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
 import {
@@ -297,6 +297,16 @@ export function IconAppDialog({
     setBg(s.bg);
     setPadPct(s.padPct);
   };
+
+  // Preselect the widget pack requested by the panel / palette
+  // (e.g. the "Glitch" pack button in the Plugins panel).
+  useEffect(() => {
+    if (!open) return;
+    const pack = (app.config as { pack?: string } | undefined)?.pack;
+    const found = pack ? WIDGET_PACKS.find((wp) => wp.id === pack) : null;
+    if (found) applyPack(found);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   /** Pack-specific font stack. */
   const packFont = () =>
