@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
 import {
