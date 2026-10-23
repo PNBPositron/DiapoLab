@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, LayoutGrid, Type, Shapes, Camera, Image, Layers, Palette, WandSparkles, Check, MonitorPlay } from "lucide-react";
+import { Loader2, LayoutGrid, Type, Shapes, Camera, Image, Layers, Palette, Puzzle, Check, MonitorPlay } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useEditor, CANVAS_PRESETS, type Page } from "@/store/editor";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
@@ -18,7 +18,7 @@ const PANEL_OPTIONS = [
   { id: "illustrations", label: "Illustrations", icon: Image, hint: "Vector art" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },
-  { id: "ai", label: "AI", icon: WandSparkles, hint: "Generate with JSON" }
+  { id: "plugins", label: "Plugins", icon: Puzzle, hint: "Import widget packs" }
 ] as const;
 
 export function WelcomeDialog() {
