@@ -178,6 +178,12 @@ export type ImageFilters = {
   sepia: number; // %
   hueRotate: number; // deg
   invert: number; // %
+  /** color grading — warm (+) / cool (−) shift, -100..100 */
+  temperature?: number;
+  /** color grading — tint washed over the image */
+  tintColor?: string;
+  /** tint strength, 0..100 */
+  tintOpacity?: number;
 };
 
 export const DEFAULT_FILTERS: ImageFilters = {
@@ -189,6 +195,7 @@ export const DEFAULT_FILTERS: ImageFilters = {
   sepia: 0,
   hueRotate: 0,
   invert: 0,
+  temperature: 0,
 };
 
 export type ImageElement = ElementBase & {
