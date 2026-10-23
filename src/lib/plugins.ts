@@ -205,6 +205,44 @@ export const SAMPLE_PLUGIN_CODE = `diapolabPlugin({
 });`;
 
 /* ------------------------------------------------------------------ */
+/* Preinstalled plugins                                                */
+/* ------------------------------------------------------------------ */
+
+/** The built-in Paint app — shipped with the editor, always available. */
+export const PAINT_APP: PluginApp = {
+  id: "paint",
+  name: "Paint",
+  description: "Drawing studio — brush, shapes, arrows & more",
+  type: "paint",
+  config: {
+    colors: ["#0a0f1f", "#2563eb", "#ff0080", "#ffd84a", "#059669", "#7c3aed", "#f97316", "#7df9ff"],
+    defaultColor: "#2563eb",
+    brushSizes: [4, 8, 16, 28, 48],
+    bg: "#ffffff",
+  },
+};
+
+/** Plugins that ship with the editor. Never stored, never removable. */
+export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
+  {
+    id: "builtin-paint",
+    name: "Paint",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Built-in paint studio — draw on a pad, insert on the slide.",
+    enabled: true,
+    widgets: [],
+    apps: [PAINT_APP],
+    importedAt: 0,
+  },
+];
+
+/** All usable plugins: preinstalled first, then user-imported ones. */
+export function allPlugins(userPlugins: EditorPlugin[]): EditorPlugin[] {
+  return [...PREINSTALLED_PLUGINS, ...userPlugins];
+}
+
+/* ------------------------------------------------------------------ */
 /* Store (persisted in localStorage)                                    */
 /* ------------------------------------------------------------------ */
 
