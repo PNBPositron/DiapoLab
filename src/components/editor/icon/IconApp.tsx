@@ -8,13 +8,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import * as Lucide from "lucide-react";
-import { Shapes, Check, Search, Sparkles } from "lucide-react";
+import { Shapes, Check, Search, Sparkles, Square, Type as TypeIcon, Eye, EyeOff } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* Icon app — the built-in icon maker.                                  */
-/* Two sources: built-in shapes, or ANY Lucide icon (searchable).      */
-/* Tune the icon/plate colors, stroke weight, padding, export size —   */
-/* then insert it on the slide as a crisp PNG.                          */
+/* A COMPOSER: combine a background SHAPE, a LUCIDE ICON and a TEXT     */
+/* label into one icon. Every layer can be toggled, colored and sized.  */
+/* The composition is rendered as a single SVG and rasterized to a      */
+/* crisp PNG for the slide.                                             */
 /* ------------------------------------------------------------------ */
 
 type ShapeDef = { id: string; label: string; path: string };
@@ -50,21 +51,33 @@ const NON_ICONS = new Set([
   "icons",
 ]);
 
+type LucideComp = React.ComponentType<{
+  size?: number | string;
+  strokeWidth?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+}>;
+
 /** Every Lucide icon component, name-sorted (PascalCase names only). */
-const LUCIDE_LIST: Array<{ name: string; Comp: React.ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string; style?: React.CSSProperties }> }> = Object.entries(Lucide)
+const LUCIDE_LIST: Array<{ name: string; Comp: LucideComp }> = Object.entries(Lucide)
   .filter(
     ([name, val]) =>
       typeof val === "function" &&
       /^[A-Z]/.test(name) &&
       !NON_ICONS.has(name),
   )
-  .map(([name, Comp]) => ({ name, Comp: Comp as never }))
+  .map(([name, Comp]) => ({ name, Comp: Comp as LucideComp }))
   .sort((a, b) => a.name.localeCompare(b.name));
 
-const FG_DEFAULT = "#2563eb";
+const SHAPE_COLOR_DEFAULT = "#2563eb";
+const ICON_COLOR_DEFAULT = "#ffffff";
+const TEXT_COLOR_DEFAULT = "#ffffff";
 const BG_SWATCHES = ["transparent", "#f8fafc", "#0a0f1f", "#2563eb", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
-const FG_SWATCHES = ["#ffffff", "#0a0f1f", "#2563eb", "#7df9ff", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
+const COLOR_SWATCHES = ["#ffffff", "#0a0f1f", "#2563eb", "#7df9ff", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
 const EXPORT_SIZES = [128, 256, 512, 1024];
+
+const escapeXml = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 export function IconAppDialog({
   app,
@@ -79,14 +92,26 @@ export function IconAppDialog({
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
 
-  const [mode, setMode] = useState<"lucide" | "shape">("lucide");
+  // ---- layers ----
+  const [shapeOn, setShapeOn] = useState(true);
+  const [iconOn, setIconOn] = useState(true);
+  const [textOn, setTextOn] = useState(true);
+
+  const [shapeId, setShapeId] = useState("rounded");
+  const [shapeColor, setShapeColor] = useState(SHAPE_COLOR_DEFAULT);
+
   const [query, setQuery] = useState("");
   const [iconName, setIconName] = useState("Sparkles");
-  const [shapeId, setShapeId] = useState("rounded");
-  const [fg, setFg] = useState(FG_DEFAULT);
-  const [bg, setBg] = useState<string | "transparent">("transparent");
+  const [iconColor, setIconColor] = useState(ICON_COLOR_DEFAULT);
   const [strokeW, setStrokeW] = useState(2);
-  const [padPct, setPadPct] = useState(10);
+  const [iconSizePct, setIconSizePct] = useState(55);
+
+  const [text, setText] = useState("LABEL");
+  const [textColor, setTextColor] = useState(TEXT_COLOR_DEFAULT);
+  const [textSizePct, setTextSizePct] = useState(24);
+
+  const [bg, setBg] = useState<string | "transparent">("transparent");
+  const [padPct, setPadPct] = useState(8);
   const [outSize, setOutSize] = useState(512);
 
   const shape = SHAPES.find((s) => s.id === shapeId) ?? SHAPES[0];
@@ -96,29 +121,73 @@ export function IconAppDialog({
   );
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const list = q
-      ? LUCIDE_LIST.filter((i) => i.name.toLowerCase().includes(q))
-      : LUCIDE_LIST;
+    const list = q ? LUCIDE_LIST.filter((i) => i.name.toLowerCase().includes(q)) : LUCIDE_LIST;
     return list.slice(0, 96);
   }, [query]);
 
-  /** Paint the plate + the prepared image on a square canvas → PNG. */
-  const placeOnPlate = (draw: (ctx: CanvasRenderingContext2D) => void, done: (url: string) => void) => {
-    const c = document.createElement("canvas");
-    c.width = outSize;
-    c.height = outSize;
-    const ctx = c.getContext("2d");
-    if (!ctx) return;
-    if (bg !== "transparent") {
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, outSize, outSize);
+  // hidden live render of the lucide icon — serialized into the composed SVG
+  const iconSvgRef = useRef<HTMLDivElement>(null);
+
+  /** Serialized lucide <svg>, repositioned inside the 100×100 composition. */
+  const iconSvgFor = (w: number, x: number, y: number): string | null => {
+    const svgEl = iconSvgRef.current?.querySelector("svg");
+    if (!svgEl) return null;
+    const clone = svgEl.cloneNode(true) as SVGElement;
+    clone.setAttribute("x", x.toFixed(2));
+    clone.setAttribute("y", y.toFixed(2));
+    clone.setAttribute("width", w.toFixed(2));
+    clone.setAttribute("height", w.toFixed(2));
+    clone.setAttribute("viewBox", "0 0 24 24");
+    clone.setAttribute("fill", "none");
+    clone.setAttribute("stroke", iconColor);
+    clone.setAttribute("color", iconColor);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.removeAttribute("class");
+    clone.removeAttribute("style");
+    return clone.outerHTML;
+  };
+
+  /** Inner SVG markup of the whole composition (100×100 viewBox). */
+  const composeInner = (): string => {
+    const parts: string[] = [];
+    if (bg !== "transparent")
+      parts.push(`<rect x="0" y="0" width="100" height="100" rx="22" fill="${bg}"/>`);
+    if (shapeOn)
+      parts.push(`<path d="${shape.path}" fill="${shapeColor}" transform="translate(3,3) scale(0.94)"/>`);
+    const hasText = textOn && text.trim().length > 0;
+    const pad = padPct;
+    const content = 100 - pad * 2;
+    if (iconOn) {
+      const ih = (iconSizePct / 100) * content;
+      const ix = 50 - ih / 2;
+      const iy = hasText ? pad : pad + (content - ih) / 2;
+      const markup = iconSvgFor(ih, ix, iy);
+      if (markup) parts.push(markup);
     }
-    draw(ctx);
-    done(c.toDataURL("image/png"));
+    if (hasText) {
+      const fs = (textSizePct / 100) * content;
+      const baseline = 100 - pad - fs * 0.16;
+      parts.push(
+        `<text x="50" y="${baseline.toFixed(1)}" text-anchor="middle" font-family="Archivo Black, Inter, system-ui, sans-serif" font-weight="900" font-size="${fs.toFixed(1)}" fill="${textColor}">${escapeXml(text.trim())}</text>`,
+      );
+    }
+    return parts.join("");
   };
 
   const insert = () => {
-    const place = (dataUrl: string) => {
+    const inner = composeInner();
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${outSize}" height="${outSize}">${inner}</svg>`;
+    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = outSize;
+      c.height = outSize;
+      const ctx = c.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, outSize, outSize);
+      const dataUrl = c.toDataURL("image/png");
       const w = Math.min(480, Math.round(canvasW * 0.25));
       add({
         type: "image",
@@ -133,45 +202,79 @@ export function IconAppDialog({
       } as unknown as AnyElement);
       onOpenChange(false);
     };
-
-    if (mode === "shape") {
-      placeOnPlate((ctx) => {
-        const inner = outSize * (1 - padPct / 100);
-        const scale = inner / 100;
-        const off = (outSize - inner) / 2;
-        ctx.save();
-        ctx.translate(off, off);
-        ctx.scale(scale, scale);
-        ctx.fillStyle = fg;
-        ctx.fill(new Path2D(shape.path));
-        ctx.restore();
-      }, place);
-      return;
-    }
-
-    // Lucide: serialize the live preview SVG, rasterize it onto the plate.
-    const svgEl = previewRef.current?.querySelector("svg");
-    if (!svgEl) return;
-    const clone = svgEl.cloneNode(true) as SVGElement;
-    clone.setAttribute("stroke", fg);
-    clone.setAttribute("color", fg);
-    clone.setAttribute("width", "512");
-    clone.setAttribute("height", "512");
-    clone.removeAttribute("class");
-    const svgStr = new XMLSerializer().serializeToString(clone);
-    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr);
-    const img = new Image();
-    img.onload = () => {
-      placeOnPlate((ctx) => {
-        const inner = outSize * (1 - padPct / 100);
-        const off = (outSize - inner) / 2;
-        ctx.drawImage(img, off, off, inner, inner);
-      }, place);
-    };
     img.src = url;
   };
 
-  const previewRef = useRef<HTMLDivElement>(null);
+  const LayerToggle = ({
+    on,
+    set,
+    label,
+    Icon,
+  }: {
+    on: boolean;
+    set: (v: boolean) => void;
+    label: string;
+    Icon: typeof Square;
+  }) => (
+    <button
+      onClick={() => set(!on)}
+      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-all ${
+        on
+          ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+          : "border-slate-200 bg-white text-slate-400 hover:border-indigo-300"
+      }`}
+    >
+      {on ? <Eye className="size-3" /> : <EyeOff className="size-3" />}
+      <Icon className="size-3" />
+      {label}
+    </button>
+  );
+
+  const Swatches = ({
+    value,
+    onChange,
+    includeTransparent,
+  }: {
+    value: string;
+    onChange: (c: string) => void;
+    includeTransparent?: boolean;
+  }) => (
+    <span className="flex items-center gap-1">
+      {includeTransparent && (
+        <button
+          title="No background"
+          onClick={() => onChange("transparent")}
+          className={`size-5 rounded-full border-2 transition-transform hover:scale-110 ${
+            value === "transparent" ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
+          }`}
+          style={{ background: "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px" }}
+        />
+      )}
+      {COLOR_SWATCHES.map((c) => (
+        <button
+          key={c}
+          title={c}
+          onClick={() => onChange(c)}
+          className={`size-5 rounded-full border-2 transition-transform hover:scale-110 ${
+            value === c ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
+          }`}
+          style={{ background: c }}
+        />
+      ))}
+      <label
+        title="Custom color"
+        className="relative grid size-5 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
+        style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
+      >
+        <input
+          type="color"
+          value={value === "transparent" ? "#ffffff" : value}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </label>
+    </span>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -191,65 +294,79 @@ export function IconAppDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-3 p-4">
-          {/* live preview (also the SVG source for the Lucide rasterizer) */}
+          {/* hidden lucide source used by the serializer */}
+          <div ref={iconSvgRef} style={{ display: "none" }} aria-hidden="true">
+            <LucideIcon size={512} strokeWidth={strokeW} />
+          </div>
+
+          {/* live composed preview */}
           <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)_50%/16px_16px] p-4">
-            <div
-              ref={previewRef}
-              className="grid place-items-center"
-              style={{
-                width: 128,
-                height: 128,
-                background: bg === "transparent" ? undefined : bg,
-                borderRadius: bg === "transparent" ? 0 : 16,
-              }}
-            >
-              {mode === "lucide" ? (
-                <LucideIcon size={128 * (1 - padPct / 100)} strokeWidth={strokeW} style={{ color: fg }} />
-              ) : (
-                <svg viewBox="0 0 100 100" width={128} height={128}>
-                  <g transform={`translate(${padPct / 2} ${padPct / 2}) scale(${(100 - padPct) / 100})`}>
-                    <path d={shape.path} fill={fg} />
-                  </g>
-                </svg>
-              )}
+            <svg
+              viewBox="0 0 100 100"
+              width={160}
+              height={160}
+              style={{ display: "block" }}
+              dangerouslySetInnerHTML={{ __html: composeInner() }}
+            />
+          </div>
+
+          {/* layer toggles */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Layers</span>
+            <LayerToggle on={shapeOn} set={setShapeOn} label="Shape" Icon={Square} />
+            <LayerToggle on={iconOn} set={setIconOn} label="Lucide icon" Icon={Sparkles} />
+            <LayerToggle on={textOn} set={setTextOn} label="Text" Icon={TypeIcon} />
+          </div>
+
+          {/* SHAPE layer */}
+          {shapeOn && (
+            <div className="flex flex-col gap-2 rounded-xl border border-slate-200 p-2.5">
+              <span className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  Shape · <span className="text-slate-500">{shape.label}</span>
+                </span>
+                <Swatches value={shapeColor} onChange={setShapeColor} />
+              </span>
+              <div className="grid grid-cols-9 gap-1">
+                {SHAPES.map((s) => (
+                  <button
+                    key={s.id}
+                    title={s.label}
+                    onClick={() => setShapeId(s.id)}
+                    className={`grid aspect-square place-items-center rounded-lg border p-1 transition-all ${
+                      shapeId === s.id
+                        ? "border-indigo-600 bg-indigo-50"
+                        : "border-slate-200 bg-white hover:border-indigo-300"
+                    }`}
+                  >
+                    <svg viewBox="0 0 100 100" className="size-full">
+                      <path d={s.path} fill={shapeId === s.id ? "#4f46e5" : "#94a3b8"} />
+                    </svg>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* mode tabs */}
-          <div className="flex items-center gap-1.5">
-            {(["lucide", "shape"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`rounded-lg border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-all ${
-                  mode === m
-                    ? "border-indigo-600 bg-indigo-50 text-indigo-600"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
-                }`}
-              >
-                {m === "lucide" ? `Lucide icons (${LUCIDE_LIST.length})` : "Shapes"}
-              </button>
-            ))}
-          </div>
-
-          {mode === "lucide" ? (
-            <>
-              {/* search */}
-              <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5">
+          {/* ICON layer */}
+          {iconOn && (
+            <div className="flex flex-col gap-2 rounded-xl border border-slate-200 p-2.5">
+              <span className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  Icon · <span className="text-slate-500">{iconName}</span>
+                </span>
+                <Swatches value={iconColor} onChange={setIconColor} />
+              </span>
+              <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5">
                 <Search className="size-3.5 shrink-0 text-slate-400" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={`Search ${LUCIDE_LIST.length} icons… (rocket, check, star, play…)`}
+                  placeholder={`Search ${LUCIDE_LIST.length} Lucide icons…`}
                   className="w-full bg-transparent text-[11px] font-medium text-slate-700 outline-none placeholder:text-slate-300"
                 />
-                <span className="shrink-0 text-[9px] font-semibold text-slate-400 tabular-nums">
-                  {matches.length}+
-                </span>
               </label>
-
-              {/* icon grid */}
-              <div className="grid max-h-40 grid-cols-8 gap-1 overflow-y-auto rounded-xl border border-slate-200 p-2">
+              <div className="grid max-h-32 grid-cols-8 gap-1 overflow-y-auto">
                 {matches.map(({ name, Comp }) => (
                   <button
                     key={name}
@@ -265,65 +382,77 @@ export function IconAppDialog({
                   </button>
                 ))}
               </div>
-            </>
-          ) : (
-            /* shape grid */
-            <div className="grid grid-cols-6 gap-1.5 rounded-xl border border-slate-200 p-2.5">
-              {SHAPES.map((s) => (
-                <button
-                  key={s.id}
-                  title={s.label}
-                  onClick={() => setShapeId(s.id)}
-                  className={`grid aspect-square place-items-center rounded-lg border p-1.5 transition-all ${
-                    shapeId === s.id
-                      ? "border-indigo-600 bg-indigo-50"
-                      : "border-slate-200 bg-white hover:border-indigo-300"
-                  }`}
-                >
-                  <svg viewBox="0 0 100 100" className="size-full">
-                    <path d={s.path} fill={shapeId === s.id ? "#4f46e5" : "#94a3b8"} />
-                  </svg>
-                </button>
-              ))}
+              <span className="flex flex-wrap items-center gap-3 text-[9px] font-semibold text-slate-400">
+                <label className="flex items-center gap-1">
+                  stroke
+                  <input
+                    type="range"
+                    min={1}
+                    max={4}
+                    step={0.25}
+                    value={strokeW}
+                    onChange={(e) => setStrokeW(Number(e.target.value))}
+                    className="h-1 w-14 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-5 tabular-nums">{strokeW}</span>
+                </label>
+                <label className="flex items-center gap-1">
+                  size
+                  <input
+                    type="range"
+                    min={20}
+                    max={95}
+                    value={iconSizePct}
+                    onChange={(e) => setIconSizePct(Number(e.target.value))}
+                    className="h-1 w-14 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{iconSizePct}%</span>
+                </label>
+              </span>
             </div>
           )}
 
-          {/* colors */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="flex items-center gap-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Icon</span>
-              {FG_SWATCHES.map((c) => (
-                <button
-                  key={c}
-                  title={c}
-                  onClick={() => setFg(c)}
-                  className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${
-                    fg === c ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
-                  }`}
-                  style={{ background: c }}
-                />
-              ))}
-              <label
-                title="Custom icon color"
-                className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
-                style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
-              >
+          {/* TEXT layer */}
+          {textOn && (
+            <div className="flex flex-col gap-2 rounded-xl border border-slate-200 p-2.5">
+              <span className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Text</span>
+                <Swatches value={textColor} onChange={setTextColor} />
+              </span>
+              <span className="flex flex-wrap items-center gap-3">
                 <input
-                  type="color"
-                  value={fg}
-                  onChange={(e) => setFg(e.target.value)}
-                  className="absolute inset-0 cursor-pointer opacity-0"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Label…"
+                  maxLength={24}
+                  className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 outline-none placeholder:text-slate-300"
                 />
-              </label>
-            </span>
-            <span className="flex items-center gap-1.5">
+                <label className="flex items-center gap-1 text-[9px] font-semibold text-slate-400">
+                  size
+                  <input
+                    type="range"
+                    min={10}
+                    max={50}
+                    value={textSizePct}
+                    onChange={(e) => setTextSizePct(Number(e.target.value))}
+                    className="h-1 w-16 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{textSizePct}%</span>
+                </label>
+              </span>
+            </div>
+          )}
+
+          {/* plate + padding + export */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1">
               <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Plate</span>
               {BG_SWATCHES.map((c) => (
                 <button
                   key={c}
-                  title={c === "transparent" ? "No background" : c}
+                  title={c === "transparent" ? "No plate" : c}
                   onClick={() => setBg(c)}
-                  className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${
+                  className={`size-5 rounded-full border-2 transition-transform hover:scale-110 ${
                     bg === c ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
                   }`}
                   style={{
@@ -334,57 +463,26 @@ export function IconAppDialog({
                   }}
                 />
               ))}
-              <label
-                title="Custom plate color"
-                className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
-                style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
-              >
-                <input
-                  type="color"
-                  value={bg === "transparent" ? "#ffffff" : bg}
-                  onChange={(e) => setBg(e.target.value)}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                />
-              </label>
             </span>
-          </div>
-
-          {/* stroke + padding + export size */}
-          <div className="flex flex-wrap items-center gap-3">
-            {mode === "lucide" && (
-              <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
-                Stroke
-                <input
-                  type="range"
-                  min={1}
-                  max={4}
-                  step={0.25}
-                  value={strokeW}
-                  onChange={(e) => setStrokeW(Number(e.target.value))}
-                  className="h-1 w-16 cursor-pointer accent-indigo-600"
-                />
-                <span className="w-6 tabular-nums">{strokeW}</span>
-              </label>
-            )}
-            <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
-              Padding
+            <label className="flex items-center gap-1 text-[9px] font-semibold text-slate-400">
+              padding
               <input
                 type="range"
                 min={0}
-                max={40}
+                max={30}
                 value={padPct}
                 onChange={(e) => setPadPct(Number(e.target.value))}
-                className="h-1 w-20 cursor-pointer accent-indigo-600"
+                className="h-1 w-16 cursor-pointer accent-indigo-600"
               />
               <span className="w-7 tabular-nums">{padPct}%</span>
             </label>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1">
               <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Export</span>
               {EXPORT_SIZES.map((s) => (
                 <button
                   key={s}
                   onClick={() => setOutSize(s)}
-                  className={`rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition-all ${
+                  className={`rounded-lg border px-2 py-1 text-[10px] font-semibold transition-all ${
                     outSize === s
                       ? "border-indigo-600 bg-indigo-50 text-indigo-600"
                       : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
@@ -403,10 +501,8 @@ export function IconAppDialog({
             </button>
           </div>
           <p className="text-[9px] leading-relaxed text-slate-400">
-            {mode === "lucide"
-              ? `Selected: ${iconName}. The `
-              : "The "}
-            icon is exported as a crisp {outSize}×{outSize} PNG — it stays sharp at any size on the slide.
+            Compose a shape, a Lucide icon and a text label — layers can be toggled, colored and sized
+            independently. Exported as a crisp {outSize}×{outSize} PNG.
           </p>
         </div>
       </DialogContent>
