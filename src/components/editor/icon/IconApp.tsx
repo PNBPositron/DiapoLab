@@ -367,7 +367,7 @@ export function IconAppDialog({
       const baseline = (100 - pad - fs * 0.16).toFixed(1);
       const fam = packFont();
       const ls = packId === "digital" ? ` letter-spacing="2"` : packId === "glitch" ? ` letter-spacing="1"` : "";
-      const body = escapeXml(packId === "terminal" ? "> ${text.trim()}" : text.trim());
+      const body = escapeXml(packId === "terminal" ? "> " + text.trim() : text.trim());
       const mkText = (fill: string, dx: number) =>
         `<text x="${(50 + dx).toFixed(1)}" y="${baseline}" text-anchor="middle" font-family="${fam}"${ls} font-weight="900" font-size="${fs.toFixed(1)}" fill="${fill}">${body}</text>`;
       if (packId === "glitch") {
