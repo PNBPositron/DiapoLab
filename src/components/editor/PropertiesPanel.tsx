@@ -500,7 +500,7 @@ export function PropertiesPanel() {
             <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Shape color">
               <div className="size-4 rounded-md border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
             </button>
-            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9" onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
+            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
           </div>
         )}
 
