@@ -226,6 +226,8 @@ export type VideoElement = ElementBase & {
   /** trim window in seconds — playback starts at "start" and loops/pauses at "end" */
   start?: number;
   end?: number;
+  /** playback rate — 1 = normal speed */
+  rate?: number;
 };
 
 export type IconElement = ElementBase & {
