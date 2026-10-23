@@ -8,12 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import * as Lucide from "lucide-react";
-import { Shapes, Check, Search, Sparkles, Square, Type as TypeIcon, Eye, EyeOff } from "lucide-react";
+import { Shapes, Check, Search, Sparkles, Square, Type as TypeIcon, Eye, EyeOff, Package, X } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* Icon app — the built-in icon maker.                                  */
 /* A COMPOSER: combine a background SHAPE, a LUCIDE ICON and a TEXT     */
 /* label into one icon. Every layer can be toggled, colored and sized.  */
+/* PREINSTALLED WIDGET PACKS (glitch, terminal, digital, glass, modern) */
+/* configure the whole composer in one click and add their own SVG     */
+/* decorations (RGB-split text, terminal chrome, scanlines, glass…).   */
 /* The composition is rendered as a single SVG and rasterized to a      */
 /* crisp PNG for the slide.                                             */
 /* ------------------------------------------------------------------ */
@@ -76,6 +79,150 @@ const BG_SWATCHES = ["transparent", "#f8fafc", "#0a0f1f", "#2563eb", "#ff0080", 
 const COLOR_SWATCHES = ["#ffffff", "#0a0f1f", "#2563eb", "#7df9ff", "#ff0080", "#ffd84a", "#059669", "#7c3aed"];
 const EXPORT_SIZES = [128, 256, 512, 1024];
 
+/* ------------------------------------------------------------------ */
+/* Preinstalled widget packs.                                           */
+/* Each pack is a full composer configuration + its own SVG deco set.  */
+/* ------------------------------------------------------------------ */
+
+type PackState = {
+  shapeOn: boolean;
+  shapeId: string;
+  shapeColor: string;
+  iconOn: boolean;
+  iconName: string;
+  iconColor: string;
+  strokeW: number;
+  iconSizePct: number;
+  textOn: boolean;
+  text: string;
+  textColor: string;
+  textSizePct: number;
+  bg: string | "transparent";
+  padPct: number;
+};
+
+type WidgetPack = {
+  id: string;
+  label: string;
+  hint: string;
+  /** small inline preview gradient for the pack button */
+  chip: string;
+  state: PackState;
+};
+
+const WIDGET_PACKS: WidgetPack[] = [
+  {
+    id: "glitch",
+    label: "Glitch",
+    hint: "RGB-split text + scan slices on dark",
+    chip: "linear-gradient(135deg,#ff0080,#7df9ff)",
+    state: {
+      shapeOn: false,
+      shapeId: "square",
+      shapeColor: "#2563eb",
+      iconOn: true,
+      iconName: "Zap",
+      iconColor: "#7df9ff",
+      strokeW: 2.5,
+      iconSizePct: 58,
+      textOn: true,
+      text: "ERROR_404",
+      textColor: "#ffffff",
+      textSizePct: 20,
+      bg: "#0a0f1f",
+      padPct: 10,
+    },
+  },
+  {
+    id: "terminal",
+    label: "Terminal",
+    hint: "macOS-style window chrome + monospace",
+    chip: "linear-gradient(135deg,#1e293b,#4ade80)",
+    state: {
+      shapeOn: false,
+      shapeId: "square",
+      shapeColor: "#2563eb",
+      iconOn: true,
+      iconName: "Terminal",
+      iconColor: "#4ade80",
+      strokeW: 2,
+      iconSizePct: 42,
+      textOn: true,
+      text: "run app --dev",
+      textColor: "#4ade80",
+      textSizePct: 15,
+      bg: "#0a0f1f",
+      padPct: 20,
+    },
+  },
+  {
+    id: "digital",
+    label: "Digital",
+    hint: "Neon hexagon + scanlines overlay",
+    chip: "linear-gradient(135deg,#052e2b,#7df9ff)",
+    state: {
+      shapeOn: true,
+      shapeId: "hexagon",
+      shapeColor: "#052e2b",
+      iconOn: true,
+      iconName: "Cpu",
+      iconColor: "#7df9ff",
+      strokeW: 1.5,
+      iconSizePct: 50,
+      textOn: true,
+      text: "SYS ONLINE",
+      textColor: "#7df9ff",
+      textSizePct: 14,
+      bg: "#0a0f1f",
+      padPct: 10,
+    },
+  },
+  {
+    id: "glass",
+    label: "Glass",
+    hint: "Frosted translucent plate + highlight",
+    chip: "linear-gradient(135deg,rgba(255,255,255,.55),rgba(148,163,184,.35))",
+    state: {
+      shapeOn: false,
+      shapeId: "rounded",
+      shapeColor: "#2563eb",
+      iconOn: true,
+      iconName: "Droplets",
+      iconColor: "#ffffff",
+      strokeW: 1.5,
+      iconSizePct: 55,
+      textOn: true,
+      text: "HELLO",
+      textColor: "#ffffff",
+      textSizePct: 17,
+      bg: "transparent",
+      padPct: 12,
+    },
+  },
+  {
+    id: "modern",
+    label: "Modern",
+    hint: "Clean rounded badge, Archivo Black",
+    chip: "linear-gradient(135deg,#2563eb,#7c3aed)",
+    state: {
+      shapeOn: true,
+      shapeId: "rounded",
+      shapeColor: "#2563eb",
+      iconOn: true,
+      iconName: "Sparkles",
+      iconColor: "#ffffff",
+      strokeW: 2,
+      iconSizePct: 55,
+      textOn: true,
+      text: "LABEL",
+      textColor: "#ffffff",
+      textSizePct: 22,
+      bg: "transparent",
+      padPct: 8,
+    },
+  },
+];
+
 const escapeXml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -91,6 +238,9 @@ export function IconAppDialog({
   const add = useEditor((s) => s.add);
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
+
+  // ---- active widget pack ("none" once the user clears it) ----
+  const [packId, setPackId] = useState<string | null>("modern");
 
   // ---- layers ----
   const [shapeOn, setShapeOn] = useState(true);
@@ -128,6 +278,32 @@ export function IconAppDialog({
   // hidden live render of the lucide icon — serialized into the composed SVG
   const iconSvgRef = useRef<HTMLDivElement>(null);
 
+  /** Apply a full widget-pack configuration to the composer. */
+  const applyPack = (p: WidgetPack) => {
+    const s = p.state;
+    setPackId(p.id);
+    setShapeOn(s.shapeOn);
+    setShapeId(s.shapeId);
+    setShapeColor(s.shapeColor);
+    setIconOn(s.iconOn);
+    setIconName(s.iconName);
+    setIconColor(s.iconColor);
+    setStrokeW(s.strokeW);
+    setIconSizePct(s.iconSizePct);
+    setTextOn(s.textOn);
+    setText(s.text);
+    setTextColor(s.textColor);
+    setTextSizePct(s.textSizePct);
+    setBg(s.bg);
+    setPadPct(s.padPct);
+  };
+
+  /** Pack-specific font stack. */
+  const packFont = () =>
+    packId === "glitch" || packId === "terminal" || packId === "digital"
+      ? "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+      : "Archivo Black, Inter, system-ui, sans-serif";
+
   /** Serialized lucide <svg>, repositioned inside the 100×100 composition. */
   const iconSvgFor = (w: number, x: number, y: number): string | null => {
     const svgEl = iconSvgRef.current?.querySelector("svg");
@@ -150,10 +326,32 @@ export function IconAppDialog({
   /** Inner SVG markup of the whole composition (100×100 viewBox). */
   const composeInner = (): string => {
     const parts: string[] = [];
+
+    // ---- pack decorations: BEHIND the content ----
     if (bg !== "transparent")
       parts.push(`<rect x="0" y="0" width="100" height="100" rx="22" fill="${bg}"/>`);
+    if (packId === "glass") {
+      parts.push(
+        `<rect x="2" y="2" width="96" height="96" rx="24" fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>`,
+        `<ellipse cx="36" cy="26" rx="30" ry="13" fill="rgba(255,255,255,0.2)"/>`,
+      );
+    }
+    if (packId === "terminal") {
+      parts.push(
+        `<rect x="4" y="4" width="92" height="14" rx="8" fill="#1e293b"/>`,
+        `<circle cx="12" cy="11" r="2.2" fill="#ff5f57"/>`,
+        `<circle cx="18.6" cy="11" r="2.2" fill="#febc2e"/>`,
+        `<circle cx="25.2" cy="11" r="2.2" fill="#28c840"/>`,
+        `<line x1="4" y1="18" x2="96" y2="18" stroke="#1e293b" stroke-width="1.4"/>`,
+      );
+    }
     if (shapeOn)
       parts.push(`<path d="${shape.path}" fill="${shapeColor}" transform="translate(3,3) scale(0.94)"/>`);
+    if (packId === "modern" && shapeOn)
+      parts.push(
+        `<path d="M32 10 H68 A22 22 0 0 1 90 32 V40 Q50 28 10 40 V32 A22 22 0 0 1 32 10 Z" fill="rgba(255,255,255,0.2)" transform="translate(3,3) scale(0.94)"/>`,
+      );
+
     const hasText = textOn && text.trim().length > 0;
     const pad = padPct;
     const content = 100 - pad * 2;
@@ -166,9 +364,30 @@ export function IconAppDialog({
     }
     if (hasText) {
       const fs = (textSizePct / 100) * content;
-      const baseline = 100 - pad - fs * 0.16;
+      const baseline = (100 - pad - fs * 0.16).toFixed(1);
+      const fam = packFont();
+      const ls = packId === "digital" ? ` letter-spacing="2"` : packId === "glitch" ? ` letter-spacing="1"` : "";
+      const body = escapeXml(packId === "terminal" ? "> ${text.trim()}" : text.trim());
+      const mkText = (fill: string, dx: number) =>
+        `<text x="${(50 + dx).toFixed(1)}" y="${baseline}" text-anchor="middle" font-family="${fam}"${ls} font-weight="900" font-size="${fs.toFixed(1)}" fill="${fill}">${body}</text>`;
+      if (packId === "glitch") {
+        // RGB-split copies behind the crisp main text
+        parts.push(mkText("#00ffff", -1.6), mkText("#ff0080", 1.6));
+      }
+      parts.push(mkText(textColor, 0));
+    }
+
+    // ---- pack decorations: ON TOP of the content ----
+    if (packId === "digital") {
+      const lines: string[] = [];
+      for (let i = 0; i < 14; i++)
+        lines.push(`<rect x="0" y="${(i * 7.2 + 1).toFixed(1)}" width="100" height="2.4" fill="#000000"/>`);
+      parts.push(`<g opacity="0.14">${lines.join("")}</g>`);
+    }
+    if (packId === "glitch") {
       parts.push(
-        `<text x="50" y="${baseline.toFixed(1)}" text-anchor="middle" font-family="Archivo Black, Inter, system-ui, sans-serif" font-weight="900" font-size="${fs.toFixed(1)}" fill="${textColor}">${escapeXml(text.trim())}</text>`,
+        `<rect x="18" y="34" width="60" height="3" fill="#7df9ff" opacity="0.9"/>`,
+        `<rect x="24" y="52" width="52" height="2" fill="#ff0080" opacity="0.8"/>`,
       );
     }
     return parts.join("");
@@ -308,6 +527,47 @@ export function IconAppDialog({
               style={{ display: "block" }}
               dangerouslySetInnerHTML={{ __html: composeInner() }}
             />
+          </div>
+
+          {/* preinstalled widget packs */}
+          <div className="flex flex-col gap-1.5 rounded-xl border border-slate-200 p-2.5">
+            <span className="flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                <Package className="size-3" />
+                Widget packs
+              </span>
+              {packId && (
+                <button
+                  onClick={() => setPackId(null)}
+                  title="Remove pack decorations (keep current layers)"
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-slate-400 transition-all hover:border-indigo-300 hover:text-slate-600"
+                >
+                  <X className="size-3" />
+                  deco off
+                </button>
+              )}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {WIDGET_PACKS.map((p) => (
+                <button
+                  key={p.id}
+                  title={p.hint}
+                  onClick={() => applyPack(p)}
+                  className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-all ${
+                    packId === p.id
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
+                  }`}
+                >
+                  <span className="size-3.5 rounded-md border border-white/60 shadow" style={{ background: p.chip }} />
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-[9px] leading-relaxed text-slate-400">
+              One click configures every layer — then tweak anything. Pack decorations (glitch split,
+              terminal chrome, scanlines, glass…) stay live in the preview and in the exported PNG.
+            </p>
           </div>
 
           {/* layer toggles */}
@@ -502,7 +762,7 @@ export function IconAppDialog({
           </div>
           <p className="text-[9px] leading-relaxed text-slate-400">
             Compose a shape, a Lucide icon and a text label — layers can be toggled, colored and sized
-            independently. Exported as a crisp {outSize}×{outSize} PNG.
+            independently. Pick a widget pack for instant styling. Exported as a crisp {outSize}×{outSize} PNG.
           </p>
         </div>
       </DialogContent>
