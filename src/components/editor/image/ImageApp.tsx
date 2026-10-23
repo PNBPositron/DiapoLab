@@ -48,8 +48,11 @@ const PRESETS: Array<{ id: string; label: string; f: Partial<ImageFilters> }> = 
   { id: "original", label: "Original", f: {} },
   { id: "vivid", label: "Vivid", f: { saturate: 145, contrast: 115 } },
   { id: "noir", label: "Noir", f: { grayscale: 100, contrast: 125 } },
-  { id: "warm", label: "Warm", f: { sepia: 35, saturate: 125, brightness: 105 } },
-  { id: "cool", label: "Cool", f: { hueRotate: 190, saturate: 120 } },
+  { id: "warm", label: "Warm", f: { temperature: 40, brightness: 105 } },
+  { id: "cool", label: "Cool", f: { temperature: -40 } },
+  { id: "gold", label: "Gold", f: { temperature: 45, tintColor: "#ffd700", tintOpacity: 14 } },
+  { id: "cyber", label: "Cyber", f: { temperature: -35, tintColor: "#ff00ff", tintOpacity: 16, saturate: 140 } },
+  { id: "to", label: "T/O", f: { temperature: 25, tintColor: "#00b3b3", tintOpacity: 12, saturate: 120, contrast: 110 } },
   { id: "vintage", label: "Vintage", f: { sepia: 55, contrast: 90, brightness: 105 } },
   { id: "fade", label: "Fade", f: { contrast: 82, brightness: 112, saturate: 75 } },
   { id: "xray", label: "X-Ray", f: { invert: 100, grayscale: 40 } },
@@ -70,8 +73,16 @@ const FORMATS = [
   { id: "webp", label: "WebP", mime: "image/webp" },
 ] as const;
 
-const filterCss = (f: ImageFilters) =>
-  `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturate}%) blur(${f.blur}px) grayscale(${f.grayscale}%) sepia(${f.sepia}%) hue-rotate(${f.hueRotate}deg) invert(${f.invert}%)`;
+const filterCss = (f: ImageFilters) => {
+  const temp = f.temperature ?? 0;
+  return [
+    `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturate}%) blur(${f.blur}px) grayscale(${f.grayscale}%) sepia(${f.sepia}%) hue-rotate(${f.hueRotate}deg) invert(${f.invert}%)`,
+    temp > 0 ? `sepia(${(temp * 0.35).toFixed(1)}%) saturate(106%)` : "",
+    temp < 0 ? `hue-rotate(${(temp * 0.15).toFixed(1)}deg) saturate(110%)` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+};
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
@@ -226,9 +237,10 @@ export function ImageAppDialog({
       ctx.restore();
     }
     // picture (clipped by the rounded frame)
+    // NOTE: filters & grading are NOT baked here — they are passed to the
+    // element as live ImageFilters so they stay editable on the slide.
     ctx.save();
     ctx.clip(path);
-    ctx.filter = css;
     ctx.translate(margin + w / 2, margin + h / 2);
     ctx.rotate((rot * Math.PI) / 180);
     ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
@@ -236,7 +248,6 @@ export function ImageAppDialog({
     const t = (rot * Math.PI) / 180;
     const cover = Math.abs(Math.cos(t)) + Math.abs(Math.sin(t));
     ctx.drawImage(img, cx, cy, cw, ch, (-w * cover) / 2, (-h * cover) / 2, w * cover, h * cover);
-    ctx.filter = "none";
     // vignette
     if (vignette > 0) {
       const g = ctx.createRadialGradient(
@@ -327,6 +338,7 @@ export function ImageAppDialog({
                 onPointerLeave={onPanUp}
                 className="flex items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)_50%/16px_16px] p-2"
                 style={{
+                  position: "relative",
                   aspectRatio: String(ratio ?? natural.w / natural.h),
                   maxHeight: 200,
                   borderRadius: Math.round((radius / 100) * 40) + 8,
@@ -346,6 +358,19 @@ export function ImageAppDialog({
                     cursor: zoom > 1 ? "grab" : "default",
                   }}
                 />
+                {(filters.tintColor ?? "") !== "" && (filters.tintOpacity ?? 0) > 0 && !compare && (
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      pointerEvents: "none",
+                      background: filters.tintColor,
+                      opacity: (filters.tintOpacity ?? 0) / 100,
+                      mixBlendMode: "multiply",
+                    }}
+                  />
+                )}
               </div>
 
               {/* transforms */}
@@ -463,6 +488,40 @@ export function ImageAppDialog({
                     <span className="w-8 tabular-nums">{filters[key]}</span>
                   </label>
                 ))}
+              </div>
+
+              {/* color grading */}
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 p-2.5">
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  temp
+                  <input
+                    type="range"
+                    min={-100}
+                    max={100}
+                    value={filters.temperature ?? 0}
+                    onChange={(e) => setFilters((f) => ({ ...f, temperature: Number(e.target.value) }))}
+                    className="h-1 w-20 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-8 tabular-nums">{filters.temperature ?? 0}</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  tint
+                  <input
+                    type="color"
+                    value={filters.tintColor ?? "#2563eb"}
+                    onChange={(e) => setFilters((f) => ({ ...f, tintColor: e.target.value }))}
+                    className="size-4 cursor-pointer rounded border border-slate-200"
+                  />
+                  <input
+                    type="range"
+                    min={0}
+                    max={60}
+                    value={filters.tintOpacity ?? 0}
+                    onChange={(e) => setFilters((f) => ({ ...f, tintOpacity: Number(e.target.value) }))}
+                    className="h-1 w-16 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{filters.tintOpacity ?? 0}</span>
+                </label>
               </div>
 
               {/* styling: corners, border, vignette, shadow */}
@@ -590,8 +649,8 @@ export function ImageAppDialog({
               </div>
               <p className="text-[9px] leading-relaxed text-slate-400">
                 Crop{zoom > 1 ? " & zoom" : ""}, rotation, corners, border and shadow are baked into the
-                inserted picture{styled ? "" : " (untouched so far)"}; filter values stay editable from
-                the element panel.
+                inserted picture{styled ? "" : " (untouched so far)"}; ALL filters & color grading
+                stay live on the slide — editable from the element panel at any time.
               </p>
             </>
           )}
