@@ -117,26 +117,21 @@ export function PluginsPanel() {
               <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
                 <Brush className="size-2.5" /> Apps ({enabledApps.length})
               </span>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {enabledApps.map(({ key, pluginName, app }) => (
                   <button
                     key={key}
                     title={app.description || `from ${pluginName}`}
                     onClick={() => setAppOpen(app)}
-                    className="group flex items-center gap-2.5 rounded-xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white px-2.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-[0_10px_24px_-10px_rgba(79,70,229,0.45)] active:scale-[0.98]"
+                    className="group flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2 py-1.5 text-left transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-100/60 active:scale-[0.97]"
                   >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white text-indigo-600 shadow-sm transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                      <Brush className="size-3.5" />
+                    <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                      <Brush className="size-3" />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[11px] font-semibold text-slate-800">{app.name}</span>
-                      <span className="block truncate text-[9px] text-slate-400">
-                        {app.description || `interactive app · ${pluginName}`}
-                      </span>
+                    <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-slate-700">
+                      {app.name}
                     </span>
-                    <span className="flex shrink-0 items-center gap-1 rounded-lg bg-white px-2 py-1 text-[9px] font-bold text-indigo-600 shadow-sm">
-                      <Play className="size-2.5" /> Open
-                    </span>
+                    <Play className="size-2.5 shrink-0 text-indigo-400 transition-colors group-hover:text-indigo-600" />
                   </button>
                 ))}
               </div>
