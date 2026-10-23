@@ -184,6 +184,12 @@ export type ImageFilters = {
   tintColor?: string;
   /** tint strength, 0..100 */
   tintOpacity?: number;
+  /** glitch intensity 0..100 — SVG turbulence displacement, live on the slide */
+  glitch?: number;
+  /** pixel size in px, 0 = off — SVG mosaic filter, live on the slide */
+  pixelate?: number;
+  /** posterize levels (2..16), 0 = off — SVG discrete transfer, live on the slide */
+  posterize?: number;
 };
 
 export const DEFAULT_FILTERS: ImageFilters = {
@@ -196,6 +202,9 @@ export const DEFAULT_FILTERS: ImageFilters = {
   hueRotate: 0,
   invert: 0,
   temperature: 0,
+  glitch: 0,
+  pixelate: 0,
+  posterize: 0,
 };
 
 export type ImageElement = ElementBase & {
