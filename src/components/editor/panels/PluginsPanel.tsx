@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Image as ImageIcon, Shapes, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -13,6 +13,8 @@ import {
 import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
+import { ImageAppDialog } from "../image/ImageApp";
+import { IconAppDialog } from "../icon/IconApp";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -129,6 +131,10 @@ export function PluginsPanel() {
                     <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                       {app.type === "video" ? (
                         <Clapperboard className="size-3" />
+                      ) : app.type === "image" ? (
+                        <ImageIcon className="size-3" />
+                      ) : app.type === "icon" ? (
+                        <Shapes className="size-3" />
                       ) : (
                         <Brush className="size-3" />
                       )}
@@ -176,6 +182,10 @@ export function PluginsPanel() {
       {appOpen &&
         (appOpen.type === "video" ? (
           <VideoAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
+        ) : appOpen.type === "image" ? (
+          <ImageAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
+        ) : appOpen.type === "icon" ? (
+          <IconAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ) : (
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
