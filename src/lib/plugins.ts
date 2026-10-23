@@ -23,7 +23,7 @@ export type PluginApp = {
   id?: string;
   name: string;
   description?: string;
-  type: "paint" | "video";
+  type: "paint" | "video" | "image" | "icon";
   config?: {
     /** swatches shown in the color picker (any CSS color) */
     colors?: string[];
@@ -231,6 +231,22 @@ export const VIDEO_APP: PluginApp = {
   type: "video",
 };
 
+/** The built-in Image app — advanced image editor. */
+export const IMAGE_APP: PluginApp = {
+  id: "image",
+  name: "Image",
+  description: "Advanced image editor — filters, crop, rotate & flip",
+  type: "image",
+};
+
+/** The built-in Icon app — build icons from shapes. */
+export const ICON_APP: PluginApp = {
+  id: "icon",
+  name: "Icon",
+  description: "Icon maker — pick a shape, colors & export as PNG",
+  type: "icon",
+};
+
 /** Plugins that ship with the editor. Never stored, never removable. */
 export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
   {
@@ -253,6 +269,28 @@ export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
     enabled: true,
     widgets: [],
     apps: [VIDEO_APP],
+    importedAt: 0,
+  },
+  {
+    id: "builtin-image",
+    name: "Image",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Built-in image editor — filters, crop, rotate & flip, insert on the slide.",
+    enabled: true,
+    widgets: [],
+    apps: [IMAGE_APP],
+    importedAt: 0,
+  },
+  {
+    id: "builtin-icon",
+    name: "Icon",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Built-in icon maker — build icons from shapes and export as PNG.",
+    enabled: true,
+    widgets: [],
+    apps: [ICON_APP],
     importedAt: 0,
   },
 ];
