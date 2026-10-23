@@ -619,6 +619,7 @@ export function CanvasElement({
           muted={element.muted ?? true}
           loop={element.loop ?? true}
           autoPlay
+          playbackRate={element.rate ?? 1}
           playsInline
           controls={useEditor.getState().presenting}
           onLoadedMetadata={(e) => {
