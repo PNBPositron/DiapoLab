@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Image as ImageIcon, Shapes, Play } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Image as ImageIcon, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -14,7 +14,6 @@ import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
 import { ImageAppDialog } from "../image/ImageApp";
-import { IconAppDialog } from "../icon/IconApp";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -133,8 +132,6 @@ export function PluginsPanel() {
                         <Clapperboard className="size-3" />
                       ) : app.type === "image" ? (
                         <ImageIcon className="size-3" />
-                      ) : app.type === "icon" ? (
-                        <Shapes className="size-3" />
                       ) : (
                         <Brush className="size-3" />
                       )}
@@ -184,8 +181,6 @@ export function PluginsPanel() {
           <VideoAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ) : appOpen.type === "image" ? (
           <ImageAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
-        ) : appOpen.type === "icon" ? (
-          <IconAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ) : (
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
