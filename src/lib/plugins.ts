@@ -35,6 +35,8 @@ export type PluginApp = {
     /** export size in canvas pixels (slide is 1920x1080) */
     width?: number;
     height?: number;
+    /** widget-pack id preselected when the Icon app opens */
+    pack?: string;
   };
 };
 
@@ -247,6 +249,45 @@ export const ICON_APP: PluginApp = {
   type: "icon",
 };
 
+/** Preinstalled widget packs — open the Icon app with the pack applied. */
+export const WIDGET_PACK_APPS: PluginApp[] = [
+  {
+    id: "icon-pack-glitch",
+    name: "Glitch",
+    description: "Glitch pack — RGB-split text, scan slices, dark",
+    type: "icon",
+    config: { pack: "glitch" },
+  },
+  {
+    id: "icon-pack-terminal",
+    name: "Terminal",
+    description: "Terminal pack — macOS window chrome, monospace",
+    type: "icon",
+    config: { pack: "terminal" },
+  },
+  {
+    id: "icon-pack-digital",
+    name: "Digital",
+    description: "Digital pack — neon hexagon, scanlines overlay",
+    type: "icon",
+    config: { pack: "digital" },
+  },
+  {
+    id: "icon-pack-glass",
+    name: "Glass",
+    description: "Glass pack — frosted translucent plate + highlight",
+    type: "icon",
+    config: { pack: "glass" },
+  },
+  {
+    id: "icon-pack-modern",
+    name: "Modern",
+    description: "Modern pack — clean rounded badge, Archivo Black",
+    type: "icon",
+    config: { pack: "modern" },
+  },
+];
+
 /** Plugins that ship with the editor. Never stored, never removable. */
 export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
   {
@@ -290,7 +331,7 @@ export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
     description: "Built-in icon maker — build icons from shapes and export as PNG.",
     enabled: true,
     widgets: [],
-    apps: [ICON_APP],
+    apps: [ICON_APP, ...WIDGET_PACK_APPS],
     importedAt: 0,
   },
 ];
