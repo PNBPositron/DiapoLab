@@ -179,7 +179,8 @@ export const usePlugins = create<PluginsState>()(
 /* Instantiation                                                       */
 /* ------------------------------------------------------------------ */
 
-/** Materializes a widget's elements with fresh ids and a small offset. */
+/** Materializes a widget's elements with fresh ids and a small offset.
+ *  All elements of one widget share a groupId so they move as a single block. */
 export function instantiateWidget(widget: PluginWidget, baseX = 140, baseY = 140): AnyElement[] {
   const raw = typeof widget.elements === "function" ? widget.elements() : widget.elements;
   const elements = Array.isArray(raw) ? raw.slice(0, MAX_ELEMENTS) : [];
@@ -191,11 +192,13 @@ export function instantiateWidget(widget: PluginWidget, baseX = 140, baseY = 140
   }
   const dx = baseX - (minX === Infinity ? 0 : minX);
   const dy = baseY - (minY === Infinity ? 0 : minY);
+  const groupId = crypto.randomUUID();
   return elements.map(
     (el) =>
       ({
         ...el,
         id: crypto.randomUUID(),
+        groupId,
         x: (typeof el.x === "number" ? el.x : 0) + dx,
         y: (typeof el.y === "number" ? el.y : 0) + dy,
       }) as AnyElement,
