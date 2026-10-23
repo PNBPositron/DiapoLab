@@ -231,8 +231,8 @@ export function AiPanel() {
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-indigo-950">Give an LLM a slide schema</p>
             <p className="mt-1 text-[10px] leading-relaxed text-indigo-900/75">Describe slides as JSON: the model can create, duplicate, and edit native elements without guessing the editor format.</p>
-            <pre className="mt-2 max-h-36 overflow-auto rounded-lg bg-slate-950 p-2.5 font-mono text-[9px] leading-relaxed text-indigo-100">{`{\n  "canvas": { "width": 1920, "height": 1080 },\n  "pages": [{\n    "background": "#F8FAFC",\n    "elements": [{\n      "type": "text", "text": "Launch plan",\n      "x": 120, "y": 120, "width": 900,\n      "fontSize": 64, "color": "#0F172A"\n    }]\n  }]\n}`}</pre>
-            <p className="mt-2 text-[10px] leading-relaxed text-indigo-900/70">Keep coordinates in the canvas bounds and return valid JSON only. Add more elements using the editor&apos;s element properties.</p>
+            <pre className="mt-2 max-h-52 overflow-auto rounded-lg bg-slate-950 p-2.5 font-mono text-[9px] leading-relaxed text-indigo-100">{`{\n  "canvas": { "width": 1920, "height": 1080 },\n  "pages": [{\n    "id": "page-1",\n    "bgColor": "#F8FAFC",\n    "duration": 3,\n    "elements": [{\n      "id": "title-1",\n      "type": "text",\n      "x": 120, "y": 120, "width": 900, "height": 96,\n      "text": "Launch plan",\n      "fontSize": 64, "fontFamily": "Inter",\n      "fontWeight": 700, "color": "#0F172A",\n      "align": "left", "opacity": 1, "rotation": 0\n    }, {\n      "id": "hero-1", "type": "shape",\n      "shape": "rounded_rectangle",\n      "x": 120, "y": 280, "width": 720, "height": 360,\n      "fill": "#2563EB", "opacity": 1, "rotation": 0\n    }]\n  }]\n}`}</pre>
+            <p className="mt-2 text-[10px] leading-relaxed text-indigo-900/70">Use unique IDs. Use only supported element types such as text, shape, image, chart, quiz, and button. Every element needs x, y, width, and height; keep them inside the canvas. Return one JSON object with canvas and pages, never markdown or comments.</p>
           </div>
         </div>
       </section>
@@ -285,7 +285,7 @@ export function AiPanel() {
       )}
 
       {/* TAB 1: FULL DECK GENERATOR */}
-      {activeTab === "generate" && (
+      {false && activeTab === "generate" && (
         <div className="space-y-4">
           {/* Prompt Section */}
           <div className="space-y-2">
@@ -406,7 +406,7 @@ export function AiPanel() {
       )}
 
       {/* TAB 2: SLIDE COPILOT / EDIT */}
-      {activeTab === "copilot" && (
+      {false && activeTab === "copilot" && (
         <div className="space-y-4">
           <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 space-y-2">
             <div className="flex items-center gap-2 text-slate-800 font-medium">

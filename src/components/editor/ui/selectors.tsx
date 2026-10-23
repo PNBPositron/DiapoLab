@@ -29,13 +29,15 @@ export function PanelHeader({ title, kicker, description, icon: Icon, children }
           {kicker && <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-blue-600">{kicker}</p>}
           <h3 className="mt-1 text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
           {description && <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{description}</p>}
-          {children}
         </div>
-        {Icon && (
+        <div className="flex shrink-0 items-center gap-2">
+          {children}
+          {Icon && (
           <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
             <Icon className="size-4" />
           </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
