@@ -37,7 +37,6 @@ import {
   Brush,
   Clapperboard,
   Image as ImageIcon,
-  Shapes,
   History as HistoryIcon,
   Shuffle,
   Zap,
@@ -110,7 +109,7 @@ function highlightLabel(label: string, query: string): React.ReactNode {
     if (found === -1) return label; // not a subsequence of the label — no highlight
     if (found > li) parts.push(label.slice(li, found));
     parts.push(
-      <mark key={found} className="rounded-sm bg-blue-100 px-0.5 text-blue-700">
+      <mark key={found} className="rounded-sm bg-indigo-400/30 px-0.5 text-sky-300">
         {label[found]}
       </mark>,
     );
@@ -534,8 +533,6 @@ export function CommandPalette({
               <Clapperboard className="size-4" />
             ) : a.type === "image" ? (
               <ImageIcon className="size-4" />
-            ) : a.type === "icon" ? (
-              <Shapes className="size-4" />
             ) : (
               <Brush className="size-4" />
             ),
@@ -619,7 +616,7 @@ export function CommandPalette({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/40 p-4 pt-[10vh] backdrop-blur-md animate-in fade-in duration-150"
+      className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/60 p-4 pt-[10vh] backdrop-blur-xl animate-in fade-in duration-150"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onOpenChange(false);
       }}
@@ -629,16 +626,16 @@ export function CommandPalette({
         aria-modal="true"
         aria-label="Command palette"
         onKeyDown={onKeyDown}
-        className="w-full max-w-[600px] overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-[0_32px_90px_-20px_rgba(15,23,42,0.45),0_0_0_1px_rgba(15,23,42,0.04)] backdrop-blur-xl animate-in slide-in-from-top-4 zoom-in-95 duration-200"
+        className="w-full max-w-[640px] overflow-hidden rounded-3xl border border-white/10 bg-[#0b1020]/90 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8),0_0_60px_-20px_rgba(99,102,241,0.45),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-2xl animate-in slide-in-from-top-4 zoom-in-95 duration-200"
       >
         {/* Brand + search bar */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-50 via-white to-blue-50/60 px-5">
+        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.06] to-transparent px-5">
           <div
             className="pointer-events-none absolute inset-0 opacity-60"
-            style={{ backgroundImage: "radial-gradient(circle at 92% 20%, rgba(37,99,235,0.16) 0%, transparent 60%)" }}
+            style={{ backgroundImage: "radial-gradient(circle at 88% -10%, rgba(99,102,241,0.35) 0%, transparent 55%), radial-gradient(circle at 0% 120%, rgba(14,165,233,0.22) 0%, transparent 50%)" }}
           />
           <div className="relative flex items-center gap-3 py-4">
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)]">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.55)]">
               <Search className="size-4" />
             </span>
             <input
@@ -646,26 +643,26 @@ export function CommandPalette({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search commands, widgets, apps, features…"
-              className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-800 outline-none placeholder:text-slate-400"
+              className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-100 outline-none placeholder:text-slate-500"
             />
-            <kbd className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
+            <kbd className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
               ESC
             </kbd>
           </div>
         </div>
 
-        <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
         {/* Results */}
         <div ref={listRef} className="max-h-[52vh] overflow-y-auto p-2.5">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-14">
-              <span className="grid size-12 place-items-center rounded-2xl bg-slate-100 text-slate-300">
+              <span className="grid size-12 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-500">
                 <Search className="size-5" />
               </span>
               <div className="text-center">
-                <p className="text-xs font-semibold text-slate-500">No results for “{query}”</p>
-                <p className="mt-1 text-[11px] text-slate-400">Try “insert”, “paint”, “plugin”, “present”…</p>
+                <p className="text-xs font-semibold text-slate-300">No results for “{query}”</p>
+                <p className="mt-1 text-[11px] text-slate-500">Try “insert”, “paint”, “plugin”, “present”…</p>
               </div>
             </div>
           ) : (
@@ -676,8 +673,8 @@ export function CommandPalette({
               return (
                 <div key={c.id}>
                   {showHeader && (
-                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                      <span className="text-blue-400">{GROUP_ICONS[c.group]}</span>
+                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                      <span className="text-indigo-400">{GROUP_ICONS[c.group]}</span>
                       {c.group}
                     </div>
                   )}
@@ -686,31 +683,31 @@ export function CommandPalette({
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => runCommand(c)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-all duration-75 ${
-                      active ? "bg-blue-50/80 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.18)]" : "text-slate-700 hover:bg-slate-50"
+                      active ? "bg-indigo-500/15 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]" : "text-slate-300 hover:bg-white/5"
                     }`}
                   >
                     <span
                       className={`grid size-9 shrink-0 place-items-center rounded-xl border transition-all ${
                         active
-                          ? "border-blue-600 bg-blue-600 text-white shadow-[0_6px_14px_rgba(37,99,235,0.4)]"
-                          : "border-slate-100 bg-slate-50 text-slate-500"
+                          ? "border-indigo-400/60 bg-gradient-to-br from-indigo-500 to-sky-500 text-white shadow-[0_0_18px_rgba(99,102,241,0.55)]"
+                          : "border-white/10 bg-white/5 text-slate-400"
                       }`}
                     >
                       {c.icon}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xs font-semibold text-slate-800">
+                      <span className="block truncate text-xs font-semibold text-slate-100">
                         {highlightLabel(c.label, query)}
                       </span>
                       {c.hint && (
-                        <span className="block truncate text-[10px] text-slate-400">
+                        <span className="block truncate text-[10px] text-slate-500">
                           {c.hint}
                         </span>
                       )}
                     </span>
                     {c.href && (
                       <ExternalLink
-                        className={`size-3.5 shrink-0 ${active ? "text-blue-500" : "text-slate-300"}`}
+                        className={`size-3.5 shrink-0 ${active ? "text-sky-400" : "text-slate-600"}`}
                       />
                     )}
                     {c.shortcut && (
@@ -720,8 +717,8 @@ export function CommandPalette({
                             key={k}
                             className={`rounded-md border px-1.5 py-0.5 font-mono text-[9px] font-medium ${
                               active
-                                ? "border-blue-200 bg-blue-100/60 text-blue-700"
-                                : "border-slate-200 bg-slate-50/80 text-slate-500"
+                                ? "border-indigo-400/40 bg-indigo-400/15 text-indigo-200"
+                                : "border-white/10 bg-white/5 text-slate-400"
                             }`}
                           >
                             {k}
@@ -730,7 +727,7 @@ export function CommandPalette({
                       </span>
                     )}
                     {active && (
-                      <CornerDownLeft className="size-3.5 shrink-0 text-blue-500" />
+                      <CornerDownLeft className="size-3.5 shrink-0 text-sky-400" />
                     )}
                   </button>
                 </div>
@@ -740,7 +737,7 @@ export function CommandPalette({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-4 border-t border-slate-100 bg-slate-50/70 px-4 py-2 text-[10px] text-slate-400">
+        <div className="flex items-center gap-4 border-t border-white/10 bg-white/[0.04] px-4 py-2 text-[10px] text-slate-500">
           <span className="flex items-center gap-1">
             <ArrowUp className="size-3" />
             <ArrowDown className="size-3" /> navigate
@@ -749,7 +746,7 @@ export function CommandPalette({
             <CornerDownLeft className="size-3" /> run
           </span>
           <span className="ml-auto flex items-center gap-1">
-            <kbd className="rounded border border-slate-200 bg-slate-50 px-1 font-mono">
+            <kbd className="rounded border border-white/10 bg-white/5 px-1 font-mono">
               Ctrl K
             </kbd>
             toggle
