@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
-import { Home, Type, Shapes, Image, Layers, Palette, WandSparkles, Folder, Camera } from "lucide-react";
+import { Home, Type, Shapes, Image, Layers, Palette, Puzzle, Folder, Camera } from "lucide-react";
 import "@/editor-ui.css";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -11,7 +11,7 @@ import { UnsplashPanel } from "./panels/UnsplashPanel";
 import { DesignPanel } from "./panels/DesignPanel";
 import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { IllustrationsPanel } from "./panels/IllustrationsPanel";
-import { AiPanel } from "./panels/AiPanel";
+import { PluginsPanel } from "./panels/PluginsPanel";
 import { MyDesignsDialog } from "./MyDesignsDialog";
 
 const TOOLS = [
@@ -22,7 +22,7 @@ const TOOLS = [
   { id: "illustrations", label: "Illus.", icon: Image },
   { id: "components", label: "Presets", icon: Layers },
   { id: "design", label: "Design", icon: Palette },
-  { id: "ai", label: "AI", icon: WandSparkles },
+  { id: "plugins", label: "Plugins", icon: Puzzle },
   { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
@@ -75,7 +75,7 @@ export function Sidebar() {
         })}
       </nav>
       <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
-        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "unsplash" && <UnsplashPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "ai" && <AiPanel />}
+        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "unsplash" && <UnsplashPanel />}{tool === "illustrations" && <IllustrationsPanel />}{tool === "design" && <DesignPanel />}{tool === "plugins" && <PluginsPanel />}
       </div>
       {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}
     </aside>
