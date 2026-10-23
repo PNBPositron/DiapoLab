@@ -18,17 +18,33 @@ import { UiRender } from "./UiRender";
 import * as LucideIcons from "lucide-react";
 import { HelpCircle, Check, X as XIcon } from "lucide-react";
 
+const svgFilterUrl = (inner: string) =>
+  `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg"><filter id="f" x="0" y="0" width="100%" height="100%">${inner}</filter></svg>`,
+  )}")`;
+
 const filterCss = (f?: ImageFilters) => {
   const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
   const temp = v.temperature ?? 0;
-  return [
+  const parts = [
     `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturate}%) blur(${v.blur}px) grayscale(${v.grayscale}%) sepia(${v.sepia}%) hue-rotate(${v.hueRotate}deg) invert(${v.invert}%)`,
     // color grading: warm (+) / cool (−) temperature shift
     temp > 0 ? `sepia(${(temp * 0.35).toFixed(1)}%) saturate(106%)` : "",
     temp < 0 ? `hue-rotate(${(temp * 0.15).toFixed(1)}deg) saturate(110%)` : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  ];
+  if ((v.posterize ?? 0) >= 2) {
+    const n = Math.min(16, Math.round(v.posterize!));
+    const steps = Array.from({ length: n }, (_, i) => (i / (n - 1)).toFixed(3)).join(" ");
+    parts.push(svgFilterUrl(`<feComponentTransfer><feFuncR type="discrete" tableValues="${steps}"/><feFuncG type="discrete" tableValues="${steps}"/><feFuncB type="discrete" tableValues="${steps}"/></feComponentTransfer>`));
+  }
+  if ((v.glitch ?? 0) > 0) {
+    parts.push(svgFilterUrl(`<feTurbulence type="fractalNoise" baseFrequency="0.015 0.12" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(v.glitch! * 0.9).toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>`));
+  }
+  if ((v.pixelate ?? 0) >= 2) {
+    const p = Math.min(40, Math.round(v.pixelate!));
+    parts.push(svgFilterUrl(`<feFlood x="${p / 2}" y="${p / 2}" height="${p}" width="${p}"/><feComposite width="${p * 2}" height="${p * 2}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${p / 2}"/>`));
+  }
+  return parts.filter(Boolean).join(" ");
 };
 
 const shadowFilter = (s?: ElementShadow) =>
