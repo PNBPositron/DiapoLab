@@ -55,7 +55,7 @@ async function waitForExportReady() {
 async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]> {
   const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
   select(null);
-  await ensureFontsForPages(pages);
+  await ensureFontsForPages(pages.map((page) => ({ elements: page.elements.filter((element): element is Extract<typeof element, { fontFamily?: string }> => "fontFamily" in element) })));
   const original = currentIndex;
   const shots: string[] = [];
   for (let i = 0; i < pages.length; i++) {
@@ -195,7 +195,7 @@ export async function exportPPTX(name: string) {
   // The browser bundle exposes shape types on the presentation instance.
   // Falling back to the documented string keeps exports compatible across versions.
   const rectangleShape =
-    (pptx as PptxGenJS & { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
+    (pptx as { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
   const wIn = canvasW / 96;
   const hIn = canvasH / 96;
   const px = (value: number) => value / 96;
@@ -223,7 +223,7 @@ export async function exportPPTX(name: string) {
           breakLine: false,
           margin: 0,
           fit: "shrink",
-          valign: "mid",
+          valign: "middle",
           rotate: element.rotation,
         });
       } else if (element.type === "shape") {

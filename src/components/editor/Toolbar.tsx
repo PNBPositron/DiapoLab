@@ -79,6 +79,7 @@ export function Toolbar() {
     canvasW,
     canvasH,
     loadPages,
+    setTool,
   } = useEditor();
 
   const { user } = useAuth();
@@ -401,6 +402,7 @@ export function Toolbar() {
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
           onClear={clear}
+          onAssistant={() => setTool("ai")}
           publishing={publishing}
           isAuthenticated={!!user}
         />

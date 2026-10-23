@@ -122,7 +122,7 @@ export function PresentationMode() {
                 key={`slide-${currentIndex}-${page.transition ?? "none"}`}
                 initial={preset.initial}
                 animate={preset.animate}
-                transition={preset.transition}
+                transition={preset.transition as never}
                 onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
                 className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}`}
                 style={

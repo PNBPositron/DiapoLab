@@ -32,7 +32,7 @@ function SharedTemplate() {
     let cancelled = false;
     (async () => {
       if (share) {
-        const { data, error: rpcError } = await supabase.rpc("get_shared_design", {
+        const { data, error: rpcError } = await (supabase as any).rpc("get_shared_design", {
           p_design_id: id,
           p_token: share,
         });
