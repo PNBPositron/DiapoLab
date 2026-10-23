@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
+import { usePlugins, instantiateWidget } from "@/lib/plugins";
 import {
   Search,
   CornerDownLeft,
@@ -33,6 +34,8 @@ import {
   Droplets,
   Box,
   Puzzle,
+  Brush,
+  History as HistoryIcon,
   Shuffle,
   Zap,
   Link2,
@@ -47,7 +50,7 @@ import {
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-type CommandGroup = "Actions" | "Insert" | "Shortcuts" | "Features" | "Links";
+type CommandGroup = "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Plugins" | "Links";
 
 type Command = {
   id: string;
@@ -62,10 +65,12 @@ type Command = {
 };
 
 const GROUP_ICONS: Record<CommandGroup, React.ReactNode> = {
+  Recent: <HistoryIcon className="size-2.5" />,
   Actions: <Zap className="size-2.5" />,
   Insert: <Plus className="size-2.5" />,
   Shortcuts: <Command className="size-2.5" />,
   Features: <Sparkles className="size-2.5" />,
+  Plugins: <Puzzle className="size-2.5" />,
   Links: <Link2 className="size-2.5" />,
 };
 
@@ -89,6 +94,53 @@ function fuzzyScore(query: string, target: string): number {
   return score * 0.8;
 }
 
+/** Wraps the fuzzy-matched characters of "label" in highlighted marks. */
+function highlightLabel(label: string, query: string): React.ReactNode {
+  const q = query.toLowerCase().trim();
+  if (!q) return label;
+  const lower = label.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let ti = 0;
+  let li = 0;
+  for (const ch of q) {
+    const found = lower.indexOf(ch, ti);
+    if (found === -1) return label; // not a subsequence of the label — no highlight
+    if (found > li) parts.push(label.slice(li, found));
+    parts.push(
+      <mark key={found} className="rounded-sm bg-blue-100 px-0.5 text-blue-700">
+        {label[found]}
+      </mark>,
+    );
+    li = found + 1;
+    ti = found + 1;
+  }
+  if (li < label.length) parts.push(label.slice(li));
+  return parts;
+}
+
+/* ------------------ Recent commands (localStorage) ------------------ */
+
+const RECENTS_KEY = "diapolab.palette.recents.v1";
+const RECENTS_MAX = 6;
+
+function loadRecents(): string[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? "[]");
+    return Array.isArray(v) ? v.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(id: string) {
+  try {
+    const next = [id, ...loadRecents().filter((x) => x !== id)].slice(0, RECENTS_MAX);
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+  } catch {
+    /* private mode — ignore */
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* The palette                                                         */
 /* ------------------------------------------------------------------ */
@@ -107,6 +159,7 @@ export function CommandPalette({
 
   const store = useEditor();
   const selected = store.elements.find((e) => e.id === store.selectedId);
+  const [recents, setRecents] = useState<string[]>([]);
 
   /* ------------------ Command registry ------------------ */
   const commands = useMemo<Command[]>(() => {
@@ -454,12 +507,49 @@ export function CommandPalette({
       },
     ];
 
-    return [...actions, ...insert, ...shortcuts, ...features, ...links];
+    /* Plugin content — widgets become insertable, apps open their tool */
+    const pluginsState = usePlugins.getState();
+    const pluginCmds: Command[] = pluginsState.plugins
+      .filter((p) => p.enabled)
+      .flatMap((p) => [
+        ...p.widgets.map((w, i) => ({
+          id: `pw-${p.id}-${i}`,
+          label: w.name,
+          group: "Plugins" as CommandGroup,
+          icon: <Puzzle className="size-4" />,
+          hint: `widget · ${p.name}`,
+          keywords: `plugin widget insert ${w.name} ${p.name}`,
+          run: () => store.addGroup(instantiateWidget(w)),
+        })),
+        ...(p.apps ?? []).map((a, i) => ({
+          id: `pa-${p.id}-${i}`,
+          label: `Open ${a.name}`,
+          group: "Plugins" as CommandGroup,
+          icon: <Brush className="size-4" />,
+          hint: `app · ${p.name}`,
+          keywords: `plugin app ${a.type} ${a.name} ${p.name}`,
+          run: () => {
+            store.setTool("plugins");
+            window.dispatchEvent(
+              new CustomEvent("diapolab:open-app", { detail: { appName: a.name } }),
+            );
+          },
+        })),
+      ]);
+
+    return [...actions, ...insert, ...shortcuts, ...features, ...pluginCmds, ...links];
   }, [store, open, onOpenChange]);
 
   /* ------------------ Filtering ------------------ */
   const filtered = useMemo(() => {
-    if (!query.trim()) return commands;
+    if (!query.trim()) {
+      // idle palette: recent commands first, then everything else
+      const recentCmds = recents
+        .map((id) => commands.find((c) => c.id === id))
+        .filter((c): c is Command => !!c && !c.href);
+      const recentIds = new Set(recentCmds.map((c) => c.id));
+      return [...recentCmds, ...commands.filter((c) => !recentIds.has(c.id))];
+    }
     return commands
       .map((c) => {
         const target = `${c.label} ${c.hint ?? ""} ${c.keywords ?? ""} ${(c.shortcut ?? []).join(" ")}`;
@@ -468,13 +558,14 @@ export function CommandPalette({
       .filter((x) => x.score > 0)
       .sort((a, b) => b.score - a.score)
       .map((x) => x.c);
-  }, [query, commands]);
+  }, [query, commands, recents]);
 
   /* ------------------ Behavior ------------------ */
   useEffect(() => {
     if (open) {
       setQuery("");
       setActiveIndex(0);
+      setRecents(loadRecents());
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
@@ -490,6 +581,7 @@ export function CommandPalette({
   const runCommand = (c: Command) => {
     if (c.href) window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
     else c.run?.();
+    if (c.run) saveRecent(c.id);
     onOpenChange(false);
   };
 
@@ -540,7 +632,7 @@ export function CommandPalette({
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search commands, features, shortcuts…"
+              placeholder="Search commands, widgets, apps, features…"
               className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-medium text-slate-800 outline-none placeholder:text-slate-400"
             />
             <kbd className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-semibold text-slate-400 shadow-sm">
@@ -560,7 +652,7 @@ export function CommandPalette({
               </span>
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-500">No results for “{query}”</p>
-                <p className="mt-1 text-[11px] text-slate-400">Try “insert”, “theme”, “present”…</p>
+                <p className="mt-1 text-[11px] text-slate-400">Try “insert”, “paint”, “plugin”, “present”…</p>
               </div>
             </div>
           ) : (
@@ -595,7 +687,7 @@ export function CommandPalette({
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-xs font-semibold text-slate-800">
-                        {c.label}
+                        {highlightLabel(c.label, query)}
                       </span>
                       {c.hint && (
                         <span className="block truncate text-[10px] text-slate-400">
