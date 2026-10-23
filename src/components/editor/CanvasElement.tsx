@@ -748,7 +748,7 @@ export function CanvasElement({
                 {advancedEffects(element.filters).map((e) => (
                   <filter
                     key={e.key}
-                    id={`img-fx-${D}{element.id}-${D}{e.key}`}
+                    id={`img-fx-${element.id}-${e.key}`}
                     x="0"
                     y="0"
                     width="100%"
