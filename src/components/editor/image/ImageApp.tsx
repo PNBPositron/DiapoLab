@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent, type PointerEvent as RPointerEvent } from "react";
 import { useEditor, type AnyElement, type ImageFilters, DEFAULT_FILTERS } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
 import {
@@ -16,15 +16,15 @@ import {
   FlipVertical2,
   Crop,
   Check,
+  Eye,
+  Move,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
 /* Image app — the built-in advanced image editor.                     */
-/* Upload a picture, tune filters (brightness, contrast, saturation,   */
-/* blur, grayscale, sepia, hue, invert), crop to a ratio, rotate by    */
-/* 90° steps, flip, pick the export size — then insert it on the       */
-/* slide. The crop/rotation is baked into the exported PNG while the   */
-/* filters stay live-editable on the element.                          */
+/* Filters & presets, draggable zoom/pan crop, free rotation, flips,  */
+/* rounded corners, border, vignette, drop shadow, before/after        */
+/* compare, multiple export formats — then insert on the slide.        */
 /* ------------------------------------------------------------------ */
 
 const SLIDERS: Array<{
@@ -34,18 +34,29 @@ const SLIDERS: Array<{
   max: number;
   step: number;
 }> = [
-  { key: "brightness", label: "Brightness", min: 0, max: 200, step: 1 },
+  { key: "brightness", label: "Bright", min: 0, max: 200, step: 1 },
   { key: "contrast", label: "Contrast", min: 0, max: 200, step: 1 },
-  { key: "saturate", label: "Saturation", min: 0, max: 200, step: 1 },
+  { key: "saturate", label: "Sat", min: 0, max: 200, step: 1 },
   { key: "blur", label: "Blur", min: 0, max: 20, step: 0.5 },
-  { key: "grayscale", label: "Grayscale", min: 0, max: 100, step: 1 },
+  { key: "grayscale", label: "B&W", min: 0, max: 100, step: 1 },
   { key: "sepia", label: "Sepia", min: 0, max: 100, step: 1 },
   { key: "hueRotate", label: "Hue", min: 0, max: 360, step: 1 },
   { key: "invert", label: "Invert", min: 0, max: 100, step: 1 },
 ];
 
+const PRESETS: Array<{ id: string; label: string; f: Partial<ImageFilters> }> = [
+  { id: "original", label: "Original", f: {} },
+  { id: "vivid", label: "Vivid", f: { saturate: 145, contrast: 115 } },
+  { id: "noir", label: "Noir", f: { grayscale: 100, contrast: 125 } },
+  { id: "warm", label: "Warm", f: { sepia: 35, saturate: 125, brightness: 105 } },
+  { id: "cool", label: "Cool", f: { hueRotate: 190, saturate: 120 } },
+  { id: "vintage", label: "Vintage", f: { sepia: 55, contrast: 90, brightness: 105 } },
+  { id: "fade", label: "Fade", f: { contrast: 82, brightness: 112, saturate: 75 } },
+  { id: "xray", label: "X-Ray", f: { invert: 100, grayscale: 40 } },
+];
+
 const ASPECTS: Array<{ id: string; label: string; ratio: number | null }> = [
-  { id: "original", label: "Original", ratio: null },
+  { id: "original", label: "Free", ratio: null },
   { id: "1:1", label: "1:1", ratio: 1 },
   { id: "4:3", label: "4:3", ratio: 4 / 3 },
   { id: "16:9", label: "16:9", ratio: 16 / 9 },
@@ -53,9 +64,16 @@ const ASPECTS: Array<{ id: string; label: string; ratio: number | null }> = [
 ];
 
 const SIZES = [480, 720, 960, 1280];
+const FORMATS = [
+  { id: "png", label: "PNG", mime: "image/png" },
+  { id: "jpeg", label: "JPEG", mime: "image/jpeg" },
+  { id: "webp", label: "WebP", mime: "image/webp" },
+] as const;
 
 const filterCss = (f: ImageFilters) =>
   `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturate}%) blur(${f.blur}px) grayscale(${f.grayscale}%) sepia(${f.sepia}%) hue-rotate(${f.hueRotate}deg) invert(${f.invert}%)`;
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 export function ImageAppDialog({
   app,
@@ -74,14 +92,26 @@ export function ImageAppDialog({
   const [fileName, setFileName] = useState("");
   const [natural, setNatural] = useState({ w: 1, h: 1 });
   const [filters, setFilters] = useState<ImageFilters>({ ...DEFAULT_FILTERS });
-  const [rot, setRot] = useState(0);
+  const [rot, setRot] = useState(0); // free angle, deg
   const [flipX, setFlipX] = useState(false);
   const [flipY, setFlipY] = useState(false);
   const [aspect, setAspect] = useState("original");
+  const [zoom, setZoom] = useState(1); // 1..3
+  const [offset, setOffset] = useState({ x: 0, y: 0 }); // pan, -1..1
+  const [radius, setRadius] = useState(0); // rounded corners %
+  const [borderW, setBorderW] = useState(0); // px
+  const [borderColor, setBorderColor] = useState("#ffffff");
+  const [vignette, setVignette] = useState(0); // 0..100
+  const [shadow, setShadow] = useState(false);
   const [outWidth, setOutWidth] = useState(960);
+  const [format, setFormat] = useState<(typeof FORMATS)[number]["id"]>("png");
+  const [quality, setQuality] = useState(92);
+  const [compare, setCompare] = useState(false);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const panRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
 
   const onFile = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -102,56 +132,157 @@ export function ImageAppDialog({
     setFlipX(false);
     setFlipY(false);
     setAspect("original");
+    setZoom(1);
+    setOffset({ x: 0, y: 0 });
+    setRadius(0);
+    setBorderW(0);
+    setVignette(0);
+    setShadow(false);
+    setFormat("png");
   };
 
   const css = filterCss({ ...DEFAULT_FILTERS, ...filters });
   const ratio = ASPECTS.find((a) => a.id === aspect)?.ratio ?? null;
-  const dirty =
-    JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) || rot !== 0 || flipX || flipY || ratio !== null;
+  const styled =
+    radius > 0 || borderW > 0 || vignette > 0 || shadow ||
+    JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) || rot !== 0 || flipX || flipY || ratio !== null || zoom !== 1;
 
-  const insert = () => {
+  /** Pan the crop by dragging the preview (active when zoomed in). */
+  const onPanDown = (e: RPointerEvent) => {
+    if (zoom <= 1) return;
+    panRef.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onPanMove = (e: RPointerEvent) => {
+    const p = panRef.current;
+    const el = frameRef.current;
+    if (!p || !el) return;
+    const r = el.getBoundingClientRect();
+    const dx = (e.clientX - p.x) / r.width;
+    const dy = (e.clientY - p.y) / r.height;
+    const span = Math.max(0.001, 1 - 1 / zoom); // pan freedom at this zoom
+    setOffset({
+      x: clamp(p.ox - dx * 2, -span, span),
+      y: clamp(p.oy - dy * 2, -span, span),
+    });
+  };
+  const onPanUp = () => {
+    panRef.current = null;
+  };
+
+  const applyPreset = (f: Partial<ImageFilters>) => setFilters({ ...DEFAULT_FILTERS, ...f });
+
+  const resetAll = () => {
+    setFilters({ ...DEFAULT_FILTERS });
+    setRot(0);
+    setFlipX(false);
+    setFlipY(false);
+    setAspect("original");
+    setZoom(1);
+    setOffset({ x: 0, y: 0 });
+    setRadius(0);
+    setBorderW(0);
+    setVignette(0);
+    setShadow(false);
+  };
+
+  /** Renders the edited picture and returns a data URL. */
+  const render = (): string | null => {
     const img = imgRef.current;
-    if (!img || !src) return;
-    // crop rect (centered) in natural coordinates
-    let cw = img.naturalWidth;
-    let ch = img.naturalHeight;
+    if (!img) return null;
+    // base crop rect (centered) for the chosen ratio, in natural coords
+    let bw = img.naturalWidth;
+    let bh = img.naturalHeight;
     if (ratio) {
-      if (cw / ch > ratio) cw = Math.round(ch * ratio);
-      else ch = Math.round(cw / ratio);
+      if (bw / bh > ratio) bw = Math.round(bh * ratio);
+      else bh = Math.round(bw / ratio);
     }
-    const cx = (img.naturalWidth - cw) / 2;
-    const cy = (img.naturalHeight - ch) / 2;
+    // zoom crop window + pan offset
+    const cz = clamp(zoom, 1, 3);
+    const cw = bw / cz;
+    const ch = bh / cz;
+    const cx = clamp(((img.naturalWidth - cw) / 2) * (1 + offset.x), 0, img.naturalWidth - cw);
+    const cy = clamp(((img.naturalHeight - ch) / 2) * (1 + offset.y), 0, img.naturalHeight - ch);
+    // output
     const w = Math.min(outWidth, 1600);
-    const h = Math.round((w * ch) / cw);
-    const swap = rot === 90 || rot === 270;
+    const h = Math.round((w * bh) / bw);
+    const margin = shadow ? Math.round(Math.min(w, h) * 0.14) : 0;
     const c = document.createElement("canvas");
-    c.width = swap ? h : w;
-    c.height = swap ? w : h;
+    c.width = w + margin * 2;
+    c.height = h + margin * 2;
     const ctx = c.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) return null;
+    const r = Math.round((radius / 100) * Math.min(w, h) / 2);
+    const path = new Path2D();
+    path.roundRect(margin, margin, w, h, r);
+    // soft drop shadow under the (rounded) picture
+    if (shadow) {
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.45)";
+      ctx.shadowBlur = margin * 0.7;
+      ctx.shadowOffsetY = Math.round(margin * 0.3);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill(path);
+      ctx.restore();
+    }
+    // picture (clipped by the rounded frame)
     ctx.save();
+    ctx.clip(path);
     ctx.filter = css;
-    ctx.translate(c.width / 2, c.height / 2);
+    ctx.translate(margin + w / 2, margin + h / 2);
     ctx.rotate((rot * Math.PI) / 180);
     ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-    ctx.drawImage(img, cx, cy, cw, ch, -w / 2, -h / 2, w, h);
+    // overscale so a rotated picture still covers the frame
+    const t = (rot * Math.PI) / 180;
+    const cover = Math.abs(Math.cos(t)) + Math.abs(Math.sin(t));
+    ctx.drawImage(img, cx, cy, cw, ch, (-w * cover) / 2, (-h * cover) / 2, w * cover, h * cover);
+    ctx.filter = "none";
+    // vignette
+    if (vignette > 0) {
+      const g = ctx.createRadialGradient(
+        margin + w / 2, margin + h / 2, Math.min(w, h) * 0.35,
+        margin + w / 2, margin + h / 2, Math.max(w, h) * 0.75,
+      );
+      g.addColorStop(0, "rgba(0,0,0,0)");
+      g.addColorStop(1, `rgba(0,0,0,${(vignette / 100).toFixed(2)})`);
+      ctx.fillStyle = g;
+      ctx.fill(path);
+    }
     ctx.restore();
-    const dataUrl = c.toDataURL("image/png");
-    const ew = Math.min(w, Math.round(canvasW * 0.5));
-    const eh = Math.round((ew * c.height) / c.width);
-    add({
-      type: "image",
-      id: crypto.randomUUID(),
-      x: Math.round((canvasW - ew) / 2),
-      y: Math.round((canvasH - eh) / 2),
-      width: ew,
-      height: eh,
-      rotation: 0,
-      src: dataUrl,
-      fit: "contain",
-      filters: { ...DEFAULT_FILTERS, ...filters },
-    } as unknown as AnyElement);
-    onOpenChange(false);
+    // border on top of everything
+    if (borderW > 0) {
+      ctx.save();
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = borderW;
+      ctx.stroke(path);
+      ctx.restore();
+    }
+    const mime = FORMATS.find((f) => f.id === format)?.mime ?? "image/png";
+    return c.toDataURL(mime, quality / 100);
+  };
+
+  const insert = () => {
+    const dataUrl = render();
+    if (!dataUrl || !src) return;
+    const probe = new Image();
+    probe.onload = () => {
+      const ew = Math.min(probe.naturalWidth, Math.round(canvasW * 0.55));
+      const eh = Math.round((ew * probe.naturalHeight) / probe.naturalWidth);
+      add({
+        type: "image",
+        id: crypto.randomUUID(),
+        x: Math.round((canvasW - ew) / 2),
+        y: Math.round((canvasH - eh) / 2),
+        width: ew,
+        height: eh,
+        rotation: 0,
+        src: dataUrl,
+        fit: "contain",
+        filters: { ...DEFAULT_FILTERS, ...filters },
+      } as unknown as AnyElement);
+      onOpenChange(false);
+    };
+    probe.src = dataUrl;
   };
 
   return (
@@ -187,22 +318,34 @@ export function ImageAppDialog({
             </button>
           ) : (
             <>
-              {/* live preview — crop via aspect-ratio box, filter/rotate via CSS */}
-              <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)_50%/16px_16px] p-2">
-                <div
-                  className="overflow-hidden rounded-lg"
-                  style={{ aspectRatio: String(ratio ?? natural.w / natural.h), maxHeight: 208, maxWidth: "100%" }}
-                >
-                  <img
-                    src={src}
-                    alt={fileName}
-                    className="h-full w-full object-cover"
-                    style={{
-                      filter: css,
-                      transform: `rotate(${rot}deg) scaleX(${flipX ? -1 : 1}) scaleY(${flipY ? -1 : 1})`,
-                    }}
-                  />
-                </div>
+              {/* live preview — drag to pan when zoomed */}
+              <div
+                ref={frameRef}
+                onPointerDown={onPanDown}
+                onPointerMove={onPanMove}
+                onPointerUp={onPanUp}
+                onPointerLeave={onPanUp}
+                className="flex items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)_50%/16px_16px] p-2"
+                style={{
+                  aspectRatio: String(ratio ?? natural.w / natural.h),
+                  maxHeight: 200,
+                  borderRadius: Math.round((radius / 100) * 40) + 8,
+                  boxShadow: shadow ? "0 14px 30px rgba(0,0,0,0.35)" : undefined,
+                  outline: borderW > 0 ? `${borderW}px solid ${borderColor}` : undefined,
+                  outlineOffset: -2,
+                }}
+              >
+                <img
+                  src={src}
+                  alt={fileName}
+                  draggable={false}
+                  className="h-full w-full select-none object-cover"
+                  style={{
+                    filter: compare ? "none" : css,
+                    transform: `translate(${offset.x * 100}%, ${offset.y * 100}%) rotate(${rot}deg) scale(${zoom * (flipX ? -1 : 1)}, ${zoom * (flipY ? -1 : 1)})`,
+                    cursor: zoom > 1 ? "grab" : "default",
+                  }}
+                />
               </div>
 
               {/* transforms */}
@@ -232,7 +375,35 @@ export function ImageAppDialog({
                 >
                   <FlipVertical2 className="size-3.5" />
                 </button>
-                <span className="mx-1 h-6 w-px bg-slate-200" />
+                <label className="flex items-center gap-1 text-[9px] font-semibold text-slate-400">
+                  angle
+                  <input
+                    type="range"
+                    min={0}
+                    max={360}
+                    value={rot}
+                    onChange={(e) => setRot(Number(e.target.value))}
+                    className="h-1 w-20 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-8 tabular-nums">{rot}°</span>
+                </label>
+                <button
+                  onMouseDown={() => setCompare(true)}
+                  onMouseUp={() => setCompare(false)}
+                  onMouseLeave={() => setCompare(false)}
+                  onTouchStart={() => setCompare(true)}
+                  onTouchEnd={() => setCompare(false)}
+                  title="Hold to see the original"
+                  className={`grid size-8 place-items-center rounded-lg border transition ${
+                    compare ? "border-indigo-600 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
+                  }`}
+                >
+                  <Eye className="size-3.5" />
+                </button>
+              </div>
+
+              {/* crop: ratio + zoom */}
+              <div className="flex flex-wrap items-center gap-1.5">
                 <Crop className="size-3 text-slate-400" />
                 {ASPECTS.map((a) => (
                   <button
@@ -247,45 +418,109 @@ export function ImageAppDialog({
                     {a.label}
                   </button>
                 ))}
-                <button
-                  onClick={() => {
-                    setFilters({ ...DEFAULT_FILTERS });
-                    setRot(0);
-                    setFlipX(false);
-                    setFlipY(false);
-                    setAspect("original");
-                  }}
-                  title="Reset adjustments"
-                  className="ml-auto grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:border-rose-300 hover:text-rose-500"
-                >
-                  <RotateCcw className="size-3.5" />
-                </button>
+                <label className="ml-1 flex items-center gap-1 text-[9px] font-semibold text-slate-400">
+                  <Move className="size-2.5" /> zoom
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.05}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="h-1 w-16 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-9 tabular-nums">{zoom.toFixed(2)}×</span>
+                </label>
               </div>
 
-              {/* filters */}
+              {/* presets */}
+              <div className="flex flex-wrap items-center gap-1">
+                {PRESETS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => applyPreset(p.f)}
+                    className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-bold text-slate-500 transition-all hover:border-indigo-400 hover:text-indigo-600"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* filter sliders */}
               <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 p-2.5">
                 {SLIDERS.map(({ key, label, min, max, step }) => (
                   <label key={key} className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
-                    <span className="w-16 shrink-0 text-right">{label}</span>
+                    <span className="w-12 shrink-0 text-right">{label}</span>
                     <input
                       type="range"
                       min={min}
                       max={max}
                       step={step}
                       value={filters[key]}
-                      onChange={(e) =>
-                        setFilters((f) => ({ ...f, [key]: Number(e.target.value) }))
-                      }
+                      onChange={(e) => setFilters((f) => ({ ...f, [key]: Number(e.target.value) }))}
                       className="h-1 flex-1 cursor-pointer accent-indigo-600"
                     />
-                    <span className="w-8 tabular-nums">
-                      {key === "hueRotate" ? filters[key] + "°" : filters[key]}
-                    </span>
+                    <span className="w-8 tabular-nums">{filters[key]}</span>
                   </label>
                 ))}
               </div>
 
-              {/* export size */}
+              {/* styling: corners, border, vignette, shadow */}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 p-2.5">
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  corners
+                  <input
+                    type="range"
+                    min={0}
+                    max={50}
+                    value={radius}
+                    onChange={(e) => setRadius(Number(e.target.value))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{radius}%</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  border
+                  <input
+                    type="range"
+                    min={0}
+                    max={16}
+                    value={borderW}
+                    onChange={(e) => setBorderW(Number(e.target.value))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <input
+                    type="color"
+                    value={borderColor}
+                    onChange={(e) => setBorderColor(e.target.value)}
+                    className="size-4 cursor-pointer rounded border border-slate-200"
+                  />
+                </label>
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  vignette
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={vignette}
+                    onChange={(e) => setVignette(Number(e.target.value))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{vignette}</span>
+                </label>
+                <button
+                  onClick={() => setShadow((s) => !s)}
+                  className={`rounded-lg border px-2 py-1.5 text-[9px] font-bold uppercase tracking-wide transition-all ${
+                    shadow
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                      : "border-slate-200 bg-white text-slate-400 hover:border-indigo-300"
+                  }`}
+                >
+                  Drop shadow {shadow ? "on" : "off"}
+                </button>
+              </div>
+
+              {/* export */}
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Export</span>
                 {SIZES.map((s) => (
@@ -301,9 +536,41 @@ export function ImageAppDialog({
                     {s}px
                   </button>
                 ))}
-                <span className="ml-1 truncate text-[9px] text-slate-400" title={fileName}>
-                  {fileName} · {natural.w}×{natural.h}
-                </span>
+                <span className="mx-0.5 h-4 w-px bg-slate-200" />
+                {FORMATS.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setFormat(f.id)}
+                    className={`rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition-all ${
+                      format === f.id
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+                {format !== "png" && (
+                  <label className="flex items-center gap-1 text-[9px] font-semibold text-slate-400">
+                    quality
+                    <input
+                      type="range"
+                      min={50}
+                      max={100}
+                      value={quality}
+                      onChange={(e) => setQuality(Number(e.target.value))}
+                      className="h-1 w-14 cursor-pointer accent-indigo-600"
+                    />
+                    <span className="w-7 tabular-nums">{quality}</span>
+                  </label>
+                )}
+                <button
+                  onClick={resetAll}
+                  title="Reset everything"
+                  className="ml-auto grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-400 transition hover:border-rose-300 hover:text-rose-500"
+                >
+                  <RotateCcw className="size-3.5" />
+                </button>
               </div>
 
               <div className="flex items-center justify-between gap-2">
@@ -322,8 +589,9 @@ export function ImageAppDialog({
                 </button>
               </div>
               <p className="text-[9px] leading-relaxed text-slate-400">
-                Crop, rotation and flips are baked into the inserted picture; the filter values
-                {dirty ? "" : " (currently untouched)"} stay editable from the element panel.
+                Crop{zoom > 1 ? " & zoom" : ""}, rotation, corners, border and shadow are baked into the
+                inserted picture{styled ? "" : " (untouched so far)"}; filter values stay editable from
+                the element panel.
               </p>
             </>
           )}
