@@ -69,9 +69,26 @@ function paintStroke(ctx: CanvasRenderingContext2D, s: Stroke, sx: number, sy: n
   const p1 = s.points[s.points.length - 1];
   ctx.beginPath();
   if (s.tool === "brush" || s.tool === "eraser") {
-    ctx.moveTo(p0.x * sx, p0.y * sy);
-    for (const p of s.points.slice(1)) ctx.lineTo(p.x * sx, p.y * sy);
-    ctx.stroke();
+    const pts = s.points;
+    if (pts.length === 1) {
+      // tap = dot
+      ctx.arc(pts[0].x * sx, pts[0].y * sy, Math.max(0.5, (s.size * sx) / 2), 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // quadratic midpoint smoothing for silky curves
+      ctx.moveTo(pts[0].x * sx, pts[0].y * sy);
+      if (pts.length === 2) {
+        ctx.lineTo(pts[1].x * sx, pts[1].y * sy);
+      } else {
+        for (let i = 1; i < pts.length - 1; i++) {
+          const mx = ((pts[i].x + pts[i + 1].x) / 2) * sx;
+          const my = ((pts[i].y + pts[i + 1].y) / 2) * sy;
+          ctx.quadraticCurveTo(pts[i].x * sx, pts[i].y * sy, mx, my);
+        }
+        ctx.lineTo(pts[pts.length - 1].x * sx, pts[pts.length - 1].y * sy);
+      }
+      ctx.stroke();
+    }
   } else if (s.tool === "line" || s.tool === "arrow") {
     ctx.moveTo(p0.x * sx, p0.y * sy);
     ctx.lineTo(p1.x * sx, p1.y * sy);
@@ -133,11 +150,12 @@ export function PaintAppDialog({
   const [filled, setFilled] = useState(false);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [redoStack, setRedoStack] = useState<Stroke[]>([]);
-  const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
+  // live drawing state lives in refs — pointer moves never re-render React
   const drawing = useRef(false);
   const padRef = useRef<HTMLCanvasElement>(null);
   const startRef = useRef({ x: 0, y: 0 });
-  const [freehand, setFreehand] = useState<Array<{ x: number; y: number }>>([]);
+  const freehandRef = useRef<Array<{ x: number; y: number }>>([]);
+  const shapeToRef = useRef<{ x: number; y: number } | null>(null);
 
   const dispW = 640;
   const dispH = Math.round((dispW * outH) / outW);
@@ -149,7 +167,7 @@ export function PaintAppDialog({
     opacity: opacity / 100,
     filled,
     erase: tool === "eraser",
-    points: SHAPE_TOOLS.includes(tool) ? [startRef.current, to] : [...freehand, to],
+    points: SHAPE_TOOLS.includes(tool) ? [startRef.current, to] : freehandRef.current,
   });
 
   const redraw = (preview?: Stroke | null) => {
@@ -168,12 +186,53 @@ export function PaintAppDialog({
     if (preview) paintStroke(ctx, preview, sx, sy);
   };
 
-  useEffect(() => redraw(drag ? liveStroke(drag) : null), [strokes, drag, open, bg, outW, outH]);
+  useEffect(() => redraw(), [strokes, open, bg, outW, outH, tool, filled, color, size, opacity]);
 
   const pos = (e: React.PointerEvent) => {
     const pad = padRef.current!;
     const r = pad.getBoundingClientRect();
     return { x: (e.clientX - r.left) * (dispW / r.width), y: (e.clientY - r.top) * (dispH / r.height) };
+  };
+
+  /** Draws the newest brush segment straight on the canvas — zero React work. */
+  const drawSegment = (p: { x: number; y: number }) => {
+    const pad = padRef.current;
+    const ctx = pad?.getContext("2d");
+    if (!ctx) return;
+    const sx = outW / dispW;
+    const sy = outH / dispH;
+    const pts = freehandRef.current;
+    const prev = pts[pts.length - 1];
+    pts.push(p);
+    ctx.save();
+    ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+    ctx.globalAlpha = opacity / 100;
+    ctx.strokeStyle = color;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = size * sx;
+    ctx.beginPath();
+    if (pts.length === 1) {
+      ctx.arc(p.x * sx, p.y * sy, Math.max(0.5, (size * sx) / 2), 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    } else if (pts.length === 2) {
+      ctx.moveTo(prev.x * sx, prev.y * sy);
+      ctx.lineTo(p.x * sx, p.y * sy);
+      ctx.stroke();
+    } else {
+      // quadratic segment between midpoints, control = previous point
+      const p0 = pts[pts.length - 3];
+      const p1 = pts[pts.length - 2];
+      const m1x = ((p0.x + p1.x) / 2) * sx;
+      const m1y = ((p0.y + p1.y) / 2) * sy;
+      const m2x = ((p1.x + p.x) / 2) * sx;
+      const m2y = ((p1.y + p.y) / 2) * sy;
+      ctx.moveTo(m1x, m1y);
+      ctx.quadraticCurveTo(p1.x * sx, p1.y * sy, m2x, m2y);
+      ctx.stroke();
+    }
+    ctx.restore();
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
@@ -183,9 +242,10 @@ export function PaintAppDialog({
     const p = pos(e);
     startRef.current = p;
     if (SHAPE_TOOLS.includes(tool)) {
-      setDrag(p);
+      shapeToRef.current = p;
     } else {
-      setFreehand([p]);
+      freehandRef.current = [];
+      drawSegment(p); // immediate dot
     }
     setRedoStack([]);
   };
@@ -193,24 +253,24 @@ export function PaintAppDialog({
     if (!drawing.current) return;
     const p = pos(e);
     if (SHAPE_TOOLS.includes(tool)) {
-      setDrag(p);
+      // shape preview redrawn imperatively — no setState per move
+      shapeToRef.current = p;
+      redraw(shapeToRef.current ? liveStroke(shapeToRef.current) : null);
     } else {
-      setFreehand((prev) => [...prev, p]);
+      drawSegment(p);
     }
   };
   const onPointerUp = () => {
     if (!drawing.current) return;
     drawing.current = false;
     if (SHAPE_TOOLS.includes(tool)) {
-      if (drag) setStrokes((prev) => [...prev, liveStroke(drag)]);
-      setDrag(null);
+      const to = shapeToRef.current;
+      if (to) setStrokes((prev) => [...prev, liveStroke(to)]);
+      shapeToRef.current = null;
     } else {
-      if (freehand.length > 0)
-        setStrokes((prev) => [
-          ...prev,
-          { tool, color, size, opacity: opacity / 100, filled, erase: tool === "eraser", points: freehand },
-        ]);
-      setFreehand([]);
+      if (freehandRef.current.length > 0)
+        setStrokes((prev) => [...prev, liveStroke({ x: 0, y: 0 })]);
+      freehandRef.current = [];
     }
   };
 
