@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   CircleHelp,
   MonitorPlay,
+  Braces,
 } from "lucide-react";
 
 export const Route = createFileRoute("/wiki")({
@@ -46,6 +47,7 @@ const SECTIONS = [
   { id: "formats", label: "Canvas formats", icon: <MonitorPlay className="size-3.5" /> },
   { id: "panels", label: "Panels", icon: <LayoutGrid className="size-3.5" /> },
   { id: "palette", label: "Command palette", icon: <Command className="size-3.5" /> },
+  { id: "ai", label: "AI slideshow JSON", icon: <Braces className="size-3.5" /> },
   { id: "shortcuts", label: "Shortcuts", icon: <Keyboard className="size-3.5" /> },
   { id: "effects", label: "Effects & transitions", icon: <WandSparkles className="size-3.5" /> },
   { id: "publishing", label: "Publishing & sharing", icon: <Share2 className="size-3.5" /> },
@@ -210,6 +212,62 @@ function Wiki() {
               feature guides and links — type “insert chart”, “morph”, or “undo” and hit{" "}
               <Kbd>↵</Kbd>. Navigate with the arrow keys, run with Enter.
             </p>
+          </Section>
+
+          <Section
+            id="ai"
+            icon={<Braces className="size-4" />}
+            kicker="For LLMs"
+            title="Generate slideshows with AI"
+          >
+            <p>
+              Give an LLM the editor contract below, then ask it to return only valid JSON.
+              The example shows the shape of a complete deck: canvas settings, pages, and
+              elements with position, size, styling, and content. Keep element types and
+              properties consistent with the example so the result can be imported safely.
+            </p>
+            <div className="mt-4 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-300">slideshow.json</span>
+                <span className="text-[10px] text-slate-500">starter contract</span>
+              </div>
+              <pre className="overflow-x-auto p-4 text-[10px] leading-relaxed text-slate-300"><code>{`{
+  "title": "Product launch",
+  "canvas": { "width": 1920, "height": 1080, "format": "16:9" },
+  "pages": [
+    {
+      "id": "page-1",
+      "background": "#F8FAFC",
+      "elements": [
+        {
+          "id": "title-1", "type": "text",
+          "x": 140, "y": 180, "width": 1100, "height": 150,
+          "text": "Ship better ideas",
+          "fontSize": 76, "fontFamily": "Inter", "fontWeight": 700,
+          "color": "#0F172A", "align": "left"
+        },
+        {
+          "id": "hero-1", "type": "shape",
+          "shape": "roundedRect", "x": 140, "y": 390,
+          "width": 720, "height": 280, "fill": "#2563EB",
+          "radius": 24, "opacity": 1
+        },
+        {
+          "id": "image-1", "type": "image",
+          "src": "https://images.unsplash.com/photo-example",
+          "x": 980, "y": 180, "width": 720, "height": 490,
+          "fit": "cover", "radius": 24
+        }
+      ]
+    }
+  ]
+}`}</code></pre>
+            </div>
+            <Callout icon={<Braces className="size-3.5" />}>
+              Prompt pattern: “Create a 5-page investor pitch about [topic]. Return only JSON
+              matching the DiapoLab slideshow contract. Use unique ids, 1920×1080 canvas, and
+              keep every element inside the page bounds.”
+            </Callout>
           </Section>
 
           <Section

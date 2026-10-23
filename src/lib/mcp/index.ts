@@ -15,7 +15,7 @@ const projectRef =
 export default defineMcp({
   name: "positron-studio-mcp",
   title: "DiapoLab",
-  version: "0.2.0",
+  version: "0.3.0",
   instructions:
     "Tools for DiapoLab, a deck/design editor. List, read, create and delete the signed-in user's designs, and browse or read community templates.",
   auth: auth.oauth.issuer({
