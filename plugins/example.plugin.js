@@ -57,6 +57,28 @@
    quiz  : question, options, correctId, bgColor, fgColor, accentColor
 
    Coordinates are canvas pixels — a 1920x1080 slide is the default deck.
+
+   APPS (interactive mini-tools)
+   -----------------------------
+   A plugin may also ship "apps" — small interactive tools that run inside
+   the editor and produce canvas elements. Currently supported: paint.
+
+     apps: [
+       {
+         name: "My paint studio",       // required
+         description: "Shown as tooltip",
+         type: "paint",                 // "paint"
+         config: {
+           colors: ["#2563eb", ...],   // swatches in the picker
+           defaultColor: "#2563eb",
+           brushSizes: [4, 8, 14, 24], // brush size palette
+           bg: "#f8fafc",              // pad background, or "transparent"
+           width: 960, height: 540,    // export size in slide pixels
+         },
+       },
+     ]
+
+   Apps appear in the Plugins panel and in the command palette (Ctrl+K).
    ========================================================================== */
 
 diapolabPlugin({
@@ -66,6 +88,20 @@ diapolabPlugin({
   description:
     "Ten advanced widgets: gradient hero, dot-matrix generator, KPI row, " +
     "donut chart, icon lockups, interactive buttons, glass panels and more.",
+
+  apps: [
+    {
+      name: "Neon paint",
+      description: "Freehand doodle pad — insert as an image",
+      type: "paint",
+      config: {
+        colors: ["#2563eb", "#ff0080", "#ffd84a", "#7df9ff", "#111827"],
+        defaultColor: "#ff0080",
+        brushSizes: [4, 10, 20, 36],
+        bg: "#0a0f1f",
+      },
+    },
+  ],
 
   widgets: [
     /* -- 1. Gradient hero — shapes with gradients + gradient text ------- */
