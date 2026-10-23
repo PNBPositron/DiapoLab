@@ -131,6 +131,11 @@ const IMAGE_FILTER_PRESETS: Array<{
     filters: { ...DEFAULT_FILTERS, blur: 0.7, contrast: 88, saturate: 118, brightness: 110 },
     preview: "blur(.7px) contrast(.88) saturate(1.18) brightness(1.1)",
   },
+  { name: "Glitch", description: "RGB split & distort", filters: { ...DEFAULT_FILTERS, glitch: 55 }, preview: "none" },
+  { name: "Pixelate", description: "8-bit mosaic", filters: { ...DEFAULT_FILTERS, pixelate: 10 }, preview: "none" },
+  { name: "Posterize", description: "Flat color bands", filters: { ...DEFAULT_FILTERS, posterize: 5 }, preview: "none" },
+  { name: "VHS", description: "Retro tape", filters: { ...DEFAULT_FILTERS, glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 }, preview: "saturate(1.35) contrast(1.12) hue-rotate(-8deg)" },
+  { name: "Gameboy", description: "Dotted handheld", filters: { ...DEFAULT_FILTERS, pixelate: 12, grayscale: 100, contrast: 145, brightness: 105 }, preview: "grayscale(1) contrast(1.45) brightness(1.05)" },
 ];
 
 const SWATCHES = [
@@ -1146,6 +1151,36 @@ export function PropertiesPanel() {
                   unit="%"
                   onChange={(val) =>
                     update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, invert: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Glitch"
+                  min={0}
+                  max={100}
+                  value={el.filters?.glitch ?? 0}
+                  unit="%"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, glitch: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Pixelate"
+                  min={0}
+                  max={40}
+                  value={el.filters?.pixelate ?? 0}
+                  unit="px"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, pixelate: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Posterize"
+                  min={0}
+                  max={16}
+                  value={el.filters?.posterize ?? 0}
+                  unit=" lvl"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, posterize: val } })
                   }
                 />
                 <SliderWithInput
