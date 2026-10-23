@@ -20,7 +20,15 @@ import { HelpCircle, Check, X as XIcon } from "lucide-react";
 
 const filterCss = (f?: ImageFilters) => {
   const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
-  return `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturate}%) blur(${v.blur}px) grayscale(${v.grayscale}%) sepia(${v.sepia}%) hue-rotate(${v.hueRotate}deg) invert(${v.invert}%)`;
+  const temp = v.temperature ?? 0;
+  return [
+    `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturate}%) blur(${v.blur}px) grayscale(${v.grayscale}%) sepia(${v.sepia}%) hue-rotate(${v.hueRotate}deg) invert(${v.invert}%)`,
+    // color grading: warm (+) / cool (−) temperature shift
+    temp > 0 ? `sepia(${(temp * 0.35).toFixed(1)}%) saturate(106%)` : "",
+    temp < 0 ? `hue-rotate(${(temp * 0.15).toFixed(1)}deg) saturate(110%)` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 };
 
 const shadowFilter = (s?: ElementShadow) =>
@@ -741,6 +749,20 @@ export function CanvasElement({
                 ]
                   .filter(Boolean)
                   .join(" "),
+              }}
+            />
+          )}
+          {/* color grading — tint wash (kept live on the slide) */}
+          {element.filters?.tintColor && (element.filters.tintOpacity ?? 0) > 0 && (
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                background: element.filters.tintColor,
+                opacity: (element.filters.tintOpacity ?? 0) / 100,
+                mixBlendMode: "multiply",
               }}
             />
           )}
