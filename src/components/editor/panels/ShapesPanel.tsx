@@ -95,7 +95,7 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
       {!embedded && <PanelHeader title="Shapes" />}
 
       <ChipGroup value={category} options={SHAPE_CATEGORIES.map(c => ({ value: c.name, label: `${c.name} (${c.shapes.length})` }))} onChange={setCategory} label="Shape categories" />
-      <OptionGrid columns={3} label="Shapes" options={activeShapes.map(s => ({ value: s.kind, label: s.label, preview: <ShapePreview kind={s.kind} fill="#9ca3af" /> }))} onChange={kind => add(newShape(kind, { fill: "#9ca3af", stroke: "#0a0f1f" }))} />
+      <OptionGrid columns={3} label="Shapes" options={activeShapes.map(s => ({ value: s.kind, label: s.label, preview: <ShapePreview kind={s.kind} fill="#ffffff" /> }))} onChange={kind => add(newShape(kind, { fill: "#ffffff", stroke: "#2563eb", strokeWidth: 5 }))} />
 
 
     </div>
@@ -103,7 +103,7 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
 }
 
 function ShapePreview({ kind, fill }: { kind: ShapeKind; fill: string }) {
-  const stroke = fill === "#0a0f1f" ? "#7df9ff" : "#0a0f1f";
+  const stroke = fill === "#0a0f1f" ? "#7df9ff" : "#2563eb";
   const sw = 3;
   if (kind === "rect")
     return (
