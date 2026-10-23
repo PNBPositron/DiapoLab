@@ -263,7 +263,7 @@ export function PaintAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl gap-0 overflow-hidden p-0 sm:rounded-3xl">
+      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto p-0 sm:rounded-3xl">
         <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-4">
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">
             <span className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.35)]">
@@ -278,29 +278,28 @@ export function PaintAppDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex gap-4 p-5">
-          {/* toolbar */}
-          <div className="flex w-12 shrink-0 flex-col items-center gap-2">
+        <div className="flex flex-col gap-3 p-4">
+          {/* Tools row */}
+          <div className="flex flex-wrap items-center gap-1.5">
             {TOOLS.map(({ tool: t, label, Icon }) => (
               <button
                 key={t}
                 title={label}
                 onClick={() => setTool(t)}
-                className={`grid size-10 place-items-center rounded-xl border transition-all ${
+                className={`grid size-9 place-items-center rounded-lg border transition-all ${
                   tool === t
-                    ? "border-indigo-600 bg-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.4)]"
+                    ? "border-indigo-600 bg-indigo-600 text-white shadow-[0_4px_10px_rgba(79,70,229,0.4)]"
                     : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
                 }`}
               >
                 <Icon className="size-4" />
               </button>
             ))}
-            <div className="my-1 h-px w-8 bg-slate-200" />
             <button
               title={filled ? "Shape fill: ON" : "Shape fill: OFF"}
-              disabled={!SHAPE_TOOLS.includes(tool) || tool === "line" || tool === "arrow"}
+              disabled={tool === "line" || tool === "arrow" || tool === "brush" || tool === "eraser"}
               onClick={() => setFilled((f) => !f)}
-              className={`grid size-10 place-items-center rounded-xl border transition-all disabled:opacity-30 ${
+              className={`grid size-9 place-items-center rounded-lg border transition-all disabled:opacity-30 ${
                 filled
                   ? "border-indigo-600 bg-indigo-50 text-indigo-600"
                   : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
@@ -308,28 +307,29 @@ export function PaintAppDialog({
             >
               <PaintBucket className="size-4" />
             </button>
-            <div className="my-1 h-px w-8 bg-slate-200" />
+            <span className="mx-1 h-6 w-px bg-slate-200" />
+            {/* Brush sizes inline */}
             {sizes.map((s) => (
               <button
                 key={s}
                 title={`Size ${s}px`}
                 onClick={() => setSize(s)}
-                className={`grid size-10 place-items-center rounded-xl border transition-all ${
+                className={`grid size-9 place-items-center rounded-lg border transition-all ${
                   size === s ? "border-indigo-600 bg-indigo-50" : "border-slate-200 bg-white hover:border-indigo-300"
                 }`}
               >
                 <span
                   className="rounded-full bg-slate-800"
-                  style={{ width: Math.min(20, 3 + s * 0.42), height: Math.min(20, 3 + s * 0.42) }}
+                  style={{ width: Math.min(18, 3 + s * 0.38), height: Math.min(18, 3 + s * 0.38) }}
                 />
               </button>
             ))}
-            <div className="my-1 h-px w-8 bg-slate-200" />
+            <span className="mx-1 h-6 w-px bg-slate-200" />
             <button
               title="Undo"
               disabled={strokes.length === 0}
               onClick={undo}
-              className="grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
+              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
             >
               <Undo2 className="size-4" />
             </button>
@@ -337,7 +337,7 @@ export function PaintAppDialog({
               title="Redo"
               disabled={redoStack.length === 0}
               onClick={redo}
-              className="grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
+              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
             >
               <Redo2 className="size-4" />
             </button>
@@ -345,14 +345,14 @@ export function PaintAppDialog({
               title="Clear all"
               disabled={strokes.length === 0}
               onClick={clearAll}
-              className="grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-rose-300 hover:text-rose-500 disabled:opacity-40"
+              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-rose-300 hover:text-rose-500 disabled:opacity-40"
             >
               <Trash2 className="size-4" />
             </button>
           </div>
 
-          {/* pad + palette */}
-          <div className="flex min-w-0 flex-1 flex-col gap-3">
+          {/* Pad — height capped so the dialog always fits the screen */}
+          <div className="mx-auto w-full" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
             <canvas
               ref={padRef}
               width={dispW}
@@ -361,78 +361,80 @@ export function PaintAppDialog({
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
               onPointerLeave={onPointerUp}
-              className={`w-full touch-none rounded-2xl border-2 border-dashed border-slate-300 bg-white shadow-inner ${
+              className={`block w-full touch-none rounded-xl border-2 border-dashed border-slate-300 bg-white shadow-inner ${
                 tool === "eraser" ? "cursor-cell" : "cursor-crosshair"
               }`}
               style={{ background: transparent ? "repeating-conic-gradient(#f1f5f9 0% 25%, #ffffff 0% 50%) 50% / 24px 24px" : undefined }}
             />
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {colors.map((c) => (
-                  <button
-                    key={c}
-                    title={c}
-                    onClick={() => {
-                      setColor(c);
-                      if (tool === "eraser") setTool("brush");
-                    }}
-                    className={`size-7 rounded-full border-2 transition-transform hover:scale-110 ${
-                      color === c && tool !== "eraser" ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
-                    }`}
-                    style={{ background: c }}
-                  />
-                ))}
-                <label
-                  title="Custom color"
-                  className="relative grid size-7 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
-                  style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
-                >
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => {
-                      setColor(e.target.value);
-                      if (tool === "eraser") setTool("brush");
-                    }}
-                    className="absolute inset-0 cursor-pointer opacity-0"
-                  />
-                </label>
-                {/* opacity */}
-                <span className="ml-2 flex items-center gap-1 text-[10px] font-semibold text-slate-400" title="Opacity">
-                  <Droplets className="size-3" />
-                  <input
-                    type="range"
-                    min={10}
-                    max={100}
-                    value={opacity}
-                    onChange={(e) => setOpacity(Number(e.target.value))}
-                    className="h-1 w-16 cursor-pointer accent-indigo-600"
-                  />
-                  <span className="w-7 tabular-nums">{opacity}%</span>
-                </span>
-                {/* background toggle */}
+          </div>
+
+          {/* Palette + actions */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {colors.map((c) => (
                 <button
-                  title={transparent ? "Background: transparent" : "Background: " + bg + " — click for transparent"}
-                  onClick={() => setBg((b) => (b === "transparent" ? defaultBg : "transparent"))}
-                  className={`ml-1 grid size-7 place-items-center rounded-lg border transition-all ${
-                    transparent ? "border-indigo-600 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-white text-slate-400"
+                  key={c}
+                  title={c}
+                  onClick={() => {
+                    setColor(c);
+                    if (tool === "eraser") setTool("brush");
+                  }}
+                  className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${
+                    color === c && tool !== "eraser" ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
                   }`}
-                >
-                  <span
-                    className="size-3.5 rounded"
-                    style={{ background: transparent ? "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px" : bg }}
-                  />
-                </button>
-              </div>
-              <button
-                onClick={insert}
-                disabled={strokes.length === 0}
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+                  style={{ background: c }}
+                />
+              ))}
+              <label
+                title="Custom color"
+                className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
+                style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
               >
-                <Check className="size-3.5" />
-                Insert on slide
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => {
+                    setColor(e.target.value);
+                    if (tool === "eraser") setTool("brush");
+                  }}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                />
+              </label>
+              {/* opacity */}
+              <span className="ml-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-400" title="Opacity">
+                <Droplets className="size-3" />
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  value={opacity}
+                  onChange={(e) => setOpacity(Number(e.target.value))}
+                  className="h-1 w-16 cursor-pointer accent-indigo-600"
+                />
+                <span className="w-7 tabular-nums">{opacity}%</span>
+              </span>
+              {/* background toggle */}
+              <button
+                title={transparent ? "Background: transparent" : "Background: " + bg + " — click for transparent"}
+                onClick={() => setBg((b) => (b === "transparent" ? defaultBg : "transparent"))}
+                className={`ml-1 grid size-6 place-items-center rounded-md border transition-all ${
+                  transparent ? "border-indigo-600 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-white text-slate-400"
+                }`}
+              >
+                <span
+                  className="size-3 rounded"
+                  style={{ background: transparent ? "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px" : bg }}
+                />
               </button>
             </div>
+            <button
+              onClick={insert}
+              disabled={strokes.length === 0}
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+            >
+              <Check className="size-3.5" />
+              Insert on slide
+            </button>
           </div>
         </div>
       </DialogContent>
