@@ -14,15 +14,16 @@ export type PluginWidget = {
 };
 
 /**
- * An APP is an interactive mini-tool shipped by a plugin (e.g. a paint
- * studio). Apps run inside the editor and produce canvas elements.
- * Currently supported: type "paint" (freehand drawing pad).
+ * An APP is an interactive mini-tool shipped by a plugin. Apps run inside
+ * the editor and produce canvas elements.
+ * Supported types: "paint" (freehand drawing pad), "video" (upload, trim
+ * & insert video clips on the slide).
  */
 export type PluginApp = {
   id?: string;
   name: string;
   description?: string;
-  type: "paint";
+  type: "paint" | "video";
   config?: {
     /** swatches shown in the color picker (any CSS color) */
     colors?: string[];
@@ -95,7 +96,7 @@ function normalizeApps(raw: unknown): PluginApp[] {
     if (!a || typeof a !== "object") continue;
     const app = a as Record<string, unknown>;
     const name = typeof app.name === "string" && app.name.trim() ? app.name.trim() : null;
-    const type = app.type === "paint" ? "paint" : null;
+    const type = app.type === "paint" || app.type === "video" ? app.type : null;
     if (!name || !type) continue;
     const cfg = (app.config ?? {}) as Record<string, unknown>;
     apps.push({
@@ -222,6 +223,14 @@ export const PAINT_APP: PluginApp = {
   },
 };
 
+/** The built-in Video app — upload, trim and insert video clips. */
+export const VIDEO_APP: PluginApp = {
+  id: "video",
+  name: "Video",
+  description: "Upload, trim & insert video clips",
+  type: "video",
+};
+
 /** Plugins that ship with the editor. Never stored, never removable. */
 export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
   {
@@ -233,6 +242,17 @@ export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
     enabled: true,
     widgets: [],
     apps: [PAINT_APP],
+    importedAt: 0,
+  },
+  {
+    id: "builtin-video",
+    name: "Video",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Built-in video editor — upload a clip, trim it, insert it.",
+    enabled: true,
+    widgets: [],
+    apps: [VIDEO_APP],
     importedAt: 0,
   },
 ];
