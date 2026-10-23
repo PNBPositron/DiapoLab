@@ -164,7 +164,7 @@ const UI_PRESETS: Array<{
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 
 export function ComponentsPanel() {
-  const { add, selectedId, elements, update } = useEditor();
+  const { add, addGroup, selectedId, elements, update } = useEditor();
   const [style, setStyle] = useState<UiStyle>("cyber");
   const [section, setSection] = useState<PresetSection>("interfaces");
   const [search, setSearch] = useState("");
@@ -289,7 +289,7 @@ export function ComponentsPanel() {
                 }))}
                 onChange={(key) => {
                   const entry = pluginWidgets.find((w) => w.key === key);
-                  if (entry) instantiateWidget(entry.widget).forEach((el) => add(el));
+                  if (entry) addGroup(instantiateWidget(entry.widget));
                 }}
               />
             </div>
