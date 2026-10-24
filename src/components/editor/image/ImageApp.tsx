@@ -56,7 +56,37 @@ const PRESETS: Array<{ id: string; label: string; f: Partial<ImageFilters> }> = 
   { id: "vintage", label: "Vintage", f: { sepia: 55, contrast: 90, brightness: 105 } },
   { id: "fade", label: "Fade", f: { contrast: 82, brightness: 112, saturate: 75 } },
   { id: "xray", label: "X-Ray", f: { invert: 100, grayscale: 40 } },
+  { id: "punch", label: "Punch", f: { saturate: 160, contrast: 130 } },
+  { id: "crisp", label: "Crisp", f: { contrast: 140, saturate: 110 } },
+  { id: "silver", label: "Silver", f: { grayscale: 100, brightness: 112, contrast: 105 } },
+  { id: "charcoal", label: "Charcoal", f: { grayscale: 100, contrast: 160, brightness: 92 } },
+  { id: "mono", label: "Mono", f: { grayscale: 100, contrast: 110 } },
+  { id: "golden", label: "Golden", f: { temperature: 50, tintColor: "#f5a623", tintOpacity: 18 } },
+  { id: "sunset", label: "Sunset", f: { temperature: 55, tintColor: "#ff6b6b", tintOpacity: 15, saturate: 115 } },
+  { id: "arctic", label: "Arctic", f: { temperature: -55, brightness: 108 } },
+  { id: "sepia", label: "Sepia", f: { sepia: 80, contrast: 105 } },
+  { id: "retro", label: "Retro", f: { sepia: 35, saturate: 130, contrast: 110, hueRotate: 10 } },
+  { id: "pastel", label: "Pastel", f: { saturate: 70, brightness: 115, contrast: 90 } },
+  { id: "dreamy", label: "Dreamy", f: { blur: 1.5, brightness: 112, saturate: 120 } },
+  { id: "bleach", label: "Bleach", f: { saturate: 45, contrast: 130, brightness: 115 } },
+  { id: "pop", label: "Pop", f: { saturate: 180, contrast: 125 } },
+  { id: "duoblue", label: "Duo blue", f: { grayscale: 100, tintColor: "#2563eb", tintOpacity: 45 } },
+  { id: "duoteal", label: "Duo teal", f: { grayscale: 100, tintColor: "#14b8a6", tintOpacity: 45 } },
+  { id: "duopink", label: "Duo pink", f: { grayscale: 100, tintColor: "#ec4899", tintOpacity: 45 } },
+  { id: "lavender", label: "Lavender", f: { tintColor: "#a78bfa", tintOpacity: 25 } },
+  { id: "peach", label: "Peach", f: { tintColor: "#ffb4a2", tintOpacity: 22, temperature: 25 } },
+  { id: "mint", label: "Mint", f: { tintColor: "#99f6e4", tintOpacity: 20, temperature: -20 } },
+  { id: "steel", label: "Steel", f: { grayscale: 100, tintColor: "#94a3b8", tintOpacity: 35, contrast: 115 } },
+  { id: "blueprint", label: "Blueprint", f: { invert: 95, grayscale: 100, tintColor: "#1d4ed8", tintOpacity: 40 } },
   { id: "glitch", label: "Glitch", f: { contrast: 125, saturate: 160, glitch: 72 } },
+  { id: "glitchplus", label: "Glitch+", f: { glitch: 95, contrast: 125 } },
+  { id: "vhs", label: "VHS", f: { glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 } },
+  { id: "poster", label: "Poster", f: { posterize: 4 } },
+  { id: "posterplus", label: "Poster+", f: { posterize: 6, temperature: 30 } },
+  { id: "comic", label: "Comic", f: { posterize: 6, contrast: 140, saturate: 160 } },
+  { id: "pixel", label: "Pixel", f: { pixelate: 10 } },
+  { id: "8bit", label: "8-bit", f: { pixelate: 12, grayscale: 100, contrast: 145, brightness: 105 } },
+  { id: "mosaic", label: "Mosaic", f: { pixelate: 20 } },
 ];
 
 const ASPECTS: Array<{ id: string; label: string; ratio: number | null }> = [
@@ -185,8 +215,9 @@ export function ImageAppDialog({
   };
 
   const applyPreset = (f: Partial<ImageFilters>) => {
-    setFilters({ ...DEFAULT_FILTERS, ...f });
-    setGlitch(f.glitch ?? 0);
+    const { glitch: g, ...rest } = f;
+    setFilters({ ...DEFAULT_FILTERS, ...rest });
+    setGlitch(g ?? 0);
   };
 
   const resetAll = () => {
@@ -201,6 +232,7 @@ export function ImageAppDialog({
     setBorderW(0);
     setVignette(0);
     setShadow(false);
+    setGlitch(0);
   };
 
   /** Renders the edited picture and returns a data URL. */
@@ -278,6 +310,43 @@ export function ImageAppDialog({
       ctx.fill(path);
     }
     ctx.restore();
+    // bake pixelate (mosaic) into the bitmap
+    const pxSize = Math.round(filters.pixelate ?? 0);
+    if (pxSize >= 2) {
+      try {
+        const tmp = document.createElement("canvas");
+        tmp.width = Math.max(1, Math.round(c.width / pxSize));
+        tmp.height = Math.max(1, Math.round(c.height / pxSize));
+        const tctx = tmp.getContext("2d");
+        if (tctx) {
+          tctx.imageSmoothingEnabled = false;
+          tctx.drawImage(c, 0, 0, tmp.width, tmp.height);
+          ctx.clearRect(0, 0, c.width, c.height);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(tmp, 0, 0, c.width, c.height);
+          ctx.imageSmoothingEnabled = true;
+        }
+      } catch {
+        /* tainted canvas — skip fx */
+      }
+    }
+    // bake posterize (flat color bands)
+    const levels = Math.round(filters.posterize ?? 0);
+    if (levels >= 2 && levels <= 16) {
+      try {
+        const region = ctx.getImageData(margin, margin, w, h);
+        const step = 255 / (levels - 1);
+        const d = region.data;
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = Math.round(Math.round(d[i] / step) * step);
+          d[i + 1] = Math.round(Math.round(d[i + 1] / step) * step);
+          d[i + 2] = Math.round(Math.round(d[i + 2] / step) * step);
+        }
+        ctx.putImageData(region, margin, margin);
+      } catch {
+        /* tainted canvas — skip fx */
+      }
+    }
     // border on top of everything
     if (borderW > 0) {
       ctx.save();
@@ -297,6 +366,12 @@ export function ImageAppDialog({
     probe.onload = () => {
       const ew = Math.min(probe.naturalWidth, Math.round(canvasW * 0.55));
       const eh = Math.round((ew * probe.naturalHeight) / probe.naturalWidth);
+      // glitch / pixelate / posterize are already baked into the bitmap —
+      // don't pass them as live element filters too.
+      const live: ImageFilters = { ...DEFAULT_FILTERS, ...filters };
+      delete live.glitch;
+      delete live.pixelate;
+      delete live.posterize;
       add({
         type: "image",
         id: crypto.randomUUID(),
@@ -307,7 +382,7 @@ export function ImageAppDialog({
         rotation: 0,
         src: dataUrl,
         fit: "contain",
-        filters: { ...DEFAULT_FILTERS, ...filters },
+        filters: live,
       } as unknown as AnyElement);
       onOpenChange(false);
     };
@@ -477,13 +552,13 @@ export function ImageAppDialog({
                 </label>
               </div>
 
-              {/* presets */}
-              <div className="flex flex-wrap items-center gap-1">
+              {/* presets — horizontally scrollable */}
+              <div className="flex flex-nowrap items-center gap-1 overflow-x-auto pb-1.5 [scrollbar-width:thin]">
                 {PRESETS.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => applyPreset(p.f)}
-                    className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-bold text-slate-500 transition-all hover:border-indigo-400 hover:text-indigo-600"
+                    className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-bold text-slate-500 transition-all hover:border-indigo-400 hover:text-indigo-600"
                   >
                     {p.label}
                   </button>
@@ -507,6 +582,46 @@ export function ImageAppDialog({
                     <span className="w-8 tabular-nums">{filters[key]}</span>
                   </label>
                 ))}
+              </div>
+
+              {/* pixel & glitch fx — baked into the picture on insert */}
+              <div className="grid grid-cols-3 gap-x-3 gap-y-1.5 rounded-xl border border-slate-200 p-2.5">
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  <span className="w-12 shrink-0 text-right">glitch</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={glitch}
+                    onChange={(e) => setGlitch(Number(e.target.value))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{glitch}</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  <span className="w-12 shrink-0 text-right">pixelate</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={40}
+                    value={filters.pixelate ?? 0}
+                    onChange={(e) => setFilters((f) => ({ ...f, pixelate: Number(e.target.value) }))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{filters.pixelate ?? 0}</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                  <span className="w-12 shrink-0 text-right">posterize</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={16}
+                    value={filters.posterize ?? 0}
+                    onChange={(e) => setFilters((f) => ({ ...f, posterize: Number(e.target.value) }))}
+                    className="h-1 flex-1 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{filters.posterize ?? 0}</span>
+                </label>
               </div>
 
               {/* color grading */}
@@ -667,9 +782,10 @@ export function ImageAppDialog({
                 </button>
               </div>
               <p className="text-[9px] leading-relaxed text-slate-400">
-                Crop{zoom > 1 ? " & zoom" : ""}, rotation, corners, border and shadow are baked into the
-                inserted picture{styled ? "" : " (untouched so far)"}; ALL filters & color grading
-                stay live on the slide — editable from the element panel at any time.
+                Crop{zoom > 1 ? " & zoom" : ""}, rotation, corners, border, shadow, glitch, pixelate
+                and posterize are baked into the inserted picture{styled ? "" : " (untouched so far)"}
+                (pixelate & posterize are not visible in the preview above); ALL other filters &
+                color grading stay live on the slide — editable from the element panel at any time.
               </p>
             </>
           )}
