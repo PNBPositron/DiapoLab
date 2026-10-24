@@ -76,17 +76,22 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
     const node = document.getElementById("canvas-export");
     if (!node) continue;
     node.dataset.exporting = "true";
+    const page = pages[i];
+    const originalBackground = node.style.background;
+    node.style.background = page.bgColor;
     const options = {
       width: canvasW,
       height: canvasH,
       pixelRatio: EXPORT_PIXEL_RATIO,
-      style: { transform: "none", left: "0", top: "0", margin: "0" },
+      cacheBust: true,
+      style: { transform: "none", left: "0", top: "0", margin: "0", background: page.bgColor },
     };
     // JPEG has no alpha channel, so give it a white base for any transparent areas.
     const dataUrl =
       format === "jpeg"
         ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: "#ffffff" })
         : await toPng(node, options);
+    node.style.background = originalBackground;
     delete node.dataset.exporting;
     shots.push(dataUrl);
   }
@@ -102,6 +107,9 @@ export async function exportJPG(name: string) {
   const node = document.getElementById("canvas-export");
   if (!node) return;
   node.dataset.exporting = "true";
+  const page = useEditor.getState().pages[useEditor.getState().currentIndex];
+  const originalBackground = node.style.background;
+  node.style.background = page?.bgColor || "#ffffff";
   const dataUrl = await toJpeg(node, {
     width: canvasW,
     height: canvasH,
@@ -111,6 +119,7 @@ export async function exportJPG(name: string) {
     backgroundColor: "#ffffff",
     style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
+  node.style.background = originalBackground;
   delete node.dataset.exporting;
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.jpg`;
@@ -126,6 +135,9 @@ export async function exportPNG(name: string) {
   const node = document.getElementById("canvas-export");
   if (!node) return;
   node.dataset.exporting = "true";
+  const page = useEditor.getState().pages[useEditor.getState().currentIndex];
+  const originalBackground = node.style.background;
+  node.style.background = page?.bgColor || "#ffffff";
   const dataUrl = await toPng(node, {
     width: canvasW,
     height: canvasH,
@@ -134,6 +146,7 @@ export async function exportPNG(name: string) {
     backgroundColor: "#ffffff",
     style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
+  node.style.background = originalBackground;
   delete node.dataset.exporting;
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.png`;

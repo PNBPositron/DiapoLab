@@ -1194,7 +1194,33 @@ const newPage = (overrides: Partial<Page> = {}): Page => ({
   ...overrides,
 });
 
-const initialPage = newPage();
+const initialPage = newPage({
+  bgColor: "linear-gradient(135deg, #0a0f1f 0%, #172554 58%, #2563eb 100%)",
+  elements: [
+    newText({
+      x: 150,
+      y: 170,
+      width: 1100,
+      height: 150,
+      text: "Make the idea visible.",
+      fontSize: 96,
+      color: "#ffffff",
+      fontFamily: "Orbitron",
+      fontWeight: 700,
+    }),
+    newText({
+      x: 158,
+      y: 355,
+      width: 780,
+      height: 80,
+      text: "A clearer way to build expressive presentations.",
+      fontSize: 32,
+      color: "#bfdbfe",
+      fontFamily: "Inter",
+      fontWeight: 500,
+    }),
+  ],
+});
 
 export const useEditor = create<State>((set, get) => {
   const snap = (): HistorySnap => ({
