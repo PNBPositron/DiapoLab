@@ -123,8 +123,9 @@ function Marketplace() {
             remix it, make it yours.
           </p>
 
-          {/* Search */}
-          <div className="mt-6 flex max-w-md items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
+          {/* Search console */}
+          <div className="mt-6 max-w-2xl rounded-2xl border border-slate-200 bg-white/90 p-2 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
             <Search className="size-4 shrink-0 text-slate-400" />
             <input
               value={query}
@@ -140,6 +141,8 @@ function Marketplace() {
                 clear
               </button>
             )}
+            </div>
+            <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-slate-400"><span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">/</span><span>Search templates, plugins, authors</span><span className="ml-auto hidden sm:inline">{filteredTemplates.length + filteredPlugins.length} results</span></div>
           </div>
         </div>
       </header>
