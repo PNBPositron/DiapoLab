@@ -42,6 +42,86 @@ export async function importJSONFile(file: File): Promise<void> {
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/** Extract the first & last color of a CSS gradient string (null if not a gradient). */
+function gradientColors(css: string): [string, string] | null {
+  if (!css.includes("gradient(")) return null;
+  const colors = css.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\)/g);
+  if (!colors || colors.length === 0) return null;
+  return [colors[0], colors[colors.length - 1]];
+}
+
+/** Best solid color representing a page background (used as raster base). */
+function solidFallback(bgColor: string | undefined): string {
+  const bg = bgColor?.trim();
+  if (!bg) return "#ffffff";
+  return gradientColors(bg)?.[0] ?? bg;
+}
+
+/** Paint the page background under a captured slide image.
+ *  html-to-image has known fidelity gaps (backgrounds/fonts can be dropped in
+ *  the SVG foreignObject pass); compositing on a 2D canvas guarantees the
+ *  background always renders in exported PNG/JPEG/PDF. */
+async function compositeWithBackground(
+  dataUrl: string,
+  bgColor: string | undefined,
+  width: number,
+  height: number,
+  pixelRatio: number,
+  format: "png" | "jpeg",
+  quality = JPEG_QUALITY,
+): Promise<string> {
+  try {
+    const img = await loadImage(dataUrl);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(width * pixelRatio);
+    canvas.height = Math.round(height * pixelRatio);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return dataUrl;
+    const bg = bgColor?.trim() ? bgColor : "#ffffff";
+    const pair = gradientColors(bg);
+    if (pair) {
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, pair[0]);
+      grad.addColorStop(1, pair[1]);
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = bg;
+    }
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return format === "jpeg"
+      ? canvas.toDataURL("image/jpeg", quality)
+      : canvas.toDataURL("image/png");
+  } catch {
+    return dataUrl;
+  }
+}
+
+/** Convert any CSS color to an RGB hex string (no leading #) for PPTX export. */
+function cssColorToHex(color: string): string {
+  const s = color.trim();
+  if (/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(s)) return s.slice(1, 7);
+  if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+    return s.slice(1).split("").map((ch) => ch + ch).join("");
+  }
+  try {
+    const probe = document.createElement("i");
+    probe.style.display = "none";
+    probe.style.color = s;
+    document.body.appendChild(probe);
+    const computed = getComputedStyle(probe).color;
+    probe.remove();
+    const m = computed.match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+    if (m) {
+      return [1, 2, 3].map((i) => Number(m[i]).toString(16).padStart(2, "0")).join("");
+    }
+  } catch {
+    /* ignore */
+  }
+  const hex = s.match(/#[0-9a-fA-F]{6}/);
+  return hex ? hex[0].slice(1) : "FFFFFF";
+}
+
 const JPEG_QUALITY = 0.96;
 const EXPORT_PIXEL_RATIO = 2.5;
 
@@ -83,12 +163,15 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
       style: { transform: "none", left: "0", top: "0", margin: "0" },
     };
     // JPEG has no alpha channel, so give it a white base for any transparent areas.
-    const dataUrl =
+    const pageBg = pages[i].bgColor;
+    const raw =
       format === "jpeg"
-        ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: "#ffffff" })
+        ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: solidFallback(pageBg) })
         : await toPng(node, options);
     delete node.dataset.exporting;
-    shots.push(dataUrl);
+    // Safety net: repaint the page background under the capture (solid or
+    // gradient) so it can never be lost by the DOM capture.
+    shots.push(await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, format));
   }
   setCurrentPage(original);
   return shots;
@@ -102,16 +185,19 @@ export async function exportJPG(name: string) {
   const node = document.getElementById("canvas-export");
   if (!node) return;
   node.dataset.exporting = "true";
-  const dataUrl = await toJpeg(node, {
+  const st = useEditor.getState();
+  const pageBg = st.pages[st.currentIndex]?.bgColor;
+  const raw = await toJpeg(node, {
     width: canvasW,
     height: canvasH,
     pixelRatio: EXPORT_PIXEL_RATIO,
     cacheBust: true,
     quality: JPEG_QUALITY,
-    backgroundColor: "#ffffff",
+    backgroundColor: solidFallback(pageBg),
     style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
   delete node.dataset.exporting;
+  const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "jpeg");
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.jpg`;
   link.href = dataUrl;
@@ -126,15 +212,18 @@ export async function exportPNG(name: string) {
   const node = document.getElementById("canvas-export");
   if (!node) return;
   node.dataset.exporting = "true";
-  const dataUrl = await toPng(node, {
+  const st = useEditor.getState();
+  const pageBg = st.pages[st.currentIndex]?.bgColor;
+  const raw = await toPng(node, {
     width: canvasW,
     height: canvasH,
     pixelRatio: EXPORT_PIXEL_RATIO,
     cacheBust: true,
-    backgroundColor: "#ffffff",
+    backgroundColor: solidFallback(pageBg),
     style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
   });
   delete node.dataset.exporting;
+  const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "png");
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.png`;
   link.href = dataUrl;
@@ -213,7 +302,8 @@ export async function exportPPTX(name: string) {
   pptx.layout = "POS";
   for (const page of pages) {
     const slide = pptx.addSlide();
-    slide.background = { color: page.bgColor?.replace("#", "") || "FFFFFF" };
+    const bgBase = gradientColors(page.bgColor ?? "")?.[0] ?? page.bgColor ?? "";
+    slide.background = { color: cssColorToHex(bgBase) || "FFFFFF" };
     for (const element of page.elements) {
       const box = {
         x: px(element.x),
