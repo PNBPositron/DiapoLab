@@ -40,13 +40,13 @@ export function PluginsPanel() {
     }
   };
 
-  // preinstalled plugins (Paint…) merged with user-imported ones
+  // preinstalled plugins merged with user-imported ones — split in two
+  // families, each with its own section and its own shareable code.
   const all = allPlugins(plugins);
-  const enabledWidgets = all
-    .filter((p) => p.enabled)
-    .flatMap((p) => p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })));
+  const appPlugins = all.filter((p) => (p.apps?.length ?? 0) > 0);
+  const packPlugins = all.filter((p) => p.widgets.length > 0);
 
-  const enabledApps = all
+  const enabledApps = appPlugins
     .filter((p) => p.enabled)
     .flatMap((p) => (p.apps ?? []).map((a, i) => ({ key: `${p.id}:app:${i}`, pluginName: p.name, app: a })));
 
@@ -66,8 +66,8 @@ export function PluginsPanel() {
     <div className="space-y-4">
       <PanelHeader
         kicker="Plugins"
-        title="Widget packs"
-        description="Import plugin code, then drop its widgets straight onto the canvas."
+        title="Apps & packs"
+        description="Interactive apps and widget packs — each pack ships its own importable code."
         icon={Puzzle}
       />
 
@@ -95,26 +95,8 @@ export function PluginsPanel() {
           </div>
         </div>
       ) : (
-        <div className="space-y-3 px-4">
-          {/* Installed plugins */}
-          <div>
-            <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
-              <Layers className="size-2.5" /> Installed ({all.length})
-            </span>
-            <div className="space-y-2">
-              {all.map((p) => (
-                <PluginRow
-                  key={p.id}
-                  plugin={p}
-                  builtin={p.id.startsWith("builtin-")}
-                  onToggle={() => togglePlugin(p.id)}
-                  onRemove={() => removePlugin(p.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Apps */}
+        <div className="space-y-4 px-4">
+          {/* ---- APPS: interactive mini-tools ---- */}
           {enabledApps.length > 0 && (
             <div>
               <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
@@ -147,36 +129,99 @@ export function PluginsPanel() {
             </div>
           )}
 
-          {/* Widgets */}
-          {enabledWidgets.length > 0 && (
-            <div>
-              <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
-                <Puzzle className="size-2.5" /> Widgets ({enabledWidgets.length})
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {enabledWidgets.map(({ key, pluginName, widget }) => (
-                  <button
-                    key={key}
-                    title={widget.description || `from ${pluginName}`}
-                    onClick={() => addGroup(instantiateWidget(widget))}
-                    className="group flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50/40 hover:shadow-[0_10px_24px_-10px_rgba(79,70,229,0.35)] active:scale-[0.97]"
-                  >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                      <Plus className="size-3.5" />
+          {/* ---- WIDGET PACKS: each pack has its own header, widgets & code ---- */}
+          <div>
+            <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
+              <Layers className="size-2.5" /> Widget packs ({packPlugins.length})
+            </span>
+            <div className="space-y-3">
+              {packPlugins.map((p) => (
+                <div
+                  key={p.id}
+                  className={`rounded-2xl border p-2.5 transition-opacity ${
+                    p.enabled ? "border-slate-200 bg-white" : "border-slate-200 bg-white opacity-60"
+                  }`}
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span
+                      className={`grid size-6 shrink-0 place-items-center rounded-lg ${
+                        p.enabled ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                      }`}
+                    >
+                      <Puzzle className="size-3.5" />
                     </span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-[11px] font-semibold text-slate-800">{widget.name}</span>
-                      <span className="block truncate text-[9px] text-slate-400">{pluginName}</span>
+                    <span
+                      className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-800"
+                      title={p.description || p.name}
+                    >
+                      {p.name}
+                      {p.id.startsWith("builtin-") && (
+                        <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+                          Built-in
+                        </span>
+                      )}
                     </span>
-                  </button>
-                ))}
-              </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(pluginToCode(p)).then(() => window.alert(`Code for “${p.name}” copied to clipboard.`)).catch(() => window.alert("Could not copy plugin code."))}
+                      title="Copy this pack's code"
+                      aria-label={`Copy code of ${p.name}`}
+                      className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-blue-50 hover:text-blue-600"
+                    >
+                      <Share2 className="size-3.5" />
+                    </button>
+                    {!p.id.startsWith("builtin-") && (
+                      <>
+                        <button
+                          onClick={() => togglePlugin(p.id)}
+                          role="switch"
+                          aria-checked={p.enabled}
+                          aria-label={`${p.enabled ? "Disable" : "Enable"} ${p.name}`}
+                          className={`relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ${
+                            p.enabled ? "bg-indigo-600" : "bg-slate-200"
+                          }`}
+                        >
+                          <span
+                            className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                              p.enabled ? "translate-x-4" : ""
+                            }`}
+                          />
+                        </button>
+                        <button
+                          onClick={() => removePlugin(p.id)}
+                          title="Remove pack"
+                          className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {p.enabled && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {p.widgets.map((widget, i) => (
+                        <button
+                          key={`${p.id}:${i}`}
+                          title={widget.description || p.name}
+                          onClick={() => addGroup(instantiateWidget(widget))}
+                          className="group flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50/40 hover:shadow-[0_10px_24px_-10px_rgba(79,70,229,0.35)] active:scale-[0.97]"
+                        >
+                          <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                            <Plus className="size-3.5" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block truncate text-[11px] font-semibold text-slate-800">{widget.name}</span>
+                            <span className="block truncate text-[9px] text-slate-400">{p.name}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       )}
-
-      {/* Plugin app (e.g. paint) */}
       {appOpen &&
         (appOpen.type === "video" ? (
           <VideoAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
