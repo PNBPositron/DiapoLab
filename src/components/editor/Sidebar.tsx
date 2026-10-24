@@ -84,9 +84,6 @@ export function Sidebar() {
             >
               <Icon className="h-4 w-4" strokeWidth={2.2} />
               {t.label}
-              {active && (
-                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />
-              )}
             </button>
           );
         })}
