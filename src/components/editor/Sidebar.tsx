@@ -71,7 +71,24 @@ export function Sidebar() {
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
-          return <button key={t.id} onClick={() => { setTool(t.id); setHovering(true); }} className={`group relative flex flex-col items-center gap-1 border-0 bg-transparent px-0.5 py-2.5 text-[8px] font-semibold uppercase tracking-[0.04em] transition-colors duration-200 ${active && panelOpen ? "text-slate-700" : "text-slate-500 hover:text-slate-700"}`}><Icon className="h-4 w-4" strokeWidth={2.2} />{t.label}</button>;
+          return (
+            <button
+              key={t.id}
+              onClick={() => { setTool(t.id); setHovering(true); }}
+              title={t.label}
+              className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold uppercase tracking-[0.05em] transition-all duration-200 ${
+                active
+                  ? "bg-slate-100/90 text-slate-900"
+                  : "bg-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
+              }`}
+            >
+              <Icon className="h-4 w-4" strokeWidth={2.2} />
+              {t.label}
+              {active && (
+                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />
+              )}
+            </button>
+          );
         })}
       </nav>
       <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
