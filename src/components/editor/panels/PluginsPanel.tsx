@@ -6,7 +6,10 @@ import {
   usePlugins,
   allPlugins,
   instantiateWidget,
-  SAMPLE_PLUGIN_CODE,
+  SAMPLE_APP_CODE,
+  SAMPLE_PACK_CODE,
+  appToCode,
+  packToCode,
   type EditorPlugin,
   type PluginApp,
   pluginToCode,
@@ -22,7 +25,7 @@ export function PluginsPanel() {
   const removePlugin = usePlugins((s) => s.removePlugin);
   const togglePlugin = usePlugins((s) => s.togglePlugin);
 
-  const [importOpen, setImportOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState<null | "app" | "pack">(null);
   const [appOpen, setAppOpen] = useState<PluginApp | null>(null);
   const [pluginCode, setPluginCode] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
@@ -32,8 +35,13 @@ export function PluginsPanel() {
     setImportError(null);
     setImportSuccess(null);
     try {
-      const plugin = usePlugins.getState().importPlugin(pluginCode);
-      setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
+      if (importOpen === "app") {
+        const plugin = usePlugins.getState().importAppPlugin(pluginCode);
+        setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.apps.length} app${plugin.apps.length === 1 ? "" : "s"}`);
+      } else {
+        const plugin = usePlugins.getState().importPackPlugin(pluginCode);
+        setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
+      }
       setPluginCode("");
     } catch (e) {
       setImportError(e instanceof Error ? e.message : "Import failed");
@@ -65,19 +73,25 @@ export function PluginsPanel() {
   return (
     <div className="space-y-4">
       <PanelHeader
-        kicker="Plugins"
+        kicker="Add-ons"
         title="Apps & packs"
         description="Interactive apps and widget packs — each pack ships its own importable code."
         icon={Puzzle}
       />
 
-      {/* Import button */}
-      <div className="px-4">
+      {/* Import buttons — apps and packs each have their own code format */}
+      <div className="grid grid-cols-2 gap-2 px-4">
         <button
-          onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:brightness-110 active:scale-[0.98]"
+          onClick={() => { setImportOpen("app"); setImportError(null); setImportSuccess(null); }}
+          className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:brightness-110 active:scale-[0.98]"
         >
-          <Code2 className="size-3.5" /> Import plugin code
+          <Brush className="size-3.5" /> Import app code
+        </button>
+        <button
+          onClick={() => { setImportOpen("pack"); setImportError(null); setImportSuccess(null); }}
+          className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-indigo-300 hover:text-indigo-600 active:scale-[0.98]"
+        >
+          <Layers className="size-3.5" /> Import pack code
         </button>
       </div>
 
@@ -97,33 +111,100 @@ export function PluginsPanel() {
       ) : (
         <div className="space-y-4 px-4">
           {/* ---- APPS: interactive mini-tools ---- */}
-          {enabledApps.length > 0 && (
+          {appPlugins.length > 0 && (
             <div>
               <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
                 <Brush className="size-2.5" /> Apps ({enabledApps.length})
               </span>
-              <div className="grid grid-cols-2 gap-1.5">
-                {enabledApps.map(({ key, pluginName, app }) => (
-                  <button
-                    key={key}
-                    title={app.description || `from ${pluginName}`}
-                    onClick={() => setAppOpen(app)}
-                    className="group flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2 py-1.5 text-left transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-100/60 active:scale-[0.97]"
+              <div className="space-y-3">
+                {appPlugins.map((p) => (
+                  <div
+                    key={p.id}
+                    className={`rounded-2xl border p-2.5 transition-opacity ${
+                      p.enabled ? "border-slate-200 bg-white" : "border-slate-200 bg-white opacity-60"
+                    }`}
                   >
-                    <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                      {app.type === "video" ? (
-                        <Clapperboard className="size-3" />
-                      ) : app.type === "image" ? (
-                        <ImageIcon className="size-3" />
-                      ) : (
-                        <Brush className="size-3" />
+                    <div className="mb-2 flex items-center gap-2">
+                      <span
+                        className={`grid size-6 shrink-0 place-items-center rounded-lg ${
+                          p.enabled ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                        }`}
+                      >
+                        <Brush className="size-3.5" />
+                      </span>
+                      <span
+                        className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-800"
+                        title={p.description || p.name}
+                      >
+                        {p.name}
+                        {p.id.startsWith("builtin-") && (
+                          <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+                            Built-in
+                          </span>
+                        )}
+                      </span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(appToCode(p)).then(() => window.alert(`Code for “${p.name}” copied to clipboard.`)).catch(() => window.alert("Could not copy app code."))}
+                        title="Copy this app's code"
+                        aria-label={`Copy code of ${p.name}`}
+                        className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-blue-50 hover:text-blue-600"
+                      >
+                        <Share2 className="size-3.5" />
+                      </button>
+                      {!p.id.startsWith("builtin-") && (
+                        <>
+                          <button
+                            onClick={() => togglePlugin(p.id)}
+                            role="switch"
+                            aria-checked={p.enabled}
+                            aria-label={`${p.enabled ? "Disable" : "Enable"} ${p.name}`}
+                            className={`relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ${
+                              p.enabled ? "bg-indigo-600" : "bg-slate-200"
+                            }`}
+                          >
+                            <span
+                              className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                                p.enabled ? "translate-x-4" : ""
+                              }`}
+                            />
+                          </button>
+                          <button
+                            onClick={() => removePlugin(p.id)}
+                            title="Remove app"
+                            className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </>
                       )}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-slate-700">
-                      {app.name}
-                    </span>
-                    <Play className="size-2.5 shrink-0 text-indigo-400 transition-colors group-hover:text-indigo-600" />
-                  </button>
+                    </div>
+                    {p.enabled && (
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {(p.apps ?? []).map((app, i) => (
+                          <button
+                            key={`${p.id}:app:${i}`}
+                            title={app.description || p.name}
+                            onClick={() => setAppOpen(app)}
+                            className="group flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2 py-1.5 text-left transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-100/60 active:scale-[0.97]"
+                          >
+                            <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                              {app.type === "video" ? (
+                                <Clapperboard className="size-3" />
+                              ) : app.type === "image" ? (
+                                <ImageIcon className="size-3" />
+                              ) : (
+                                <Brush className="size-3" />
+                              )}
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-slate-700">
+                              {app.name}
+                            </span>
+                            <Play className="size-2.5 shrink-0 text-indigo-400 transition-colors group-hover:text-indigo-600" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -162,7 +243,7 @@ export function PluginsPanel() {
                       )}
                     </span>
                     <button
-                      onClick={() => navigator.clipboard.writeText(pluginToCode(p)).then(() => window.alert(`Code for “${p.name}” copied to clipboard.`)).catch(() => window.alert("Could not copy plugin code."))}
+                      onClick={() => navigator.clipboard.writeText(packToCode(p)).then(() => window.alert(`Code for “${p.name}” copied to clipboard.`)).catch(() => window.alert("Could not copy pack code."))}
                       title="Copy this pack's code"
                       aria-label={`Copy code of ${p.name}`}
                       className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-blue-50 hover:text-blue-600"
@@ -232,24 +313,25 @@ export function PluginsPanel() {
         ))}
 
       {/* Import dialog */}
-      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+      <Dialog open={importOpen !== null} onOpenChange={(v) => !v && setImportOpen(null)}>
         <DialogContent className="max-w-xl border-slate-200 bg-white p-0">
           <DialogHeader className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
             <DialogTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-800">
               <span className="grid size-7 place-items-center rounded-lg bg-indigo-600 text-white">
                 <Code2 className="size-3.5" />
               </span>
-              Import plugin
+              {importOpen === "app" ? "Import app" : "Import pack"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 p-5">
             <p className="text-xs leading-relaxed text-slate-500">
-              Paste plugin code below. Call{" "}
+              Paste {importOpen === "app" ? "app" : "pack"} code below. Call{" "}
               <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">
-                diapolabPlugin(&#123; name, widgets: [...] &#125;)
+                {importOpen === "app" ? "diapolabApp(&#123; name, apps: [...] &#125;)" : "diapolabPack(&#123; name, widgets: [...] &#125;)"}
               </code>{" "}
-              with an array of widgets — each widget is a named set of canvas
-              elements that becomes an insertable preset.
+              {importOpen === "app"
+                ? "with an array of apps — each app becomes an interactive tool you can open from this panel."
+                : "with an array of widgets — each widget is a named set of canvas elements that becomes an insertable preset."}
             </p>
             <textarea
               value={pluginCode}
@@ -270,7 +352,7 @@ export function PluginsPanel() {
             )}
             <div className="flex items-center justify-between gap-3">
               <button
-                onClick={() => setPluginCode(SAMPLE_PLUGIN_CODE)}
+                onClick={() => setPluginCode(importOpen === "app" ? SAMPLE_APP_CODE : SAMPLE_PACK_CODE)}
                 className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-500 transition hover:border-blue-300 hover:text-blue-600"
               >
                 <Wand2 className="size-3.5" /> Load sample
@@ -280,7 +362,7 @@ export function PluginsPanel() {
                 disabled={!pluginCode.trim()}
                 className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
               >
-                <Check className="size-3.5" /> Import plugin
+                <Check className="size-3.5" /> {importOpen === "app" ? "Import app" : "Import pack"}
               </button>
             </div>
           </div>
