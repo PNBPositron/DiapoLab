@@ -89,7 +89,7 @@ export function PagesBar() {
   const thumbH = ratio >= 1 ? 116 / ratio : 116 * ratio;
 
   return (
-    <div className="pages-bar flex h-[94px] shrink-0 items-center gap-3 border-t border-transparent bg-transparent px-3 py-2 text-slate-700 shadow-none backdrop-blur-none">
+    <div className="pages-bar flex h-[94px] shrink-0 items-center gap-3 border-t border-slate-200/70 bg-white/70 px-3 py-2 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
       <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         Pages
       </span>
@@ -102,8 +102,8 @@ export function PagesBar() {
                 onClick={() => setCurrentPage(i)}
                 className={`relative overflow-hidden rounded-xl border bg-white/60 backdrop-blur-[1px] transition-all duration-200 ${
                   active
-                    ? "border-slate-400 shadow-[0_1px_4px_rgba(15,23,42,0.12)]"
-                    : "border-slate-200/80 hover:border-slate-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
+                    ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_2px_10px_rgba(37,99,235,0.22)]"
+                    : "border-slate-200/80 hover:border-blue-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
                 }`}
                 style={{ width: thumbW + 4, height: thumbH + 4 }}
               >
@@ -268,7 +268,7 @@ export function PagesBar() {
         </span>
         <button
           onClick={() => setPresenting(true)}
-          className="flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
+          className="flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
           type="button"
         >
           <Play className="h-3.5 w-3.5 fill-white" /> Present
