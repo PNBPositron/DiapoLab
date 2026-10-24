@@ -606,9 +606,6 @@ function LargeModernHamburger({
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-
           {/* EXPLORE SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
             <span className="size-1.5 rounded-full bg-blue-400" />
