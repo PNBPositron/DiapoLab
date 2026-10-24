@@ -98,7 +98,7 @@ function normalizeApps(raw: unknown): PluginApp[] {
     if (!a || typeof a !== "object") continue;
     const app = a as Record<string, unknown>;
     const name = typeof app.name === "string" && app.name.trim() ? app.name.trim() : null;
-    const type = app.type === "paint" || app.type === "video" ? app.type : null;
+    const type = app.type === "paint" || app.type === "video" || app.type === "image" ? app.type : null;
     if (!name || !type) continue;
     const cfg = (app.config ?? {}) as Record<string, unknown>;
     apps.push({
@@ -165,6 +165,122 @@ export function evaluatePluginCode(code: string): PluginMeta {
     widgets: normalizeWidgets(raw.widgets),
     apps: normalizeApps(raw.apps),
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Dedicated import formats                                            */
+/*   • App code  → diapolabApp({ name, author, apps: [...] })          */
+/*   • Pack code → diapolabPack({ name, author, widgets: [...] })      */
+/* The two formats are intentionally separate: apps and widget packs   */
+/* each have their own code, samples and import path.                 */
+/* ------------------------------------------------------------------ */
+
+function evalObject(code: string, callbackName: string): Record<string, unknown> {
+  const trimmed = code.trim();
+  if (!trimmed) throw new Error("Paste some code first.");
+  let captured: unknown;
+  try {
+    const fn = new Function(callbackName, `"use strict";\n${trimmed}`);
+    fn((p: unknown) => {
+      captured = p;
+    });
+  } catch {
+    /* fall through to plain expression */
+  }
+  let obj = captured;
+  if (!obj || typeof obj !== "object") {
+    try {
+      obj = new Function(`"use strict"; return (${trimmed})`)();
+    } catch {
+      obj = null;
+    }
+  }
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) {
+    throw new Error(`Could not read the code. Call ${callbackName}({ ... }) or return that object.`);
+  }
+  return obj as Record<string, unknown>;
+}
+
+function readMeta(raw: Record<string, unknown>): Pick<PluginMeta, "name" | "author" | "version" | "description"> {
+  const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : null;
+  if (!name) throw new Error('The object needs a "name" string.');
+  return {
+    name,
+    author: typeof raw.author === "string" ? raw.author : undefined,
+    version: typeof raw.version === "string" ? raw.version : undefined,
+    description: typeof raw.description === "string" ? raw.description : undefined,
+  };
+}
+
+/** App code: `diapolabApp({ name, author, apps: [...] })` — adds apps only. */
+export function evaluateAppCode(code: string): PluginMeta {
+  const raw = evalObject(code, "diapolabApp");
+  const apps = normalizeApps(raw.apps);
+  if (apps.length === 0) {
+    throw new Error('App code needs a non-empty "apps" array (type "paint", "video" or "image").');
+  }
+  return { ...readMeta(raw), widgets: [], apps };
+}
+
+/** Pack code: `diapolabPack({ name, author, widgets: [...] })` — packs only. */
+export function evaluatePackCode(code: string): PluginMeta {
+  const raw = evalObject(code, "diapolabPack");
+  return { ...readMeta(raw), widgets: normalizeWidgets(raw.widgets), apps: [] };
+}
+
+export const SAMPLE_APP_CODE = `diapolabApp({
+  name: "Sketch tools",
+  author: "DiapoLab",
+  version: "1.0.0",
+  description: "A custom drawing pad with a pastel palette.",
+  apps: [
+    {
+      name: "Pastel pad",
+      description: "Soft pastel doodles, inserted as an image",
+      type: "paint",
+      config: {
+        colors: ["#fbcfe8", "#ddd6fe", "#bfdbfe", "#bbf7d0", "#fde68a", "#0f172a"],
+        defaultColor: "#0f172a",
+        brushSizes: [4, 8, 16, 28],
+        bg: "#fffbeb",
+      },
+    },
+  ],
+});`;
+
+export const SAMPLE_PACK_CODE = `diapolabPack({
+  name: "Micro layout",
+  author: "DiapoLab",
+  version: "1.0.0",
+  description: "Two tiny layout presets.",
+  widgets: [
+    {
+      name: "Callout",
+      description: "Accent chip + line",
+      elements: [
+        { type: "shape", x: 120, y: 160, width: 120, height: 12, rotation: 0, shape: "rect", fill: "#0ea5e9", stroke: "transparent", strokeWidth: 0, cornerRadius: 6 },
+        { type: "text", x: 120, y: 184, width: 700, height: 60, rotation: 0, text: "Key takeaway", fontSize: 44, color: "#0f172a", fontWeight: 800, fontFamily: "Inter", align: "left" }
+      ]
+    },
+    {
+      name: "Kicker",
+      description: "Small uppercase label",
+      elements: [
+        { type: "text", x: 120, y: 140, width: 500, height: 40, rotation: 0, text: "SECTION 01", fontSize: 24, color: "#0ea5e9", fontWeight: 800, fontFamily: "Inter", align: "left", letterSpacing: 0.2 }
+      ]
+    }
+  ]
+});`;
+
+/** Export an app plugin as portable app code. */
+export function appToCode(plugin: EditorPlugin): string {
+  return `diapolabApp(${JSON.stringify({ name: plugin.name, author: plugin.author, version: plugin.version, description: plugin.description, apps: plugin.apps }, null, 2)});`;
+}
+
+/** Export a widget-pack plugin as portable pack code. */
+export function packToCode(plugin: EditorPlugin): string {
+  const widgets = plugin.widgets.map((widget) => ({ ...widget, elements: typeof widget.elements === "function" ? widget.elements() : widget.elements }));
+  return `diapolabPack(${JSON.stringify({ name: plugin.name, author: plugin.author, version: plugin.version, description: plugin.description, widgets }, null, 2)});`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -419,6 +535,8 @@ export function pluginToCode(plugin: EditorPlugin): string {
 type PluginsState = {
   plugins: EditorPlugin[];
   importPlugin: (code: string) => EditorPlugin;
+  importAppPlugin: (code: string) => EditorPlugin;
+  importPackPlugin: (code: string) => EditorPlugin;
   removePlugin: (id: string) => void;
   togglePlugin: (id: string) => void;
 };
@@ -439,6 +557,18 @@ export const usePlugins = create<PluginsState>()(
           // Re-importing the same plugin name replaces it.
           plugins: [...s.plugins.filter((p) => p.name !== plugin.name), plugin],
         }));
+        return plugin;
+      },
+      importAppPlugin: (code) => {
+        const meta = evaluateAppCode(code);
+        const plugin: EditorPlugin = { ...meta, id: crypto.randomUUID(), enabled: true, importedAt: Date.now() };
+        set((s) => ({ plugins: [...s.plugins.filter((p) => p.name !== plugin.name), plugin] }));
+        return plugin;
+      },
+      importPackPlugin: (code) => {
+        const meta = evaluatePackCode(code);
+        const plugin: EditorPlugin = { ...meta, id: crypto.randomUUID(), enabled: true, importedAt: Date.now() };
+        set((s) => ({ plugins: [...s.plugins.filter((p) => p.name !== plugin.name), plugin] }));
         return plugin;
       },
       removePlugin: (id) => set((s) => ({ plugins: s.plugins.filter((p) => p.id !== id) })),
