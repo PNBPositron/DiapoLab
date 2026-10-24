@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Image as ImageIcon, Play } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Image as ImageIcon, Play, Share2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -9,6 +9,7 @@ import {
   SAMPLE_PLUGIN_CODE,
   type EditorPlugin,
   type PluginApp,
+  pluginToCode,
 } from "@/lib/plugins";
 import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
@@ -298,6 +299,16 @@ function PluginRow({
             plugin.enabled ? "translate-x-4" : ""
           }`}
         />
+      </button>
+      )}
+      {!builtin && (
+      <button
+        onClick={() => navigator.clipboard.writeText(pluginToCode(plugin)).then(() => window.alert(`Published code for “${plugin.name}” copied to clipboard.`)).catch(() => window.alert("Could not copy plugin code."))}
+        title="Publish plugin code"
+        aria-label={`Publish ${plugin.name}`}
+        className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-blue-50 hover:text-blue-600"
+      >
+        <Share2 className="size-3.5" />
       </button>
       )}
       {!builtin && (

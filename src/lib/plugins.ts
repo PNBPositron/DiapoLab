@@ -406,6 +406,12 @@ export function allPlugins(userPlugins: EditorPlugin[]): EditorPlugin[] {
   return [...PREINSTALLED_PLUGINS, ...userPlugins];
 }
 
+/** Export an installed plugin as portable code for publishing or sharing. */
+export function pluginToCode(plugin: EditorPlugin): string {
+  const widgets = plugin.widgets.map((widget) => ({ ...widget, elements: typeof widget.elements === "function" ? widget.elements() : widget.elements }));
+  return `diapolabPlugin(${JSON.stringify({ name: plugin.name, author: plugin.author, version: plugin.version, description: plugin.description, apps: plugin.apps, widgets }, null, 2)});`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Store (persisted in localStorage)                                    */
 /* ------------------------------------------------------------------ */

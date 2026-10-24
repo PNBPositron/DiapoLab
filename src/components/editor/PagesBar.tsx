@@ -24,6 +24,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
+import { VersionHistoryDialog } from "./VersionHistoryDialog";
+import { History } from "lucide-react";
 
 const transitionIcons = {
   none: Ban,
@@ -61,6 +63,7 @@ const transitionOptions: SlideTransition[] = [
 
 export function PagesBar() {
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const {
     pages,
     currentIndex,
@@ -166,6 +169,7 @@ export function PagesBar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        <button type="button" onClick={() => setHistoryOpen(true)} className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white/75 px-2.5 py-2 text-[10px] font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600" title="Slide version history"><History className="size-3.5" /> History</button>
           <div className="flex items-center gap-2 rounded-2xl border border-white/80 bg-white/70 px-2.5 py-1.5 shadow-[0_8px_20px_-14px_rgba(15,23,42,0.4)] backdrop-blur-sm">
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
           <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -270,8 +274,7 @@ export function PagesBar() {
           <Play className="h-3.5 w-3.5 fill-white" /> Present
         </button>
       </div>
-
-
+      <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );
 }
