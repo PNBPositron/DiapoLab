@@ -127,22 +127,32 @@ export function Canvas() {
               style={{
                 width: canvasW,
                 height: canvasH,
-                backgroundColor: bgColor,
-                backgroundImage: page.bgImage
-                  ? `url(${page.bgImage})`
-                  : bgColor.includes("gradient(")
-                    ? bgColor
-                    : undefined,
-                backgroundSize: page.bgImage ? (page.bgFit ?? "cover") : "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
+                backgroundColor: page.bgImage ? bgColor : bgColor.includes("gradient(") ? undefined : bgColor,
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
               }}
             >
-              {elements.map((el) => (
-                <CanvasElement key={el.id} element={el} scale={scale} />
-              ))}
+              {page.bgImage ? (
+                <img
+                  src={page.bgImage}
+                  alt=""
+                  aria-hidden="true"
+                  crossOrigin="anonymous"
+                  className="pointer-events-none absolute inset-0 z-0 size-full"
+                  style={{ objectFit: page.bgFit ?? "cover", objectPosition: "center" }}
+                />
+              ) : bgColor.includes("gradient(") ? (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-0"
+                  style={{ background: bgColor }}
+                />
+              ) : null}
+              <div className="relative z-10 size-full">
+                {elements.map((el) => (
+                  <CanvasElement key={el.id} element={el} scale={scale} />
+                ))}
+              </div>
               {(guides.v.length > 0 || guides.h.length > 0) && (
                 <div className="pointer-events-none absolute inset-0 z-50">
                   {guides.v.map((x, i) => (

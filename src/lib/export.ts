@@ -48,7 +48,17 @@ const EXPORT_PIXEL_RATIO = 2.5;
 async function waitForExportReady() {
   if (document.fonts?.ready) await document.fonts.ready;
   const images = Array.from(document.querySelectorAll<HTMLImageElement>("#canvas-export img"));
-  await Promise.all(images.map((image) => image.decode?.().catch(() => undefined)));
+  await Promise.all(
+    images.map(async (image) => {
+      if (!image.complete) {
+        await new Promise<void>((resolve) => {
+          image.addEventListener("load", () => resolve(), { once: true });
+          image.addEventListener("error", () => resolve(), { once: true });
+        });
+      }
+      await image.decode?.().catch(() => undefined);
+    }),
+  );
   await wait(80);
 }
 
