@@ -22,7 +22,7 @@ const TOOLS = [
   { id: "illustrations", label: "Illus.", icon: Image },
   { id: "components", label: "Presets", icon: Layers },
   { id: "design", label: "Design", icon: Palette },
-  { id: "plugins", label: "Plugins", icon: Puzzle },
+  { id: "plugins", label: "Add-ons", icon: Puzzle },
   { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
