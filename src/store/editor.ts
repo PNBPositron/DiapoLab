@@ -628,6 +628,7 @@ export const CANVAS_PRESETS = [
 type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "illustrations" | "unsplash" | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
+export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };
 
 type State = {
   pages: Page[];
@@ -642,6 +643,9 @@ type State = {
   canvasH: number;
   history: HistorySnap[];
   future: HistorySnap[];
+  versions: SlideVersion[];
+  saveVersion: (name?: string) => void;
+  restoreVersion: (id: string) => void;
   presenting: boolean;
   // cloud-saved design metadata
   designId: string | null;
@@ -1222,6 +1226,7 @@ export const useEditor = create<State>((set, get) => {
     canvasH: DEFAULT_H,
     history: [],
     future: [],
+    versions: [],
     presenting: false,
     designId: null,
     designName: "untitled.design",
@@ -1302,6 +1307,23 @@ export const useEditor = create<State>((set, get) => {
           ? pages.map(paint)
           : pages.map((p, i) => (i === currentIndex ? paint(p) : p));
       set({ ...syncCurrent(next, currentIndex), selectedId: null, selectedIds: [] });
+    },
+    saveVersion: (name) => {
+      const { pages, currentIndex, versions } = get();
+      const version: SlideVersion = {
+        id: uid(),
+        name: name?.trim() || `Version ${versions.length + 1}`,
+        createdAt: Date.now(),
+        pages: JSON.parse(JSON.stringify(pages)),
+        currentIndex,
+      };
+      set({ versions: [version, ...versions].slice(0, 30) });
+    },
+    restoreVersion: (id) => {
+      const version = get().versions.find((item) => item.id === id);
+      if (!version) return;
+      pushHistory();
+      set({ ...syncCurrent(JSON.parse(JSON.stringify(version.pages)), version.currentIndex), selectedId: null, selectedIds: [] });
     },
     setPresenting: (presenting) => set({ presenting }),
     setGuides: (guides) => set({ guides }),
