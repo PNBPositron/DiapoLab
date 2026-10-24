@@ -56,6 +56,7 @@ const PRESETS: Array<{ id: string; label: string; f: Partial<ImageFilters> }> = 
   { id: "vintage", label: "Vintage", f: { sepia: 55, contrast: 90, brightness: 105 } },
   { id: "fade", label: "Fade", f: { contrast: 82, brightness: 112, saturate: 75 } },
   { id: "xray", label: "X-Ray", f: { invert: 100, grayscale: 40 } },
+  { id: "glitch", label: "Glitch", f: { contrast: 125, saturate: 160, glitch: 72 } },
 ];
 
 const ASPECTS: Array<{ id: string; label: string; ratio: number | null }> = [
@@ -114,6 +115,7 @@ export function ImageAppDialog({
   const [borderColor, setBorderColor] = useState("#ffffff");
   const [vignette, setVignette] = useState(0); // 0..100
   const [shadow, setShadow] = useState(false);
+  const [glitch, setGlitch] = useState(0);
   const [outWidth, setOutWidth] = useState(960);
   const [format, setFormat] = useState<(typeof FORMATS)[number]["id"]>("png");
   const [quality, setQuality] = useState(92);
@@ -149,6 +151,7 @@ export function ImageAppDialog({
     setBorderW(0);
     setVignette(0);
     setShadow(false);
+    setGlitch(0);
     setFormat("png");
   };
 
@@ -156,7 +159,7 @@ export function ImageAppDialog({
   const ratio = ASPECTS.find((a) => a.id === aspect)?.ratio ?? null;
   const styled =
     radius > 0 || borderW > 0 || vignette > 0 || shadow ||
-    JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) || rot !== 0 || flipX || flipY || ratio !== null || zoom !== 1;
+    JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS) || glitch > 0 || rot !== 0 || flipX || flipY || ratio !== null || zoom !== 1;
 
   /** Pan the crop by dragging the preview (active when zoomed in). */
   const onPanDown = (e: RPointerEvent) => {
@@ -181,7 +184,10 @@ export function ImageAppDialog({
     panRef.current = null;
   };
 
-  const applyPreset = (f: Partial<ImageFilters>) => setFilters({ ...DEFAULT_FILTERS, ...f });
+  const applyPreset = (f: Partial<ImageFilters>) => {
+    setFilters({ ...DEFAULT_FILTERS, ...f });
+    setGlitch(f.glitch ?? 0);
+  };
 
   const resetAll = () => {
     setFilters({ ...DEFAULT_FILTERS });
@@ -247,7 +253,19 @@ export function ImageAppDialog({
     // overscale so a rotated picture still covers the frame
     const t = (rot * Math.PI) / 180;
     const cover = Math.abs(Math.cos(t)) + Math.abs(Math.sin(t));
-    ctx.drawImage(img, cx, cy, cw, ch, (-w * cover) / 2, (-h * cover) / 2, w * cover, h * cover);
+    if (glitch > 0) {
+      const slices = Math.max(4, Math.round(glitch / 8));
+      const sliceH = Math.max(1, Math.round(h / slices));
+      for (let i = 0; i < slices; i++) {
+        const sy = Math.round((i / slices) * ch);
+        const sh = Math.max(1, Math.round(ch / slices));
+        const shift = Math.round((Math.random() - 0.5) * w * (glitch / 100) * 0.22);
+        ctx.drawImage(img, cx, cy + sy, cw, sh, (-w * cover) / 2 + shift, (-h * cover) / 2 + i * sliceH, w * cover, sliceH + 1);
+        if (i % 3 === 0) { ctx.globalCompositeOperation = "screen"; ctx.globalAlpha = 0.22; ctx.fillStyle = i % 2 ? "#ff1744" : "#00e5ff"; ctx.fillRect((-w * cover) / 2 + shift, (-h * cover) / 2 + i * sliceH, w * cover, 1); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over"; }
+      }
+    } else {
+      ctx.drawImage(img, cx, cy, cw, ch, (-w * cover) / 2, (-h * cover) / 2, w * cover, h * cover);
+    }
     // vignette
     if (vignette > 0) {
       const g = ctx.createRadialGradient(
@@ -355,6 +373,7 @@ export function ImageAppDialog({
                   style={{
                     filter: compare ? "none" : css,
                     transform: `translate(${offset.x * 100}%, ${offset.y * 100}%) rotate(${rot}deg) scale(${zoom * (flipX ? -1 : 1)}, ${zoom * (flipY ? -1 : 1)})`,
+                    clipPath: glitch > 0 ? `polygon(0 ${Math.round(2 + glitch / 8)}%, 100% 0, 100% ${Math.round(98 - glitch / 10)}%, 0 100%)` : undefined,
                     cursor: zoom > 1 ? "grab" : "default",
                   }}
                 />
