@@ -1521,6 +1521,12 @@ export function PropertiesPanel() {
                     { value: "blur-in", label: "Blur In" },
                     { value: "spin-in", label: "Spin In" },
                     { value: "bounce-in", label: "Bounce In" },
+                    { value: "flip-in", label: "Flip In" },
+                    { value: "swing-in", label: "Swing In" },
+                    { value: "wobble-in", label: "Wobble In" },
+                    { value: "slingshot-in", label: "Slingshot In" },
+                    { value: "flicker-in", label: "Neon Flicker" },
+                    { value: "stretch-in", label: "Stretch In" },
                   ]}
                   onChange={(v) => update(el.id, { animation: v as any })}
                 />
