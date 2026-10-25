@@ -16,9 +16,18 @@ import {
   Filter,
   CircleDot,
   Waypoints,
+  Route,
+  Columns3,
+  Layers,
+  Circle,
+  Target,
+  Combine,
+  Map,
+  Kanban,
+  LayoutGrid,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type UiStyle } from "@/store/editor";
+import { newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 import { PanelHeader, ChipGroup } from "../ui/selectors";
@@ -56,17 +65,61 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_
 });
 
 
-type FlowKind = "process" | "cycle" | "timeline" | "pyramid" | "funnel" | "orgchart" | "hub" | "mindmap";
+type FlowKind =
+  | "process"
+  | "cycle"
+  | "timeline"
+  | "pyramid"
+  | "funnel"
+  | "orgchart"
+  | "hub"
+  | "mindmap"
+  | "journey"
+  | "pillars"
+  | "layers"
+  | "venn"
+  | "rings"
+  | "roadmap"
+  | "kanban"
+  | "matrix";
 
-const FLOWCRAFT_DIAGRAMS: Array<{ kind: FlowKind; label: string; description: string; Icon: LucideIcon }> = [
-  { kind: "process", label: "Stepped flow", description: "Numbered stages linked by arrows", Icon: GitBranch },
-  { kind: "cycle", label: "Cycle loop", description: "Circular loop around a central hub", Icon: RefreshCw },
-  { kind: "timeline", label: "Timeline", description: "Milestones along an axis", Icon: Milestone },
-  { kind: "pyramid", label: "Pyramid", description: "Three-tier hierarchy", Icon: Triangle },
-  { kind: "funnel", label: "Funnel", description: "Narrowing conversion stages", Icon: Filter },
-  { kind: "orgchart", label: "Org chart", description: "Team tree with connectors", Icon: Network },
-  { kind: "hub", label: "Hub & spoke", description: "Central concept with satellites", Icon: CircleDot },
-  { kind: "mindmap", label: "Mind map", description: "Central idea with six branches", Icon: Waypoints },
+/** Second accent used for modern gradient fills, per Presets theme. */
+const FLOW_ACCENT2: Record<UiStyle, string> = {
+  cyber: "#7df9ff",
+  glass: "#8fd0ff",
+  neobrutalist: "#ffd84a",
+  sketch: "#7dd3fc",
+  xp: "#6ea8fe",
+  aqua: "#22d3ee",
+  midnight: "#a5b4fc",
+  pastel: "#f9a8d4",
+  vapor: "#f0abfc",
+};
+
+const FLOWCRAFT_META: Record<FlowKind, { label: string; description: string; Icon: LucideIcon }> = {
+  process: { label: "Stepped flow", description: "Numbered stages linked by arrows", Icon: GitBranch },
+  cycle: { label: "Cycle loop", description: "Circular loop around a central hub", Icon: RefreshCw },
+  timeline: { label: "Timeline", description: "Milestones along an axis", Icon: Milestone },
+  pyramid: { label: "Pyramid", description: "Three-tier hierarchy", Icon: Triangle },
+  funnel: { label: "Funnel", description: "Narrowing conversion stages", Icon: Filter },
+  orgchart: { label: "Org chart", description: "Team tree with connectors", Icon: Network },
+  hub: { label: "Hub & spoke", description: "Central concept with satellites", Icon: CircleDot },
+  mindmap: { label: "Mind map", description: "Central idea with six branches", Icon: Waypoints },
+  journey: { label: "Journey", description: "Serpentine path from start to goal", Icon: Route },
+  pillars: { label: "Pillars", description: "Roof, three pillars and a base", Icon: Columns3 },
+  layers: { label: "Layers", description: "Stacked architecture bands", Icon: Layers },
+  venn: { label: "Venn", description: "Two sets with a shared overlap", Icon: Combine },
+  rings: { label: "Rings", description: "Concentric goals around a core", Icon: Target },
+  roadmap: { label: "Roadmap", description: "Now / Next / Later horizons", Icon: Map },
+  kanban: { label: "Kanban", description: "Three columns of work cards", Icon: Kanban },
+  matrix: { label: "2x2 matrix", description: "Quadrants by impact and effort", Icon: LayoutGrid },
+};
+
+const FLOWCRAFT_SECTIONS: Array<{ label: string; kinds: FlowKind[] }> = [
+  { label: "Flows", kinds: ["process", "funnel", "cycle", "journey"] },
+  { label: "Structures", kinds: ["pyramid", "orgchart", "pillars", "layers"] },
+  { label: "Networks", kinds: ["hub", "mindmap", "venn", "rings"] },
+  { label: "Plans", kinds: ["timeline", "roadmap", "kanban", "matrix"] },
 ];
 
 /** Derive a FlowCraft palette from the same themes used by the Presets panel. */
@@ -83,7 +136,19 @@ const flowPalette = (style: UiStyle) => {
   };
 };
 
+/** Public factory: builds the diagram, then upgrades every accent node
+ *  to a modern two-tone gradient derived from the selected theme. */
 function createFlowCraft(kind: FlowKind, style: UiStyle): AnyElement[] {
+  const p = flowPalette(style);
+  const gradient: ShapeGradient = { from: p.accent, to: FLOW_ACCENT2[style], angle: 100, type: "linear" };
+  return buildFlowCraft(kind, style).map((element) =>
+    element.type === "shape" && element.fill === p.accent
+      ? { ...element, gradient }
+      : element,
+  );
+}
+
+function buildFlowCraft(kind: FlowKind, style: UiStyle): AnyElement[] {
   const p = flowPalette(style);
   const els: AnyElement[] = [];
 
@@ -241,6 +306,162 @@ function createFlowCraft(kind: FlowKind, style: UiStyle): AnyElement[] {
     return els;
   }
 
+  if (kind === "journey") {
+    const top: Array<[string, string]> = [["Discover", "Find the product"], ["Sign up", "Create an account"], ["Value", "First win"]];
+    const bottom: Array<[string, string]> = [["Advocate", "Tell the world"], ["Upgrade", "Go Pro"], ["Habit", "Weekly use"]];
+    const w = 340, h = 150;
+    top.forEach(([label, sub], i) => {
+      const x = 180 + i * 500;
+      els.push(
+        newShape("capsule", { x, y: 260, width: w, height: h, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: x + 20, y: 296, width: w - 40, height: 50, text: label, fontSize: 28, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+        newText({ x: x + 20, y: 348, width: w - 40, height: 40, text: sub, fontSize: 18, color: p.ink, fontWeight: 500, align: "center", fontFamily: p.font }),
+      );
+      if (i < top.length - 1) els.push(newShape("arrow", { x: x + w + 40, y: 300, width: 80, height: 56, fill: p.accent, stroke: p.accent, strokeWidth: 2 }));
+    });
+    els.push(newShape("arrow", { x: 1500, y: 430, width: 56, height: 80, fill: p.accent, stroke: p.accent, strokeWidth: 2, rotation: 90 }));
+    bottom.forEach(([label, sub], i) => {
+      const x = 1180 - i * 500;
+      const hot = i === bottom.length - 1;
+      els.push(
+        newShape("capsule", { x, y: 540, width: w, height: h, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: x + 20, y: 576, width: w - 40, height: 50, text: label, fontSize: 28, color: hot ? p.onAccent : p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+        newText({ x: x + 20, y: 628, width: w - 40, height: 40, text: sub, fontSize: 18, color: hot ? p.onAccent : p.ink, fontWeight: 500, align: "center", fontFamily: p.font }),
+      );
+      if (i < bottom.length - 1) els.push(newShape("arrow", { x: x - 120, y: 580, width: 80, height: 56, fill: p.accent, stroke: p.accent, strokeWidth: 2, rotation: 180 }));
+    });
+    return els;
+  }
+
+  if (kind === "pillars") {
+    els.push(
+      newShape("rect", { x: 360, y: 220, width: 1200, height: 140, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 24 }),
+      newText({ x: 460, y: 252, width: 1000, height: 70, text: "Vision", fontSize: 40, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+    );
+    (["Design", "Build", "Grow"] as const).forEach((label, i) => {
+      const x = 520 + i * 330;
+      els.push(
+        newShape("rect", { x, y: 400, width: 220, height: 380, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 18 }),
+        newText({ x: x + 10, y: 550, width: 200, height: 60, text: label, fontSize: 32, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+      );
+    });
+    els.push(
+      newShape("rect", { x: 360, y: 820, width: 1200, height: 130, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 18 }),
+      newText({ x: 460, y: 852, width: 1000, height: 60, text: "Foundation — shared standards", fontSize: 28, color: p.ink, fontWeight: 700, align: "center", fontFamily: p.font }),
+    );
+    return els;
+  }
+
+  if (kind === "layers") {
+    const bands: Array<[string, string]> = [
+      ["Interface", "What people see and touch"],
+      ["Experience", "Flows, motion and feedback"],
+      ["Logic", "Rules, state and data"],
+      ["Platform", "Infra, build and deploy"],
+    ];
+    bands.forEach(([label, sub], i) => {
+      const y = 230 + i * 210;
+      const hot = i === 0;
+      els.push(
+        newShape("rect", { x: 320, y, width: 1280, height: 180, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 22 }),
+        newText({ x: 370, y: y + 56, width: 420, height: 70, text: label, fontSize: 36, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "left", fontFamily: p.font }),
+        newText({ x: 820, y: y + 68, width: 720, height: 50, text: sub, fontSize: 20, color: hot ? p.onAccent : p.ink, fontWeight: 500, align: "left", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  if (kind === "venn") {
+    els.push(
+      newShape("circle", { x: 540, y: 290, width: 520, height: 520, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, opacity: 0.85 }),
+      newShape("circle", { x: 860, y: 290, width: 520, height: 520, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth, opacity: 0.55 }),
+      newText({ x: 560, y: 460, width: 300, height: 60, text: "Team A", fontSize: 34, color: p.ink, fontWeight: 900, align: "center", fontFamily: p.font }),
+      newText({ x: 1060, y: 460, width: 300, height: 60, text: "Team B", fontSize: 34, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+      newText({ x: 810, y: 660, width: 300, height: 60, text: "Shared goals", fontSize: 26, color: p.onAccent, fontWeight: 800, align: "center", fontFamily: p.font }),
+    );
+    return els;
+  }
+
+  if (kind === "rings") {
+    const cx = 960, cy = 540;
+    els.push(
+      newShape("circle", { x: cx - 400, y: cy - 400, width: 800, height: 800, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, opacity: 0.9 }),
+      newShape("circle", { x: cx - 270, y: cy - 270, width: 540, height: 540, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, opacity: 0.9 }),
+      newShape("circle", { x: cx - 150, y: cy - 150, width: 300, height: 300, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+      newText({ x: cx - 100, y: cy - 34, width: 200, height: 70, text: "Core", fontSize: 36, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+      newText({ x: cx - 100, y: cy - 380, width: 200, height: 50, text: "Vision", fontSize: 26, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+      newText({ x: cx - 100, y: cy - 250, width: 200, height: 50, text: "Strategy", fontSize: 26, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+    );
+    return els;
+  }
+
+  if (kind === "roadmap") {
+    const lanes: Array<[string, string, number]> = [
+      ["Now", "In progress this quarter", 500],
+      ["Next", "Planned next quarter", 800],
+      ["Later", "On the horizon", 1100],
+    ];
+    lanes.forEach(([label, sub, w], i) => {
+      const y = 260 + i * 220;
+      const hot = i === 0;
+      els.push(
+        newShape("capsule", { x: 420, y, width: w, height: 160, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: 470, y: y + 34, width: w - 100, height: 60, text: label, fontSize: 34, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "left", fontFamily: p.font }),
+        newText({ x: 470, y: y + 94, width: w - 100, height: 40, text: sub, fontSize: 18, color: hot ? p.onAccent : p.ink, fontWeight: 500, align: "left", fontFamily: p.font }),
+      );
+    });
+    els.push(
+      newShape("arrow", { x: 1580, y: 310, width: 90, height: 56, fill: p.border, stroke: p.border, strokeWidth: 2 }),
+      newText({ x: 1580, y: 250, width: 240, height: 50, text: "Horizon", fontSize: 22, color: p.ink, fontWeight: 700, align: "left", fontFamily: p.font }),
+    );
+    return els;
+  }
+
+  if (kind === "kanban") {
+    const columns: Array<[string, Array<string>]> = [
+      ["To do", ["Wireframes", "Copy pass"]],
+      ["Doing", ["Editor polish", "Share flow"]],
+      ["Done", ["Pages bar", "FlowCraft"]],
+    ];
+    columns.forEach(([label, cards], i) => {
+      const x = 200 + i * 560;
+      els.push(
+        newShape("rect", { x, y: 260, width: 480, height: 660, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 24, opacity: 0.55 }),
+        newText({ x: x + 30, y: 300, width: 420, height: 50, text: label, fontSize: 30, color: p.ink, fontWeight: 900, align: "left", fontFamily: p.font }),
+      );
+      cards.forEach((card, j) => {
+        const cy = 400 + j * 190;
+        const hot = i === 2 && j === 1;
+        els.push(
+          newShape("rect", { x: x + 30, y: cy, width: 420, height: 150, fill: hot ? p.accent : p.border, stroke: p.border, strokeWidth: hot ? p.strokeWidth : 2, cornerRadius: 16, opacity: hot ? 1 : 0.28 }),
+          newText({ x: x + 55, y: cy + 48, width: 370, height: 55, text: card, fontSize: 24, color: hot ? p.onAccent : p.ink, fontWeight: 700, align: "left", fontFamily: p.font }),
+        );
+      });
+    });
+    return els;
+  }
+
+  if (kind === "matrix") {
+    els.push(
+      newText({ x: 280, y: 150, width: 400, height: 50, text: "Impact", fontSize: 24, color: p.ink, fontWeight: 700, align: "left", fontFamily: p.font }),
+      newText({ x: 65, y: 515, width: 300, height: 50, text: "Effort", fontSize: 24, color: p.ink, fontWeight: 700, align: "center", fontFamily: p.font, rotation: -90 }),
+    );
+    const quads: Array<[string, string, number, number, boolean]> = [
+      ["Quick wins", "Do these first", 280, 250, true],
+      ["Big bets", "Invest to win big", 1000, 250, false],
+      ["Fill-ins", "Only if time", 280, 650, false],
+      ["Time sinks", "Avoid or cut", 1000, 650, false],
+    ];
+    quads.forEach(([label, sub, x, y, hot]) => {
+      els.push(
+        newShape("rect", { x, y, width: 640, height: 340, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 24 }),
+        newText({ x: x + 40, y: y + 60, width: 560, height: 70, text: label, fontSize: 34, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "left", fontFamily: p.font }),
+        newText({ x: x + 40, y: y + 140, width: 560, height: 50, text: sub, fontSize: 20, color: hot ? p.onAccent : p.ink, fontWeight: 500, align: "left", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
   // mindmap
   const cx = 960, cy = 540;
   const branches: Array<[string, number]> = [
@@ -319,8 +540,13 @@ export function ElementsPanel() {
       if (!("groupId" in element) || element.groupId !== gid) continue;
       if (element.type === "shape") {
         const patch: Partial<ShapeElement> = {};
-        if (accs.has(element.fill)) patch.fill = theme.accent;
-        else if (softs.has(element.fill)) patch.fill = theme.bg;
+        if (accs.has(element.fill)) {
+          patch.fill = theme.accent;
+          if (element.gradient) patch.gradient = { ...element.gradient, from: theme.accent, to: FLOW_ACCENT2[style] };
+        } else if (softs.has(element.fill)) {
+          patch.fill = theme.bg;
+          if (element.gradient) patch.gradient = { ...element.gradient, from: theme.bg };
+        }
         if (borders.has(element.stroke)) patch.stroke = theme.border;
         if (Object.keys(patch).length) update(element.id, patch);
       } else if (element.type === "text") {
@@ -446,8 +672,11 @@ export function ElementsPanel() {
 
       {section === "flowcraft" && (
         <div className="space-y-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><GitBranch className="size-4 text-blue-600" /> FlowCraft diagrams</div>
-          <p className="text-[10px] leading-relaxed text-slate-500">Drop a connected visual story built from editable shapes and labels.</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><GitBranch className="size-4 text-blue-600" /> FlowCraft diagrams</div>
+            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">16 diagrams</span>
+          </div>
+          <p className="text-[10px] leading-relaxed text-slate-500">Drop a connected visual story built from editable shapes, gradients and labels.</p>
           <div className="space-y-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Theme — from the Presets panel</span>
             <ChipGroup
@@ -457,22 +686,30 @@ export function ElementsPanel() {
               options={(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((value) => ({ value, label: UI_STYLE_THEMES[value].label }))}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {FLOWCRAFT_DIAGRAMS.map(({ kind, label, description, Icon }) => (
-              <button
-                key={kind}
-                type="button"
-                title={description}
-                onClick={() => addGroup(createFlowCraft(kind, flowStyle))}
-                className="group flex flex-col gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_22px_-8px_rgba(37,99,235,0.28)] active:translate-y-0 active:scale-[0.97]"
-              >
-                <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700 group-hover:text-blue-600">
-                  <Icon className="size-3.5 text-slate-400 group-hover:text-blue-600" /> {label}
-                </span>
-                <span className="text-[9px] leading-tight text-slate-400">{description}</span>
-              </button>
-            ))}
-          </div>
+          {FLOWCRAFT_SECTIONS.map((sec) => (
+            <div key={sec.label} className="space-y-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{sec.label}</span>
+              <div className="grid grid-cols-2 gap-2">
+                {sec.kinds.map((kind) => {
+                  const meta = FLOWCRAFT_META[kind];
+                  return (
+                    <button
+                      key={kind}
+                      type="button"
+                      title={meta.description}
+                      onClick={() => addGroup(createFlowCraft(kind, flowStyle))}
+                      className="group flex flex-col gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_22px_-8px_rgba(37,99,235,0.28)] active:translate-y-0 active:scale-[0.97]"
+                    >
+                      <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700 group-hover:text-blue-600">
+                        <meta.Icon className="size-3.5 text-slate-400 group-hover:text-blue-600" /> {meta.label}
+                      </span>
+                      <span className="text-[9px] leading-tight text-slate-400">{meta.description}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
           <p className="text-[9px] leading-relaxed text-slate-400">Tip: select a diagram on the slide, then pick a theme to restyle it.</p>
         </div>
       )}
