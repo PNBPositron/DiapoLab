@@ -131,18 +131,21 @@ export function CanvasElement({
   element,
   scale,
   morph = false,
+  preview = false,
 }: {
   element: AnyElement;
   scale: number;
   /** when true the node tweens position/size between slides (morph transition) */
   morph?: boolean;
+  /** when true renders read-only (thumbnails): no selection outline or resize handles */
+  preview?: boolean;
 }) {
   const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
   const presenting = useEditor((s) => s.presenting);
   const page = useEditor((s) => s.pages[s.currentIndex]);
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
-  const selected = !presenting && selectedIds.includes(element.id);
+  const selected = !presenting && !preview && selectedIds.includes(element.id);
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
