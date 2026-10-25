@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-white text-slate-900" style={{ background: "#ffffff" }}>
+    <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-white text-slate-900" style={{ background: "linear-gradient(135deg, #f7f3ea 0%, #e8eef7 100%)" }}>
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
@@ -35,7 +35,7 @@ function Editor() {
             className="pointer-events-none absolute inset-0 opacity-35"
             style={{
               backgroundImage:
-                "linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px), linear-gradient(180deg, rgba(255,255,255,0.9), rgba(239,247,255,0.7))",
+                "linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px), linear-gradient(180deg, rgba(255,255,255,0.72), rgba(243,240,232,0.9))",
               backgroundSize: "32px 32px, 32px 32px, 100% 100%",
               maskImage: "radial-gradient(ellipse at center, black 30%, transparent 82%)",
             }}

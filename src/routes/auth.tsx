@@ -84,7 +84,7 @@ function AuthPage() {
           <Link to="/" className="relative flex items-center gap-3">
             <img src="/favicon.ico" alt="DiapoLab" className="size-10 rounded-xl object-contain" />
             <span className="font-display text-lg font-semibold uppercase tracking-[0.22em]">
-              DiapoLab
+              <span className="logo-wordmark font-orbitron">DiapoLab</span>
             </span>
           </Link>
 
@@ -128,7 +128,7 @@ function AuthPage() {
           <Link to="/" className="mb-6 flex items-center gap-2.5 lg:hidden">
             <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain" />
             <span className="font-display text-base font-semibold uppercase tracking-[0.18em] text-slate-800">
-              DiapoLab
+              <span className="logo-wordmark font-orbitron">DiapoLab</span>
             </span>
           </Link>
 

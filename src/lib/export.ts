@@ -406,8 +406,8 @@ export async function exportGIF(
     ctx.fillRect(0, 0, W, H);
     ctx.drawImage(images[i], 0, 0, W, H);
     const { data } = ctx.getImageData(0, 0, W, H);
-    const palette = quantize(data, 256);
-    const index = applyPalette(data, palette);
+    const palette = quantize(data, 256, { format: "rgb565", oneBitAlpha: false });
+    const index = applyPalette(data, palette, "rgb565");
     enc.writeFrame(index, W, H, {
       palette,
       delay: Math.max(200, Math.round((pages[i].duration || 3) * 1000)),

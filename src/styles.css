@@ -300,6 +300,7 @@
     text-transform: none;
   }
   .logo-wordmark {
+  font-family: "Orbitron", sans-serif;
     font-family: "Orbitron", "Inter", system-ui, sans-serif;
   }
   button,
