@@ -8,14 +8,16 @@ import {
   UploadCloud,
   Loader2,
   Sparkles,
+  Network,
+  GitBranch,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newIcon, newImage, newVideo, useEditor } from "@/store/editor";
+import { newIcon, newImage, newVideo, newShape, newText, useEditor } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 import { PanelHeader } from "../ui/selectors";
 
-type ElementSection = "shapes" | "icons" | null;
+type ElementSection = "shapes" | "icons" | "flowcraft" | null;
 
 const POPULAR_ICON_NAMES = [
   "Activity", "AlertCircle", "AlertTriangle", "AlignCenter", "AlignLeft", "AlignRight", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight",
@@ -37,12 +39,37 @@ const POPULAR_ICON_NAMES = [
   "Rocket", "Route", "ScanLine", "SendHorizontal", "Server", "ShieldCheck", "SlidersHorizontal", "Sparkles", "SquareStack",
   "Store", "Table2", "Tablet", "Terminal", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "TriangleAlert",
   "Truck", "Tv", "Umbrella", "Unlock", "UserCheck", "UserPlus", "WalletCards", "Wifi", "Wind", "Wrench",
+  "Accessibility", "BadgeAlert", "Blocks", "Brain", "CalendarCheck", "ChartNoAxesCombined", "CircleUserRound", "CloudCog", "Combine", "FileChartColumn", "FolderGit2", "Gauge", "Infinity", "Kanban", "ListTree", "MessageCircleMore", "Milestone", "Orbit", "PackageCheck", "PanelsTopLeft", "Pointer", "Puzzle", "QrCode", "Receipt", "ScanSearch", "SquareDashedKanban", "Workflow", "Waypoints",
 ] as const;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
-  const Icon = LucideIcons[name] as LucideIcon | undefined;
-  return Icon ? [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }] : [];
+  const candidate = LucideIcons[name] as unknown;
+  if (typeof candidate !== "function") return [];
+  const Icon = candidate as LucideIcon;
+  return [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }];
 });
+
+function createFlowCraft(kind: "process" | "cycle") {
+  const accent = "#2563eb";
+  const dark = "#0f172a";
+  const light = "#eff6ff";
+  if (kind === "process") {
+    const labels = ["Discover", "Shape", "Launch"];
+    return labels.flatMap((label, index) => [
+      newShape("rect", { x: 140 + index * 500, y: 330, width: 360, height: 220, fill: index === 1 ? accent : light, stroke: accent, strokeWidth: 4, cornerRadius: 28 }),
+      newText({ x: 170 + index * 500, y: 405, width: 300, height: 70, text: label, fontSize: 44, color: index === 1 ? "#ffffff" : dark, fontWeight: 800, align: "center" }),
+      ...(index < 2 ? [newShape("arrow", { x: 510 + index * 500, y: 405, width: 120, height: 70, fill: accent, stroke: accent, strokeWidth: 2 })] : []),
+    ]);
+  }
+  const labels = ["Idea", "Build", "Learn", "Repeat"];
+  return labels.flatMap((label, index) => {
+    const angle = (index * Math.PI) / 2 - Math.PI / 2;
+    return [
+      newShape("circle", { x: 760 + Math.cos(angle) * 300 - 95, y: 440 + Math.sin(angle) * 300 - 95, width: 190, height: 190, fill: index === 0 ? accent : light, stroke: accent, strokeWidth: 4 }),
+      newText({ x: 775 + Math.cos(angle) * 300 - 70, y: 505 + Math.sin(angle) * 300 - 35, width: 140, height: 50, text: label, fontSize: 28, color: index === 0 ? "#ffffff" : dark, fontWeight: 800, align: "center" }),
+    ];
+  });
+}
 
 /* Refined tile: frosted card, gradient chip, subtle lift + blue glow on hover. */
 function ActionTile({
@@ -76,8 +103,13 @@ function ActionTile({
 
 export function ElementsPanel() {
   const { add } = useEditor();
+  const addGroup = (elements: ReturnType<typeof createFlowCraft>) => {
+    const groupId = crypto.randomUUID();
+    elements.forEach((element) => add({ ...element, groupId }));
+  };
   const [section, setSection] = useState<ElementSection>(null);
   const [iconQuery, setIconQuery] = useState("");
+  const [flowcraftKind, setFlowcraftKind] = useState<"process" | "cycle">("process");
   const [imageUrl, setImageUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -180,9 +212,32 @@ export function ElementsPanel() {
           active={section === "icons"}
           onClick={() => setSection(section === "icons" ? null : "icons")}
         />
+        <ActionTile
+          Icon={Network}
+          label="FlowCraft"
+          active={section === "flowcraft"}
+          onClick={() => setSection(section === "flowcraft" ? null : "flowcraft")}
+        />
       </div>
 
       {section === "shapes" && <ShapesPanel embedded />}
+
+      {section === "flowcraft" && (
+        <div className="space-y-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><GitBranch className="size-4 text-blue-600" /> FlowCraft diagrams</div>
+          <p className="text-[10px] leading-relaxed text-slate-500">Build a connected visual story from editable shapes and labels.</p>
+          <div className="grid grid-cols-2 gap-2">
+            {(["process", "cycle"] as const).map((kind) => (
+              <button key={kind} type="button" onClick={() => setFlowcraftKind(kind)} className={`rounded-xl border px-2 py-2 text-[10px] font-semibold capitalize transition ${flowcraftKind === kind ? "border-blue-500 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-blue-300"}`}>
+                {kind === "process" ? "3-step flow" : "Cycle"}
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={() => addGroup(createFlowCraft(flowcraftKind))} className="w-full rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 active:scale-[0.98]">
+            Add FlowCraft diagram
+          </button>
+        </div>
+      )}
 
       {section === "icons" && (
         <div className="flex flex-col gap-3">

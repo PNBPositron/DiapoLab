@@ -612,7 +612,7 @@ export type Page = {
 
 export const DEFAULT_W = 1920;
 export const DEFAULT_H = 1080;
-const DEFAULT_BG = "#f3f0e8";
+const DEFAULT_BG = "#ffffff";
 export const DEFAULT_PAGE_DURATION = 3;
 
 export const CANVAS_PRESETS = [
