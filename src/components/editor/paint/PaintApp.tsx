@@ -413,8 +413,8 @@ export function PaintAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto p-0 sm:rounded-3xl">
-        <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-4">
+      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl">
+        <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 px-5 py-4">
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">
             <span className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.35)]">
               <Brush className="size-4" />
@@ -429,8 +429,8 @@ export function PaintAppDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-3 p-4">
-          {/* Tools row */}
-          <div className="flex flex-wrap items-center gap-1.5">
+          {/* Tools row — floating toolbar island */}
+          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
             {TOOLS.map(({ tool: t, label, Icon }) => (
               <button
                 key={t}
@@ -439,7 +439,7 @@ export function PaintAppDialog({
                 className={`grid size-9 place-items-center rounded-lg border transition-all ${
                   tool === t
                     ? "border-indigo-600 bg-indigo-600 text-white shadow-[0_4px_10px_rgba(79,70,229,0.4)]"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:bg-indigo-50"
                 }`}
               >
                 <Icon className="size-4" />
@@ -502,7 +502,7 @@ export function PaintAppDialog({
           </div>
 
           {/* Pad — height capped so the dialog always fits the screen */}
-          <div className="relative mx-auto w-full" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
+          <div className="relative mx-auto w-full rounded-2xl bg-white p-1 ring-1 ring-slate-200/70 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.1)]" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
             <canvas
               ref={padRef}
               width={dispW}
@@ -542,8 +542,8 @@ export function PaintAppDialog({
             )}
           </div>
 
-          {/* Palette + actions */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Palette + actions — bottom island */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
             <div className="flex flex-wrap items-center gap-1.5">
               {colors.map((c) => (
                 <button
