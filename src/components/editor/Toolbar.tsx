@@ -144,8 +144,8 @@ export function Toolbar() {
   };
 
 
-  const handleSave = async () => {
-    if (!user) return;
+  const handleSave = async (): Promise<string | null> => {
+    if (!user) return null;
     setSaving(true);
     try {
       const { pages, canvasW, canvasH } = useEditor.getState();
@@ -158,9 +158,11 @@ export function Toolbar() {
       });
       setDesignMeta({ id: saved.id, name: saved.name });
       setSavedAt(Date.now());
+      return saved.id;
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Failed to save");
+      return null;
     } finally {
       setSaving(false);
     }
@@ -172,8 +174,7 @@ export function Toolbar() {
     try {
       let id = useEditor.getState().designId;
       if (!id) {
-        await handleSave();
-        id = useEditor.getState().designId;
+        id = await handleSave();
       }
       if (!id) throw new Error("Could not save the design");
       const token = await createPrivateShare(id);
@@ -402,6 +403,7 @@ export function Toolbar() {
           onSettings={() => setSettingsDialogOpen(true)}
           onNewDesign={newDesign}
           onShare={handlePrivateShare}
+          onPublish={handlePublish}
           onClear={clear}
           onAssistant={() => setTool("plugins")}
           publishing={publishing}
@@ -474,6 +476,7 @@ function LargeModernHamburger({
   onSettings,
   onNewDesign,
   onShare,
+  onPublish,
   onClear,
   onAssistant,
   publishing,
@@ -482,6 +485,7 @@ function LargeModernHamburger({
   onSettings: () => void;
   onNewDesign: () => void;
   onShare: () => void;
+  onPublish: () => void;
   onClear: () => void;
   onAssistant: () => void;
   publishing: boolean;
@@ -566,13 +570,24 @@ function LargeModernHamburger({
           />
 
           {isAuthenticated && (
-            <MenuCardItem
-              icon={publishing ? Loader2 : Share2}
-              title={publishing ? "Publishing…" : "Copy private link"}
-              subtitle="Share this slideshow privately"
-              disabled={publishing}
-              onClick={() => handleAction(onShare)}
-            />
+            <>
+              <MenuCardItem
+                icon={publishing ? Loader2 : Share2}
+                title={publishing ? "Working…" : "Copy private link"}
+                subtitle="Share this slideshow privately"
+                disabled={publishing}
+                onClick={() => handleAction(onShare)}
+              />
+              <MenuCardItem
+                icon={publishing ? Loader2 : Upload}
+                iconColor="text-blue-600"
+                iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+                title={publishing ? "Publishing…" : "Publish template to community"}
+                subtitle="Share this deck in the marketplace"
+                disabled={publishing}
+                onClick={() => handleAction(onPublish)}
+              />
+            </>
           )}
 
           {/* SEPARATOR */}
