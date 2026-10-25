@@ -977,7 +977,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   // Live poll sync: every open window on the same channel shares the tally.
   useEffect(() => {
     if (!isPoll || typeof BroadcastChannel === "undefined") return;
-    const ch = new BroadcastChannel(`poll-${element.liveKey ?? element.id}`);
+    const ch = new BroadcastChannel("poll-" + (element.liveKey ?? element.id));
     chanRef.current = ch;
     ch.onmessage = (ev: MessageEvent) => {
       const d = ev.data as { type: string; optionId?: string };
@@ -1023,6 +1023,63 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         }
       : {};
 
+  // ---- Theme-driven styling: question + answer cards follow the UI style ----
+  const accent = element.accentColor;
+  const onAccent = theme?.onAccent ?? "#ffffff";
+  const font = theme?.font ?? "Inter, system-ui, sans-serif";
+  const uppercaseText = theme?.uppercase ? ("uppercase" as const) : ("none" as const);
+  const tracking = theme?.letterSpacing ?? "0em";
+  const optRadius = Math.max(4, Math.round((theme?.radius ?? 14) * 0.75));
+  const optBg = theme
+    ? theme.dark
+      ? "rgba(255,255,255,0.07)"
+      : "rgba(255,255,255,0.85)"
+    : "rgba(255,255,255,0.06)";
+  const optBorder = theme?.border ?? "rgba(255,255,255,0.18)";
+  const optBorderWidth = theme ? Math.max(1, theme.borderWidth) : 2;
+  // signature detail per UI style so each theme reads instantly on the answers
+  const flair: Record<string, React.CSSProperties> = {
+    neobrutalist: { boxShadow: "4px 4px 0 0 " + (theme?.border ?? "#0a0a0a") },
+    cyber: { boxShadow: "0 0 12px " + accent + "44" },
+    matrix: { boxShadow: "0 0 10px " + accent + "33" },
+    vapor: { boxShadow: "0 0 16px " + accent + "55" },
+    swiss: { borderLeft: "6px solid " + accent },
+    xp: { boxShadow: "inset -1px -1px 0 #808080, inset 1px 1px 0 #ffffff" },
+    glass: {
+      backdropFilter: "blur(10px) saturate(150%)",
+      WebkitBackdropFilter: "blur(10px) saturate(150%)",
+    },
+    aqua: { boxShadow: "0 4px 14px rgba(15,23,42,0.10)" },
+    material: { boxShadow: "0 1px 2px rgba(0,0,0,0.30), 0 2px 8px rgba(0,0,0,0.12)" },
+    midnight: { boxShadow: "0 6px 18px rgba(0,0,0,0.35)" },
+    pastel: { boxShadow: "0 6px 14px rgba(244,143,177,0.28)" },
+    sketch: { borderStyle: "dashed" },
+  };
+  const optFlair = element.uiStyle ? (flair[element.uiStyle] ?? {}) : {};
+
+  // A/B/C/D letter chip, tinted by the current theme's accent.
+  const LetterChip = ({ i, solid }: { i: number; solid: boolean }) => (
+    <span
+      aria-hidden="true"
+      style={{
+        display: "inline-grid",
+        placeItems: "center",
+        width: "1.9em",
+        height: "1.9em",
+        flexShrink: 0,
+        borderRadius: Math.max(2, Math.round(optRadius * 0.6)),
+        background: solid ? "rgba(0,0,0,0.22)" : accent,
+        color: onAccent,
+        fontSize: "0.72em",
+        fontWeight: 800,
+        letterSpacing: 0,
+        fontFamily: font,
+      }}
+    >
+      {String.fromCharCode(65 + i)}
+    </span>
+  );
+
   return (
     <div
       onMouseDown={(e) => interactive && e.stopPropagation()}
@@ -1040,19 +1097,43 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         display: "flex",
         flexDirection: "column",
         gap: "4%",
-        border: `${theme?.borderWidth ?? 3}px solid ${theme?.border ?? element.accentColor}`,
+        border: (theme?.borderWidth ?? 3) + "px solid " + (theme?.border ?? element.accentColor),
         borderRadius: theme?.radius ?? 18,
         boxShadow: theme?.shadow,
-        fontFamily: theme?.font ?? "Inter, system-ui, sans-serif",
+        fontFamily: font,
         overflow: "hidden",
       }}
     >
-      <div style={{ fontSize: "max(20px, 5%)", fontWeight: 800, lineHeight: 1.2 }}>
+      <div
+        style={{
+          fontSize: "max(20px, 5%)",
+          fontWeight: 800,
+          lineHeight: 1.2,
+          fontFamily: font,
+          letterSpacing: tracking,
+          textTransform: uppercaseText,
+          color: theme?.fg ?? element.fgColor,
+          display: "flex",
+          alignItems: "center",
+          gap: "3%",
+        }}
+      >
+        <span
+          aria-hidden="true"
+          style={{
+            width: 6,
+            alignSelf: "stretch",
+            borderRadius: 3,
+            background: accent,
+            boxShadow: "0 0 10px " + accent + "66",
+            flexShrink: 0,
+          }}
+        />
         {element.question}
       </div>
       {isPoll ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "3%", flex: 1 }}>
-          {element.options.map((opt) => {
+          {element.options.map((opt, i) => {
             const count = votes[opt.id] ?? 0;
             const pct = total ? Math.round((count / total) * 100) : 0;
             const mine = picked === opt.id;
@@ -1065,11 +1146,14 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                   position: "relative",
                   flex: 1,
                   overflow: "hidden",
-                  background: theme?.bg ?? "rgba(255,255,255,0.06)",
-                  color: element.fgColor,
-                  border: `2px solid ${mine ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
-                  borderRadius: theme?.radius ?? 12,
+                  background: mine ? accent : optBg,
+                  color: mine ? onAccent : element.fgColor,
+                  border: optBorderWidth + "px solid " + (mine ? accent : optBorder),
+                  borderRadius: optRadius,
                   padding: "0 16px",
+                  fontFamily: font,
+                  letterSpacing: tracking,
+                  textTransform: uppercaseText,
                   fontSize: "max(15px, 3%)",
                   fontWeight: 600,
                   textAlign: "left",
@@ -1077,20 +1161,34 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  gap: 8,
+                  gap: 10,
+                  ...optFlair,
                 }}
               >
+                {!mine && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: pct + "%",
+                      background: accent,
+                      opacity: 0.28,
+                      transition: "width 420ms cubic-bezier(0.16,1,0.3,1)",
+                    }}
+                  />
+                )}
                 <span
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: `${pct}%`,
-                    background: element.accentColor,
-                    opacity: 0.28,
-                    transition: "width 420ms cubic-bezier(0.16,1,0.3,1)",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    minWidth: 0,
                   }}
-                />
-                <span style={{ position: "relative" }}>{opt.text}</span>
+                >
+                  <LetterChip i={i} solid={mine} />
+                  <span>{opt.text}</span>
+                </span>
                 <span style={{ position: "relative", fontVariantNumeric: "tabular-nums" }}>
                   {pct}% · {count}
                 </span>
@@ -1118,41 +1216,46 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         </div>
       ) : (
         <div style={{ display: "grid", gap: "3%", flex: 1, gridTemplateColumns: "1fr 1fr" }}>
-          {element.options.map((opt) => {
+          {element.options.map((opt, i) => {
             const isPicked = picked === opt.id;
             const isCorrect = opt.id === element.correctId;
             const showResult = picked !== null;
-            const bg = !showResult
-              ? (theme?.bg ?? "rgba(255,255,255,0.06)")
-              : isCorrect
-                ? "#16a34a"
-                : isPicked
-                  ? "#dc2626"
-                  : (theme?.bg ?? "rgba(255,255,255,0.04)");
+            const marked = showResult && (isCorrect || isPicked);
             return (
               <button
                 key={opt.id}
                 disabled={!interactive || showResult}
                 onClick={() => interactive && setPicked(opt.id)}
                 style={{
-                  background: bg,
-                  color: showResult && (isCorrect || isPicked) ? "#ffffff" : element.fgColor,
-                  border: `2px solid ${isPicked || (showResult && isCorrect) ? element.accentColor : (theme?.border ?? "rgba(255,255,255,0.18)")}`,
-                  borderRadius: theme?.radius ?? 12,
+                  background: isCorrect ? accent : isPicked ? "#dc2626" : optBg,
+                  color: isCorrect ? onAccent : isPicked ? "#ffffff" : element.fgColor,
+                  border:
+                    optBorderWidth +
+                    "px solid " +
+                    (isCorrect ? accent : isPicked ? "#dc2626" : optBorder),
+                  borderRadius: optRadius,
                   padding: "0 16px",
-                  fontSize: "max(16px, 3.2%)",
+                  fontFamily: font,
+                  letterSpacing: tracking,
+                  textTransform: uppercaseText,
+                  fontSize: "max(15px, 3.2%)",
                   fontWeight: 600,
                   textAlign: "left",
+                  opacity: showResult && !marked ? 0.55 : 1,
                   cursor: interactive && !showResult ? "pointer" : "default",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  gap: 8,
-                  transition: "all 0.2s",
+                  gap: 10,
+                  transition: "all 0.25s",
+                  ...optFlair,
                 }}
               >
-                <span>{opt.text}</span>
-                {showResult && isCorrect && <Check size={20} strokeWidth={3} />}
+                <span style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <LetterChip i={i} solid={isCorrect} />
+                  <span>{opt.text}</span>
+                </span>
+                {showResult && isCorrect && <Check size={20} strokeWidth={3} color={onAccent} />}
                 {showResult && isPicked && !isCorrect && <XIcon size={20} strokeWidth={3} />}
               </button>
             );
