@@ -18,14 +18,14 @@ export type PluginWidget = {
 /**
  * An APP is an interactive mini-tool shipped by a plugin. Apps run inside
  * the editor and produce canvas elements.
- * Supported types: "paint" (freehand drawing pad), "video" (upload, trim
- * & insert video clips on the slide).
+ * Supported types: "paint" (freehand drawing pad) and "video" (upload,
+ * trim & insert video clips on the slide).
  */
 export type PluginApp = {
   id?: string;
   name: string;
   description?: string;
-  type: "paint" | "video" | "image";
+  type: "paint" | "video";
   config?: {
     /** swatches shown in the color picker (any CSS color) */
     colors?: string[];
@@ -98,7 +98,7 @@ function normalizeApps(raw: unknown): PluginApp[] {
     if (!a || typeof a !== "object") continue;
     const app = a as Record<string, unknown>;
     const name = typeof app.name === "string" && app.name.trim() ? app.name.trim() : null;
-    const type = app.type === "paint" || app.type === "video" || app.type === "image" ? app.type : null;
+    const type = app.type === "paint" || app.type === "video" ? app.type : null;
     if (!name || !type) continue;
     const cfg = (app.config ?? {}) as Record<string, unknown>;
     apps.push({
@@ -217,7 +217,7 @@ export function evaluateAppCode(code: string): PluginMeta {
   const raw = evalObject(code, "diapolabApp");
   const apps = normalizeApps(raw.apps);
   if (apps.length === 0) {
-    throw new Error('App code needs a non-empty "apps" array (type "paint", "video" or "image").');
+    throw new Error('App code needs a non-empty "apps" array (type "paint" or "video").');
   }
   return { ...readMeta(raw), widgets: [], apps };
 }
@@ -349,13 +349,6 @@ export const VIDEO_APP: PluginApp = {
   type: "video",
 };
 
-/** The built-in Image app — advanced image editor. */
-export const IMAGE_APP: PluginApp = {
-  id: "image",
-  name: "Image",
-  description: "Advanced image editor — filters, crop, rotate & flip",
-  type: "image",
-};
 
 /* ------------------------------------------------------------------ */
 /* Preinstalled widget packs — ready-to-drop element groups            */
@@ -502,17 +495,6 @@ export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
     enabled: true,
     widgets: [],
     apps: [VIDEO_APP],
-    importedAt: 0,
-  },
-  {
-    id: "builtin-image",
-    name: "Image",
-    author: "DiapoLab",
-    version: "1.0.0",
-    description: "Built-in image editor — filters, crop, rotate & flip, insert on the slide.",
-    enabled: true,
-    widgets: [],
-    apps: [IMAGE_APP],
     importedAt: 0,
   },
 ];
