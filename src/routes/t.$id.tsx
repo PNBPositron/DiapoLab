@@ -37,7 +37,17 @@ function SharedTemplate() {
           p_token: share,
         });
         if (cancelled) return;
-        if (rpcError || !data) {
+        if (rpcError) {
+          // Distinguish a server that lacks the get_shared_design RPC from an
+          // actually invalid/revoked token, so users aren't misled.
+          setError(
+            /^could not find|does not exist|function/i.test(rpcError.message)
+              ? "Private links are not enabled on this server yet. The database function get_shared_design must be installed."
+              : rpcError.message,
+          );
+          return;
+        }
+        if (!data) {
           setError("This private link is invalid or has been revoked.");
           return;
         }
