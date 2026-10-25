@@ -172,8 +172,8 @@ export function VideoAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto p-0 sm:rounded-3xl">
-        <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-indigo-50/50 px-5 py-4">
+      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl">
+        <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 px-5 py-4">
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">
             <span className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.35)]">
               <Clapperboard className="size-4" />
@@ -193,9 +193,9 @@ export function VideoAppDialog({
           {!src ? (
             <button
               onClick={() => fileRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 py-12 text-center transition-all hover:border-indigo-400 hover:bg-indigo-50/40"
+              className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed border-slate-300 bg-gradient-to-b from-slate-50 to-white py-14 text-center transition-all hover:border-indigo-400 hover:bg-indigo-50/40 hover:shadow-[0_10px_30px_-12px_rgba(79,70,229,0.25)]"
             >
-              <span className="grid size-11 place-items-center rounded-xl bg-white text-indigo-600 shadow-sm">
+              <span className="grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_8px_18px_rgba(79,70,229,0.35)]">
                 <Upload className="size-5" />
               </span>
               <span className="text-xs font-semibold text-slate-700">Upload a video</span>
@@ -204,7 +204,7 @@ export function VideoAppDialog({
           ) : (
             <>
               {/* preview */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950">
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-[0_10px_30px_-12px_rgba(15,23,42,0.4)]">
                 <video
                   ref={videoRef}
                   src={src}
@@ -236,7 +236,7 @@ export function VideoAppDialog({
               </div>
 
               {/* trim */}
-              <div className="rounded-xl border border-slate-200 p-2.5">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-2.5">
                 <span className="mb-1.5 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
                   <Scissors className="size-3" /> Trim
                   {trimmed && (
@@ -318,8 +318,8 @@ export function VideoAppDialog({
                 </label>
               </div>
 
-              {/* options */}
-              <div className="flex flex-wrap items-center gap-1.5">
+              {/* options — floating island */}
+              <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
                 <button
                   onClick={() => setMuted((m) => !m)}
                   title={muted ? "Muted" : "Sound on"}
@@ -405,7 +405,7 @@ export function VideoAppDialog({
                 tab open to keep them.
               </p>
 
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
                 <button
                   onClick={() => fileRef.current?.click()}
                   className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-500 transition hover:border-indigo-300"
