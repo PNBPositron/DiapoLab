@@ -10,12 +10,18 @@ import {
   Sparkles,
   Network,
   GitBranch,
+  RefreshCw,
+  Milestone,
+  Triangle,
+  Filter,
+  CircleDot,
+  Waypoints,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newIcon, newImage, newVideo, newShape, newText, useEditor } from "@/store/editor";
+import { newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type UiStyle } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
-import { PanelHeader } from "../ui/selectors";
+import { PanelHeader, ChipGroup } from "../ui/selectors";
 
 type ElementSection = "shapes" | "icons" | "flowcraft" | null;
 
@@ -49,26 +55,213 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_
   return [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }];
 });
 
-function createFlowCraft(kind: "process" | "cycle") {
-  const accent = "#2563eb";
-  const dark = "#0f172a";
-  const light = "#eff6ff";
+
+type FlowKind = "process" | "cycle" | "timeline" | "pyramid" | "funnel" | "orgchart" | "hub" | "mindmap";
+
+const FLOWCRAFT_DIAGRAMS: Array<{ kind: FlowKind; label: string; description: string; Icon: LucideIcon }> = [
+  { kind: "process", label: "Stepped flow", description: "Numbered stages linked by arrows", Icon: GitBranch },
+  { kind: "cycle", label: "Cycle loop", description: "Circular loop around a central hub", Icon: RefreshCw },
+  { kind: "timeline", label: "Timeline", description: "Milestones along an axis", Icon: Milestone },
+  { kind: "pyramid", label: "Pyramid", description: "Three-tier hierarchy", Icon: Triangle },
+  { kind: "funnel", label: "Funnel", description: "Narrowing conversion stages", Icon: Filter },
+  { kind: "orgchart", label: "Org chart", description: "Team tree with connectors", Icon: Network },
+  { kind: "hub", label: "Hub & spoke", description: "Central concept with satellites", Icon: CircleDot },
+  { kind: "mindmap", label: "Mind map", description: "Central idea with six branches", Icon: Waypoints },
+];
+
+/** Derive a FlowCraft palette from the same themes used by the Presets panel. */
+const flowPalette = (style: UiStyle) => {
+  const t = UI_STYLE_THEMES[style];
+  return {
+    accent: t.accent,
+    soft: t.bg,
+    ink: t.fg,
+    border: t.border,
+    onAccent: t.onAccent,
+    font: t.font,
+    strokeWidth: Math.max(2, t.borderWidth ?? 2),
+  };
+};
+
+function createFlowCraft(kind: FlowKind, style: UiStyle): AnyElement[] {
+  const p = flowPalette(style);
+  const els: AnyElement[] = [];
+
   if (kind === "process") {
-    const labels = ["Discover", "Shape", "Launch"];
-    return labels.flatMap((label, index) => [
-      newShape("rect", { x: 140 + index * 500, y: 330, width: 360, height: 220, fill: index === 1 ? accent : light, stroke: accent, strokeWidth: 4, cornerRadius: 28 }),
-      newText({ x: 170 + index * 500, y: 405, width: 300, height: 70, text: label, fontSize: 44, color: index === 1 ? "#ffffff" : dark, fontWeight: 800, align: "center" }),
-      ...(index < 2 ? [newShape("arrow", { x: 510 + index * 500, y: 405, width: 120, height: 70, fill: accent, stroke: accent, strokeWidth: 2 })] : []),
-    ]);
-  }
-  const labels = ["Idea", "Build", "Learn", "Repeat"];
-  return labels.flatMap((label, index) => {
-    const angle = (index * Math.PI) / 2 - Math.PI / 2;
-    return [
-      newShape("circle", { x: 760 + Math.cos(angle) * 300 - 95, y: 440 + Math.sin(angle) * 300 - 95, width: 190, height: 190, fill: index === 0 ? accent : light, stroke: accent, strokeWidth: 4 }),
-      newText({ x: 775 + Math.cos(angle) * 300 - 70, y: 505 + Math.sin(angle) * 300 - 35, width: 140, height: 50, text: label, fontSize: 28, color: index === 0 ? "#ffffff" : dark, fontWeight: 800, align: "center" }),
+    const steps: Array<[string, string, string]> = [
+      ["01", "Discover", "Explore the problem space"],
+      ["02", "Design", "Shape the core experience"],
+      ["03", "Build", "Ship a working version"],
+      ["04", "Launch", "Measure and iterate"],
     ];
+    const w = 360, h = 250, y = 400, gap = 90;
+    const startX = (1920 - (steps.length * w + (steps.length - 1) * gap)) / 2;
+    steps.forEach(([num, title, sub], i) => {
+      const x = startX + i * (w + gap);
+      const hot = i === 1;
+      els.push(
+        newShape("rect", { x, y, width: w, height: h, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 26 }),
+        newText({ x: x + 28, y: y + 24, width: 100, height: 60, text: num, fontSize: 30, color: hot ? p.onAccent : p.accent, fontWeight: 900, align: "left", fontFamily: p.font }),
+        newText({ x: x + 28, y: y + 96, width: w - 56, height: 60, text: title, fontSize: 38, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "left", fontFamily: p.font }),
+        newText({ x: x + 28, y: y + 162, width: w - 56, height: 60, text: sub, fontSize: 20, color: hot ? p.onAccent : p.ink, fontWeight: 500, align: "left", fontFamily: p.font }),
+      );
+      if (i < steps.length - 1) {
+        els.push(newShape("arrow", { x: x + w + 14, y: y + h / 2 - 28, width: 62, height: 56, fill: p.accent, stroke: p.accent, strokeWidth: 2 }));
+      }
+    });
+    return els;
+  }
+
+  if (kind === "cycle") {
+    const labels = ["Plan", "Build", "Measure", "Learn"];
+    const cx = 960, cy = 540, r = 330, node = 220;
+    els.push(
+      newShape("circle", { x: cx - 150, y: cy - 150, width: 300, height: 300, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+      newText({ x: cx - 120, y: cy - 32, width: 240, height: 70, text: "Loop", fontSize: 42, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+    );
+    labels.forEach((label, i) => {
+      const a = (i * Math.PI) / 2 - Math.PI / 2;
+      const nx = cx + Math.cos(a) * r;
+      const ny = cy + Math.sin(a) * r;
+      els.push(
+        newShape("circle", { x: nx - node / 2, y: ny - node / 2, width: node, height: node, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: nx - node / 2 + 20, y: ny - 24, width: node - 40, height: 50, text: label, fontSize: 30, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+      );
+      const mid = a + Math.PI / 4;
+      const ax = cx + Math.cos(mid) * (r + 70);
+      const ay = cy + Math.sin(mid) * (r + 70);
+      const deg = ((mid + Math.PI / 2) * 180) / Math.PI;
+      els.push(newShape("arrow", { x: ax - 30, y: ay - 15, width: 60, height: 30, fill: p.accent, stroke: p.accent, strokeWidth: 2, rotation: deg }));
+    });
+    return els;
+  }
+
+  if (kind === "timeline") {
+    const items: Array<[string, string, string]> = [
+      ["2023", "Idea", "First prototype"],
+      ["2024", "Launch", "Public release"],
+      ["2025", "Growth", "10k users"],
+      ["2026", "Today", "Global team"],
+    ];
+    const axisY = 540;
+    els.push(newShape("rect", { x: 180, y: axisY - 5, width: 1560, height: 10, fill: p.border, stroke: p.border, strokeWidth: 0 }));
+    items.forEach(([year, title, sub], i) => {
+      const x = 340 + i * 420;
+      const above = i % 2 === 0;
+      els.push(
+        newShape("circle", { x: x - 26, y: axisY - 26, width: 52, height: 52, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newShape("rect", { x: x - 4, y: above ? axisY - 120 : axisY + 10, width: 8, height: 100, fill: p.border, stroke: p.border, strokeWidth: 0 }),
+        newShape("rect", { x: x - 70, y: above ? axisY - 200 : axisY + 110, width: 140, height: 54, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 27 }),
+        newText({ x: x - 70, y: above ? axisY - 188 : axisY + 122, width: 140, height: 40, text: year, fontSize: 24, color: p.accent, fontWeight: 900, align: "center", fontFamily: p.font }),
+        newText({ x: x - 160, y: above ? axisY - 300 : axisY + 180, width: 320, height: 50, text: title, fontSize: 34, color: p.ink, fontWeight: 900, align: "center", fontFamily: p.font }),
+        newText({ x: x - 160, y: above ? axisY - 246 : axisY + 234, width: 320, height: 40, text: sub, fontSize: 20, color: p.ink, fontWeight: 500, align: "center", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  if (kind === "pyramid") {
+    const tiers: Array<[string, number]> = [["Vision", 560], ["Strategy", 800], ["Execution", 1040]];
+    tiers.forEach(([label, w], i) => {
+      const y = 240 + i * 200;
+      const hot = i === 0;
+      els.push(
+        newShape("trapezoid", { x: (1920 - w) / 2, y, width: w, height: 186, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: 660, y: y + 56, width: 600, height: 70, text: label, fontSize: 38, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "center", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  if (kind === "funnel") {
+    const stages: Array<[string, string]> = [["Visitors", "100%"], ["Signups", "42%"], ["Active users", "18%"], ["Customers", "6%"]];
+    const widths = [1100, 820, 560, 320];
+    stages.forEach(([label, pct], i) => {
+      const w = widths[i];
+      const y = 190 + i * 190;
+      const hot = i === stages.length - 1;
+      els.push(
+        newShape("trapezoid", { x: (1920 - w) / 2, y, width: w, height: 170, fill: hot ? p.accent : p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: 660, y: y + 52, width: 600, height: 60, text: label, fontSize: 34, color: hot ? p.onAccent : p.ink, fontWeight: 900, align: "center", fontFamily: p.font }),
+        newText({ x: (1920 - w) / 2 + w + 36, y: y + 58, width: 220, height: 50, text: pct, fontSize: 26, color: p.accent, fontWeight: 800, align: "left", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  if (kind === "orgchart") {
+    const line = (x: number, y: number, w: number, h: number) =>
+      newShape("rect", { x, y, width: w, height: h, fill: p.border, stroke: p.border, strokeWidth: 0 });
+    els.push(
+      newShape("capsule", { x: 760, y: 150, width: 400, height: 140, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+      newText({ x: 790, y: 190, width: 340, height: 60, text: "DiapoLab", fontSize: 34, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+      line(956, 290, 8, 60),
+      line(560, 350, 800, 8),
+      line(556, 358, 8, 32),
+      line(1356, 358, 8, 32),
+    );
+    (["Design", "Engineering"] as const).forEach((label, i) => {
+      const x = i === 0 ? 350 : 1150;
+      els.push(
+        newShape("rect", { x, y: 390, width: 420, height: 130, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 20 }),
+        newText({ x: x + 20, y: 432, width: 380, height: 50, text: label, fontSize: 30, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+        line(x + 206, 520, 8, 40),
+      );
+    });
+    els.push(line(270, 560, 580, 8), line(1070, 560, 580, 8));
+    const leaves: Array<[string, number]> = [["Brand", 100], ["Product", 680], ["Platform", 900], ["Research", 1480]];
+    leaves.forEach(([label, x]) => {
+      els.push(
+        line(x + 166, 568, 8, 32),
+        newShape("rect", { x, y: 600, width: 340, height: 130, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 20 }),
+        newText({ x: x + 20, y: 642, width: 300, height: 50, text: label, fontSize: 26, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  if (kind === "hub") {
+    const cx = 960, cy = 540;
+    const labels = ["Data", "Design", "Code", "Users"];
+    els.push(
+      newShape("circle", { x: cx - 180, y: cy - 180, width: 360, height: 360, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+      newText({ x: cx - 140, y: cy - 32, width: 280, height: 70, text: "Core", fontSize: 40, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+    );
+    labels.forEach((label, i) => {
+      const deg = 45 + i * 90;
+      const a = (deg * Math.PI) / 180;
+      const sx = cx + Math.cos(a) * 480;
+      const sy = cy + Math.sin(a) * 480;
+      els.push(
+        newShape("rect", { x: cx + Math.cos(a) * 270 - 70, y: cy + Math.sin(a) * 270 - 5, width: 140, height: 10, fill: p.border, stroke: p.border, strokeWidth: 0, rotation: deg }),
+        newShape("circle", { x: sx - 130, y: sy - 130, width: 260, height: 260, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: sx - 110, y: sy - 26, width: 220, height: 50, text: label, fontSize: 30, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+      );
+    });
+    return els;
+  }
+
+  // mindmap
+  const cx = 960, cy = 540;
+  const branches: Array<[string, number]> = [
+    ["Research", 150], ["Content", 180], ["Design", 210],
+    ["Data", 330], ["Outreach", 0], ["Growth", 30],
+  ];
+  els.push(
+    newShape("capsule", { x: cx - 150, y: cy - 70, width: 300, height: 140, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+    newText({ x: cx - 130, y: cy - 28, width: 260, height: 60, text: "Idea", fontSize: 36, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+  );
+  branches.forEach(([label, deg]) => {
+    const a = (deg * Math.PI) / 180;
+    const nx = cx + Math.cos(a) * 560;
+    const ny = cy + Math.sin(a) * 560;
+    els.push(
+      newShape("rect", { x: cx + Math.cos(a) * 330 - 110, y: cy + Math.sin(a) * 330 - 4, width: 220, height: 8, fill: p.border, stroke: p.border, strokeWidth: 0, rotation: deg }),
+      newShape("capsule", { x: nx - 160, y: ny - 55, width: 320, height: 110, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth }),
+      newText({ x: nx - 140, y: ny - 20, width: 280, height: 50, text: label, fontSize: 26, color: p.ink, fontWeight: 800, align: "center", fontFamily: p.font }),
+    );
   });
+  return els;
 }
 
 /* Refined tile: frosted card, gradient chip, subtle lift + blue glow on hover. */
@@ -102,14 +295,43 @@ function ActionTile({
 }
 
 export function ElementsPanel() {
-  const { add } = useEditor();
-  const addGroup = (elements: ReturnType<typeof createFlowCraft>) => {
+  const { add, elements, selectedId, update } = useEditor();
+  const addGroup = (els: AnyElement[]) => {
     const groupId = crypto.randomUUID();
-    elements.forEach((element) => add({ ...element, groupId }));
+    els.forEach((element) => add({ ...element, groupId }));
+  };
+
+  // Pick a Presets-panel theme for new diagrams; if a FlowCraft group is
+  // selected on the slide, restyle it live by mapping old theme colors to the
+  // new palette (accent nodes, soft nodes, borders and label inks).
+  const restyleFlowGroup = (style: UiStyle) => {
+    setFlowStyle(style);
+    const sel = elements.find((element) => element.id === selectedId);
+    const gid = sel && "groupId" in sel ? sel.groupId : undefined;
+    if (!gid) return;
+    const accs = new Set(Object.values(UI_STYLE_THEMES).map((t) => t.accent));
+    const softs = new Set(Object.values(UI_STYLE_THEMES).map((t) => t.bg));
+    const borders = new Set(Object.values(UI_STYLE_THEMES).map((t) => t.border));
+    const inks = new Set(Object.values(UI_STYLE_THEMES).map((t) => t.fg));
+    const onAccents = new Set(Object.values(UI_STYLE_THEMES).map((t) => t.onAccent));
+    const theme = UI_STYLE_THEMES[style];
+    for (const element of elements) {
+      if (!("groupId" in element) || element.groupId !== gid) continue;
+      if (element.type === "shape") {
+        const patch: Partial<ShapeElement> = {};
+        if (accs.has(element.fill)) patch.fill = theme.accent;
+        else if (softs.has(element.fill)) patch.fill = theme.bg;
+        if (borders.has(element.stroke)) patch.stroke = theme.border;
+        if (Object.keys(patch).length) update(element.id, patch);
+      } else if (element.type === "text") {
+        if (inks.has(element.color)) update(element.id, { color: theme.fg });
+        else if (onAccents.has(element.color)) update(element.id, { color: theme.onAccent });
+      }
+    }
   };
   const [section, setSection] = useState<ElementSection>(null);
   const [iconQuery, setIconQuery] = useState("");
-  const [flowcraftKind, setFlowcraftKind] = useState<"process" | "cycle">("process");
+  const [flowStyle, setFlowStyle] = useState<UiStyle>("cyber");
   const [imageUrl, setImageUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -225,17 +447,33 @@ export function ElementsPanel() {
       {section === "flowcraft" && (
         <div className="space-y-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><GitBranch className="size-4 text-blue-600" /> FlowCraft diagrams</div>
-          <p className="text-[10px] leading-relaxed text-slate-500">Build a connected visual story from editable shapes and labels.</p>
+          <p className="text-[10px] leading-relaxed text-slate-500">Drop a connected visual story built from editable shapes and labels.</p>
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Theme — from the Presets panel</span>
+            <ChipGroup
+              value={flowStyle}
+              onChange={restyleFlowGroup}
+              label="FlowCraft theme"
+              options={(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((value) => ({ value, label: UI_STYLE_THEMES[value].label }))}
+            />
+          </div>
           <div className="grid grid-cols-2 gap-2">
-            {(["process", "cycle"] as const).map((kind) => (
-              <button key={kind} type="button" onClick={() => setFlowcraftKind(kind)} className={`rounded-xl border px-2 py-2 text-[10px] font-semibold capitalize transition ${flowcraftKind === kind ? "border-blue-500 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-blue-300"}`}>
-                {kind === "process" ? "3-step flow" : "Cycle"}
+            {FLOWCRAFT_DIAGRAMS.map(({ kind, label, description, Icon }) => (
+              <button
+                key={kind}
+                type="button"
+                title={description}
+                onClick={() => addGroup(createFlowCraft(kind, flowStyle))}
+                className="group flex flex-col gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_22px_-8px_rgba(37,99,235,0.28)] active:translate-y-0 active:scale-[0.97]"
+              >
+                <span className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-700 group-hover:text-blue-600">
+                  <Icon className="size-3.5 text-slate-400 group-hover:text-blue-600" /> {label}
+                </span>
+                <span className="text-[9px] leading-tight text-slate-400">{description}</span>
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => addGroup(createFlowCraft(flowcraftKind))} className="w-full rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 active:scale-[0.98]">
-            Add FlowCraft diagram
-          </button>
+          <p className="text-[9px] leading-relaxed text-slate-400">Tip: select a diagram on the slide, then pick a theme to restyle it.</p>
         </div>
       )}
 
