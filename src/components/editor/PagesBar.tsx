@@ -20,6 +20,15 @@ import {
   Cloudy,
   RotateCw,
   CircleDot,
+  Aperture,
+  PanelTop,
+  Tornado,
+  Waves,
+  Rainbow,
+  Pyramid,
+  Undo2,
+  Rocket,
+  StretchHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -41,6 +50,12 @@ const transitionIcons = {
   "parallax-left": MoveLeft,
   "parallax-up": MoveUp,
   "parallax-depth": Layers,
+  reveal: Aperture,
+  shutter: PanelTop,
+  swirl: Tornado,
+  warp: Waves,
+  prism: Rainbow,
+  origami: Pyramid,
 };
 
 const transitionOptions: SlideTransition[] = [
@@ -57,6 +72,12 @@ const transitionOptions: SlideTransition[] = [
   "parallax-left",
   "parallax-up",
   "parallax-depth",
+  "reveal",
+  "shutter",
+  "swirl",
+  "warp",
+  "prism",
+  "origami",
 ];
 
 export function PagesBar() {
@@ -206,6 +227,8 @@ export function PagesBar() {
                         ["neon", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
                         ["move-up", "Rise", MoveUp], ["move-down", "Drop", ChevronDown], ["blur-in", "Blur", Cloudy],
                         ["spin-in", "Spin", RotateCw], ["bounce-in", "Bounce", CircleDot],
+                        ["flip-in", "Flip", FlipHorizontal], ["swing-in", "Swing", Undo2], ["wobble-in", "Wobble", Waves],
+                        ["slingshot-in", "Slingshot", Rocket], ["flicker-in", "Flicker", Zap], ["stretch-in", "Stretch", StretchHorizontal],
                       ] as const).map(([value, label, icon]) => ({ value, label, icon }))}
                     />
                   </div>
