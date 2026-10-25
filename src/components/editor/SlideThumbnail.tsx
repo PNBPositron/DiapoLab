@@ -80,7 +80,7 @@ export function SlideThumbnail({
         }}
       >
         {page.elements.map((el) => (
-          <CanvasElement key={el.id} element={el} scale={scale} />
+          <CanvasElement key={el.id} element={el} scale={scale} preview />
         ))}
       </div>
     </div>
