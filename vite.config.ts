@@ -31,6 +31,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     vite: {
+      // Keep TanStack Router in the dependency bundle so HMR never requests
+      // stale deep-import URLs from an older router build.
+      optimizeDeps: {
+        include: ["@tanstack/react-router", "@tanstack/react-start"],
+      },
       // Emits the MCP server routes (POST /mcp + /.well-known/oauth-protected-resource)
       // from src/lib/mcp/index.ts at build time.
       plugins: [mcpPlugin()],
