@@ -26,14 +26,12 @@ import {
   BookOpen,
   Scale,
   ShieldCheck,
-  Search,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import { SettingsDialog } from "./SettingsDialog";
-import { CommandPalette } from "./CommandPalette";
 import { importPPTXFile } from "@/lib/import-pptx";
 import {
   exportPNG,
@@ -85,9 +83,7 @@ export function Toolbar() {
 
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { appAccent, setAppAccent } = useSettings();
-  const [brandMenuOpen, setBrandMenuOpen] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
+  const { appAccent } = useSettings();
 
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -223,26 +219,8 @@ export function Toolbar() {
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
-          <button
-            type="button"
-            aria-label="Customize app accent"
-            aria-expanded={brandMenuOpen}
-            onClick={() => setBrandMenuOpen((open) => !open)}
-            className="group relative flex size-9 items-center justify-center rounded-xl bg-transparent transition-all hover:-translate-y-0.5 active:scale-95"
-          >
-            <img
-              src="/favicon.ico"
-              alt="DiapoLab"
-              className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]"
-            />
-          </button>
-          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.2em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
-          {brandMenuOpen && (
-            <div className="toolbar-flyout absolute left-0 top-12 z-50 w-64 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.45)]">
-              <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">App appearance</div>
-              <label className="flex items-center justify-between gap-3 text-xs text-slate-600">Accent <input type="color" value={appAccent} onChange={(event) => setAppAccent(event.target.value)} className="size-8 cursor-pointer rounded-lg border-0 bg-transparent p-0" /></label>
-            </div>
-          )}
+          <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]" />
+          <Link to="/" className="logo-wordmark font-orbitron text-base font-bold tracking-[0.2em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
         </div>
 
         {/* Decorative vertical divider */}
@@ -270,18 +248,6 @@ export function Toolbar() {
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
       <div className="flex items-center gap-1 rounded-2xl border border-slate-200/60 bg-white/70 p-1 shadow-[0_2px_12px_rgba(15,23,42,0.05)] backdrop-blur-md">
-        <button
-          type="button"
-          onClick={() => setPaletteOpen(true)}
-          title="Search commands (Ctrl+K)"
-          aria-label="Search commands and features"
-          className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3 text-[11px] font-medium text-slate-600 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:scale-95"
-        >
-          <Search className="size-4" />
-          <span className="hidden lg:inline">SEARCH</span>
-          <kbd className="hidden rounded-md border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[9px] text-slate-400 sm:inline">Ctrl K</kbd>
-        </button>
-
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl p-0.5">
           <button
@@ -464,7 +430,6 @@ export function Toolbar() {
           </div>
         </div>
       )}
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </header>
   );
 }

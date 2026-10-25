@@ -34,9 +34,8 @@ const transitionIcons = {
   zoom: ZoomIn,
   flip: FlipHorizontal,
   morph: Shapes,
-  glitch: Zap,
   tv: MonitorPlay,
-  neon: Sparkles,
+  neon: Zap,
   cube: Box,
   blur: Cloudy,
   "parallax-left": MoveLeft,
@@ -51,7 +50,6 @@ const transitionOptions: SlideTransition[] = [
   "zoom",
   "flip",
   "morph",
-  "glitch",
   "tv",
   "neon",
   "cube",
@@ -205,7 +203,7 @@ export function PagesBar() {
                       onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
                       options={( [
                         ["none", "None", Ban], ["fade-up", "Fade", Blend], ["pop", "Pop", Sparkles],
-                        ["glitch", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
+                        ["neon", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
                         ["move-up", "Rise", MoveUp], ["move-down", "Drop", ChevronDown], ["blur-in", "Blur", Cloudy],
                         ["spin-in", "Spin", RotateCw], ["bounce-in", "Bounce", CircleDot],
                       ] as const).map(([value, label, icon]) => ({ value, label, icon }))}

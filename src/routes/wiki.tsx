@@ -31,7 +31,7 @@ export const Route = createFileRoute("/wiki")({
       {
         name: "description",
         content:
-          "Learn DiapoLab: formats, panels, the command palette, effects and transitions, publishing templates and sharing decks.",
+          "Learn DiapoLab: formats, panels, effects and transitions, publishing templates and sharing decks.",
       },
       { property: "og:title", content: "Wiki — DiapoLab documentation" },
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
@@ -100,7 +100,7 @@ function Wiki() {
               <BookOpen className="size-5" />
             </span>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">DiapoLab</p>
+              <p className="logo-wordmark text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">DiapoLab</p>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Wiki</h1>
             </div>
           </div>
