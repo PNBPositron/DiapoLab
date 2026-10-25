@@ -103,6 +103,10 @@ function ActionTile({
 
 export function ElementsPanel() {
   const { add } = useEditor();
+  const addGroup = (elements: ReturnType<typeof createFlowCraft>) => {
+    const groupId = crypto.randomUUID();
+    elements.forEach((element) => add({ ...element, groupId }));
+  };
   const [section, setSection] = useState<ElementSection>(null);
   const [iconQuery, setIconQuery] = useState("");
   const [flowcraftKind, setFlowcraftKind] = useState<"process" | "cycle">("process");
