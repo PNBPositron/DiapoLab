@@ -29,7 +29,13 @@ export type ElementAnimation =
   | "move-down"
   | "blur-in"
   | "spin-in"
-  | "bounce-in";
+  | "bounce-in"
+  | "flip-in"
+  | "swing-in"
+  | "wobble-in"
+  | "slingshot-in"
+  | "flicker-in"
+  | "stretch-in";
 export type SlideTransition =
   | "none"
   | "fade"
@@ -43,7 +49,13 @@ export type SlideTransition =
   | "blur"
   | "parallax-left"
   | "parallax-up"
-  | "parallax-depth";
+  | "parallax-depth"
+  | "reveal"
+  | "shutter"
+  | "swirl"
+  | "warp"
+  | "prism"
+  | "origami";
 export type BgFit = "cover" | "contain";
 
 export type TextElement = ElementBase & {
