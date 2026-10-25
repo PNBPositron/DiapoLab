@@ -43,8 +43,10 @@ const POPULAR_ICON_NAMES = [
 ] as const;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
-  const Icon = LucideIcons[name] as LucideIcon | undefined;
-  return Icon ? [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }] : [];
+  const candidate = LucideIcons[name] as unknown;
+  if (typeof candidate !== "function") return [];
+  const Icon = candidate as LucideIcon;
+  return [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }];
 });
 
 function createFlowCraft(kind: "process" | "cycle") {
