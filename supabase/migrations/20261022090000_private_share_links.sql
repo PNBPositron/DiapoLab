@@ -31,7 +31,7 @@ create or replace function public.get_shared_design(p_design_id uuid, p_token te
 returns jsonb
 language sql
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select to_jsonb(d)
   from public.designs d
