@@ -86,7 +86,7 @@ export function PresentationMode() {
   if (!presenting || !page) return null;
 
   const morphing = page.transition === "morph";
-  const motionTransitionNames = new Set(["tv", "neon", "cube"]);
+  const motionTransitionNames = new Set(["tv", "neon", "cube", "prism", "origami"]);
   const transition =
     page.transition &&
     page.transition !== "none" &&
@@ -101,10 +101,7 @@ export function PresentationMode() {
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
       <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center">
         <div
-          key={`frame-${currentIndex}`}
-          className={`brutal-shadow-lg relative shrink-0 ${
-            page.transition === "zoom" ? "slide-transition-zoom" : ""
-          }`}
+          className="brutal-shadow-lg relative shrink-0"
           style={
             {
               width: canvasW * scale,
@@ -122,9 +119,12 @@ export function PresentationMode() {
                 key={`slide-${currentIndex}-${page.transition ?? "none"}`}
                 initial={preset.initial}
                 animate={preset.animate}
+                exit={{ opacity: 1, transition: { duration: morphing ? 0 : 0.95 } }}
                 transition={preset.transition as never}
                 onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
-                className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}`}
+                className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}${
+                  page.transition === "zoom" ? " slide-transition-zoom" : ""
+                }`}
                 style={
                   {
                     width: canvasW,
@@ -195,6 +195,28 @@ function transitionPreset(name: string | undefined) {
         filter: ["brightness(2.4) saturate(2.8) contrast(1.5)", "brightness(1.7) saturate(2.2) contrast(1.4)", "brightness(1.35) saturate(1.6) contrast(1.15)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
       },
       transition: { duration: 0.78, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
+    };
+  }
+  if (name === "prism") {
+    return {
+      // Refraction lock: the slide snaps into focus like light through a prism.
+      initial: { opacity: 0, filter: "blur(16px) hue-rotate(90deg) saturate(2.2) brightness(1.3)" },
+      animate: {
+        opacity: [0, 1],
+        filter: [
+          "blur(16px) hue-rotate(90deg) saturate(2.2) brightness(1.3)",
+          "blur(0px) hue-rotate(0deg) saturate(1) brightness(1)",
+        ],
+      },
+      transition: { duration: 0.7, ease },
+    };
+  }
+  if (name === "origami") {
+    return {
+      // Paper fold: the sheet unfolds from its top edge.
+      initial: { opacity: 0, rotateX: -55, originY: 0, transformPerspective: 1200 },
+      animate: { opacity: [0, 1, 1], rotateX: [-55, 6, 0] },
+      transition: { duration: 0.8, times: [0, 0.7, 1], ease },
     };
   }
   if (name === "cube") {
