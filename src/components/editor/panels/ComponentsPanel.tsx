@@ -4,6 +4,7 @@ import {
   AppWindow,
   Bell,
   Blocks,
+  Bookmark,
   Check,
   Chrome,
   Command,
@@ -22,6 +23,7 @@ import {
   Puzzle,
   Quote,
   Rows3,
+  Save,
   Search,
   SlidersHorizontal,
   Smartphone,
@@ -29,6 +31,7 @@ import {
   Square,
   Terminal,
   TerminalSquare,
+  Trash2,
   ToggleRight,
   TrendingUp,
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
@@ -49,8 +52,16 @@ import {
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
+import {
+  loadBlocks,
+  saveBlock,
+  deleteBlock,
+  cloneBlockElements,
+  describeBlock,
+  type UserBlock,
+} from "@/lib/user-blocks";
 
-type PresetSection = "interfaces" | "ui" | "elements";
+type PresetSection = "interfaces" | "ui" | "elements" | "blocks";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -164,12 +175,27 @@ const UI_PRESETS: Array<{
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 
 export function ComponentsPanel() {
-  const { add, addGroup, selectedId, elements, update } = useEditor();
+  const { add, addGroup, selectedId, selectedIds, elements, update } = useEditor();
   const [style, setStyle] = useState<UiStyle>("cyber");
   const [section, setSection] = useState<PresetSection>("interfaces");
   const [search, setSearch] = useState("");
+  const [blocks, setBlocks] = useState<UserBlock[]>(() => loadBlocks());
+  const [blockName, setBlockName] = useState("");
+  const [blockSaved, setBlockSaved] = useState(false);
 
   const selected = elements.find((element) => element.id === selectedId);
+
+  // ---- My blocks: reusable selections (headers, footers, FlowCraft groups) ----
+  const selectedElements = elements.filter((e) => selectedIds.includes(e.id));
+  const refreshBlocks = () => setBlocks(loadBlocks());
+  const handleSaveBlock = () => {
+    if (selectedElements.length === 0) return;
+    saveBlock(blockName, selectedElements);
+    setBlockName("");
+    setBlockSaved(true);
+    setTimeout(() => setBlockSaved(false), 1600);
+    refreshBlocks();
+  };
   const plugins = usePlugins((s) => s.plugins);
   const pluginWidgets = plugins
     .filter((p) => p.enabled)
@@ -257,6 +283,7 @@ export function ComponentsPanel() {
         { value: "interfaces", label: "Frames", icon: MonitorCog },
         { value: "ui", label: "Widgets", icon: Blocks },
         { value: "elements", label: "Blocks", icon: Sparkles },
+        { value: "blocks", label: "My blocks", icon: Bookmark },
       ]} />
       <SearchField value={search} onChange={setSearch} placeholder={`Search ${section}...`} />
       <div className="space-y-2">
@@ -297,8 +324,88 @@ export function ComponentsPanel() {
         </div>
       )}
 
+      {/* My blocks — save the current selection and reuse it everywhere */}
+      {section === "blocks" && (
+        <div className="flex flex-col gap-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+            <div className="panel-section-label">Save selection as block</div>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                value={blockName}
+                onChange={(e) => setBlockName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveBlock()}
+                placeholder={selectedElements.length ? "Name (e.g. Header)" : "Select elements on the slide first"}
+                disabled={selectedElements.length === 0}
+                className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400"
+              />
+              <button
+                type="button"
+                onClick={handleSaveBlock}
+                disabled={selectedElements.length === 0}
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-40"
+              >
+                {blockSaved ? <Check className="size-3.5" /> : <Save className="size-3.5" />}
+                {blockSaved ? "Saved" : "Save"}
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-slate-400">
+              {selectedElements.length > 0
+                ? `${selectedElements.length} selected element${selectedElements.length > 1 ? "s" : ""} — the block is inserted as one movable group.`
+                : "Blocks are stored in this browser and available in every design."}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Saved blocks ({blocks.length})
+            </span>
+          </div>
+
+          {blocks.length === 0 && (
+            <div className="py-6 text-center text-xs text-slate-400">
+              No saved blocks yet — select elements on the slide, then press Save.
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2 pb-6">
+            {blocks.map((block) => (
+              <div
+                key={block.id}
+                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-2xs"
+              >
+                <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                  <Bookmark className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs font-semibold text-slate-700">{block.name}</div>
+                  <div className="truncate text-[10px] text-slate-400">{describeBlock(block)}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => addGroup(cloneBlockElements(block))}
+                  className="flex shrink-0 items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-slate-700"
+                >
+                  <Plus className="size-3" /> Insert
+                </button>
+                <button
+                  type="button"
+                  title="Delete block"
+                  onClick={() => {
+                    deleteBlock(block.id);
+                    refreshBlocks();
+                  }}
+                  className="grid size-7 shrink-0 place-items-center rounded-lg border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Grid of UI Components / Interfaces */}
-      {section !== "elements" && (
+      {(section === "interfaces" || section === "ui") && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
