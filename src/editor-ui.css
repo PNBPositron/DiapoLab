@@ -643,3 +643,14 @@
   transform: translateY(-1px) scale(1.03);
   transition-duration: 90ms;
 }
+
+/* ── Web embeds: export fallback ──────────────────────────────────────────
+   While capturing the canvas (PNG / JPG / PDF / GIF), html-to-image cannot
+   rasterize cross-origin iframes — swap the live iframe for the static
+   fallback card rendered inside every embed element. */
+#canvas-export[data-exporting] iframe.embed-live {
+  display: none !important;
+}
+#canvas-export[data-exporting] .embed-fallback {
+  display: flex !important;
+}
