@@ -19,6 +19,7 @@ import {
   type UiStyle,
 } from "@/store/editor";
 import { prepareImage } from "@/lib/image-assets";
+import { toEmbedSrc } from "@/store/editor";
 import { ELEMENT_ANIMATION_LABELS } from "@/lib/motion-catalog";
 import { ColorPicker } from "./ColorPicker";
 import { Dropdown } from "./ui/Dropdown";
@@ -1087,6 +1088,45 @@ export function PropertiesPanel() {
                     onChange={(val) => update(el.id, { cornerRadius: val })}
                   />
                 )}
+              </Section>
+            )}
+
+            {/* WEB EMBED */}
+            {el.type === "embed" && (
+              <Section title="Web embed">
+                <Field label="Embed URL">
+                  <div className="flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20">
+                    <Link2 className="mr-1.5 size-3.5 text-slate-400" />
+                    <input
+                      type="url"
+                      placeholder="https://www.youtube.com/watch?v=…"
+                      value={el.src}
+                      onChange={(e) => update(el.id, { src: toEmbedSrc(e.target.value) })}
+                      className="w-full text-xs text-slate-700 outline-none"
+                    />
+                  </div>
+                  <p className="mt-1.5 text-[10px] leading-snug text-slate-400">
+                    Collez un lien YouTube, Spotify, SoundCloud, Google Maps, Figma ou Vimeo — il est converti en lecteur intégré.
+                  </p>
+                </Field>
+                <Field label="Titre (fallback export)">
+                  <input
+                    value={el.title ?? ""}
+                    onChange={(e) => update(el.id, { title: e.target.value })}
+                    placeholder="Ex : Notre produit en vidéo"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none focus:border-sky-500"
+                  />
+                </Field>
+                <button
+                  type="button"
+                  onClick={() => window.open(el.src, "_blank", "noopener,noreferrer")}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  Ouvrir dans un nouvel onglet ↗
+                </button>
+                <p className="text-[10px] leading-snug text-slate-400">
+                  Les exports PDF / PPTX remplacent l'embed par une carte cliquable.
+                </p>
               </Section>
             )}
 
