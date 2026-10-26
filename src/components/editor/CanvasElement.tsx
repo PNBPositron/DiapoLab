@@ -928,6 +928,81 @@ export function CanvasElement({
               }}
             />
           )}
+          {/* Interactive crop overlay — drag to pan the image inside its frame,
+              wheel to zoom, corner handles still resize the frame. */}
+          {cropping && (
+            <div
+              onMouseDown={onCropPanStart}
+              style={{
+                position: "absolute",
+                inset: 0,
+                cursor: "grab",
+                touchAction: "none",
+                boxShadow: "inset 0 0 0 2px #ffd84a",
+                outline: "1px solid rgba(255,216,74,0.35)",
+                outlineOffset: "-1px",
+              }}
+            >
+              <div style={{ position: "absolute", left: "33.333%", top: 0, bottom: 0, width: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", left: "66.667%", top: 0, bottom: 0, width: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: "33.333%", left: 0, right: 0, height: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: "66.667%", left: 0, right: 0, height: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
+              <div
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex",
+                  gap: 6,
+                  whiteSpace: "nowrap",
+                  zIndex: 2,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    useEditor.getState().setCroppingId(null);
+                  }}
+                  style={{
+                    border: "2px solid #0a0f1f",
+                    background: "#ffd84a",
+                    color: "#0a0f1f",
+                    fontWeight: 800,
+                    fontSize: 11,
+                    padding: "5px 12px",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  ✓ Terminé
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    useEditor.getState().update(element.id, { cropZoom: 1, cropX: 50, cropY: 50 });
+                  }}
+                  style={{
+                    border: "2px solid #0a0f1f",
+                    background: "#ffffff",
+                    color: "#0a0f1f",
+                    fontWeight: 700,
+                    fontSize: 11,
+                    padding: "5px 12px",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {element.type === "icon" &&
