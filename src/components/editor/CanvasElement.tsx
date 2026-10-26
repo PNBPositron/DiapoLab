@@ -15,8 +15,8 @@ import {
 import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
-import * as LucideIcons from "lucide-react";
 import type { LucideProps } from "lucide-react";
+import { LUCIDE_ICONS } from "@/lib/lucide-icons";
 import { HelpCircle, Check, X as XIcon, QrCode } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
@@ -888,7 +888,7 @@ export function CanvasElement({
           }
           const Comp =
             (
-              LucideIcons as unknown as Record<string, React.ComponentType<LucideProps>>
+              LUCIDE_ICONS as unknown as Record<string, React.ComponentType<LucideProps>>
             )[element.name] ?? HelpCircle;
           return (
             <Comp
