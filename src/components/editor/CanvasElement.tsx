@@ -149,6 +149,8 @@ export function CanvasElement({
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
   const selected = !presenting && !preview && selectedIds.includes(element.id);
+  // interactive crop mode (double-click an image or press the Crop button)
+  const cropping = !presenting && !preview && useEditor((s) => s.croppingId) === element.id;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -214,6 +216,7 @@ export function CanvasElement({
 
   const onDragStart = (e: React.MouseEvent) => {
     if (editing) return;
+    if (cropping) return; // in crop mode, dragging pans the image inside its frame
     if (presenting) return; // no selection/drag while presenting
     if (linkActive && !e.shiftKey) return; // let the <a> handle the click; shift+click selects
     e.stopPropagation();
@@ -432,8 +435,69 @@ export function CanvasElement({
   };
 
   useEffect(() => {
-    if (!selected) setEditing(false);
+    if (!selected) {
+      setEditing(false);
+      if (useEditor.getState().croppingId === element.id) useEditor.getState().setCroppingId(null);
+    }
   }, [selected]);
+
+  // Crop mode: Escape exits
+  useEffect(() => {
+    if (!cropping) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") useEditor.getState().setCroppingId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [cropping]);
+
+  // Crop mode: wheel zooms the image inside its frame (like other slide editors)
+  useEffect(() => {
+    if (!cropping) return;
+    const node = ref.current;
+    if (!node) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const el = useEditor.getState().elements.find((x) => x.id === element.id);
+      if (!el || el.type !== "image") return;
+      const next = Math.max(1, Math.min(4, (el.cropZoom ?? 1) * (1 - e.deltaY * 0.0015)));
+      useEditor.getState().update(element.id, { cropZoom: Math.round(next * 100) / 100 });
+    };
+    node.addEventListener("wheel", onWheel, { passive: false });
+    return () => node.removeEventListener("wheel", onWheel);
+  }, [cropping, element.id]);
+
+  // Crop mode: drag pans the image inside its frame (focal point follows)
+  const onCropPanStart = (e: React.MouseEvent) => {
+    if (!cropping) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const el0 = useEditor.getState().elements.find((x) => x.id === element.id);
+    if (!el0 || el0.type !== "image") return;
+    const zoom = el0.cropZoom ?? 1;
+    const cx0 = el0.cropX ?? 50;
+    const cy0 = el0.cropY ?? 50;
+    const flipX = el0.flipX ? -1 : 1;
+    const onMove = (m: MouseEvent) => {
+      const dx = (m.clientX - startX) / scale;
+      const dy = (m.clientY - startY) / scale;
+      const px = (100 * flipX * dx) / Math.max(1, el0.width * zoom);
+      const py = (100 * dy) / Math.max(1, el0.height * zoom);
+      useEditor.getState().update(element.id, {
+        cropX: Math.round(Math.max(0, Math.min(100, cx0 - px))),
+        cropY: Math.round(Math.max(0, Math.min(100, cy0 - py))),
+      });
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
 
   return (
     <div
@@ -451,6 +515,10 @@ export function CanvasElement({
         if (element.type === "text") {
           e.stopPropagation();
           setEditing(true);
+        }
+        if (element.type === "image" && !presenting) {
+          e.stopPropagation();
+          useEditor.getState().setCroppingId(element.id);
         }
       }}
       className={
