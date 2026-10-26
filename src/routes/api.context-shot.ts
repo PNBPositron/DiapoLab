@@ -22,8 +22,8 @@ export const Route = createFileRoute("/api/context-shot")({
         const mshotsUrl = `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
           target.toString(),
         )}?w=1280`;
-        for (let attempt = 0; attempt < 2; attempt++) {
-          if (attempt === 1) await new Promise((resolve) => setTimeout(resolve, 3000));
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 3000));
           try {
             const res = await fetch(mshotsUrl, {
               redirect: "follow",
@@ -41,7 +41,24 @@ export const Route = createFileRoute("/api/context-shot")({
           }
         }
 
-        // 2) PageSpeed Insights rendered screenshot fallback.
+        // 2) thum.io render service (keyless fallback).
+        try {
+          const res = await fetch(
+            "https://image.thum.io/check/width/1280/" + target.toString(),
+            { signal: AbortSignal.timeout(20000) },
+          );
+          const mime = res.headers.get("content-type") ?? "image/jpeg";
+          if (res.ok && mime.startsWith("image/")) {
+            const bytes = await res.arrayBuffer();
+            if (bytes.byteLength > 12000) {
+              return Response.json({ dataUrl: toDataUrl(bytes, mime) });
+            }
+          }
+        } catch {
+          // try next strategy
+        }
+
+        // 3) PageSpeed Insights rendered screenshot fallback.
         try {
           const res = await fetch(
             `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(
