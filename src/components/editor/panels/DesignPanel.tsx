@@ -5,12 +5,14 @@ import {
   Maximize2,
   Palette,
   Sparkles,
+  StickyNote,
   type LucideIcon,
 } from "lucide-react";
 import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
+import { useEditor } from "@/store/editor";
 import { PanelHeader } from "../ui/selectors";
 
 interface SectionConfig {
@@ -80,6 +82,25 @@ function SectionRow({
   );
 }
 
+function NotesPanel() {
+  const page = useEditor((s) => s.pages[s.currentIndex]);
+  const setNotes = useEditor((s) => s.setNotes);
+  return (
+    <div className="flex flex-col gap-2">
+      <textarea
+        value={page?.notes ?? ""}
+        onChange={(e) => setNotes(e.target.value)}
+        rows={5}
+        placeholder="Speaker notes for this slide — press P in presentation mode to see them beside the timer and next-slide preview…"
+        className="w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2 text-[12px] leading-relaxed text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+      />
+      <p className="text-[10px] text-slate-400">
+        Notes are saved with the slide and never rendered on the canvas.
+      </p>
+    </div>
+  );
+}
+
 export function DesignPanel() {
   return (
     <div className="flex flex-col gap-3 p-1 text-slate-800">
@@ -125,6 +146,16 @@ export function DesignPanel() {
           iconColor="text-emerald-600"
         >
           <MasterStylePanel />
+        </SectionRow>
+
+        <SectionRow
+          title="Speaker notes"
+          subtitle="Presenter view only (P key)"
+          Icon={StickyNote}
+          iconBg="bg-teal-50 text-teal-600 dark:bg-teal-950/40"
+          iconColor="text-teal-600"
+        >
+          <NotesPanel />
         </SectionRow>
       </div>
     </div>
