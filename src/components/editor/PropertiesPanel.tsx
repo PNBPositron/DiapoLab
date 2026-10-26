@@ -1179,7 +1179,7 @@ export function PropertiesPanel() {
                     <SliderWithInput label="Zoom" min={100} max={400} step={5} unit="%" value={Math.round((el.cropZoom ?? 1) * 100)} onChange={(v) => update(el.id, { cropZoom: v / 100 })} />
                     <SliderWithInput label="Horizontal" min={0} max={100} unit="%" value={el.cropX ?? 50} onChange={(v) => update(el.id, { cropX: v })} />
                     <SliderWithInput label="Vertical" min={0} max={100} unit="%" value={el.cropY ?? 50} onChange={(v) => update(el.id, { cropY: v })} />
-                    <button type="button" onClick={() => update(el.id, { cropZoom: undefined, cropX: undefined, cropY: undefined })} className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">Reset crop</button>
+                    <button type="button" onClick={() => update(el.id, { cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined })} className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">Reset crop</button>
                   </div>
                 </Field>
 
