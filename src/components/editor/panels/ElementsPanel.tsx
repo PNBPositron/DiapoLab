@@ -26,14 +26,17 @@ import {
   Kanban,
   LayoutGrid,
   Waves,
+  Youtube,
+  Music2,
+  MapPin,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
+import { newEmbed, newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 import { PanelHeader, ChipGroup } from "../ui/selectors";
 
-type ElementSection = "shapes" | "icons" | "flowcraft" | null;
+type ElementSection = "shapes" | "icons" | "flowcraft" | "embeds" | null;
 
 const POPULAR_ICON_NAMES = [
   "Accessibility", "Activity", "Airplay", "AlignCenterHorizontal", "AlignStartHorizontal", "AlignEndHorizontal", "Anchor", "Apple", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "Asterisk", "Atom", "AtSign", "Award", "BadgeAlert", "BadgeCheck", "Ban", "Battery", "Bell", "Bike", "Bird", "Blocks", "Bluetooth", "Bookmark", "BookMarked", "BookOpen", "Box", "Brain", "Briefcase", "Bug", "Building2", "Bus", "Cake", "Calendar", "CalendarCheck", "Camera", "Car", "Check", "CheckCheck", "Cherry", "ChevronDown", "ChevronLeft", "ChevronRight", "ChevronUp", "Circle", "CircleDashed", "CircleQuestionMark", "CircleUserRound", "CircleAlert", "TriangleAlert", "CircleCheck", "CircleX", "Clapperboard", "Clipboard", "Clock", "Clock3", "Cloud", "CloudCog", "CloudSun", "CloudDownload", "Code", "CodeXml", "Coffee", "Cog", "Columns3", "Combine", "Command", "Compass", "Contact", "Cookie", "Copy", "Cpu", "CreditCard", "Croissant", "Crown", "Database", "Diamond", "Disc3", "DollarSign", "Download", "Dumbbell", "Pencil", "Ellipsis", "ExternalLink", "Eye", "EyeOff", "Feather", "File", "FileChartColumn", "FileCheck", "FilePlus", "FileText", "Funnel", "Fish", "Flag", "Flame", "Flower2", "Folder", "FolderGit2", "FolderOpen", "Gauge", "Ghost", "Gift", "Globe", "Earth", "Grid2x2", "Guitar", "Hammer", "Hand", "Hash", "Headphones", "Heart", "Highlighter", "History", "House", "Hourglass", "Image", "Inbox", "Infinity", "Info", "Kanban", "Key", "Keyboard", "Laptop", "Layers", "LayoutPanelLeft", "LayoutDashboard", "Leaf", "Lightbulb", "Link", "Link2", "List", "ListChecks", "ListTree", "Locate", "Lock", "LockOpen", "LogIn", "LogOut", "Magnet", "Mail", "Map", "MapPin", "Medal", "Megaphone", "Menu", "MessageCircle", "MessageCircleMore", "MessageSquare", "MessagesSquare", "Mic", "Microscope", "Milestone", "Minus", "Monitor", "MonitorPlay", "Moon", "Mouse", "Music", "Navigation", "Orbit", "Package", "PackageCheck", "Paintbrush", "Palette", "PanelLeft", "PanelLeftOpen", "PanelsTopLeft", "Paperclip", "Pause", "PawPrint", "Pen", "PenTool", "Phone", "PiggyBank", "Pin", "Plane", "Sprout", "Play", "Plus", "Podcast", "Pointer", "Popcorn", "Printer", "Puzzle", "QrCode", "Quote", "Radar", "Receipt", "Recycle", "RefreshCw", "Rocket", "Route", "Sailboat", "Save", "Scale", "ScanLine", "ScanSearch", "Search", "Send", "SendHorizontal", "Server", "Settings", "Share2", "Shield", "ShieldCheck", "Shirt", "ShoppingCart", "Sigma", "SlidersHorizontal", "Snowflake", "Sparkles", "SquareDashedKanban", "SquareStack", "Stamp", "Star", "Store", "Sun", "SunMoon", "Table2", "Tablet", "Tag", "Telescope", "Tent", "Terminal", "ThumbsUp", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "Trash2", "Trees", "Truck", "Tv", "Twitter", "Umbrella", "Upload", "User", "UserCheck", "UserPlus", "Users", "Video", "Volleyball", "WalletCards", "Wand", "Watch", "Waves", "Waypoints", "Wifi", "Wind", "Workflow", "Wrench", "X", "Zap", "ZoomIn", "ZoomOut", "ChartLine", "ChartPie", "ChartNoAxesCombined", "ChartColumnBig",
@@ -572,6 +575,7 @@ export function ElementsPanel() {
   const [iconQuery, setIconQuery] = useState("");
   const [flowStyle, setFlowStyle] = useState<UiStyle>("cyber");
   const [imageUrl, setImageUrl] = useState("");
+  const [embedUrl, setEmbedUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const filteredIcons = ICONS.filter(({ label }) =>
@@ -679,6 +683,12 @@ export function ElementsPanel() {
           active={section === "flowcraft"}
           onClick={() => setSection(section === "flowcraft" ? null : "flowcraft")}
         />
+        <ActionTile
+          Icon={Youtube}
+          label="Embeds"
+          active={section === "embeds"}
+          onClick={() => setSection(section === "embeds" ? null : "embeds")}
+        />
       </div>
 
       {section === "shapes" && <ShapesPanel embedded />}
@@ -724,6 +734,50 @@ export function ElementsPanel() {
             </div>
           ))}
           <p className="text-[9px] leading-relaxed text-slate-400">Tip: select a diagram on the slide, then pick a theme to restyle it.</p>
+        </div>
+      )}
+
+      {/* Web embeds — YouTube, Spotify, Maps, Figma… as live iframes on the slide */}
+      {section === "embeds" && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><Youtube className="size-4 text-blue-600" /> Web embeds</div>
+            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">live iframes</span>
+          </div>
+          <p className="text-[10px] leading-relaxed text-slate-500">Paste a link — YouTube, Spotify, SoundCloud, Google Maps, Figma, Vimeo… It plays live on the slide.</p>
+          <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-400 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white">
+            <Link2 className="size-4 shrink-0" />
+            <input
+              value={embedUrl}
+              onChange={(event) => setEmbedUrl(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && embedUrl.trim()) {
+                  add(newEmbed(embedUrl));
+                  setEmbedUrl("");
+                }
+              }}
+              placeholder="https://www.youtube.com/watch?v=…"
+              aria-label="Embed URL"
+              className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={!embedUrl.trim()}
+            onClick={() => {
+              add(newEmbed(embedUrl));
+              setEmbedUrl("");
+            }}
+            className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-40"
+          >
+            Add embed to canvas
+          </button>
+          <div className="grid grid-cols-3 gap-1.5 pt-1">
+            <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><Youtube className="size-4" /><span className="text-[8px] font-medium">YouTube</span></div>
+            <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><Music2 className="size-4" /><span className="text-[8px] font-medium">Spotify</span></div>
+            <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><MapPin className="size-4" /><span className="text-[8px] font-medium">Maps</span></div>
+          </div>
+          <p className="text-[9px] leading-relaxed text-slate-400">PDF / PPTX exports replace embeds with a linked placeholder card (iframes can't be captured).</p>
         </div>
       )}
 
