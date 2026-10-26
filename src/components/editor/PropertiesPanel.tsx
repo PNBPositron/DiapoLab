@@ -411,6 +411,7 @@ export function PropertiesPanel() {
   const [imageFilterOpen, setImageFilterOpen] = useState(false);
   const [jsonDraft, setJsonDraft] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [jsonDirty, setJsonDirty] = useState(false);
 
   const el = elements.find((e) => e.id === selectedId);
 
@@ -425,9 +426,47 @@ export function PropertiesPanel() {
     setJsonError(null);
     const current = useEditor.getState().elements.find((e) => e.id === selectedId);
     setJsonDraft(current ? JSON.stringify(current, null, 2) : "");
+    setJsonDirty(false);
   }, [selectedId]);
+
+  // Keep the JSON draft in sync while the user is not editing it, so changes
+  // made from the regular controls also show up in the JSON view.
+  useEffect(() => {
+    if (jsonDirty || !el) return;
+    const next = JSON.stringify(el, null, 2);
+    setJsonDraft((draft) => (draft === next ? draft : next));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [el, jsonDirty]);
   
   if (!el) return null;
+
+  // ---- Element JSON: explicit apply instead of per-keystroke updates ----
+  const applyJson = () => {
+    try {
+      const parsed = JSON.parse(jsonDraft) as Record<string, unknown>;
+      if (typeof parsed !== "object" || parsed === null) throw new Error("Expected a JSON object");
+      if (parsed.id !== el.id || parsed.type !== el.type) throw new Error("id and type cannot be changed");
+      const { id: _id, type: _type, ...patch } = parsed;
+      update(el.id, patch as Partial<typeof el>);
+      setJsonError(null);
+      setJsonDirty(false);
+    } catch (error) {
+      setJsonError(error instanceof Error ? error.message : "Invalid JSON");
+    }
+  };
+  const formatJson = () => {
+    try {
+      setJsonDraft(JSON.stringify(JSON.parse(jsonDraft), null, 2));
+      setJsonError(null);
+    } catch (error) {
+      setJsonError(error instanceof Error ? error.message : "Invalid JSON");
+    }
+  };
+  const resetJson = () => {
+    setJsonDraft(JSON.stringify(el, null, 2));
+    setJsonDirty(false);
+    setJsonError(null);
+  };
 
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
@@ -1297,20 +1336,21 @@ export function PropertiesPanel() {
             </Section>
 
             <Section title="Element JSON" defaultOpen={false}>
-              <p className="text-[10px] leading-relaxed text-slate-500">Edit the selected element&apos;s properties directly. The id and type are locked.</p>
+              <p className="text-[10px] leading-relaxed text-slate-500">
+                Edit the raw properties of the selected element. The id and type are
+                locked. Apply with the button or ⌘/Ctrl + ↵.
+              </p>
               <textarea
                 value={jsonDraft}
                 onChange={(event) => {
-                  const next = event.target.value;
-                  setJsonDraft(next);
-                  try {
-                    const parsed = JSON.parse(next) as Record<string, unknown>;
-                    if (parsed.id !== el.id || parsed.type !== el.type) throw new Error("id and type cannot be changed");
-                    const { id: _id, type: _type, ...patch } = parsed;
-                    update(el.id, patch as Partial<typeof el>);
-                    setJsonError(null);
-                  } catch (error) {
-                    setJsonError(error instanceof Error ? error.message : "Invalid JSON");
+                  setJsonDraft(event.target.value);
+                  setJsonDirty(true);
+                  setJsonError(null);
+                }}
+                onKeyDown={(event) => {
+                  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                    event.preventDefault();
+                    applyJson();
                   }
                 }}
                 spellCheck={false}
@@ -1318,6 +1358,31 @@ export function PropertiesPanel() {
                 className="min-h-48 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
               />
               {jsonError && <p className="text-[10px] font-medium text-rose-500">{jsonError}</p>}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={applyJson}
+                  disabled={!jsonDirty}
+                  className="flex-1 rounded-lg bg-sky-600 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition hover:bg-sky-500 disabled:opacity-40"
+                >
+                  Apply
+                </button>
+                <button
+                  type="button"
+                  onClick={formatJson}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
+                >
+                  Format
+                </button>
+                <button
+                  type="button"
+                  onClick={resetJson}
+                  disabled={!jsonDirty}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                >
+                  Reset
+                </button>
+              </div>
             </Section>
 
             {/* LAYER ORDER ACTIONS */}
