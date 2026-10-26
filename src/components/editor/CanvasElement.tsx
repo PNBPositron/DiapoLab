@@ -1218,8 +1218,8 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
         <div style={{ display: "grid", gap: "3%", flex: 1, gridTemplateColumns: "1fr 1fr" }}>
           {element.options.map((opt, i) => {
             const isPicked = picked === opt.id;
-            const isCorrect = opt.id === element.correctId;
             const showResult = picked !== null;
+            const isCorrect = showResult && opt.id === element.correctId;
             const marked = showResult && (isCorrect || isPicked);
             return (
               <button
