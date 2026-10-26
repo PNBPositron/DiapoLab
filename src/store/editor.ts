@@ -233,6 +233,10 @@ export type ImageElement = ElementBase & {
   cropZoom?: number;
   cropX?: number;
   cropY?: number;
+  /** PowerPoint-style crop: source window edges cut away, as fractions of
+   *  the source image (0..0.9). The window [l,1-r]x[t,1-b] is cover-fitted
+   *  into the frame, so dragging crop handles keeps the image pixel-still. */
+  cropRect?: { l: number; t: number; r: number; b: number };
   cornerRadius?: number;
   opacity?: number; // 0..1
   borderWidth?: number;
