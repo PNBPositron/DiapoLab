@@ -18,7 +18,13 @@ import type { PluginApp } from "@/lib/plugins";
 import { newImage, newText, useEditor } from "@/store/editor";
 
 type Result = { title?: string; url?: string; snippet?: string; description?: string };
-type Preview = { url: string; title: string; text: string; loading: boolean; error?: string };
+type Preview = {
+  url: string;
+  title: string;
+  text: string;
+  mode: "iframe" | "text";
+  error?: string;
+};
 
 const SUGGESTIONS = ["Mistral AI", "design trends 2027", "neobrutalism", "presentation tips"];
 
@@ -38,10 +44,12 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
   const [tookMs, setTookMs] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [fallbackText, setFallbackText] = useState<string | null>(null);
   const [selectedText, setSelectedText] = useState("");
   const [capturing, setCapturing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const articleRef = useRef<HTMLDivElement>(null);
 
   const flashNotice = (message: string) => {
@@ -74,33 +82,54 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
     }
   };
 
-  const openPreview = async (result: Result) => {
+  const openPreview = (result: Result) => {
     if (!result.url) return;
     setSelectedText("");
-    setPreview({ url: result.url, title: result.title || hostOf(result.url) || result.url, text: "", loading: true });
-    try {
-      const response = await fetch("/api/context-fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: result.url }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Could not load this page.");
-      setPreview({ url: result.url, title: payload.title || result.title || result.url, text: payload.text || "", loading: false });
-    } catch (e) {
-      setPreview({
-        url: result.url,
-        title: result.title || result.url,
-        text: "",
-        loading: false,
-        error: e instanceof Error ? e.message : "Could not load this page.",
-      });
-    }
+    setFallbackText(null);
+    setPreview({
+      url: result.url,
+      title: result.title || hostOf(result.url) || result.url,
+      text: "",
+      mode: "iframe",
+    });
+    // Fetch readable text in parallel — used as a fallback if the site can't
+    // be rendered in the iframe (bot protection, non-HTML…).
+    fetch("/api/context-fetch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: result.url }),
+    })
+      .then((r) => r.json())
+      .then((p: { text?: string }) => setFallbackText(typeof p.text === "string" ? p.text : null))
+      .catch(() => setFallbackText(null));
   };
 
-  const syncSelection = () => {
-    const selection = window.getSelection()?.toString().trim() ?? "";
-    setSelectedText(selection.length > 1 ? selection : "");
+  // The iframe is same-origin (served through /api/context-proxy), so we can
+  // read the visitor's text selection inside it.
+  useEffect(() => {
+    if (!preview) return;
+    const t = window.setInterval(() => {
+      let sel = "";
+      if (preview.mode === "iframe") {
+        const win = iframeRef.current?.contentWindow;
+        try { sel = win?.getSelection?.()?.toString().trim() ?? ""; } catch { sel = ""; }
+      } else {
+        sel = window.getSelection()?.toString().trim() ?? "";
+      }
+      setSelectedText(sel.length > 1 ? sel : "");
+    }, 400);
+    return () => window.clearInterval(t);
+  }, [preview?.url, preview?.mode]);
+
+  // If the proxy returned an error page, fall back to readable text.
+  const onIframeLoad = () => {
+    if (preview?.mode !== "iframe") return;
+    let bodyText = "";
+    try { bodyText = iframeRef.current?.contentDocument?.body?.innerText?.trim() ?? ""; } catch { return; }
+    if (/^(Could not load this page|Upstream \d+|Blocked|Invalid URL|Only http)/.test(bodyText)) {
+      if (fallbackText) setPreview((p) => (p ? { ...p, mode: "text", text: fallbackText } : p));
+      else setPreview((p) => (p ? { ...p, mode: "text", text: "", error: "This site can't be previewed here — open it in a new tab." } : p));
+    }
   };
 
   const insertSelectedText = () => {
@@ -123,14 +152,24 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
   };
 
   const capturePreview = async () => {
-    const node = articleRef.current;
-    if (!node || capturing) return;
+    if (capturing) return;
     setCapturing(true);
     try {
+      const node = preview?.mode === "iframe"
+        ? iframeRef.current?.contentDocument?.body
+        : articleRef.current;
+      if (!node) throw new Error("nothing to capture");
       const dataUrl = await toPng(node, { pixelRatio: 2, backgroundColor: "#ffffff" });
+      const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => resolve({ w: 0, h: 0 });
+        img.src = dataUrl;
+      });
+      if (!dims.w || !dims.h) throw new Error("empty capture");
       const { canvasW, canvasH, add } = useEditor.getState();
-      const width = Math.min(900, Math.round(canvasW * 0.55));
-      const height = Math.round(width * 0.75);
+      const width = Math.min(960, Math.round(canvasW * 0.6));
+      const height = Math.round(width * (dims.h / dims.w));
       add(newImage(dataUrl, {
         x: Math.round((canvasW - width) / 2),
         y: Math.round((canvasH - height) / 2),
@@ -139,7 +178,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
       }));
       flashNotice("Capture added to the slide");
     } catch {
-      flashNotice("Capture failed");
+      flashNotice("Capture failed — insert selected text instead");
     } finally {
       setCapturing(false);
     }
@@ -197,27 +236,29 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               </a>
             </div>
 
-            <div
-              ref={articleRef}
-              onMouseUp={syncSelection}
-              onKeyUp={syncSelection}
-              onTouchEnd={syncSelection}
-              className="max-h-[52vh] select-text overflow-y-auto bg-white px-6 py-4"
-            >
-              {preview.loading ? (
-                <div className="space-y-2.5 py-2">
-                  {[0, 1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="h-2.5 animate-pulse rounded-full bg-slate-100" style={{ width: `${65 + ((i * 13) % 35)}%` }} />
-                  ))}
-                </div>
+            <div className="h-[52vh] bg-white">
+              {preview.mode === "iframe" ? (
+                <iframe
+                  ref={iframeRef}
+                  onLoad={onIframeLoad}
+                  src={`/api/context-proxy?url=${encodeURIComponent(preview.url)}`}
+                  title="Page preview"
+                  className="h-full w-full border-0 bg-white"
+                  sandbox="allow-same-origin"
+                />
               ) : preview.error ? (
-                <p className="flex items-center gap-2 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-600">
+                <p className="m-6 flex items-center gap-2 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-600">
                   <CircleAlert className="size-4 shrink-0" /> {preview.error}
                 </p>
               ) : (
-                <article className="whitespace-pre-wrap text-[13px] leading-relaxed text-slate-700">
-                  {preview.text || "This page returned no readable text."}
-                </article>
+                <div
+                  ref={articleRef}
+                  className="max-h-[52vh] select-text overflow-y-auto bg-white px-6 py-4"
+                >
+                  <article className="whitespace-pre-wrap text-[13px] leading-relaxed text-slate-700">
+                    {preview.text || "This page returned no readable text."}
+                  </article>
+                </div>
               )}
             </div>
 
@@ -233,7 +274,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               </button>
               <button
                 onClick={capturePreview}
-                disabled={preview.loading || !!preview.error || capturing}
+                disabled={!!preview.error || capturing}
                 title="Snapshot the preview and add it to the slide as an image"
                 className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-[11px] font-bold text-slate-600 transition hover:bg-white hover:text-slate-900 disabled:opacity-40"
               >
@@ -310,8 +351,8 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
                     key={`${result.url}-${index}`}
                     role="button"
                     tabIndex={0}
-                    onClick={() => void openPreview(result)}
-                    onKeyDown={(e) => { if (e.key === "Enter") void openPreview(result); }}
+                    onClick={() => openPreview(result)}
+                    onKeyDown={(e) => { if (e.key === "Enter") openPreview(result); }}
                     className="group block cursor-pointer rounded-2xl border border-slate-100 bg-white p-3.5 transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-[0_16px_40px_-18px_rgba(8,145,178,0.45)]"
                   >
                     <div className="flex items-center gap-2.5">
@@ -363,7 +404,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
                   </span>
                   <p className="text-xs font-semibold text-slate-500">Search the web from your deck</p>
                   <p className="text-[11px] text-slate-400">
-                    Click a result to read it here — then insert selected text or a capture into the slide.
+                    Click a result to read the page here — then insert selected text or a capture into the slide.
                   </p>
                 </div>
               )}
