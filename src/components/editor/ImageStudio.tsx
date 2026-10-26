@@ -7,7 +7,11 @@
 //  - Per-layer filters: adjustments (live via ctx.filter) + baked effects
 //    (pixelate, glitch, wave deformation) + a real tone-curve editor
 //  - Layer panel: visibility, opacity, reorder, duplicate, merge down, delete
-//  - Menu bar: Fichier / Édition / Image / Calque / Affichage
+//  - Menu bar: Fichier / Édition / Image / Filtre / Calque / Affichage
+//  - Filter menu (à la Photopea): Flou (gaussien/mouvement/radial), Netteté,
+//    Accentuation, Distorsion (onde/tourbillon/glitch), Mosaïque, Bruit,
+//    Style (contours/relief/posterisation/seuil), Rendu (nuages) — each with
+//    a live-preview dialog, plus "Répéter le dernier filtre" (Ctrl+F)
 //  - Precise image resize (pixels), document crop, rotate 90°, flips
 //  - Undo / redo (document snapshots), PNG download, export to the slide
 
@@ -20,6 +24,7 @@ import {
   ArrowUp,
   Brush,
   ChevronDown,
+  ChevronRight,
   Circle,
   Copy,
   Crop,
@@ -112,6 +117,382 @@ type Tool = "select" | "hand" | "brush" | "eraser" | "text" | "rect" | "ellipse"
 type View = { zoom: number; x: number; y: number };
 type Snap = { w: number; h: number; selId: string | null; layers: unknown[] };
 type CropFrame = { x: number; y: number; w: number; h: number }; // doc px
+type MenuEntry = { label: string; action?: () => void; disabled?: boolean; sep?: boolean; sub?: MenuEntry[] };
+
+// ---------------------------------------------------------------------------
+// Filter engine (menu Filtre) — destructive filters with a live preview
+// ---------------------------------------------------------------------------
+
+type FilterParam = { key: string; label: string; min: number; max: number; def: number; unit?: string };
+type FilterDef = {
+  id: string;
+  label: string;
+  group: string;
+  params: FilterParam[];
+  apply: (src: HTMLCanvasElement, p: Record<string, number>) => HTMLCanvasElement;
+};
+
+function convolve(src: HTMLCanvasElement, kernel: number[], mix = 1): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const side = Math.round(Math.sqrt(kernel.length));
+  const half = Math.floor(side / 2);
+  const c = newCanvas(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const sd = s.data;
+  const d = out.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      for (let ky = 0; ky < side; ky++) {
+        for (let kx = 0; kx < side; kx++) {
+          const k = kernel[ky * side + kx];
+          if (!k) continue;
+          const px = Math.min(w - 1, Math.max(0, x + kx - half));
+          const py = Math.min(h - 1, Math.max(0, y + ky - half));
+          const i = (py * w + px) * 4;
+          r += sd[i] * k;
+          g += sd[i + 1] * k;
+          b += sd[i + 2] * k;
+        }
+      }
+      const i = (y * w + x) * 4;
+      d[i] = sd[i] + (r - sd[i]) * mix;
+      d[i + 1] = sd[i + 1] + (g - sd[i + 1]) * mix;
+      d[i + 2] = sd[i + 2] + (b - sd[i + 2]) * mix;
+      d[i + 3] = sd[i + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function unsharpCanvas(src: HTMLCanvasElement, amount: number, radius: number): HTMLCanvasElement {
+  const blurC = newCanvas(src.width, src.height);
+  const bcx = blurC.getContext("2d")!;
+  bcx.filter = `blur(${Math.max(0.1, radius)}px)`;
+  bcx.drawImage(src, 0, 0);
+  const s = src.getContext("2d")!.getImageData(0, 0, src.width, src.height).data;
+  const b = bcx.getImageData(0, 0, blurC.width, blurC.height).data;
+  const c = newCanvas(src.width, src.height);
+  const out = c.getContext("2d")!.createImageData(src.width, src.height);
+  const k = amount / 100;
+  for (let i = 0; i < s.length; i += 4) {
+    out.data[i] = s[i] + (s[i] - b[i]) * k;
+    out.data[i + 1] = s[i + 1] + (s[i + 1] - b[i + 1]) * k;
+    out.data[i + 2] = s[i + 2] + (s[i + 2] - b[i + 2]) * k;
+    out.data[i + 3] = s[i + 3];
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function motionBlurCanvas(src: HTMLCanvasElement, len: number, angleDeg: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  const a = (angleDeg * Math.PI) / 180;
+  const dx = Math.cos(a);
+  const dy = Math.sin(a);
+  const steps = Math.max(1, Math.round(len));
+  cx.globalAlpha = 1 / steps;
+  for (let i = 0; i < steps; i++) {
+    const t = i - (steps - 1) / 2;
+    cx.drawImage(src, t * dx, t * dy);
+  }
+  return c;
+}
+
+function spinBlurCanvas(src: HTMLCanvasElement, deg: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  const steps = 16;
+  cx.globalAlpha = 1 / steps;
+  for (let i = 0; i < steps; i++) {
+    const a = (deg * (i / (steps - 1) - 0.5) * Math.PI) / 180;
+    cx.save();
+    cx.translate(c.width / 2, c.height / 2);
+    cx.rotate(a);
+    cx.drawImage(src, -c.width / 2, -c.height / 2);
+    cx.restore();
+  }
+  return c;
+}
+
+function waveFCanvas(src: HTMLCanvasElement, amp: number, freq: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  const rows = Math.max(1, Math.round(src.height / 2));
+  const rh = src.height / rows;
+  const wavelength = Math.max(8, src.height / Math.max(1, freq));
+  for (let r = 0; r < rows; r++) {
+    const y = r * rh;
+    const dx = Math.sin((y / wavelength) * Math.PI * 2) * amp;
+    cx.drawImage(src, 0, y, src.width, rh, dx, y, src.width, rh);
+  }
+  return c;
+}
+
+function twirlCanvas(src: HTMLCanvasElement, angle: number): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const cx0 = w / 2;
+  const cy0 = h / 2;
+  const rmax = Math.hypot(cx0, cy0);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = x - cx0;
+      const dy = y - cy0;
+      const r = Math.hypot(dx, dy);
+      const t = Math.max(0, 1 - r / rmax);
+      const a = Math.atan2(dy, dx) + (angle * Math.PI * 0.01) * t * t;
+      const sxp = Math.round(cx0 + Math.cos(a) * r);
+      const syp = Math.round(cy0 + Math.sin(a) * r);
+      const si = (Math.min(h - 1, Math.max(0, syp)) * w + Math.min(w - 1, Math.max(0, sxp))) * 4;
+      const i = (y * w + x) * 4;
+      out.data[i] = s.data[si];
+      out.data[i + 1] = s.data[si + 1];
+      out.data[i + 2] = s.data[si + 2];
+      out.data[i + 3] = s.data[si + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function noiseCanvas(src: HTMLCanvasElement, amount: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() * 2 - 1) * amount;
+    d[i] += n;
+    d[i + 1] += n;
+    d[i + 2] += n;
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+function edgesCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h).data;
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const lum = new Float32Array(w * h);
+  for (let i = 0, j = 0; i < lum.length; i++, j += 4) lum[i] = 0.299 * s[j] + 0.587 * s[j + 1] + 0.114 * s[j + 2];
+  const at = (x: number, y: number) => lum[Math.min(h - 1, Math.max(0, y)) * w + Math.min(w - 1, Math.max(0, x))];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const gx = -at(x - 1, y - 1) - 2 * at(x - 1, y) - at(x - 1, y + 1) + at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1);
+      const gy = -at(x - 1, y - 1) - 2 * at(x, y - 1) - at(x + 1, y - 1) + at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1);
+      const m = Math.min(255, Math.hypot(gx, gy));
+      const i = (y * w + x) * 4;
+      out.data[i] = m;
+      out.data[i + 1] = m;
+      out.data[i + 2] = m;
+      out.data[i + 3] = 255;
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function posterizeCanvas(src: HTMLCanvasElement, levels: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  const n = Math.max(2, Math.round(levels)) - 1;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = Math.round((Math.round((d[i] / 255) * n) / n) * 255);
+    d[i + 1] = Math.round((Math.round((d[i + 1] / 255) * n) / n) * 255);
+    d[i + 2] = Math.round((Math.round((d[i + 2] / 255) * n) / n) * 255);
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+function thresholdCanvas(src: HTMLCanvasElement, t: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2] > t ? 255 : 0;
+    d[i] = v;
+    d[i + 1] = v;
+    d[i + 2] = v;
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+function cloudsCanvas(w: number, h: number, scale: number): HTMLCanvasElement {
+  const c = newCanvas(w, h);
+  const cx = c.getContext("2d")!;
+  cx.fillStyle = "#808080";
+  cx.fillRect(0, 0, w, h);
+  let cell = Math.max(2, scale);
+  let alpha = 0.6;
+  for (let oct = 0; oct < 5; oct++) {
+    const gw = Math.max(1, Math.ceil(w / cell));
+    const gh = Math.max(1, Math.ceil(h / cell));
+    const nc = newCanvas(gw, gh);
+    const nx = nc.getContext("2d")!;
+    const img = nx.createImageData(gw, gh);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.random() * 255;
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    nx.putImageData(img, 0, 0);
+    cx.globalAlpha = alpha;
+    cx.imageSmoothingEnabled = true;
+    cx.drawImage(nc, 0, 0, w, h);
+    cell /= 2;
+    alpha *= 0.55;
+  }
+  cx.globalAlpha = 1;
+  return c;
+}
+
+const FILTERS: FilterDef[] = [
+  {
+    id: "gaussian",
+    label: "Flou gaussien…",
+    group: "Flou",
+    params: [{ key: "radius", label: "Rayon", min: 0, max: 40, def: 4, unit: " px" }],
+    apply: (src, p) => {
+      const c = newCanvas(src.width, src.height);
+      const cx = c.getContext("2d")!;
+      cx.filter = `blur(${p.radius}px)`;
+      cx.drawImage(src, 0, 0);
+      return c;
+    },
+  },
+  {
+    id: "motion",
+    label: "Flou de mouvement…",
+    group: "Flou",
+    params: [
+      { key: "len", label: "Longueur", min: 1, max: 100, def: 20, unit: " px" },
+      { key: "angle", label: "Angle", min: 0, max: 360, def: 0, unit: "°" },
+    ],
+    apply: (src, p) => motionBlurCanvas(src, p.len, p.angle),
+  },
+  {
+    id: "spin",
+    label: "Flou radial (rotation)…",
+    group: "Flou",
+    params: [{ key: "deg", label: "Angle", min: 1, max: 180, def: 30, unit: "°" }],
+    apply: (src, p) => spinBlurCanvas(src, p.deg),
+  },
+  {
+    id: "sharpen",
+    label: "Netteté…",
+    group: "Netteté",
+    params: [{ key: "strength", label: "Intensité", min: 0, max: 100, def: 50, unit: " %" }],
+    apply: (src, p) => convolve(src, [0, -1, 0, -1, 5, -1, 0, -1, 0], p.strength / 100),
+  },
+  {
+    id: "unsharp",
+    label: "Accentuation…",
+    group: "Netteté",
+    params: [
+      { key: "amount", label: "Intensité", min: 0, max: 200, def: 100, unit: " %" },
+      { key: "radius", label: "Rayon", min: 0.5, max: 20, def: 2, unit: " px" },
+    ],
+    apply: (src, p) => unsharpCanvas(src, p.amount, p.radius),
+  },
+  {
+    id: "wavef",
+    label: "Onde…",
+    group: "Distorsion",
+    params: [
+      { key: "amp", label: "Amplitude", min: 1, max: 80, def: 15, unit: " px" },
+      { key: "freq", label: "Fréquence", min: 1, max: 20, def: 4 },
+    ],
+    apply: (src, p) => waveFCanvas(src, p.amp, p.freq),
+  },
+  {
+    id: "twirl",
+    label: "Tourbillon…",
+    group: "Distorsion",
+    params: [{ key: "angle", label: "Angle", min: -720, max: 720, def: 120, unit: "°" }],
+    apply: (src, p) => twirlCanvas(src, p.angle),
+  },
+  {
+    id: "glitchf",
+    label: "Glitch RGB…",
+    group: "Distorsion",
+    params: [{ key: "n", label: "Décalage", min: 1, max: 50, def: 8, unit: " px" }],
+    apply: (src, p) => glitchCanvas(src, p.n),
+  },
+  {
+    id: "mosaic",
+    label: "Mosaïque…",
+    group: "Pixelisation",
+    params: [{ key: "px", label: "Taille de bloc", min: 2, max: 80, def: 12, unit: " px" }],
+    apply: (src, p) => pixelateCanvas(src, p.px),
+  },
+  {
+    id: "noise",
+    label: "Ajouter du bruit…",
+    group: "Bruit",
+    params: [{ key: "amount", label: "Intensité", min: 1, max: 128, def: 24 }],
+    apply: (src, p) => noiseCanvas(src, p.amount),
+  },
+  {
+    id: "edges",
+    label: "Détection de contours",
+    group: "Style",
+    params: [],
+    apply: (src) => edgesCanvas(src),
+  },
+  {
+    id: "emboss",
+    label: "Relief (emboss)…",
+    group: "Style",
+    params: [{ key: "strength", label: "Intensité", min: 10, max: 200, def: 100, unit: " %" }],
+    apply: (src, p) => convolve(src, [-2, -1, 0, -1, 1, 1, 0, 1, 2], p.strength / 100),
+  },
+  {
+    id: "posterize",
+    label: "Posterisation…",
+    group: "Style",
+    params: [{ key: "levels", label: "Niveaux", min: 2, max: 32, def: 6 }],
+    apply: (src, p) => posterizeCanvas(src, p.levels),
+  },
+  {
+    id: "threshold",
+    label: "Seuil (noir & blanc)…",
+    group: "Style",
+    params: [{ key: "t", label: "Seuil", min: 0, max: 255, def: 128 }],
+    apply: (src, p) => thresholdCanvas(src, p.t),
+  },
+  {
+    id: "clouds",
+    label: "Nuages",
+    group: "Rendu",
+    params: [{ key: "scale", label: "Échelle", min: 8, max: 128, def: 32, unit: " px" }],
+    apply: (src, p) => cloudsCanvas(src.width, src.height, p.scale),
+  },
+];
+
+const FILTER_GROUP_ORDER = ["Flou", "Netteté", "Distorsion", "Pixelisation", "Bruit", "Style", "Rendu"];
 
 const DEFAULT_FX: Fx = {
   brightness: 100,
@@ -439,6 +820,8 @@ export function ImageStudioDialog({
     orig?: { x: number; y: number };
   } | null>(null);
   const histTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastFilterRef = useRef<{ id: string; params: Record<string, number> } | null>(null);
+  const filterPreviewRef = useRef<HTMLCanvasElement>(null);
 
   const [layers, setLayers] = useState<Layer[]>([]);
   const [docSize, setDocSize] = useState({ w: 0, h: 0 });
@@ -457,6 +840,7 @@ export function ImageStudioDialog({
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [resizeOpen, setResizeOpen] = useState(false);
   const [resize, setResize] = useState({ w: 0, h: 0, link: true });
+  const [filterDlg, setFilterDlg] = useState<{ def: FilterDef; params: Record<string, number> } | null>(null);
   const [tick, setTick] = useState(0);
   const bump = useCallback(() => setTick((t) => t + 1), []);
 
@@ -1215,6 +1599,90 @@ export function ImageStudioDialog({
     bump();
   };
 
+  // ---- filter menu (destructive filters with live preview) -------------------------
+
+  const openFilterDialog = (def: FilterDef) => {
+    const l = layersRef.current.find((x) => x.id === selId);
+    if (!l || l.kind !== "raster") {
+      setStatus("Sélectionnez d'abord un calque raster (pixels) pour appliquer un filtre.");
+      return;
+    }
+    const params: Record<string, number> = {};
+    def.params.forEach((p) => {
+      params[p.key] = p.def;
+    });
+    setFilterDlg({ def, params });
+  };
+
+  /** apply a filter destructively to a raster layer, with history + last-filter memory */
+  const bakeFilterOn = (l: RasterLayer, def: FilterDef, params: Record<string, number>) => {
+    pushHistory();
+    let out: HTMLCanvasElement;
+    try {
+      out = def.apply(l.canvas, params);
+    } catch {
+      setStatus("Filtre impossible (calque distant protégé) — réimportez le fichier localement.");
+      return;
+    }
+    const cx = l.canvas.getContext("2d")!;
+    cx.save();
+    cx.globalCompositeOperation = "source-over";
+    cx.clearRect(0, 0, l.canvas.width, l.canvas.height);
+    cx.drawImage(out, 0, 0);
+    cx.restore();
+    l.version++;
+    bakeCache.delete(l.id);
+    bump();
+    lastFilterRef.current = { id: def.id, params: { ...params } };
+    setStatus(`✓ ${def.label.replace("…", "")} appliqué au calque « ${l.name} »`);
+  };
+
+  const applyFilterDialog = () => {
+    if (!filterDlg) return;
+    const l = layersRef.current.find((x) => x.id === selId);
+    if (!l || l.kind !== "raster") return;
+    bakeFilterOn(l, filterDlg.def, filterDlg.params);
+    setFilterDlg(null);
+  };
+
+  const repeatLastFilter = () => {
+    const last = lastFilterRef.current;
+    if (!last) return;
+    const def = FILTERS.find((f) => f.id === last.id);
+    const l = layersRef.current.find((x) => x.id === selId);
+    if (!def || !l || l.kind !== "raster") {
+      setStatus("Sélectionnez un calque raster pour répéter le filtre.");
+      return;
+    }
+    bakeFilterOn(l, def, last.params);
+  };
+
+  // live preview inside the filter dialog (downscaled for speed)
+  useEffect(() => {
+    if (!filterDlg) return;
+    const pv = filterPreviewRef.current;
+    const l = layersRef.current.find((x) => x.id === selId);
+    if (!pv || !l || l.kind !== "raster") return;
+    const src = l.canvas;
+    const s = Math.min(1, 420 / Math.max(src.width, src.height));
+    const small = newCanvas(Math.max(1, src.width * s), Math.max(1, src.height * s));
+    const scx = small.getContext("2d")!;
+    scx.imageSmoothingQuality = "high";
+    scx.drawImage(src, 0, 0, small.width, small.height);
+    let out = small;
+    try {
+      out = filterDlg.def.apply(small, filterDlg.params);
+    } catch {
+      /* keep unfiltered preview */
+    }
+    pv.width = out.width;
+    pv.height = out.height;
+    const pcx = pv.getContext("2d")!;
+    pcx.clearRect(0, 0, pv.width, pv.height);
+    pcx.drawImage(out, 0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterDlg, selId]);
+
   // ---- import / export ---------------------------------------------------------------
 
   const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1293,6 +1761,9 @@ export function ImageStudioDialog({
       } else if ((e.key.toLowerCase() === "z" && e.shiftKey) || e.key.toLowerCase() === "y") {
         e.preventDefault();
         redo();
+      } else if (e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        repeatLastFilter();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -1302,7 +1773,7 @@ export function ImageStudioDialog({
 
   // ---- menus -----------------------------------------------------------------------
 
-  const menuDefs: Record<string, Array<{ label: string; action: () => void; disabled?: boolean; sep?: boolean }>> = {
+  const menuDefs: Record<string, MenuEntry[]> = {
     Fichier: [
       { label: "Ouvrir une image…", action: () => fileRef.current?.click() },
       { label: "Nouveau document vierge", action: newBlankDoc },
@@ -1320,6 +1791,18 @@ export function ImageStudioDialog({
       { label: "Pivoter de 90°", action: rotateDoc, sep: true },
       { label: "Miroir horizontal", action: () => flipDoc("x") },
       { label: "Miroir vertical", action: () => flipDoc("y") },
+    ],
+    Filtre: [
+      { label: "Répéter le dernier filtre (Ctrl+F)", action: repeatLastFilter, disabled: !lastFilterRef.current },
+      ...FILTER_GROUP_ORDER.map((g, gi) => ({
+        label: g,
+        sep: gi === 0,
+        sub: FILTERS.filter((f) => f.group === g).map((f) => ({
+          label: f.label,
+          disabled: !sel || sel.kind !== "raster",
+          action: () => openFilterDialog(f),
+        })),
+      })),
     ],
     Calque: [
       { label: "Nouveau calque de peinture", action: addLayer },
@@ -1346,6 +1829,45 @@ export function ImageStudioDialog({
     line: "crosshair",
     crop: "crosshair",
   };
+
+  /** recursive menu renderer — supports hover submenus (menu Filtre) */
+  const renderMenuList = (items: MenuEntry[], depth = 0): React.ReactNode =>
+    items.map((it, i) => (
+      <div key={`${depth}-${it.label}-${i}`}>
+        {it.sep && i > 0 && <div className="my-1 h-px bg-slate-100" />}
+        {it.sub && it.sub.length > 0 ? (
+          <div className="group/submenu relative">
+            <div
+              className={`flex w-full cursor-default items-center justify-between px-3 py-1.5 text-[11px] ${
+                it.disabled ? "text-slate-300" : "text-slate-700 hover:bg-fuchsia-50 hover:text-fuchsia-700"
+              }`}
+            >
+              {it.label}
+              <ChevronRight className="size-2.5" />
+            </div>
+            <div className="invisible absolute left-full top-[-4px] z-30 min-w-[220px] rounded-lg border border-slate-200 bg-white py-1 shadow-xl group-hover/submenu:visible">
+              {renderMenuList(it.sub, depth + 1)}
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            disabled={it.disabled}
+            onClick={() => {
+              setMenuOpen(null);
+              it.action?.();
+            }}
+            className={`w-full px-3 py-1.5 text-left text-[11px] ${
+              it.disabled
+                ? "cursor-not-allowed text-slate-300"
+                : "text-slate-700 hover:bg-fuchsia-50 hover:text-fuchsia-700"
+            }`}
+          >
+            {it.label}
+          </button>
+        )}
+      </div>
+    ));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -1398,26 +1920,7 @@ export function ImageStudioDialog({
               </button>
               {menuOpen === m && (
                 <div className="absolute left-0 top-full mt-1 min-w-[200px] rounded-lg border border-slate-200 bg-white py-1 shadow-xl">
-                  {menuDefs[m].map((it, i) => (
-                    <div key={it.label}>
-                      {it.sep && i > 0 && <div className="my-1 h-px bg-slate-100" />}
-                      <button
-                        type="button"
-                        disabled={it.disabled}
-                        onClick={() => {
-                          setMenuOpen(null);
-                          it.action();
-                        }}
-                        className={`w-full px-3 py-1.5 text-left text-[11px] ${
-                          it.disabled
-                            ? "cursor-not-allowed text-slate-300"
-                            : "text-slate-700 hover:bg-fuchsia-50 hover:text-fuchsia-700"
-                        }`}
-                      >
-                        {it.label}
-                      </button>
-                    </div>
-                  ))}
+                  {renderMenuList(menuDefs[m])}
                 </div>
               )}
             </div>
@@ -1580,6 +2083,69 @@ export function ImageStudioDialog({
                     <button
                       type="button"
                       onClick={() => setResizeOpen(false)}
+                      className="flex-1 rounded-lg border border-slate-200 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* filter dialog with live preview */}
+            {filterDlg && (
+              <div className="absolute inset-0 z-40 grid place-items-center bg-slate-900/30">
+                <div className="w-72 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl">
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-slate-700">
+                    {filterDlg.def.label.replace("…", "")}
+                  </h3>
+                  <div className="grid place-items-center overflow-hidden rounded border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)] bg-[length:16px_16px]">
+                    <canvas
+                      ref={filterPreviewRef}
+                      className="max-h-40 max-w-full object-contain"
+                      style={{ maxHeight: 160 }}
+                    />
+                  </div>
+                  {filterDlg.def.params.map((p) => (
+                    <SliderRow
+                      key={p.key}
+                      label={p.label}
+                      value={filterDlg.params[p.key]}
+                      min={p.min}
+                      max={p.max}
+                      unit={p.unit ?? ""}
+                      onChange={(v) => setFilterDlg((d) => (d ? { ...d, params: { ...d.params, [p.key]: v } } : d))}
+                    />
+                  ))}
+                  {filterDlg.def.params.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFilterDlg((d) => {
+                          if (!d) return d;
+                          const params: Record<string, number> = {};
+                          d.def.params.forEach((p) => {
+                            params[p.key] = p.def;
+                          });
+                          return { ...d, params };
+                        })
+                      }
+                      className="w-full rounded border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                    >
+                      Réinitialiser
+                    </button>
+                  )}
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={applyFilterDialog}
+                      className="flex-1 rounded-lg bg-fuchsia-600 py-1.5 text-[11px] font-bold text-white hover:brightness-110"
+                    >
+                      Appliquer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFilterDlg(null)}
                       className="flex-1 rounded-lg border border-slate-200 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
                     >
                       Annuler
