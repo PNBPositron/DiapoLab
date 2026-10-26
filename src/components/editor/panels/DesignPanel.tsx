@@ -36,51 +36,43 @@ function SectionRow({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="relative">
-      {/* Accent bar marking the open section */}
-      {open && (
-        <span
-          aria-hidden
-          className="absolute inset-y-2.5 left-0 w-[3px] rounded-full bg-gradient-to-b from-sky-400 to-indigo-500"
-        />
-      )}
+    <div className="transition-colors duration-150">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className={`group flex w-full items-center gap-3 py-3 pl-4 pr-3 text-left transition-colors ${
-          open ? "bg-slate-50/60" : "hover:bg-slate-50/80 active:bg-slate-100/60"
-        }`}
+        className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50/80 active:bg-slate-100/60"
       >
-        {/* Soft tinted icon chip */}
+        {/* Soft Tinted Icon Chip */}
         <div
-          className={`flex size-8 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${iconBg}`}
+          className={`flex size-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 ${iconBg} ${iconColor}`}
         >
-          <Icon className={`size-4 ${iconColor}`} />
+          <Icon className="size-3.5" />
         </div>
 
-        {/* Title & micro-detail — subtitle stays visible so the row keeps a
-            stable height whether open or closed */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[12px] font-semibold leading-tight text-slate-800">
+        {/* Title & Micro-detail */}
+        <div className="flex flex-col min-w-0">
+          <span className="text-[12px] font-medium text-slate-850 leading-tight">
             {title}
           </span>
-          <span className="truncate text-[10px] font-normal leading-tight text-slate-400">
-            {subtitle}
-          </span>
+          {!open && (
+            <span className="text-[10px] text-slate-400 font-normal leading-tight">
+              {subtitle}
+            </span>
+          )}
         </div>
 
         {/* Chevron */}
         <ChevronRight
-          className={`ml-auto size-3.5 shrink-0 text-slate-300 transition-transform duration-200 ease-out group-hover:text-slate-500 ${
+          className={`ml-auto size-3.5 text-slate-300 transition-transform duration-200 ease-out group-hover:text-slate-500 ${
             open ? "rotate-90 text-slate-700" : ""
           }`}
         />
       </button>
 
-      {/* Expanded child panel */}
+      {/* Expanded Child Panel */}
       {open && (
-        <div className="animate-in fade-in-50 slide-in-from-top-1 border-t border-slate-100/80 bg-slate-50/40 px-3.5 py-3.5 duration-200">
+        <div className="border-t border-slate-100/80 bg-slate-50/40 px-3.5 py-3 animate-in fade-in-50 duration-150">
           {children}
         </div>
       )}
@@ -90,62 +82,51 @@ function SectionRow({
 
 export function DesignPanel() {
   return (
-    <div className="flex flex-col gap-4 p-1 text-slate-800">
-      <PanelHeader
-        kicker="Design"
-        title="Shape your slide"
-        description="Format, background, brand language and master style — one place."
-        icon={Palette}
-      />
+    <div className="flex flex-col gap-3 p-1 text-slate-800">
+      <PanelHeader kicker="Design" title="Shape your slide" description="Tune the canvas, brand language, and background from one place." icon={Palette} />
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)]">
-        <div className="divide-y divide-slate-100/80">
-          <SectionRow
-            title="Canvas format"
-            subtitle="16:9 Presentation (1920 × 1080)"
-            Icon={Maximize2}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            defaultOpen
-          >
-            <SizePanel />
-          </SectionRow>
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)] divide-y divide-slate-100/80">
+        <SectionRow
+          title="Canvas format"
+          subtitle="16:9 Presentation (1920 × 1080)"
+          Icon={Maximize2}
+          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          iconColor="text-blue-600"
+          defaultOpen
+        >
+          <SizePanel />
+        </SectionRow>
 
-          <SectionRow
-            title="Background fill"
-            subtitle="Solid, gradient, or canvas texture"
-            Icon={Palette}
-            iconBg="bg-violet-50"
-            iconColor="text-violet-600"
-          >
-            <ColorPanel />
-          </SectionRow>
+        <SectionRow
+          title="Brand kit"
+          subtitle="Shared typography & colors"
+          Icon={Sparkles}
+          iconBg="bg-amber-50 text-amber-600 dark:bg-amber-950/40"
+          iconColor="text-amber-600"
+        >
+          <BrandKitPanel />
+        </SectionRow>
 
-          <SectionRow
-            title="Brand kit"
-            subtitle="Shared typography & colors"
-            Icon={Sparkles}
-            iconBg="bg-amber-50"
-            iconColor="text-amber-600"
-          >
-            <BrandKitPanel />
-          </SectionRow>
+        <SectionRow
+          title="Background fill"
+          subtitle="Solid, gradient, or canvas texture"
+          Icon={Palette}
+          iconBg="bg-violet-50 text-violet-600 dark:bg-violet-950/40"
+          iconColor="text-violet-600"
+        >
+          <ColorPanel />
+        </SectionRow>
 
-          <SectionRow
-            title="Master style"
-            subtitle="Push this slide's style deck-wide"
-            Icon={Clapperboard}
-            iconBg="bg-emerald-50"
-            iconColor="text-emerald-600"
-          >
-            <MasterStylePanel />
-          </SectionRow>
-        </div>
+        <SectionRow
+          title="Master style"
+          subtitle="Push this slide's style deck-wide"
+          Icon={Clapperboard}
+          iconBg="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40"
+          iconColor="text-emerald-600"
+        >
+          <MasterStylePanel />
+        </SectionRow>
       </div>
-
-      <p className="px-1 text-[10px] leading-relaxed text-slate-400">
-        Tip — Master style applies this slide's look to the whole deck in one click.
-      </p>
     </div>
   );
 }
