@@ -131,6 +131,38 @@ function shapeEffectStyle(el: ShapeElement): React.CSSProperties {
 
 type Handle = "nw" | "ne" | "sw" | "se";
 
+/** PowerPoint-style crop rect: source-window edges cut away, as fractions of
+ *  the source image (l/t/r/b, each 0..0.9). The window [l,1-r]x[t,1-b] is
+ *  cover-fitted into the frame (like PPT srcRect), so dragging the crop
+ *  handles changes the frame while the image content stays pixel-still. */
+export type CropRect = { l: number; t: number; r: number; b: number };
+
+/** Layout of the <img> when a cropRect is active. Returns the absolute
+ *  width/height/left/top of the full-size image inside the frame. */
+function cropRectLayout(
+  el: { width: number; height: number; cropRect?: CropRect; cropZoom?: number; cropX?: number; cropY?: number; illustrationFormat?: string },
+  nat?: { w: number; h: number } | null,
+) {
+  const cr = el.cropRect;
+  if (!nat || !cr) return null;
+  if (!(cr.l > 0.0005 || cr.t > 0.0005 || cr.r > 0.0005 || cr.b > 0.0005)) return null;
+  if (el.illustrationFormat === "svg") return null;
+  const l = Math.max(0, Math.min(0.9, cr.l));
+  const t = Math.max(0, Math.min(0.9, cr.t));
+  const r = Math.max(0, Math.min(0.9 - l, cr.r));
+  const b = Math.max(0, Math.min(0.9 - t, cr.b));
+  const winW = Math.max(1e-6, nat.w * (1 - l - r));
+  const winH = Math.max(1e-6, nat.h * (1 - t - b));
+  const s = Math.max(el.width / winW, el.height / winH) * (el.cropZoom ?? 1);
+  const imgW = nat.w * s;
+  const imgH = nat.h * s;
+  const wW = winW * s;
+  const wH = winH * s;
+  const offX = ((el.cropX ?? 50) / 100) * Math.max(0, wW - el.width);
+  const offY = ((el.cropY ?? 50) / 100) * Math.max(0, wH - el.height);
+  return { s, imgW, imgH, left: offX - l * imgW, top: offY - t * imgH };
+}
+
 export function CanvasElement({
   element,
   scale,
@@ -156,6 +188,10 @@ export function CanvasElement({
   // `presenting` or `preview` changes.
   const croppingId = useEditor((s) => s.croppingId);
   const cropping = !presenting && !preview && croppingId === element.id;
+  // Natural size of the rendered image — needed to lay out PPT-style crop.
+  const [natSize, setNatSize] = useState<{ w: number; h: number } | null>(null);
+  const cropLayout =
+    element.type === "image" ? cropRectLayout(element as never, natSize) : null;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -495,6 +531,68 @@ export function CanvasElement({
         cropX: Math.round(Math.max(0, Math.min(100, cx0 - px))),
         cropY: Math.round(Math.max(0, Math.min(100, cy0 - py))),
       });
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  // Crop mode: corner handles behave like PowerPoint — dragging them crops
+  // the frame while the image content stays perfectly in place (srcRect math).
+  const onCropHandleStart = (handle: Handle) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (element.type !== "image") return;
+    const img = ref.current?.querySelector("img");
+    const iw = img?.naturalWidth || natSize?.w || 0;
+    const ih = img?.naturalHeight || natSize?.h || 0;
+    if (!iw || !ih) return;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const x0 = element.x, y0 = element.y, W0 = element.width, H0 = element.height;
+    const c0: CropRect = {
+      l: element.cropRect?.l ?? 0,
+      t: element.cropRect?.t ?? 0,
+      r: element.cropRect?.r ?? 0,
+      b: element.cropRect?.b ?? 0,
+    };
+    const winW = Math.max(1e-6, iw * (1 - c0.l - c0.r));
+    const winH = Math.max(1e-6, ih * (1 - c0.t - c0.b));
+    const s = Math.max(W0 / winW, H0 / winH) * (element.cropZoom ?? 1);
+    const imgW = iw * s;
+    const imgH = ih * s;
+    const onMove = (m: MouseEvent) => {
+      const dx = (m.clientX - startX) / scale;
+      const dy = (m.clientY - startY) / scale;
+      let nx = x0, ny = y0, nw = W0, nh = H0;
+      const cr: CropRect = { ...c0 };
+      if (handle.includes("w")) {
+        // left edge: inward (dx > 0) crops more, outward restores (down to l = 0)
+        const d = Math.max(-c0.l * imgW, Math.min(dx, W0 - 20));
+        nx = x0 + d;
+        nw = W0 - d;
+        cr.l = Math.max(0, Math.min(0.9, c0.l + d / imgW));
+      }
+      if (handle.includes("e")) {
+        const d = Math.max(-(W0 - 20), Math.min(dx, -c0.r * imgW));
+        nw = W0 + d;
+        cr.r = Math.max(0, Math.min(0.9, c0.r - d / imgW));
+      }
+      if (handle.includes("n")) {
+        const d = Math.max(-c0.t * imgH, Math.min(dy, H0 - 20));
+        ny = y0 + d;
+        nh = H0 - d;
+        cr.t = Math.max(0, Math.min(0.9, c0.t + d / imgH));
+      }
+      if (handle.includes("s")) {
+        const d = Math.max(-(H0 - 20), Math.min(dy, -c0.b * imgH));
+        nh = H0 + d;
+        cr.b = Math.max(0, Math.min(0.9, c0.b - d / imgH));
+      }
+      update(element.id, { x: nx, y: ny, width: nw, height: nh, cropRect: cr } as never);
     };
     const onUp = () => {
       window.removeEventListener("mousemove", onMove);
@@ -875,14 +973,34 @@ export function CanvasElement({
                 }
               }}
               draggable={false}
+              onLoad={(e) => {
+                const im = e.currentTarget;
+                if (im.naturalWidth && im.naturalHeight) {
+                  setNatSize({ w: im.naturalWidth, h: im.naturalHeight });
+                }
+              }}
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: element.fit ?? "cover",
-                objectPosition: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
-                display: "block",
-                transformOrigin: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
-                transform: `scale(${(element.flipX ? -1 : 1) * (element.cropZoom ?? 1)}, ${(element.flipY ? -1 : 1) * (element.cropZoom ?? 1)})`,
+                ...(cropLayout
+                  ? {
+                      position: "absolute",
+                      width: cropLayout.imgW,
+                      height: cropLayout.imgH,
+                      left: cropLayout.left,
+                      top: cropLayout.top,
+                      maxWidth: "none",
+                      display: "block",
+                      transformOrigin: "50% 50%",
+                      transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
+                    }
+                  : {
+                      width: "100%",
+                      height: "100%",
+                      objectFit: element.fit ?? "cover",
+                      objectPosition: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
+                      display: "block",
+                      transformOrigin: `${element.cropX ?? 50}% ${element.cropY ?? 50}%`,
+                      transform: `scale(${(element.flipX ? -1 : 1) * (element.cropZoom ?? 1)}, ${(element.flipY ? -1 : 1) * (element.cropZoom ?? 1)})`,
+                    }),
                 filter: [
                   element.assetKind === "icon" && element.tint
                     ? `brightness(0) drop-shadow(0 0 0 ${element.tint})`
@@ -933,8 +1051,8 @@ export function CanvasElement({
               }}
             />
           )}
-          {/* Interactive crop overlay — drag to pan the image inside its frame,
-              wheel to zoom, corner handles still resize the frame. */}
+          {/* Interactive crop overlay — drag to pan, wheel to zoom,
+              corner handles crop like PowerPoint (frame shrinks, image stays). */}
           {cropping && (
             <div
               onMouseDown={onCropPanStart}
@@ -989,7 +1107,7 @@ export function CanvasElement({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    useEditor.getState().update(element.id, { cropZoom: 1, cropX: 50, cropY: 50 });
+                    useEditor.getState().update(element.id, { cropZoom: 1, cropX: 50, cropY: 50, cropRect: undefined });
                   }}
                   style={{
                     border: "2px solid #0a0f1f",
@@ -1157,13 +1275,13 @@ export function CanvasElement({
           {(["nw", "ne", "sw", "se"] as Handle[]).map((h) => (
             <div
               key={h}
-              onMouseDown={onResizeStart(h)}
+              onMouseDown={cropping && element.type === "image" ? onCropHandleStart(h) : onResizeStart(h)}
               style={{
                 position: "absolute",
-                width: 18,
-                height: 18,
-                background: "#ffd84a",
-                border: "3px solid #0a0f1f",
+                width: cropping ? 24 : 18,
+                height: cropping ? 24 : 18,
+                background: cropping ? "#0a0f1f" : "#ffd84a",
+                border: cropping ? "3px solid #ffffff" : "3px solid #0a0f1f",
                 ...(h.includes("n") ? { top: -10 } : { bottom: -10 }),
                 ...(h.includes("w") ? { left: -10 } : { right: -10 }),
                 cursor: `${h}-resize`,
