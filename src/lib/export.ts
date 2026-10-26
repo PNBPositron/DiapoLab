@@ -339,6 +339,20 @@ export async function exportPPTX(name: string) {
       } else if ((element.type === "image" || element.type === "video") && element.src) {
         // PPTX supports still images natively; videos are retained as a poster/frame when possible.
         slide.addImage({ data: element.src, ...box, transparency: 0, rotate: element.rotation });
+      } else if (element.type === "embed" && element.src) {
+        // iframes can't live inside PPTX — keep a clickable placeholder card.
+        slide.addText(element.title || "Web embed", {
+          ...box,
+          align: "center",
+          valign: "middle",
+          fontSize: 16,
+          bold: true,
+          color: "FFFFFF",
+          fill: { color: "1D2939" },
+          line: { color: "94A3B8", width: 1 },
+          hyperlink: { url: element.src, tooltip: element.src },
+          rotate: element.rotation,
+        });
       }
     }
   }
