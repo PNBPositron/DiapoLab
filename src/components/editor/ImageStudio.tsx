@@ -8,10 +8,16 @@
 //    (pixelate, glitch, wave deformation) + a real tone-curve editor
 //  - Layer panel: visibility, opacity, reorder, duplicate, merge down, delete
 //  - Menu bar: Fichier / Édition / Image / Filtre / Calque / Affichage
-//  - Filter menu (à la Photopea): Flou (gaussien/mouvement/radial), Netteté,
-//    Accentuation, Distorsion (onde/tourbillon/glitch), Mosaïque, Bruit,
-//    Style (contours/relief/posterisation/seuil), Rendu (nuages) — each with
-//    a live-preview dialog, plus "Répéter le dernier filtre" (Ctrl+F)
+//  - Filter menu (à la Photopea): 35 filters — Flou (gaussien/mouvement/
+//    radial/zoom), Netteté, Accentuation, Distorsion (onde/tourbillon/
+//    ondulation/bombé-pincé/glitch complet/lignes/tranches/blocs),
+//    Pixelisation (mosaïque/halftone), Bruit (bruit/grain de film), Style
+//    (contours/relief/posterisation/seuil/solarisation/duotone/néon), Rétro
+//    (scanlines/CRT/VHS/Game Boy/tramage Bayer/entrelacé), Rendu (nuages/
+//    vignettage) — live preview + "Répéter le dernier filtre" (Ctrl+F)
+//  - .psd import (ag-psd): layers, opacity & visibility preserved, and the
+//    canvas adapts to the imported image size
+//  - Precise image resize (pixels), document crop, rotate 90°, flips
 //  - Precise image resize (pixels), document crop, rotate 90°, flips
 //  - Undo / redo (document snapshots), PNG download, export to the slide
 
@@ -48,6 +54,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
+import { readPsd } from "ag-psd";
 
 // ---------------------------------------------------------------------------
 // Model
@@ -369,6 +376,428 @@ function cloudsCanvas(w: number, h: number, scale: number): HTMLCanvasElement {
   return c;
 }
 
+function zoomBlurCanvas(src: HTMLCanvasElement, amount: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  const steps = 16;
+  cx.globalAlpha = 1 / steps;
+  for (let i = 0; i < steps; i++) {
+    const s = 1 + (amount / 100) * (i / (steps - 1) - 0.5);
+    const w = c.width * s;
+    const h = c.height * s;
+    cx.drawImage(src, (c.width - w) / 2, (c.height - h) / 2, w, h);
+  }
+  return c;
+}
+
+function scanlineCanvas(src: HTMLCanvasElement, spacing: number, intensity: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  cx.fillStyle = `rgba(0,0,0,${intensity / 100})`;
+  for (let y = 0; y < c.height; y += Math.max(2, spacing)) {
+    cx.fillRect(0, y, c.width, 1);
+  }
+  return c;
+}
+
+function crtCanvas(src: HTMLCanvasElement, intensity: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  // subtle RGB fringe
+  cx.globalCompositeOperation = "screen";
+  cx.globalAlpha = 0.35 * (intensity / 100);
+  cx.drawImage(src, -2, 0);
+  cx.drawImage(src, 2, 0);
+  cx.globalCompositeOperation = "source-over";
+  cx.globalAlpha = 1;
+  // scanlines
+  cx.fillStyle = `rgba(0,0,0,${0.3 * (intensity / 100)})`;
+  for (let y = 0; y < c.height; y += 3) cx.fillRect(0, y, c.width, 1);
+  // vignette
+  const g = cx.createRadialGradient(c.width / 2, c.height / 2, Math.min(c.width, c.height) * 0.35, c.width / 2, c.height / 2, Math.hypot(c.width, c.height) / 2);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, `rgba(0,0,0,${0.6 * (intensity / 100)})`);
+  cx.fillStyle = g;
+  cx.fillRect(0, 0, c.width, c.height);
+  return c;
+}
+
+function vhsCanvas(src: HTMLCanvasElement, intensity: number): HTMLCanvasElement {
+  const k = intensity / 100;
+  // chroma shift + row wobble
+  let base = rowShiftCanvas(src, Math.round(6 * k), Math.round(4 + 10 * k), Math.round(src.height * 0.04 * k));
+  base = glitchCanvas(base, Math.max(1, Math.round(4 * k)));
+  // horizontal noise bands
+  const cx = base.getContext("2d")!;
+  const bands = Math.round(6 + 14 * k);
+  for (let i = 0; i < bands; i++) {
+    const y = Math.floor(Math.random() * base.height);
+    const bh = 1 + Math.floor(Math.random() * 4);
+    cx.globalAlpha = 0.25;
+    cx.fillStyle = Math.random() > 0.5 ? "#ffffff" : "#000000";
+    if (Math.random() > 0.5) cx.fillRect(0, y, base.width, bh);
+    else {
+      const sx = Math.floor(Math.random() * base.width);
+      cx.drawImage(base, sx, y, Math.max(4, base.width * 0.2), bh, 0, y, base.width, bh);
+    }
+  }
+  cx.globalAlpha = 1;
+  return base;
+}
+
+/** randomly displace horizontal bands — core of a real glitch */
+function rowShiftCanvas(src: HTMLCanvasElement, bands: number, maxShift: number, maxH: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const n = Math.max(1, bands);
+  for (let i = 0; i < n; i++) {
+    const y = Math.floor(Math.random() * src.height);
+    const h = 2 + Math.floor(Math.random() * Math.max(3, maxH));
+    const dx = Math.round((Math.random() * 2 - 1) * maxShift);
+    if (dx === 0) continue;
+    const row = newCanvas(src.width, h);
+    row.getContext("2d")!.drawImage(src, 0, y, src.width, h, 0, 0, src.width, h);
+    cx.clearRect(0, y, src.width, h);
+    cx.drawImage(row, dx, y);
+  }
+  return c;
+}
+
+/** offset random horizontal slices */
+function sliceShiftCanvas(src: HTMLCanvasElement, count: number, maxShift: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const step = src.height / Math.max(1, count);
+  for (let i = 0; i < count; i++) {
+    if (Math.random() > 0.5) continue;
+    const y = Math.round(i * step);
+    const h = Math.max(2, Math.round(step * (0.4 + Math.random() * 0.6)));
+    const dx = Math.round((Math.random() * 2 - 1) * maxShift);
+    if (dx === 0) continue;
+    const row = newCanvas(src.width, h);
+    row.getContext("2d")!.drawImage(src, 0, y, src.width, h, 0, 0, src.width, h);
+    cx.clearRect(0, y, src.width, h);
+    cx.drawImage(row, dx, y);
+  }
+  return c;
+}
+
+/** swap random grid blocks */
+function blockShuffleCanvas(src: HTMLCanvasElement, size: number, intensity: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const bs = Math.max(4, size);
+  const cols = Math.ceil(src.width / bs);
+  const rows = Math.ceil(src.height / bs);
+  const prob = intensity / 100;
+  for (let ry = 0; ry < rows; ry++) {
+    for (let rx = 0; rx < cols; rx++) {
+      if (Math.random() > prob) continue;
+      const sx = Math.floor(Math.random() * cols) * bs;
+      const sy = Math.floor(Math.random() * rows) * bs;
+      cx.drawImage(src, sx, sy, bs, bs, rx * bs, ry * bs, bs, bs);
+    }
+  }
+  return c;
+}
+
+/** a "real" glitch: band displacement + channel split + block corruption + noise lines */
+function glitchProCanvas(src: HTMLCanvasElement, intensity: number): HTMLCanvasElement {
+  const k = Math.min(1, intensity / 100);
+  const w = src.width;
+  // 1. band displacement
+  let c = rowShiftCanvas(src, Math.round(3 + 12 * k), Math.round(w * 0.12 * k), Math.round(4 + 26 * k));
+  // 2. channel split
+  c = glitchCanvas(c, Math.max(1, Math.round(2 + 16 * k)));
+  // 3. block corruption (copies from wrong places)
+  const cx = c.getContext("2d")!;
+  const blocks = Math.round(4 + 22 * k);
+  for (let i = 0; i < blocks; i++) {
+    const bw = 8 + Math.floor(Math.random() * w * 0.25);
+    const bh = 2 + Math.floor(Math.random() * (6 + 20 * k));
+    const sx = Math.floor(Math.random() * Math.max(1, w - bw));
+    const sy = Math.floor(Math.random() * Math.max(1, src.height - bh));
+    const dx = Math.floor(Math.random() * Math.max(1, w - bw));
+    const dy = Math.floor(Math.random() * Math.max(1, src.height - bh));
+    cx.drawImage(c, sx, sy, bw, bh, dx, dy, bw, bh);
+  }
+  // 4. thin noise lines
+  const lines = Math.round(3 + 15 * k);
+  cx.globalAlpha = 0.7;
+  for (let i = 0; i < lines; i++) {
+    const y = Math.floor(Math.random() * src.height);
+    cx.fillStyle = Math.random() > 0.5 ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)";
+    cx.fillRect(0, y, w, 1);
+  }
+  cx.globalAlpha = 1;
+  return c;
+}
+
+function halftoneCanvas(src: HTMLCanvasElement, cell: number): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const cx = c.getContext("2d")!;
+  cx.fillStyle = "#ffffff";
+  cx.fillRect(0, 0, w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h).data;
+  const bs = Math.max(3, cell);
+  cx.fillStyle = "#000000";
+  for (let y = bs / 2; y < h; y += bs) {
+    for (let x = bs / 2; x < w; x += bs) {
+      const i = (Math.floor(y) * w + Math.floor(x)) * 4;
+      const luma = (s[i] + s[i + 1] + s[i + 2]) / 3 / 255;
+      const r = (bs / 2) * Math.sqrt(1 - luma);
+      if (r > 0.3) {
+        cx.beginPath();
+        cx.arc(x, y, r, 0, Math.PI * 2);
+        cx.fill();
+      }
+    }
+  }
+  return c;
+}
+
+const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+function ditherCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h).data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const luma = (s[i] + s[i + 1] + s[i + 2]) / 3 / 255;
+      const t = (BAYER4[(y % 4) * 4 + (x % 4)] + 0.5) / 16;
+      const v = luma > t ? 255 : 0;
+      out.data[i] = v;
+      out.data[i + 1] = v;
+      out.data[i + 2] = v;
+      out.data[i + 3] = s[i + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+const GAMEBOY = [
+  [15, 56, 15],
+  [48, 98, 48],
+  [139, 172, 15],
+  [155, 188, 15],
+];
+
+function gameboyCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h).data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const luma = (s[i] + s[i + 1] + s[i + 2]) / 3 / 255;
+      const t = (BAYER4[(y % 4) * 4 + (x % 4)] + 0.5) / 16;
+      const idx = Math.min(3, Math.floor((luma + (luma > t ? 0.34 : -0.34)) * 4));
+      const col = GAMEBOY[Math.max(0, idx)];
+      out.data[i] = col[0];
+      out.data[i + 1] = col[1];
+      out.data[i + 2] = col[2];
+      out.data[i + 3] = s[i + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function interlaceCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  // soften odd lines (comb the interlacing) + darken slightly
+  for (let y = 1; y < h; y += 2) {
+    const row = newCanvas(w, 1);
+    const rx = row.getContext("2d")!;
+    rx.drawImage(src, 0, Math.max(0, y - 1), w, 1, 0, 0, w, 1);
+    rx.globalAlpha = 0.5;
+    rx.drawImage(src, 0, Math.min(h - 1, y + 1), w, 1, 0, 0, w, 1);
+    cx.drawImage(row, 0, y);
+  }
+  return c;
+}
+
+function solarizeCanvas(src: HTMLCanvasElement, t: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = d[i] > t ? 255 - d[i] : d[i];
+    d[i + 1] = d[i + 1] > t ? 255 - d[i + 1] : d[i + 1];
+    d[i + 2] = d[i + 2] > t ? 255 - d[i + 2] : d[i + 2];
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+function duotoneCanvas(src: HTMLCanvasElement, hue: number): HTMLCanvasElement {
+  const dark = `hsl(${hue}, 70%, 12%)`;
+  const light = `hsl(${hue}, 85%, 72%)`;
+  const dc = newCanvas(1, 1).getContext("2d")!;
+  const toRGB = (css: string) => {
+    dc.fillStyle = css;
+    const v = dc.fillStyle as string;
+    const m = /#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(v);
+    if (!m) return [0, 0, 0];
+    return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+  };
+  const dr = toRGB(dark);
+  const lr = toRGB(light);
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const luma = (d[i] + d[i + 1] + d[i + 2]) / 3 / 255;
+    d[i] = dr[0] + (lr[0] - dr[0]) * luma;
+    d[i + 1] = dr[1] + (lr[1] - dr[1]) * luma;
+    d[i + 2] = dr[2] + (lr[2] - dr[2]) * luma;
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+function glowCanvas(src: HTMLCanvasElement, radius: number, amount: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const blurC = newCanvas(src.width, src.height);
+  const bcx = blurC.getContext("2d")!;
+  bcx.filter = `blur(${Math.max(0.5, radius)}px)`;
+  bcx.drawImage(src, 0, 0);
+  cx.globalCompositeOperation = "lighter";
+  cx.globalAlpha = amount / 100;
+  cx.drawImage(blurC, 0, 0);
+  return c;
+}
+
+function rippleCanvas(src: HTMLCanvasElement, wavelength: number, amp: number): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h);
+  const cx0 = w / 2;
+  const cy0 = h / 2;
+  const rmax = Math.hypot(cx0, cy0);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = x - cx0;
+      const dy = y - cy0;
+      const r = Math.hypot(dx, dy);
+      const rr = r + Math.sin((r * Math.PI * 2) / wavelength) * amp * Math.max(0, 1 - r / rmax);
+      const a = Math.atan2(dy, dx);
+      const sxp = Math.round(cx0 + Math.cos(a) * rr);
+      const syp = Math.round(cy0 + Math.sin(a) * rr);
+      const si = (Math.min(h - 1, Math.max(0, syp)) * w + Math.min(w - 1, Math.max(0, sxp))) * 4;
+      const i = (y * w + x) * 4;
+      out.data[i] = s.data[si];
+      out.data[i + 1] = s.data[si + 1];
+      out.data[i + 2] = s.data[si + 2];
+      out.data[i + 3] = s.data[si + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function fisheyeCanvas(src: HTMLCanvasElement, strength: number): HTMLCanvasElement {
+  const w = src.width;
+  const h = src.height;
+  const c = newCanvas(w, h);
+  const out = c.getContext("2d")!.createImageData(w, h);
+  const s = src.getContext("2d")!.getImageData(0, 0, w, h);
+  const cx0 = w / 2;
+  const cy0 = h / 2;
+  const rmax = Math.hypot(cx0, cy0);
+  const k = strength / 100; // >0 bulge, <0 pinch
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const dx = x - cx0;
+      const dy = y - cy0;
+      const r = Math.hypot(dx, dy);
+      const t = r / rmax;
+      // inverse mapping: sample at remapped radius
+      const rr = r * (1 + k * (1 - t) * (1 - t) * 1.2);
+      const a = Math.atan2(dy, dx);
+      const sxp = Math.round(cx0 + Math.cos(a) * Math.min(rr, rmax));
+      const syp = Math.round(cy0 + Math.sin(a) * Math.min(rr, rmax));
+      const si = (Math.min(h - 1, Math.max(0, syp)) * w + Math.min(w - 1, Math.max(0, sxp))) * 4;
+      const i = (y * w + x) * 4;
+      out.data[i] = s.data[si];
+      out.data[i + 1] = s.data[si + 1];
+      out.data[i + 2] = s.data[si + 2];
+      out.data[i + 3] = s.data[si + 3];
+    }
+  }
+  c.getContext("2d")!.putImageData(out, 0, 0);
+  return c;
+}
+
+function filmGrainCanvas(src: HTMLCanvasElement, amount: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() * 2 - 1) * amount * 0.6;
+    d[i] += n;
+    d[i + 1] += n * 0.9;
+    d[i + 2] += n * 0.8;
+  }
+  cx.putImageData(data, 0, 0);
+  // white specks + scratches
+  const specks = Math.round((c.width * c.height) / 3000 * (amount / 40));
+  cx.fillStyle = "rgba(255,255,255,0.65)";
+  for (let i = 0; i < specks; i++) {
+    cx.fillRect(Math.random() * c.width, Math.random() * c.height, 1, 1);
+  }
+  const scratches = Math.round(amount / 25);
+  cx.strokeStyle = "rgba(255,255,255,0.25)";
+  for (let i = 0; i < scratches; i++) {
+    const x = Math.random() * c.width;
+    cx.beginPath();
+    cx.moveTo(x, 0);
+    cx.lineTo(x + (Math.random() * 8 - 4), c.height);
+    cx.stroke();
+  }
+  return c;
+}
+
+function vignetteCanvas(src: HTMLCanvasElement, amount: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const g = cx.createRadialGradient(c.width / 2, c.height / 2, Math.min(c.width, c.height) * 0.4, c.width / 2, c.height / 2, Math.hypot(c.width, c.height) / 2);
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, `rgba(0,0,0,${amount / 100})`);
+  cx.fillStyle = g;
+  cx.fillRect(0, 0, c.width, c.height);
+  return c;
+}
+
 const FILTERS: FilterDef[] = [
   {
     id: "gaussian",
@@ -399,6 +828,13 @@ const FILTERS: FilterDef[] = [
     group: "Flou",
     params: [{ key: "deg", label: "Angle", min: 1, max: 180, def: 30, unit: "°" }],
     apply: (src, p) => spinBlurCanvas(src, p.deg),
+  },
+  {
+    id: "zoomblur",
+    label: "Flou de zoom (radial)…",
+    group: "Flou",
+    params: [{ key: "amount", label: "Intensité", min: 1, max: 100, def: 30, unit: " %" }],
+    apply: (src, p) => zoomBlurCanvas(src, p.amount),
   },
   {
     id: "sharpen",
@@ -442,6 +878,60 @@ const FILTERS: FilterDef[] = [
     apply: (src, p) => glitchCanvas(src, p.n),
   },
   {
+    id: "glitchpro",
+    label: "Glitch (complet)…",
+    group: "Distorsion",
+    params: [{ key: "intensity", label: "Intensité", min: 1, max: 100, def: 45, unit: " %" }],
+    apply: (src, p) => glitchProCanvas(src, p.intensity),
+  },
+  {
+    id: "rowshift",
+    label: "Déplacement de lignes…",
+    group: "Distorsion",
+    params: [
+      { key: "bands", label: "Bandes", min: 1, max: 60, def: 14 },
+      { key: "shift", label: "Décalage max", min: 1, max: 150, def: 40, unit: " px" },
+    ],
+    apply: (src, p) => rowShiftCanvas(src, p.bands, p.shift, 24),
+  },
+  {
+    id: "slices",
+    label: "Tranches décalées…",
+    group: "Distorsion",
+    params: [
+      { key: "count", label: "Tranches", min: 2, max: 40, def: 12 },
+      { key: "shift", label: "Décalage max", min: 1, max: 150, def: 50, unit: " px" },
+    ],
+    apply: (src, p) => sliceShiftCanvas(src, p.count, p.shift),
+  },
+  {
+    id: "blocks",
+    label: "Blocs aléatoires…",
+    group: "Distorsion",
+    params: [
+      { key: "size", label: "Taille de bloc", min: 4, max: 120, def: 32, unit: " px" },
+      { key: "amount", label: "Densité", min: 1, max: 100, def: 25, unit: " %" },
+    ],
+    apply: (src, p) => blockShuffleCanvas(src, p.size, p.amount),
+  },
+  {
+    id: "ripple",
+    label: "Ondulation (eau)…",
+    group: "Distorsion",
+    params: [
+      { key: "wavelength", label: "Longueur d'onde", min: 8, max: 200, def: 40, unit: " px" },
+      { key: "amp", label: "Amplitude", min: 1, max: 60, def: 12, unit: " px" },
+    ],
+    apply: (src, p) => rippleCanvas(src, p.wavelength, p.amp),
+  },
+  {
+    id: "fisheye",
+    label: "Bombé / pincé…",
+    group: "Distorsion",
+    params: [{ key: "strength", label: "Force (+ bombé, − pincé)", min: -100, max: 100, def: 60, unit: " %" }],
+    apply: (src, p) => fisheyeCanvas(src, p.strength),
+  },
+  {
     id: "mosaic",
     label: "Mosaïque…",
     group: "Pixelisation",
@@ -449,11 +939,25 @@ const FILTERS: FilterDef[] = [
     apply: (src, p) => pixelateCanvas(src, p.px),
   },
   {
+    id: "halftone",
+    label: "Trame de points (halftone)…",
+    group: "Pixelisation",
+    params: [{ key: "cell", label: "Taille de maille", min: 3, max: 40, def: 8, unit: " px" }],
+    apply: (src, p) => halftoneCanvas(src, p.cell),
+  },
+  {
     id: "noise",
     label: "Ajouter du bruit…",
     group: "Bruit",
     params: [{ key: "amount", label: "Intensité", min: 1, max: 128, def: 24 }],
     apply: (src, p) => noiseCanvas(src, p.amount),
+  },
+  {
+    id: "filmgrain",
+    label: "Grain de film…",
+    group: "Bruit",
+    params: [{ key: "amount", label: "Intensité", min: 1, max: 100, def: 25 }],
+    apply: (src, p) => filmGrainCanvas(src, p.amount),
   },
   {
     id: "edges",
@@ -484,15 +988,91 @@ const FILTERS: FilterDef[] = [
     apply: (src, p) => thresholdCanvas(src, p.t),
   },
   {
+    id: "solarize",
+    label: "Solarisation…",
+    group: "Style",
+    params: [{ key: "t", label: "Seuil", min: 0, max: 255, def: 128 }],
+    apply: (src, p) => solarizeCanvas(src, p.t),
+  },
+  {
+    id: "duotone",
+    label: "Duotone…",
+    group: "Style",
+    params: [{ key: "hue", label: "Teinte", min: 0, max: 360, def: 265, unit: "°" }],
+    apply: (src, p) => duotoneCanvas(src, p.hue),
+  },
+  {
+    id: "glow",
+    label: "Néon (glow)…",
+    group: "Style",
+    params: [
+      { key: "radius", label: "Rayon", min: 1, max: 40, def: 8, unit: " px" },
+      { key: "amount", label: "Intensité", min: 10, max: 200, def: 80, unit: " %" },
+    ],
+    apply: (src, p) => glowCanvas(src, p.radius, p.amount),
+  },
+  {
+    id: "scanlines",
+    label: "Scanlines…",
+    group: "Rétro",
+    params: [
+      { key: "spacing", label: "Espacement", min: 2, max: 10, def: 3, unit: " px" },
+      { key: "intensity", label: "Intensité", min: 5, max: 100, def: 45, unit: " %" },
+    ],
+    apply: (src, p) => scanlineCanvas(src, p.spacing, p.intensity),
+  },
+  {
+    id: "crt",
+    label: "Écran CRT…",
+    group: "Rétro",
+    params: [{ key: "intensity", label: "Intensité", min: 10, max: 100, def: 60, unit: " %" }],
+    apply: (src, p) => crtCanvas(src, p.intensity),
+  },
+  {
+    id: "vhs",
+    label: "VHS (magnétoscope)…",
+    group: "Rétro",
+    params: [{ key: "intensity", label: "Intensité", min: 10, max: 100, def: 50, unit: " %" }],
+    apply: (src, p) => vhsCanvas(src, p.intensity),
+  },
+  {
+    id: "gameboy",
+    label: "Game Boy (4 couleurs)",
+    group: "Rétro",
+    params: [],
+    apply: (src) => gameboyCanvas(src),
+  },
+  {
+    id: "dither",
+    label: "Tramage 1 bit (Bayer)",
+    group: "Rétro",
+    params: [],
+    apply: (src) => ditherCanvas(src),
+  },
+  {
+    id: "interlace",
+    label: "Vidéo entrelacée",
+    group: "Rétro",
+    params: [],
+    apply: (src) => interlaceCanvas(src),
+  },
+  {
     id: "clouds",
     label: "Nuages",
     group: "Rendu",
     params: [{ key: "scale", label: "Échelle", min: 8, max: 128, def: 32, unit: " px" }],
     apply: (src, p) => cloudsCanvas(src.width, src.height, p.scale),
   },
+  {
+    id: "vignette",
+    label: "Vignettage…",
+    group: "Rendu",
+    params: [{ key: "amount", label: "Intensité", min: 5, max: 100, def: 45, unit: " %" }],
+    apply: (src, p) => vignetteCanvas(src, p.amount),
+  },
 ];
 
-const FILTER_GROUP_ORDER = ["Flou", "Netteté", "Distorsion", "Pixelisation", "Bruit", "Style", "Rendu"];
+const FILTER_GROUP_ORDER = ["Flou", "Netteté", "Distorsion", "Pixelisation", "Bruit", "Style", "Rétro", "Rendu"];
 
 const DEFAULT_FX: Fx = {
   brightness: 100,
@@ -1016,6 +1596,70 @@ export function ImageStudioDialog({
     attempt(/^https?:/i.test(src));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** import a .psd file: every layer becomes a raster layer, doc size = psd size */
+  const loadPsdFile = (file: File) => {
+    file.arrayBuffer().then((buf) => {
+      try {
+        const psd = readPsd(buf);
+        const pw = psd.width || 1;
+        const ph = psd.height || 1;
+        type Pl = { canvas: HTMLCanvasElement; name: string; opacity: number; visible: boolean };
+        const collected: Pl[] = [];
+        const walk = (ls: any[]) => {
+          for (const pl of ls) {
+            if (pl.children && pl.children.length > 0) {
+              walk(pl.children);
+              continue;
+            }
+            const cv: HTMLCanvasElement | undefined = pl.canvas;
+            if (!cv) continue;
+            const c = newCanvas(pw, ph);
+            c.getContext("2d")!.drawImage(cv, pl.left ?? 0, pl.top ?? 0);
+            collected.push({ canvas: c, name: pl.name || "Calque", opacity: pl.opacity ?? 1, visible: !pl.hidden });
+          }
+        };
+        if (psd.children && psd.children.length > 0) walk(psd.children);
+        let items: Pl[];
+        if (collected.length > 0) {
+          items = collected;
+        } else if (psd.canvas) {
+          items = [{ canvas: psd.canvas, name: "Fond", opacity: 1, visible: true }];
+        } else {
+          setStatus("Ce PSD ne contient pas de données d'image exploitables.");
+          return;
+        }
+        // psd.children is top-most first → reverse to bottom-first
+        const ls: Layer[] = items
+          .slice()
+          .reverse()
+          .map((it) => {
+            const l: RasterLayer = {
+              ...baseLayer(it.name),
+              kind: "raster",
+              canvas: it.canvas,
+              x: 0,
+              y: 0,
+              version: 0,
+            };
+            l.opacity = it.opacity;
+            l.visible = it.visible;
+            return l;
+          });
+        undoRef.current = [];
+        redoRef.current = [];
+        setHist({ u: 0, r: 0 });
+        bakeCache.clear();
+        setLayersBoth(ls);
+        setDocSize({ w: pw, h: ph });
+        setSelId(ls[ls.length - 1]?.id ?? null);
+        setCrop(null);
+        setStatus(`✓ PSD importé — ${pw} × ${ph} px, ${ls.length} calque${ls.length > 1 ? "s" : ""} (le canvas s'adapte à l'image)`);
+      } catch {
+        setStatus("Impossible de lire ce PSD (fichier corrompu ou version non supportée).");
+      }
+    });
+  };
 
   const newBlankDoc = useCallback(() => {
     const c = newCanvas(1280, 720);
@@ -1689,6 +2333,10 @@ export function ImageStudioDialog({
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (/\.psd$/i.test(file.name)) {
+      loadPsdFile(file);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const src = String(reader.result);
@@ -1775,7 +2423,7 @@ export function ImageStudioDialog({
 
   const menuDefs: Record<string, MenuEntry[]> = {
     Fichier: [
-      { label: "Ouvrir une image…", action: () => fileRef.current?.click() },
+      { label: "Ouvrir une image ou un PSD…", action: () => fileRef.current?.click() },
       { label: "Nouveau document vierge", action: newBlankDoc },
       { label: "Télécharger PNG", action: downloadPng, sep: true },
       { label: "Importer sur le canvas", action: exportToCanvas },
@@ -1900,7 +2548,7 @@ export function ImageStudioDialog({
             >
               <ImageDown className="size-3.5" /> Importer sur le canvas
             </button>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickFile} />
+            <input ref={fileRef} type="file" accept=".psd,image/*" className="hidden" onChange={onPickFile} />
           </div>
         </DialogHeader>
 
