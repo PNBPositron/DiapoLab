@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { icons as LucideIcons } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import {
   Link2,
   Shapes,
