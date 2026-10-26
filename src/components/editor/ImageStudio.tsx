@@ -491,7 +491,7 @@ export function ImageStudioDialog({
 
   const patchFx = (id: string, patch: Partial<Fx>) => {
     setLayersBoth(
-      layersRef.current.map((l) => (l.id === id ? ({ ...l, fx: { ...l.fx, ...patch } } as Layer) : l));
+      layersRef.current.map((l) => (l.id === id ? ({ ...l, fx: { ...l.fx, ...patch } } as Layer) : l))
     );
   };
 
