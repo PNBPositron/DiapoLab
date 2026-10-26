@@ -216,10 +216,10 @@ export function PagesBar() {
           {currentIndex + 1} / {pages.length}
         </span>
         <button
-          onClick={() => {
-            requestPresentationFullscreen();
-            setPresenting(true);
-          }}
+onClick={async () => {
+                  const enteredFullscreen = await requestPresentationFullscreen();
+                  if (enteredFullscreen) setPresenting(true);
+                }}
           className="flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
           type="button"
         >

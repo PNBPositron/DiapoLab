@@ -7,11 +7,15 @@ import { SlideThumbnail } from "./SlideThumbnail";
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
 import type { AnyElement } from "@/store/editor";
 
-export function requestPresentationFullscreen(target: Element = document.documentElement) {
-  if (document.fullscreenElement || !target.requestFullscreen) return;
-  void target.requestFullscreen({ navigationUI: "hide" }).catch(() => {
-    // Fullscreen can be denied by an embedded preview; the presentation overlay remains usable.
-  });
+export async function requestPresentationFullscreen(target: Element = document.documentElement) {
+  if (document.fullscreenElement) return true;
+  if (!target.requestFullscreen) return false;
+  try {
+    await target.requestFullscreen({ navigationUI: "hide" });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function PresentationMode() {

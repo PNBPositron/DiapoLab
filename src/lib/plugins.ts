@@ -25,7 +25,7 @@ export type PluginApp = {
   id?: string;
   name: string;
   description?: string;
-  type: "paint" | "video";
+  type: "paint" | "video" | "search";
   config?: {
     /** swatches shown in the color picker (any CSS color) */
     colors?: string[];
@@ -98,7 +98,7 @@ function normalizeApps(raw: unknown): PluginApp[] {
     if (!a || typeof a !== "object") continue;
     const app = a as Record<string, unknown>;
     const name = typeof app.name === "string" && app.name.trim() ? app.name.trim() : null;
-    const type = app.type === "paint" || app.type === "video" ? app.type : null;
+    const type = app.type === "paint" || app.type === "video" || app.type === "search" ? app.type : null;
     if (!name || !type) continue;
     const cfg = (app.config ?? {}) as Record<string, unknown>;
     apps.push({
@@ -349,6 +349,12 @@ export const VIDEO_APP: PluginApp = {
   type: "video",
 };
 
+export const SEARCH_APP: PluginApp = {
+  id: "context-search",
+  name: "AI Search",
+  description: "Search the web with Context.dev",
+  type: "search",
+};
 
 /* ------------------------------------------------------------------ */
 /* Preinstalled widget packs — ready-to-drop element groups            */
@@ -495,6 +501,17 @@ export const PREINSTALLED_PLUGINS: EditorPlugin[] = [
     enabled: true,
     widgets: [],
     apps: [VIDEO_APP],
+    importedAt: 0,
+  },
+  {
+    id: "builtin-context-search",
+    name: "AI Search",
+    author: "DiapoLab",
+    version: "1.0.0",
+    description: "Search the web with Context.dev and open sourced results.",
+    enabled: true,
+    widgets: [],
+    apps: [SEARCH_APP],
     importedAt: 0,
   },
 ];
