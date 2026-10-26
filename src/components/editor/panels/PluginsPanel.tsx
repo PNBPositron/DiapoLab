@@ -81,20 +81,20 @@ export function PluginsPanel() {
         icon={Puzzle}
       />
 
-      {/* Image Studio — full Photopea integration (advanced editing, not just filters) */}
-      <button
-        onClick={() => setStudioOpen(true)}
-        className="group mx-4 flex items-center gap-3 rounded-2xl border border-fuchsia-300/40 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-3 text-left shadow-[0_10px_30px_rgba(139,92,246,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(139,92,246,0.4)] active:scale-[0.99]"
-      >
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white shadow-inner">
-          <WandSparkles className="size-5" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-xs font-bold text-white">Image Studio <span className="rounded-md bg-white/10 px-1 py-px text-[8px] font-bold uppercase tracking-wider text-slate-300">Photopea</span></span>
-          <span className="block truncate text-[10px] leading-relaxed text-slate-400">Advanced image editor — layers, selections, masks, retouch. Import the result onto the slide.</span>
-        </span>
-        <Play className="size-3.5 shrink-0 text-fuchsia-400 transition-transform group-hover:translate-x-0.5" />
-      </button>
+      {/* Image Studio — full Photopea integration (advanced editing, not just filters).
+          Same card style & grid as the import buttons below. */}
+      <div className="px-4">
+        <button
+          onClick={() => setStudioOpen(true)}
+          className="group flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-indigo-300 hover:text-indigo-600 active:scale-[0.98]"
+        >
+          <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
+            <WandSparkles className="size-3.5" />
+          </span>
+          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur avancé (Photopea)</span>
+          <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </div>
 
       {/* Import buttons — apps and packs each have their own code format */}
       <div className="grid grid-cols-2 gap-2 px-4">
