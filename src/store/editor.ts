@@ -978,10 +978,50 @@ export function toEmbedSrc(raw: string): string {
       const id = u.pathname.split("/").filter(Boolean)[0];
       if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`;
     }
+    // Spotify — track/album/playlist/episode/show URLs → official embed player
+    if (host === "open.spotify.com" || host === "play.spotify.com") {
+      const parts = u.pathname.split("/").filter(Boolean);
+      if (parts.length >= 2) {
+        const kind = parts[0] === "embed" ? parts[1] : parts[0];
+        const id = parts[0] === "embed" ? parts[2] : parts[1];
+        if (kind && id) return `https://open.spotify.com/embed/${kind}/${id}`;
+      }
+    }
+    // SoundCloud — official player wrapping the track/playlist URL
+    if (host === "soundcloud.com") {
+      return `https://w.soundcloud.com/player/?url=${encodeURIComponent(s)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&visual=true`;
+    }
+    // Google Maps — place/search URLs → classic embed (no API key needed)
+    if (host === "maps.google.com" || ((host === "google.com" || host === "google.fr") && u.pathname.startsWith("/maps"))) {
+      const q = u.searchParams.get("q") || u.searchParams.get("query") || decodeURIComponent(u.pathname.split("/maps/search/")[1] || "") || "";
+      if (q) return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=14&output=embed`;
+      if (u.pathname.startsWith("/maps/place/")) {
+        const place = decodeURIComponent(u.pathname.split("/maps/place/")[1].split("/")[0] || "");
+        if (place) return `https://maps.google.com/maps?q=${encodeURIComponent(place)}&z=14&output=embed`;
+      }
+    }
+    // Figma — file/design/proto URLs → official Figma embed viewer
+    if (host === "figma.com" || host === "www.figma.com") {
+      if (u.pathname.startsWith("/embed")) return s;
+      return `https://www.figma.com/embed?embed_host=diapolab&url=${encodeURIComponent(s)}`;
+    }
     return s;
   } catch {
     return s;
   }
+}
+
+/** Detect the embed provider from a (already normalized) embed src —
+ *  used to label fallback cards in PDF/PPTX exports. */
+export function embedProvider(src: string): { label: string; emoji: string } {
+  const s = (src || "").toLowerCase();
+  if (s.includes("youtube.com") || s.includes("youtu.be")) return { label: "YouTube", emoji: "▶" };
+  if (s.includes("spotify.com")) return { label: "Spotify", emoji: "♪" };
+  if (s.includes("soundcloud.com")) return { label: "SoundCloud", emoji: "♫" };
+  if (s.includes("vimeo.com")) return { label: "Vimeo", emoji: " Vimeo" };
+  if (s.includes("maps.google")) return { label: "Google Maps", emoji: "📍" };
+  if (s.includes("figma.com")) return { label: "Figma", emoji: "✦" };
+  return { label: "Web embed", emoji: "🌐" };
 }
 
 export const newEmbed = (src: string, overrides: Partial<EmbedElement> = {}): EmbedElement => ({
