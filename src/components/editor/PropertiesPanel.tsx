@@ -412,6 +412,7 @@ export function PropertiesPanel() {
   const [jsonDraft, setJsonDraft] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [jsonDirty, setJsonDirty] = useState(false);
+  const croppingId = useEditor((s) => s.croppingId);
 
   const el = elements.find((e) => e.id === selectedId);
 
@@ -609,7 +610,7 @@ export function PropertiesPanel() {
 
         {el.type === "image" && (
           <>
-            <button type="button" onClick={() => update(el.id, { cropZoom: el.cropZoom && el.cropZoom > 1 ? 1 : 1.15 })} className="grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" title="Crop image"><Crop className="size-3.5" /></button>
+            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-sky-100 text-sky-700 ring-2 ring-sky-500/30" : ""}`} title="Crop image (double-clic : mode recadrage)"><Crop className="size-3.5" /></button>
             <div className="relative">
               <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
               {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-lg border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-sky-300 hover:bg-sky-50">{preset.name}</button>)}</div>}
@@ -1133,6 +1134,8 @@ export function PropertiesPanel() {
 
                 <Field label="Crop">
                   <div className="space-y-2">
+                    <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`w-full rounded-lg px-2 py-2 text-[11px] font-semibold transition ${croppingId === el.id ? "bg-sky-600 text-white hover:bg-sky-500" : "bg-slate-900 text-white hover:bg-slate-700"}`}>{croppingId === el.id ? "✓ Terminer le recadrage" : "✂️ Recadrer sur le canvas"}</button>
+                    {croppingId === el.id && <p className="text-[10px] leading-snug text-slate-400">Glissez l'image dans son cadre pour la déplacer, molette pour zoomer, Échap ou ✅ pour terminer.</p>}
                     <SliderWithInput label="Zoom" min={100} max={400} step={5} unit="%" value={Math.round((el.cropZoom ?? 1) * 100)} onChange={(v) => update(el.id, { cropZoom: v / 100 })} />
                     <SliderWithInput label="Horizontal" min={0} max={100} unit="%" value={el.cropX ?? 50} onChange={(v) => update(el.id, { cropX: v })} />
                     <SliderWithInput label="Vertical" min={0} max={100} unit="%" value={el.cropY ?? 50} onChange={(v) => update(el.id, { cropY: v })} />
@@ -1424,3 +1427,4 @@ export function PropertiesPanel() {
     </>
   );
 }
+
