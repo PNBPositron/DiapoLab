@@ -94,6 +94,9 @@ const FLOW_ACCENT2: Record<UiStyle, string> = {
   midnight: "#a5b4fc",
   pastel: "#f9a8d4",
   vapor: "#f0abfc",
+  material: "#00897b",
+  matrix: "#37ff7f",
+  swiss: "#111111",
 };
 
 const FLOWCRAFT_META: Record<FlowKind, { label: string; description: string; Icon: LucideIcon }> = {
