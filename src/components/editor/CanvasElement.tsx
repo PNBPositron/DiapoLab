@@ -469,7 +469,7 @@ export function CanvasElement({
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
         animation:
-          presenting && !morph && element.animation && element.animation !== "none"
+          presenting && !preview && !morph && element.animation && element.animation !== "none"
             ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) both`
             : undefined,
         transition: morph
