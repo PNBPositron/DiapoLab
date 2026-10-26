@@ -226,6 +226,28 @@ export function PresentationMode() {
           </div>
         </div>
       </div>
+      {presenterOpen && (
+        <div className="fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-md">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">Presenter · slide {currentIndex + 1}/{pages.length}</span>
+            <span className="font-mono text-sm tabular-nums text-white/90">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setElapsed(0)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Reset</button>
+              <button onClick={() => setPresenterOpen(false)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Close</button>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Notes</span>
+              <div className="mt-1 max-h-44 overflow-auto whitespace-pre-wrap text-[13px] leading-relaxed text-white/85">
+                {page.notes?.trim() ? page.notes : <span className="italic text-white/35">No notes for this slide.</span>}
+              </div>
+            </div>
+            {pages[currentIndex + 1] && <div className="w-40 shrink-0"><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Next</span><SlideThumbnail page={pages[currentIndex + 1]} canvasW={canvasW} canvasH={canvasH} className="mt-1 rounded-lg border border-white/15" /></div>}
+          </div>
+          <p className="text-[10px] text-white/35">Press P to hide · arrows to navigate</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -371,60 +393,6 @@ function MorphItem({
     >
       {children}
 
-      {presenterOpen && (
-        <div className="fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-md">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">
-              Presenter · slide {currentIndex + 1}/{pages.length}
-            </span>
-            <span className="font-mono text-sm tabular-nums text-white/90">
-              {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setElapsed(0)}
-                className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10"
-              >
-                Reset
-              </button>
-              <button
-                onClick={() => setPresenterOpen(false)}
-                className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                Notes
-              </span>
-              <div className="mt-1 max-h-44 overflow-auto whitespace-pre-wrap text-[13px] leading-relaxed text-white/85">
-                {page.notes?.trim() ? (
-                  page.notes
-                ) : (
-                  <span className="italic text-white/35">No notes for this slide.</span>
-                )}
-              </div>
-            </div>
-            {pages[currentIndex + 1] && (
-              <div className="w-40 shrink-0">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
-                  Next
-                </span>
-                <SlideThumbnail
-                  page={pages[currentIndex + 1]}
-                  canvasW={canvasW}
-                  canvasH={canvasH}
-                  className="mt-1 rounded-lg border border-white/15"
-                />
-              </div>
-            )}
-          </div>
-          <p className="text-[10px] text-white/35">Press P to hide · arrows to navigate</p>
-        </div>
-      )}
     </div>
   );
 }
