@@ -43,15 +43,9 @@ export function PresentationMode() {
     const obs = new ResizeObserver(fit);
     if (wrapRef.current) obs.observe(wrapRef.current);
 
-    const root = document.documentElement;
-    if (root.requestFullscreen && !document.fullscreenElement) {
-      root.requestFullscreen().catch(() => {});
-    }
-    const onFsChange = () => {
-      if (!document.fullscreenElement) setPresenting(false);
-    };
-    document.addEventListener("fullscreenchange", onFsChange);
-
+    // Keep presentation inside the app overlay. Requesting fullscreen from an
+    // effect is rejected by browsers because it is no longer user-initiated,
+    // which can leave the preview on a blank/error document.
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setPresenting(false);
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
@@ -81,10 +75,6 @@ export function PresentationMode() {
     return () => {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
-      document.removeEventListener("fullscreenchange", onFsChange);
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
       document.body.style.overflow = prev;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
