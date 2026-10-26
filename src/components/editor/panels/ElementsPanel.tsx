@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as LucideIcons from "lucide-react";
+import { LUCIDE_ICONS } from "@/lib/lucide-icons";
 import {
   Link2,
   Shapes,
@@ -36,38 +36,12 @@ import { PanelHeader, ChipGroup } from "../ui/selectors";
 type ElementSection = "shapes" | "icons" | "flowcraft" | null;
 
 const POPULAR_ICON_NAMES = [
-  "Activity", "AlertCircle", "AlertTriangle", "AlignCenter", "AlignLeft", "AlignRight", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight",
-  "ArrowUp", "Asterisk", "AtSign", "Award", "Ban", "Bell", "Bookmark", "BookOpen", "Briefcase", "Calendar",
-  "Camera", "Check", "CheckCircle", "ChevronDown", "ChevronLeft", "ChevronRight", "ChevronUp", "Circle", "Clipboard", "Clock",
-  "Cloud", "Code", "Cog", "Columns3", "Command", "Compass", "Copy", "CreditCard", "Crown", "Database",
-  "Download", "Edit", "Ellipsis", "Mail", "ExternalLink", "Eye", "EyeOff", "File", "FileText", "Filter",
-  "Flag", "Folder", "Gauge", "Globe", "Grid2X2", "Heart", "HelpCircle", "Home", "Image", "Info",
-  "Key", "Layers", "Layout", "LayoutDashboard", "Link", "Link2", "List", "Lock", "LogIn", "LogOut",
-  "Mail", "MapPin", "Menu", "MessageCircle", "Mic", "Minus", "Monitor", "Moon", "MoreHorizontal", "Paperclip",
-  "Pause", "PenTool", "Phone", "Play", "Plus", "RefreshCw", "Save", "Search", "Send", "Settings",
-  "Share2", "Shield", "ShoppingCart", "Sidebar", "Star", "Sun", "Tag", "ThumbsUp", "Trash2", "Twitter",
-  "Upload", "User", "Users", "Video", "X", "XCircle", "Zap", "ZoomIn", "ZoomOut",
-  "Airplay", "Anchor", "Apple", "BadgeCheck", "BarChart3", "Battery", "Bluetooth", "BookMarked", "Box", "Building2",
-  "Cake", "ChartLine", "ChartPie", "CheckCheck", "CircleDashed", "Clock3", "CloudSun", "Code2", "Coffee", "Contact",
-  "Cpu", "Diamond", "Disc3", "DollarSign", "DownloadCloud", "FileCheck", "FilePlus2", "FolderOpen", "Gift", "Globe2",
-  "Hammer", "Hash", "Headphones", "History", "Inbox", "Laptop", "Lightbulb", "ListChecks", "Map", "Megaphone",
-  "MessageSquare", "MessagesSquare", "MonitorPlay", "Palette", "PanelLeft", "Paperclip", "Pin", "Podcast", "Printer",
-  "Rocket", "Route", "ScanLine", "SendHorizontal", "Server", "ShieldCheck", "SlidersHorizontal", "Sparkles", "SquareStack",
-  "Store", "Table2", "Tablet", "Terminal", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "TriangleAlert",
-  "Truck", "Tv", "Umbrella", "Unlock", "UserCheck", "UserPlus", "WalletCards", "Wifi", "Wind", "Wrench",
-  "Accessibility", "BadgeAlert", "Blocks", "Brain", "CalendarCheck", "ChartNoAxesCombined", "CircleUserRound", "CloudCog", "Combine", "FileChartColumn", "FolderGit2", "Gauge", "Infinity", "Kanban", "ListTree", "MessageCircleMore", "Milestone", "Orbit", "PackageCheck", "PanelsTopLeft", "Pointer", "Puzzle", "QrCode", "Receipt", "ScanSearch", "SquareDashedKanban", "Workflow", "Waypoints",
-  "Atom", "Bird", "Bike", "Boat", "Bug", "Bus", "Car", "Cherry", "Clapperboard", "Cookie", "Croissant",
-  "Dumbbell", "Feather", "Fish", "Flame", "Flower2", "Ghost", "Guitar", "Hand", "Highlighter", "Hourglass",
-  "Keyboard", "Leaf", "Locate", "Magnet", "Medal", "Microscope", "Mouse", "Music", "Navigation", "Package",
-  "Paintbrush", "PawPrint", "Pen", "PiggyBank", "Plane", "Plant", "Popcorn", "Quote", "Radar", "Recycle",
-  "Sailboat", "Scale", "Sigma", "Shirt", "Snowflake", "Stamp", "SunMoon", "Telescope", "Tent", "Trees",
-  "Volleyball", "Wand", "Watch", "Waves",
+  "Accessibility", "Activity", "Airplay", "AlignCenterHorizontal", "AlignStartHorizontal", "AlignEndHorizontal", "Anchor", "Apple", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "Asterisk", "Atom", "AtSign", "Award", "BadgeAlert", "BadgeCheck", "Ban", "Battery", "Bell", "Bike", "Bird", "Blocks", "Bluetooth", "Bookmark", "BookMarked", "BookOpen", "Box", "Brain", "Briefcase", "Bug", "Building2", "Bus", "Cake", "Calendar", "CalendarCheck", "Camera", "Car", "Check", "CheckCheck", "Cherry", "ChevronDown", "ChevronLeft", "ChevronRight", "ChevronUp", "Circle", "CircleDashed", "CircleQuestionMark", "CircleUserRound", "CircleAlert", "TriangleAlert", "CircleCheck", "CircleX", "Clapperboard", "Clipboard", "Clock", "Clock3", "Cloud", "CloudCog", "CloudSun", "CloudDownload", "Code", "CodeXml", "Coffee", "Cog", "Columns3", "Combine", "Command", "Compass", "Contact", "Cookie", "Copy", "Cpu", "CreditCard", "Croissant", "Crown", "Database", "Diamond", "Disc3", "DollarSign", "Download", "Dumbbell", "Pencil", "Ellipsis", "ExternalLink", "Eye", "EyeOff", "Feather", "File", "FileChartColumn", "FileCheck", "FilePlus", "FileText", "Funnel", "Fish", "Flag", "Flame", "Flower2", "Folder", "FolderGit2", "FolderOpen", "Gauge", "Ghost", "Gift", "Globe", "Earth", "Grid2x2", "Guitar", "Hammer", "Hand", "Hash", "Headphones", "Heart", "Highlighter", "History", "House", "Hourglass", "Image", "Inbox", "Infinity", "Info", "Kanban", "Key", "Keyboard", "Laptop", "Layers", "LayoutPanelLeft", "LayoutDashboard", "Leaf", "Lightbulb", "Link", "Link2", "List", "ListChecks", "ListTree", "Locate", "Lock", "LockOpen", "LogIn", "LogOut", "Magnet", "Mail", "Map", "MapPin", "Medal", "Megaphone", "Menu", "MessageCircle", "MessageCircleMore", "MessageSquare", "MessagesSquare", "Mic", "Microscope", "Milestone", "Minus", "Monitor", "MonitorPlay", "Moon", "Mouse", "Music", "Navigation", "Orbit", "Package", "PackageCheck", "Paintbrush", "Palette", "PanelLeft", "PanelLeftOpen", "PanelsTopLeft", "Paperclip", "Pause", "PawPrint", "Pen", "PenTool", "Phone", "PiggyBank", "Pin", "Plane", "Sprout", "Play", "Plus", "Podcast", "Pointer", "Popcorn", "Printer", "Puzzle", "QrCode", "Quote", "Radar", "Receipt", "Recycle", "RefreshCw", "Rocket", "Route", "Sailboat", "Save", "Scale", "ScanLine", "ScanSearch", "Search", "Send", "SendHorizontal", "Server", "Settings", "Share2", "Shield", "ShieldCheck", "Shirt", "ShoppingCart", "Sigma", "SlidersHorizontal", "Snowflake", "Sparkles", "SquareDashedKanban", "SquareStack", "Stamp", "Star", "Store", "Sun", "SunMoon", "Table2", "Tablet", "Tag", "Telescope", "Tent", "Terminal", "ThumbsUp", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "Trash2", "Trees", "Truck", "Tv", "Twitter", "Umbrella", "Upload", "User", "UserCheck", "UserPlus", "Users", "Video", "Volleyball", "WalletCards", "Wand", "Watch", "Waves", "Waypoints", "Wifi", "Wind", "Workflow", "Wrench", "X", "Zap", "ZoomIn", "ZoomOut", "ChartLine", "ChartPie", "ChartNoAxesCombined", "ChartColumnBig",
 ] as const;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
-  const candidate = LucideIcons[name] as unknown;
-  if (typeof candidate !== "function") return [];
-  const Icon = candidate as LucideIcon;
+  const Icon = LUCIDE_ICONS[name];
+  if (!Icon) return [];
   return [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }];
 });
 
