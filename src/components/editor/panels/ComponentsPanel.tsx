@@ -16,7 +16,6 @@ import {
   ListChecks,
   LogIn,
   MessageSquare,
-  MonitorCog,
   PanelBottom,
   PanelLeft,
   Plus,
@@ -27,7 +26,6 @@ import {
   Search,
   SlidersHorizontal,
   Smartphone,
-  Sparkles,
   Square,
   Terminal,
   TerminalSquare,
@@ -61,7 +59,7 @@ import {
   type UserBlock,
 } from "@/lib/user-blocks";
 
-type PresetSection = "interfaces" | "ui" | "elements" | "blocks";
+type PresetSection = "ui" | "blocks";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -177,7 +175,7 @@ const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 export function ComponentsPanel() {
   const { add, addGroup, selectedId, selectedIds, elements, update } = useEditor();
   const [style, setStyle] = useState<UiStyle>("cyber");
-  const [section, setSection] = useState<PresetSection>("interfaces");
+  const [section, setSection] = useState<PresetSection>("ui");
   const [search, setSearch] = useState("");
   const [blocks, setBlocks] = useState<UserBlock[]>(() => loadBlocks());
   const [blockName, setBlockName] = useState("");
@@ -257,8 +255,8 @@ export function ComponentsPanel() {
   };
 
   const rawPresets = useMemo(() => {
-    if (section === "interfaces") return INTERFACES;
-    if (section === "ui") return UI_PRESETS;
+    // Widgets + Frames merged into a single "UI" catalog.
+    if (section === "ui") return [...UI_PRESETS, ...INTERFACES];
     return [];
   }, [section]);
 
@@ -280,51 +278,19 @@ export function ComponentsPanel() {
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
       <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets and charts onto the slide." icon={Blocks} />
       <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
-        { value: "interfaces", label: "Frames", icon: MonitorCog },
-        { value: "ui", label: "Widgets", icon: Blocks },
-        { value: "elements", label: "Blocks", icon: Sparkles },
+        { value: "ui", label: "UI", icon: Blocks },
         { value: "blocks", label: "My blocks", icon: Bookmark },
       ]} />
-      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section}...`} />
+      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : "blocks"}...`} />
       <div className="space-y-2">
         <span className="text-xs text-selector-subtle">Visual theme</span>
         <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
       </div>
 
-      {/* Elements Section */}
-      {section === "elements" && (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-              Blocks ({filteredElements.length})
-            </span>
-          </div>
-          <OptionGrid label="Charts and quiz" options={filteredElements.map(e => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))} onChange={label => { const preset = filteredElements.find(e => e.label === label); if (preset) add(preset.create()); }} />
+      {/* Charts & quiz presets now live inside the UI tab */}
 
-          {pluginWidgets.length > 0 && (
-            <div className="mt-3 flex flex-col gap-2">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500 uppercase">
-                <Puzzle className="size-3" /> Plugin blocks ({pluginWidgets.length})
-              </span>
-              <OptionGrid
-                label="Plugin widgets"
-                options={pluginWidgets.map(({ key, pluginName, widget }) => ({
-                  value: key,
-                  label: widget.name,
-                  icon: Puzzle,
-                  title: widget.description || `from ${pluginName}`,
-                }))}
-                onChange={(key) => {
-                  const entry = pluginWidgets.find((w) => w.key === key);
-                  if (entry) addGroup(instantiateWidget(entry.widget));
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* My blocks — save the current selection and reuse it everywhere */}
+      {/* My blocks — save the current selection and reuse it everywhere.
+          Widget packs (imported in Add-ons) are inserted from here too. */}
       {section === "blocks" && (
         <div className="flex flex-col gap-3">
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
@@ -401,11 +367,35 @@ export function ComponentsPanel() {
               </div>
             ))}
           </div>
+          {/* Widget packs — imported via Add-ons, inserted from My blocks */}
+          {pluginWidgets.length > 0 && (
+            <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500 uppercase">
+                <Puzzle className="size-3" /> Widget packs ({pluginWidgets.length})
+              </span>
+              <OptionGrid
+                label="Plugin widgets"
+                options={pluginWidgets.map(({ key, pluginName, widget }) => ({
+                  value: key,
+                  label: widget.name,
+                  icon: Puzzle,
+                  title: widget.description || `from ${pluginName}`,
+                }))}
+                onChange={(key) => {
+                  const entry = pluginWidgets.find((w) => w.key === key);
+                  if (entry) addGroup(instantiateWidget(entry.widget));
+                }}
+              />
+              <p className="text-[9px] leading-snug text-slate-400">
+                Import more packs from the Add-ons panel — they appear here.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Grid of UI Components / Interfaces */}
-      {(section === "interfaces" || section === "ui") && (
+      {/* Grid of UI components — widgets & frames merged */}
+      {section === "ui" && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
@@ -456,6 +446,23 @@ export function ComponentsPanel() {
               No components match &ldquo;{search}&rdquo;
             </div>
           )}
+
+          {/* Charts & quiz — former "Blocks" tab now folded into UI */}
+          <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3">
+            <span className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+                Charts &amp; quiz ({filteredElements.length})
+              </span>
+            </span>
+            <OptionGrid
+              label="Charts and quiz"
+              options={filteredElements.map((e) => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))}
+              onChange={(label) => {
+                const preset = filteredElements.find((e) => e.label === label);
+                if (preset) add(preset.create());
+              }}
+            />
+          </div>
         </div>
       )}
     </div>
