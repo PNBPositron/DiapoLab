@@ -81,7 +81,7 @@ export function PluginsPanel() {
         icon={Puzzle}
       />
 
-      {/* Image Studio — full Photopea integration (advanced editing, not just filters).
+      {/* Image Studio — full PhotoSplice integration (advanced editing, not just filters).
           Same card style & grid as the import buttons below. */}
       <div className="px-4">
         <button
@@ -91,7 +91,7 @@ export function PluginsPanel() {
           <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
             <WandSparkles className="size-3.5" />
           </span>
-          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur avancé (Photopea)</span>
+          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur avancé (PhotoSplice)</span>
           <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
@@ -323,7 +323,7 @@ export function PluginsPanel() {
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
 
-      {/* Advanced image editor (Photopea) */}
+      {/* Advanced image editor (PhotoSplice) */}
       {studioOpen && <ImageStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
 
       {/* Import dialog */}
