@@ -3,6 +3,18 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { brokeredPreviewStorage } from "./previewAuthStorage";
 
+// Supabase's Navigator LockManager can fail immediately in presentation mode
+// when the editor and its preview surface request the same auth lock at once.
+// Keep auth operations serialized within this client without rejecting a valid
+// request because another surface briefly owns the browser lock.
+let authLock = Promise.resolve();
+
+function serializeAuth<T>(_name: string, _acquireTimeout: number, fn: () => Promise<T>): Promise<T> {
+  const run = authLock.then(fn, fn);
+  authLock = run.then(() => undefined, () => undefined);
+  return run;
+}
+
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
@@ -38,6 +50,7 @@ function createSupabaseClient() {
       storage: brokeredPreviewStorage(),
       persistSession: true,
       autoRefreshToken: true,
+      lock: serializeAuth,
     },
   });
 }

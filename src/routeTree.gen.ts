@@ -23,6 +23,7 @@ import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as TIdRouteImport } from './routes/t.$id'
+import { Route as VKeyRouteImport } from './routes/v.$key'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const IndexRoute = IndexRouteImport.update({
@@ -95,6 +96,11 @@ const TIdRoute = TIdRouteImport.update({
   path: '/t/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VKeyRoute = VKeyRouteImport.update({
+  id: '/v/$key',
+  path: '/v/$key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
+  '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
+  '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/t/$id': typeof TIdRoute
+  '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
+    | '/v/$key'
     | '/.lovable/oauth/consent'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
+    | '/v/$key'
     | '/.lovable/oauth/consent'
   id:
     | '__root__'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/api/slide-analysis'
     | '/auth/callback'
     | '/t/$id'
+    | '/v/$key'
     | '/.lovable/oauth/consent'
   fileRoutesById: FileRoutesById
 }
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
   TIdRoute: typeof TIdRoute
+  VKeyRoute: typeof VKeyRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/v/$key': {
+      id: '/v/$key'
+      path: '/v/$key'
+      fullPath: '/v/$key'
+      preLoaderRoute: typeof VKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -358,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
   TIdRoute: TIdRoute,
+  VKeyRoute: VKeyRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
