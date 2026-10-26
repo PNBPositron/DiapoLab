@@ -620,6 +620,8 @@ export type Page = {
   bgFit?: BgFit;
   transition?: SlideTransition;
   transitionZoom?: number; // starting scale of the zoom transition (0.5–2)
+  /** presenter notes — shown in presenter view, never on the slide */
+  notes?: string;
 };
 
 export const DEFAULT_W = 1920;
@@ -686,6 +688,7 @@ type State = {
   setBgImage: (src: string | undefined, fit?: BgFit) => void;
   setTransition: (t: SlideTransition) => void;
   setTransitionZoom: (zoom: number) => void;
+  setNotes: (notes: string) => void;
   setCanvasSize: (w: number, h: number) => void;
   magicResize: (w: number, h: number) => void;
   applyBrandKit: (
@@ -1504,6 +1507,7 @@ export const useEditor = create<State>((set, get) => {
       pushHistory();
       updateCurrentPage((p) => ({ ...p, transitionZoom: Math.max(0.5, Math.min(2, zoom)) }));
     },
+    setNotes: (notes) => updateCurrentPage((p) => ({ ...p, notes })),
     undo: () => {
       const { history, future } = get();
       if (history.length === 0) return;
@@ -1576,6 +1580,7 @@ export const useEditor = create<State>((set, get) => {
         id: uid(),
         bgColor: src.bgColor,
         duration: src.duration,
+        notes: src.notes,
         elements: src.elements.map((e) => ({ ...e, id: uid() })),
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
