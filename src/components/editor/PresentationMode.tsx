@@ -117,6 +117,12 @@ export function PresentationMode() {
 
   if (!presenting || !page) return null;
 
+  // Shared and older designs may omit background fields. Presentation must
+  // still render those pages instead of throwing while the overlay mounts.
+  const pageBgColor = typeof page.bgColor === "string" ? page.bgColor : "#ffffff";
+  const backdropBgColor = backdropPage && typeof backdropPage.bgColor === "string"
+    ? backdropPage.bgColor
+    : "#ffffff";
   const morphing = page.transition === "morph";
   const motionTransitionNames = new Set(["tv", "neon", "cube", "prism", "origami"]);
   const transition =
@@ -155,13 +161,13 @@ export function PresentationMode() {
                   {
                     width: canvasW,
                     height: canvasH,
-                    backgroundColor: backdropPage.bgColor.includes("gradient(")
+                    backgroundColor: backdropBgColor.includes("gradient(")
                       ? "#0a0f1f"
-                      : backdropPage.bgColor,
+                      : backdropBgColor,
                     backgroundImage: backdropPage.bgImage
                       ? `url(${backdropPage.bgImage})`
-                      : backdropPage.bgColor.includes("gradient(")
-                        ? backdropPage.bgColor
+                      : backdropBgColor.includes("gradient(")
+                        ? backdropBgColor
                         : undefined,
                     backgroundSize: backdropPage.bgFit ?? "cover",
                     backgroundPosition: "center",
@@ -189,11 +195,11 @@ export function PresentationMode() {
                   {
                     width: canvasW,
                     height: canvasH,
-                    backgroundColor: page.bgColor.includes("gradient(") ? "#0a0f1f" : page.bgColor,
+                    backgroundColor: pageBgColor.includes("gradient(") ? "#0a0f1f" : pageBgColor,
                     backgroundImage: page.bgImage
                       ? `url(${page.bgImage})`
-                      : page.bgColor.includes("gradient(")
-                        ? page.bgColor
+                      : pageBgColor.includes("gradient(")
+                        ? pageBgColor
                         : undefined,
                     backgroundSize: page.bgFit ?? "cover",
                     backgroundPosition: "center",
