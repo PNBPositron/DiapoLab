@@ -7,6 +7,13 @@ import { SlideThumbnail } from "./SlideThumbnail";
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
 import type { AnyElement } from "@/store/editor";
 
+export function requestPresentationFullscreen(target: Element = document.documentElement) {
+  if (document.fullscreenElement || !target.requestFullscreen) return;
+  void target.requestFullscreen({ navigationUI: "hide" }).catch(() => {
+    // Fullscreen can be denied by an embedded preview; the presentation overlay remains usable.
+  });
+}
+
 export function PresentationMode() {
   const { presenting, setPresenting, pages, currentIndex, setCurrentPage, canvasW, canvasH } =
     useEditor();
@@ -76,6 +83,7 @@ export function PresentationMode() {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenting, canvasW, canvasH]);
@@ -138,6 +146,14 @@ export function PresentationMode() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
       <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center">
+        <button
+          type="button"
+          onClick={() => requestPresentationFullscreen()}
+          className="absolute right-4 top-4 z-[70] rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white/80 backdrop-blur transition hover:bg-black/50 hover:text-white"
+          aria-label="Enter fullscreen presentation"
+        >
+          Fullscreen
+        </button>
         <div
           className="brutal-shadow-lg relative shrink-0"
           style={

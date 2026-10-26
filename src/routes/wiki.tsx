@@ -46,6 +46,7 @@ const SECTIONS = [
   { id: "getting-started", label: "Getting started", icon: <Sparkles className="size-3.5" /> },
   { id: "formats", label: "Canvas formats", icon: <MonitorPlay className="size-3.5" /> },
   { id: "panels", label: "Panels", icon: <LayoutGrid className="size-3.5" /> },
+  { id: "addons", label: "Add-ons", icon: <Braces className="size-3.5" /> },
   { id: "palette", label: "Command palette", icon: <Command className="size-3.5" /> },
   { id: "ai", label: "AI slideshow JSON", icon: <Braces className="size-3.5" /> },
   { id: "shortcuts", label: "Shortcuts", icon: <Keyboard className="size-3.5" /> },
@@ -198,6 +199,28 @@ function Wiki() {
                 </div>
               ))}
             </div>
+          </Section>
+
+          <Section
+            id="addons"
+            icon={<Braces className="size-4" />}
+            kicker="Extend DiapoLab"
+            title="Build an add-on app or widget pack"
+          >
+            <p>
+              Add-ons are small, importable JavaScript snippets. An <strong>app</strong> opens a focused tool such as Paint or Video; a <strong>pack</strong> adds reusable groups of canvas elements. Open <strong>Add-ons → Import app code</strong> or <strong>Import pack code</strong> and paste the code into the editor.
+            </p>
+            <div className="mt-4 grid gap-3 lg:grid-cols-2">
+              <CodeCard title="app.js" code={`diapolabApp({\n  name: "Color notes",\n  description: "A tiny creative helper",\n  apps: [{\n    name: "Notes", type: "paint",\n    description: "Sketch a note",\n    config: { width: 800, height: 500 }\n  }]\n})`} />
+              <CodeCard title="pack.js" code={`diapolabPack({\n  name: "Brand blocks",\n  widgets: [{\n    name: "Callout",\n    description: "A reusable highlight",\n    elements: [/* canvas elements */]\n  }]\n})`} />
+            </div>
+            <ol className="mt-4 list-decimal space-y-1.5 pl-5">
+              <li>Give every app, widget, and element a clear name and unique id.</li>
+              <li>Keep app configuration serializable; do not access private account data.</li>
+              <li>Test with <strong>Load sample</strong>, import the snippet, then open it from the Add-ons panel.</li>
+              <li>Use <strong>Copy code</strong> to share a working app or pack with your team.</li>
+            </ol>
+            <Callout icon={<Braces className="size-3.5" />}>Start from the sample code in the import dialog, then change one field at a time. Apps are local tools and packs are insertable canvas presets.</Callout>
           </Section>
 
           <Section
@@ -415,6 +438,15 @@ function Section({
       <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
       <div className="mt-3 space-y-2.5 text-sm leading-relaxed text-slate-600">{children}</div>
     </section>
+  );
+}
+
+function CodeCard({ title, code }: { title: string; code: string }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+      <div className="border-b border-slate-800 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-blue-300">{title}</div>
+      <pre className="overflow-x-auto p-3 text-[10px] leading-relaxed text-slate-300"><code>{code}</code></pre>
+    </div>
   );
 }
 
