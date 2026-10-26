@@ -31,7 +31,7 @@ import {
   MapPin,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newEmbed, newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
+import { newEmbed, toEmbedSrc, newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { prepareImage } from "@/lib/image-assets";
 import { PanelHeader, ChipGroup } from "../ui/selectors";
@@ -763,14 +763,14 @@ export function ElementsPanel() {
           </label>
           <button
             type="button"
-            disabled={!embedUrl.trim()}
+            disabled={!toEmbedSrc(embedUrl)}
             onClick={() => {
               add(newEmbed(embedUrl));
               setEmbedUrl("");
             }}
             className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-40"
           >
-            Add embed to canvas
+            {embedUrl.trim() && !toEmbedSrc(embedUrl) ? "Lien invalide — vérifiez l'URL" : "Add embed to canvas"}
           </button>
           <div className="grid grid-cols-3 gap-1.5 pt-1">
             <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><Youtube className="size-4" /><span className="text-[8px] font-medium">YouTube</span></div>
