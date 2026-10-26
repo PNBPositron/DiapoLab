@@ -956,10 +956,16 @@ export const newButton = (overrides: Partial<ButtonElement> = {}): ButtonElement
 // Normalize a user-pasted URL into an embeddable iframe src.
 // Supports YouTube watch/share, Vimeo, and passes through valid iframe URLs.
 export function toEmbedSrc(raw: string): string {
-  const s = (raw || "").trim();
+  let s = (raw || "").trim();
   if (!s) return "";
+  // Accept links pasted without a scheme ("youtube.com/watch?v=…"). Without
+  // this the iframe would resolve the src relative to the app itself and
+  // show DiapoLab's own 404 page.
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) s = "https://" + s.replace(/^\/+/, "");
   try {
     const u = new URL(s);
+    // Reject hostnames that can't point at a real site ("my video", "hello").
+    if (!u.hostname.includes(".")) return "";
     const host = u.hostname.replace(/^www\./, "");
     // YouTube
     if (host === "youtube.com" || host === "m.youtube.com") {
