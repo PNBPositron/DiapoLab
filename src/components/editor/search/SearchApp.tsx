@@ -155,11 +155,36 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
     if (capturing) return;
     setCapturing(true);
     try {
-      const node = preview?.mode === "iframe"
-        ? iframeRef.current?.contentDocument?.body
-        : articleRef.current;
-      if (!node) throw new Error("nothing to capture");
-      const dataUrl = await toPng(node, { pixelRatio: 2, backgroundColor: "#ffffff" });
+      let dataUrl: string | null = null;
+      // 1) Server-side rendered screenshot — a real browser capture of the page,
+      //    independent of the iframe's cross-origin CSS limits.
+      try {
+        const response = await fetch("/api/context-shot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: preview.url }),
+        });
+        const payload = await response.json();
+        if (
+          response.ok &&
+          typeof payload?.dataUrl === "string" &&
+          payload.dataUrl.startsWith("data:image/")
+        ) {
+          dataUrl = payload.dataUrl;
+        }
+      } catch {
+        // fall back to the local snapshot below
+      }
+      // 2) Fallback: snapshot the rendered preview DOM locally.
+      if (!dataUrl) {
+        const node = preview.mode === "iframe"
+          ? iframeRef.current?.contentDocument?.body
+          : articleRef.current;
+        if (node) {
+          dataUrl = await toPng(node, { pixelRatio: 2, backgroundColor: "#ffffff" });
+        }
+      }
+      if (!dataUrl) throw new Error("nothing to capture");
       const dims = await new Promise<{ w: number; h: number }>((resolve) => {
         const img = new Image();
         img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
