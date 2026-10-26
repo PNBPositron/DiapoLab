@@ -25,6 +25,7 @@ import {
   Map,
   Kanban,
   LayoutGrid,
+  Waves,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newIcon, newImage, newVideo, newShape, newText, useEditor, UI_STYLE_THEMES, type AnyElement, type ShapeElement, type ShapeGradient, type UiStyle } from "@/store/editor";
@@ -55,6 +56,12 @@ const POPULAR_ICON_NAMES = [
   "Store", "Table2", "Tablet", "Terminal", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "TriangleAlert",
   "Truck", "Tv", "Umbrella", "Unlock", "UserCheck", "UserPlus", "WalletCards", "Wifi", "Wind", "Wrench",
   "Accessibility", "BadgeAlert", "Blocks", "Brain", "CalendarCheck", "ChartNoAxesCombined", "CircleUserRound", "CloudCog", "Combine", "FileChartColumn", "FolderGit2", "Gauge", "Infinity", "Kanban", "ListTree", "MessageCircleMore", "Milestone", "Orbit", "PackageCheck", "PanelsTopLeft", "Pointer", "Puzzle", "QrCode", "Receipt", "ScanSearch", "SquareDashedKanban", "Workflow", "Waypoints",
+  "Atom", "Bird", "Bike", "Boat", "Bug", "Bus", "Car", "Cherry", "Clapperboard", "Cookie", "Croissant",
+  "Dumbbell", "Feather", "Fish", "Flame", "Flower2", "Ghost", "Guitar", "Hand", "Highlighter", "Hourglass",
+  "Keyboard", "Leaf", "Locate", "Magnet", "Medal", "Microscope", "Mouse", "Music", "Navigation", "Package",
+  "Paintbrush", "PawPrint", "Pen", "PiggyBank", "Plane", "Plant", "Popcorn", "Quote", "Radar", "Recycle",
+  "Sailboat", "Scale", "Sigma", "Shirt", "Snowflake", "Stamp", "SunMoon", "Telescope", "Tent", "Trees",
+  "Volleyball", "Wand", "Watch", "Waves",
 ] as const;
 
 const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_ICON_NAMES.flatMap((name) => {
@@ -81,7 +88,8 @@ type FlowKind =
   | "rings"
   | "roadmap"
   | "kanban"
-  | "matrix";
+  | "matrix"
+  | "swimlane";
 
 /** Second accent used for modern gradient fills, per Presets theme. */
 const FLOW_ACCENT2: Record<UiStyle, string> = {
@@ -116,10 +124,11 @@ const FLOWCRAFT_META: Record<FlowKind, { label: string; description: string; Ico
   roadmap: { label: "Roadmap", description: "Now / Next / Later horizons", Icon: Map },
   kanban: { label: "Kanban", description: "Three columns of work cards", Icon: Kanban },
   matrix: { label: "2x2 matrix", description: "Quadrants by impact and effort", Icon: LayoutGrid },
+  swimlane: { label: "Swimlanes", description: "Three lanes of owned tasks", Icon: Waves },
 };
 
 const FLOWCRAFT_SECTIONS: Array<{ label: string; kinds: FlowKind[] }> = [
-  { label: "Flows", kinds: ["process", "funnel", "cycle", "journey"] },
+  { label: "Flows", kinds: ["process", "funnel", "cycle", "journey", "swimlane"] },
   { label: "Structures", kinds: ["pyramid", "orgchart", "pillars", "layers"] },
   { label: "Networks", kinds: ["hub", "mindmap", "venn", "rings"] },
   { label: "Plans", kinds: ["timeline", "roadmap", "kanban", "matrix"] },
@@ -465,6 +474,33 @@ function buildFlowCraft(kind: FlowKind, style: UiStyle): AnyElement[] {
     return els;
   }
 
+  if (kind === "swimlane") {
+    const lanes: Array<[string, Array<[string, string]>]> = [
+      ["Discover", [["Interviews", "12 chats"], ["Survey", "430 answers"], ["Insights", "Top 3 pains"]]],
+      ["Design", [["Wireframes", "Lo-fi pass"], ["Prototype", "Clickable"], ["Test", "5 users"]]],
+      ["Deliver", [["Build", "Sprints 1–3"], ["Ship", "Beta launch"], ["Measure", "Adoption +18%"]]],
+    ];
+    const laneW = 1700, laneH = 250, laneGap = 30, startY = 140;
+    lanes.forEach(([lane, tasks], li) => {
+      const y = startY + li * (laneH + laneGap);
+      els.push(
+        newShape("rect", { x: 110, y, width: laneW, height: laneH, fill: p.soft, stroke: p.border, strokeWidth: p.strokeWidth, cornerRadius: 22 }),
+        newShape("capsule", { x: 140, y: y + laneH / 2 - 40, width: 230, height: 80, fill: p.accent, stroke: p.border, strokeWidth: p.strokeWidth }),
+        newText({ x: 155, y: y + laneH / 2 - 14, width: 200, height: 50, text: lane, fontSize: 28, color: p.onAccent, fontWeight: 900, align: "center", fontFamily: p.font }),
+      );
+      tasks.forEach(([title, sub], ti) => {
+        const x = 430 + ti * 440;
+        els.push(
+          newShape("rect", { x, y: y + 40, width: 380, height: 170, fill: "#ffffff", stroke: p.border, strokeWidth: Math.max(1, p.strokeWidth - 1), cornerRadius: 18 }),
+          newShape("circle", { x: x + 26, y: y + 66, width: 22, height: 22, fill: p.accent, stroke: p.accent, strokeWidth: 0 }),
+          newText({ x: x + 62, y: y + 58, width: 300, height: 50, text: title, fontSize: 24, color: p.ink, fontWeight: 800, align: "left", fontFamily: p.font }),
+          newText({ x: x + 62, y: y + 112, width: 300, height: 46, text: sub, fontSize: 18, color: p.ink, fontWeight: 500, align: "left", fontFamily: p.font }),
+        );
+      });
+    });
+    return els;
+  }
+
   // mindmap
   const cx = 960, cy = 540;
   const branches: Array<[string, number]> = [
@@ -677,7 +713,7 @@ export function ElementsPanel() {
         <div className="space-y-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><GitBranch className="size-4 text-blue-600" /> FlowCraft diagrams</div>
-            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">16 diagrams</span>
+            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">17 diagrams</span>
           </div>
           <p className="text-[10px] leading-relaxed text-slate-500">Drop a connected visual story built from editable shapes, gradients and labels.</p>
           <div className="space-y-1.5">
