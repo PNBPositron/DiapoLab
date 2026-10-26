@@ -81,8 +81,8 @@ export function PluginsPanel() {
         icon={Puzzle}
       />
 
-      {/* Image Studio — full PhotoSplice integration (advanced editing, not just filters).
-          Same card style & grid as the import buttons below. */}
+      {/* Image Studio — DiapoLab's own built-in image editor (brush, eraser,
+          crop, rotate/flip, live adjustments). Same card style as the import buttons. */}
       <div className="px-4">
         <button
           onClick={() => setStudioOpen(true)}
@@ -91,7 +91,7 @@ export function PluginsPanel() {
           <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
             <WandSparkles className="size-3.5" />
           </span>
-          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur avancé (PhotoSplice)</span>
+          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur d'images intégré</span>
           <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
@@ -323,7 +323,7 @@ export function PluginsPanel() {
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
 
-      {/* Advanced image editor (PhotoSplice) */}
+      {/* Built-in image editor */}
       {studioOpen && <ImageStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
 
       {/* Import dialog */}
