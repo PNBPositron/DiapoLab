@@ -83,6 +83,28 @@ export function PresentationMode() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenting, canvasW, canvasH]);
 
+  // Explicit outgoing-slide backdrop: while a transition plays, the previous
+  // slide stays painted under the entering one (instead of the empty frame),
+  // then it is cleared. Independent of AnimatePresence exit behavior.
+  const [backdropIndex, setBackdropIndex] = useState<number | null>(null);
+  const prevIndexRef = useRef(currentIndex);
+  useEffect(() => {
+    if (prevIndexRef.current === currentIndex) return;
+    const prevIndex = prevIndexRef.current;
+    prevIndexRef.current = currentIndex;
+    const prev = pages[prevIndex];
+    const incoming = pages[currentIndex];
+    if (!prev || !incoming || incoming.transition === "morph" || incoming.transition === "none") {
+      setBackdropIndex(null);
+      return;
+    }
+    setBackdropIndex(prevIndex);
+    const t = setTimeout(() => setBackdropIndex(null), 1000);
+    return () => clearTimeout(t);
+  }, [currentIndex, pages]);
+
+  const backdropPage = backdropIndex !== null ? pages[backdropIndex] : undefined;
+
   if (!presenting || !page) return null;
 
   const morphing = page.transition === "morph";
@@ -114,12 +136,40 @@ export function PresentationMode() {
             className="absolute left-0 top-0 overflow-hidden border border-teal"
             style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
           >
+            {backdropPage && (
+              <div
+                key={`backdrop-${backdropIndex}`}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden"
+                style={
+                  {
+                    width: canvasW,
+                    height: canvasH,
+                    backgroundColor: backdropPage.bgColor.includes("gradient(")
+                      ? "#0a0f1f"
+                      : backdropPage.bgColor,
+                    backgroundImage: backdropPage.bgImage
+                      ? `url(${backdropPage.bgImage})`
+                      : backdropPage.bgColor.includes("gradient(")
+                        ? backdropPage.bgColor
+                        : undefined,
+                    backgroundSize: backdropPage.bgFit ?? "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  } as React.CSSProperties
+                }
+              >
+                {backdropPage.elements.map((el) => (
+                  <CanvasElement key={el.id} element={el} scale={scale} preview />
+                ))}
+              </div>
+            )}
             <AnimatePresence initial mode="sync">
               <motion.div
                 key={`slide-${currentIndex}-${page.transition ?? "none"}`}
                 initial={preset.initial}
                 animate={preset.animate}
-                exit={{ opacity: 1, transition: { duration: morphing ? 0 : 0.95 } }}
+                exit={{ opacity: 1, transition: { duration: 0 } }}
                 transition={preset.transition as never}
                 onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
                 className={`absolute left-0 top-0 h-full w-full cursor-pointer overflow-hidden ${transition}${
