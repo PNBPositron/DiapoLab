@@ -12,7 +12,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { newImage, useEditor } from "@/store/editor";
-import { ImageDown, Loader2, WandSparkles, RefreshCw, X } from "lucide-react";
+import { ImageDown, Loader2, WandSparkles, RefreshCw } from "lucide-react";
 
 const PHOTOPEA_ORIGIN = "https://www.photopea.com";
 
@@ -138,14 +138,14 @@ export function ImageStudioDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[92vh] max-w-[96vw] flex-col gap-0 border-slate-800 bg-slate-950 p-0 text-slate-100">
-        <DialogHeader className="flex flex-row items-center justify-between border-b border-slate-800 bg-gradient-to-r from-slate-900 to-slate-950 px-5 py-3">
-          <DialogTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-100">
+      <DialogContent className="flex h-[92vh] max-w-[96vw] flex-col gap-0 border-slate-200 bg-white p-0 text-slate-900 shadow-2xl">
+        <DialogHeader className="flex flex-row items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3">
+          <DialogTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-800">
             <span className="grid size-7 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
               <WandSparkles className="size-3.5" />
             </span>
             Image Studio
-            <span className="rounded-md bg-slate-800 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="rounded-md bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
               Photopea
             </span>
           </DialogTitle>
@@ -155,48 +155,40 @@ export function ImageStudioDialog({
                 type="button"
                 onClick={openSelectedInStudio}
                 title="Recharger Photopea avec l'image sélectionnée sur la slide"
-                className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-slate-200 transition hover:border-slate-500"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-sky-500 hover:text-sky-700"
               >
                 <RefreshCw className="size-3" /> Ouvrir l'image sélectionnée
               </button>
             ) : (
-              <span className="max-w-[320px] truncate text-[10px] text-slate-500">
+              <span className="max-w-[320px] truncate text-[10px] text-slate-400">
                 Astuce : sélectionnez une image sur la slide avant d'ouvrir le studio pour la précharger
               </span>
             )}
             <button
               type="button"
               onClick={importToCanvas}
-              className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-fuchsia-600 to-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white transition hover:brightness-110"
+              className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-fuchsia-600 to-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow-md transition hover:brightness-110"
             >
               <ImageDown className="size-3.5" /> Importer sur le canvas
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              aria-label="Fermer le studio"
-              className="grid size-7 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-white"
-            >
-              <X className="size-4" />
             </button>
           </div>
         </DialogHeader>
 
-        <div className="relative flex-1 overflow-hidden bg-slate-900">
+        <div className="relative flex-1 overflow-hidden bg-slate-100">
           <iframe
             ref={iframeRef}
             src={studioSrc}
             title="Photopea — éditeur d'image avancé"
             allow="clipboard-read; clipboard-write; fullscreen"
             onLoad={() => setLoaded(true)}
-            className="h-full w-full border-0"
+            className="h-full w-full border-0 bg-white"
           />
           {!loaded && (
-            <div className="absolute inset-0 grid place-items-center bg-slate-950">
-              <div className="flex flex-col items-center gap-3 text-slate-400">
+            <div className="absolute inset-0 grid place-items-center bg-white">
+              <div className="flex flex-col items-center gap-3 text-slate-500">
                 <Loader2 className="size-6 animate-spin" />
                 <p className="text-xs">Chargement de Photopea…</p>
-                <p className="max-w-[420px] text-center text-[10px] leading-relaxed text-slate-500">
+                <p className="max-w-[420px] text-center text-[10px] leading-relaxed text-slate-400">
                   Édition avancée : calques, sélections, masques, filtres, texte, retouche.
                   Nécessite une connexion internet. « File → Save » ou « Importer sur le canvas »
                   renvoie l'image sur la slide.
@@ -207,7 +199,7 @@ export function ImageStudioDialog({
         </div>
 
         {status && (
-          <div className="border-t border-slate-800 bg-slate-900 px-5 py-2 text-center text-[11px] font-medium text-slate-300">
+          <div className="border-t border-slate-200 bg-slate-50 px-5 py-2 text-center text-[11px] font-medium text-slate-600">
             {status}
           </div>
         )}
