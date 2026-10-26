@@ -80,12 +80,23 @@ export function PresentationMode() {
     };
     window.addEventListener("keydown", onKey);
 
+    // Leaving browser fullscreen (Escape / F11) must also leave presentation —
+    // the Escape keydown is consumed by the browser and never reaches the
+    // page, so the overlay would otherwise keep playing as an in-window copy.
+    const onFsChange = () => {
+      if (!document.fullscreenElement && useEditor.getState().presenting) {
+        setPresenting(false);
+      }
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
+      document.removeEventListener("fullscreenchange", onFsChange);
       document.body.style.overflow = prev;
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
