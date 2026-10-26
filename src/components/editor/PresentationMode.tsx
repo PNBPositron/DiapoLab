@@ -7,6 +7,17 @@ import { SlideThumbnail } from "./SlideThumbnail";
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
 import type { AnyElement } from "@/store/editor";
 
+export async function requestPresentationFullscreen(target: Element = document.documentElement) {
+  if (document.fullscreenElement) return true;
+  if (!target.requestFullscreen) return false;
+  try {
+    await target.requestFullscreen({ navigationUI: "hide" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function PresentationMode() {
   const { presenting, setPresenting, pages, currentIndex, setCurrentPage, canvasW, canvasH } =
     useEditor();
@@ -76,6 +87,7 @@ export function PresentationMode() {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenting, canvasW, canvasH]);

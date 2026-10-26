@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useEditor, type Page } from "@/store/editor";
-import { PresentationMode } from "@/components/editor/PresentationMode";
+import { PresentationMode, requestPresentationFullscreen } from "@/components/editor/PresentationMode";
 import { Loader2, Link2Off, Play, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/t/$id")({
@@ -117,7 +117,10 @@ function SharedTemplate() {
             </div>
             <button
               disabled={!ready}
-              onClick={() => useEditor.getState().setPresenting(true)}
+              onClick={() => {
+                requestPresentationFullscreen();
+                useEditor.getState().setPresenting(true);
+              }}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_14px_32px_-10px_rgba(37,99,235,0.55)] transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
               {ready ? <Play className="size-4 fill-white" /> : <Loader2 className="size-4 animate-spin" />}

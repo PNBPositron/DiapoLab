@@ -19,6 +19,7 @@ import { Route as PrivacypolicyRouteImport } from './routes/privacypolicy'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as WikiRouteImport } from './routes/wiki'
+import { Route as ApiContextSearchRouteImport } from './routes/api.context-search'
 import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -76,6 +77,11 @@ const WikiRoute = WikiRouteImport.update({
   path: '/wiki',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiContextSearchRoute = ApiContextSearchRouteImport.update({
+  id: '/api/context-search',
+  path: '/api/context-search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLlamaparseRoute = ApiLlamaparseRouteImport.update({
   id: '/api/llamaparse',
   path: '/api/llamaparse',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-search': typeof ApiContextSearchRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-search': typeof ApiContextSearchRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-search': typeof ApiContextSearchRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-search'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-search'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-search'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WikiRoute: typeof WikiRoute
+  ApiContextSearchRoute: typeof ApiContextSearchRoute
   ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
   TIdRoute: typeof TIdRoute
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WikiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/context-search': {
+      id: '/api/context-search'
+      path: '/api/context-search'
+      fullPath: '/api/context-search'
+      preLoaderRoute: typeof ApiContextSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/llamaparse': {
       id: '/api/llamaparse'
       path: '/api/llamaparse'
@@ -375,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WikiRoute: WikiRoute,
+  ApiContextSearchRoute: ApiContextSearchRoute,
   ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
   TIdRoute: TIdRoute,
