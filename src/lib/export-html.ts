@@ -210,9 +210,18 @@ function renderButton(el: AnyEl): string {
 }
 
 function renderEmbed(el: AnyEl): string {
-  return '<iframe src="' + esc(el.src) + '" title="' + esc(el.title || 'Embed') +
+  const label = el.title || 'Web embed';
+  const card =
+    '<div class="embed-fallback" style="position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-sizing:border-box;padding:6%;background:linear-gradient(150deg,#101828 0%,#1d2939 100%);border:2px solid #344054;border-radius:14px;color:#fff;font-family:Inter,system-ui,sans-serif;text-align:center;overflow:hidden">' +
+    '<div style="font-size:64px;line-height:1">🌐</div>' +
+    '<div style="font-size:28px;font-weight:800">' + esc(label) + '</div>' +
+    '<div style="font-size:13px;color:#94a3b8;word-break:break-all;max-width:92%;line-height:1.5">' + esc(el.src) + '</div>' +
+    '<div style="margin-top:6px;border:2px solid #7df9ff;border-radius:999px;padding:6px 18px;font-size:12px;font-weight:700;color:#7df9ff;letter-spacing:0.08em">▶ OPEN LINK</div>' +
+    '</div>';
+  return '<div style="position:relative;width:100%;height:100%;background:#0a0f1f">' +
+    '<iframe class="embed-live" src="' + esc(el.src) + '" title="' + esc(el.title || 'Embed') +
     '" style="width:100%;height:100%;border:0" allow="' + esc(el.allow || 'autoplay; fullscreen; clipboard-write') +
-    '" allowfullscreen></iframe>';
+    '" allowfullscreen></iframe>' + card + '</div>';
 }
 
 function renderChart(el: AnyEl): string {
@@ -435,6 +444,8 @@ const PRINT_CSS = [
   'html,body{margin:0;padding:0;background:#fff}',
   '.slide{position:relative;overflow:hidden;break-after:page;page-break-after:always}',
   '.slide:last-child{break-after:auto;page-break-after:auto}',
+  /* Cross-origin iframes print blank — swap the live embed for its static card. */
+  '@media print{.embed-live{display:none!important}.embed-fallback{display:flex!important}}',
 ].join('\n');
 
 export function buildPrintHTML(design: InteractiveDesign): string {
