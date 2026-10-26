@@ -705,6 +705,9 @@ type State = {
   ) => void;
   setPresenting: (v: boolean) => void;
   setGuides: (g: { v: number[]; h: number[] }) => void;
+  /** id of the image element currently in interactive crop mode (double-click) */
+  croppingId: string | null;
+  setCroppingId: (id: string | null) => void;
   copySelected: () => void;
   paste: () => void;
   undo: () => void;
@@ -1245,6 +1248,7 @@ export const useEditor = create<State>((set, get) => {
     designId: null,
     designName: "untitled.design",
     guides: { v: [], h: [] },
+    croppingId: null,
     clipboard: null,
 
     setTool: (tool) => set({ tool }),
@@ -1341,6 +1345,7 @@ export const useEditor = create<State>((set, get) => {
     },
     setPresenting: (presenting) => set({ presenting }),
     setGuides: (guides) => set({ guides }),
+    setCroppingId: (croppingId) => set({ croppingId }),
     copySelected: () => {
       const { selectedId, elements } = get();
       if (!selectedId) return;
