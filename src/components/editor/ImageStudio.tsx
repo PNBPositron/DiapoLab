@@ -15,9 +15,9 @@
 //    (contours/relief/posterisation/seuil/solarisation/duotone/néon), Rétro
 //    (scanlines/CRT/VHS/Game Boy/tramage Bayer/entrelacé), Rendu (nuages/
 //    vignettage) — live preview + "Répéter le dernier filtre" (Ctrl+F)
-//  - .psd import (ag-psd): layers, opacity & visibility preserved, and the
-//    canvas adapts to the imported image size
-//  - Precise image resize (pixels), document crop, rotate 90°, flips
+//  - .psd import (ag-psd): layers (order preserved), opacity, visibility &
+//    blend modes preserved, and the canvas adapts to the imported image size
+//  - Layer blend modes (Produit, Incrustation, Densité couleur…)
 //  - Precise image resize (pixels), document crop, rotate 90°, flips
 //  - Undo / redo (document snapshots), PNG download, export to the slide
 
@@ -81,6 +81,7 @@ type BaseLayer = {
   name: string;
   visible: boolean;
   opacity: number; // 0..1
+  blend: string; // canvas globalCompositeOperation ("normal" = source-over)
   fx: Fx;
 };
 
@@ -125,6 +126,57 @@ type View = { zoom: number; x: number; y: number };
 type Snap = { w: number; h: number; selId: string | null; layers: unknown[] };
 type CropFrame = { x: number; y: number; w: number; h: number }; // doc px
 type MenuEntry = { label: string; action?: () => void; disabled?: boolean; sep?: boolean; sub?: MenuEntry[] };
+
+/** layer blend modes — canvas globalCompositeOperation values + French labels */
+const BLEND_MODES: Array<{ value: string; label: string }> = [
+  { value: "normal", label: "Normal" },
+  { value: "multiply", label: "Produit" },
+  { value: "screen", label: "Superposition" },
+  { value: "overlay", label: "Incrustation" },
+  { value: "darken", label: "Obscurcir" },
+  { value: "lighten", label: "Éclaircir" },
+  { value: "color-dodge", label: "Densité couleur −" },
+  { value: "color-burn", label: "Densité couleur +" },
+  { value: "hard-light", label: "Lumière dure" },
+  { value: "soft-light", label: "Lumière tamisée" },
+  { value: "difference", label: "Différence" },
+  { value: "exclusion", label: "Exclusion" },
+  { value: "hue", label: "Teinte" },
+  { value: "saturation", label: "Saturation" },
+  { value: "color", label: "Couleur" },
+  { value: "luminosity", label: "Luminosité" },
+  { value: "plus-lighter", label: "Addition" },
+];
+
+/** map ag-psd blend mode strings to canvas modes (unsupported ones fall back to normal) */
+const PSD_BLEND_MAP: Record<string, string> = {
+  normal: "normal",
+  dissolve: "normal",
+  darken: "darken",
+  multiply: "multiply",
+  "color burn": "color-burn",
+  "linear burn": "multiply",
+  "darker color": "darken",
+  lighten: "lighten",
+  screen: "screen",
+  "color dodge": "color-dodge",
+  "linear dodge": "plus-lighter",
+  "lighter color": "lighten",
+  overlay: "overlay",
+  "soft light": "soft-light",
+  "hard light": "hard-light",
+  "vivid light": "overlay",
+  "linear light": "hard-light",
+  "pin light": "hard-light",
+  "hard mix": "hard-light",
+  difference: "difference",
+  exclusion: "exclusion",
+  hue: "hue",
+  saturation: "saturation",
+  color: "color",
+  luminosity: "luminosity",
+  "pass through": "normal",
+};
 
 // ---------------------------------------------------------------------------
 // Filter engine (menu Filtre) — destructive filters with a live preview
@@ -1441,6 +1493,7 @@ export function ImageStudioDialog({
     name,
     visible: true,
     opacity: 1,
+    blend: "normal",
     fx: { ...DEFAULT_FX, curve: null },
   });
 
@@ -1604,7 +1657,7 @@ export function ImageStudioDialog({
         const psd = readPsd(buf);
         const pw = psd.width || 1;
         const ph = psd.height || 1;
-        type Pl = { canvas: HTMLCanvasElement; name: string; opacity: number; visible: boolean };
+        type Pl = { canvas: HTMLCanvasElement; name: string; opacity: number; visible: boolean; blend: string };
         const collected: Pl[] = [];
         const walk = (ls: any[]) => {
           for (const pl of ls) {
@@ -1616,7 +1669,7 @@ export function ImageStudioDialog({
             if (!cv) continue;
             const c = newCanvas(pw, ph);
             c.getContext("2d")!.drawImage(cv, pl.left ?? 0, pl.top ?? 0);
-            collected.push({ canvas: c, name: pl.name || "Calque", opacity: pl.opacity ?? 1, visible: !pl.hidden });
+            collected.push({ canvas: c, name: pl.name || "Calque", opacity: pl.opacity ?? 1, visible: !pl.hidden, blend: PSD_BLEND_MAP[pl.blendMode] ?? "normal" });
           }
         };
         if (psd.children && psd.children.length > 0) walk(psd.children);
@@ -1624,16 +1677,14 @@ export function ImageStudioDialog({
         if (collected.length > 0) {
           items = collected;
         } else if (psd.canvas) {
-          items = [{ canvas: psd.canvas, name: "Fond", opacity: 1, visible: true }];
+          items = [{ canvas: psd.canvas, name: "Fond", opacity: 1, visible: true, blend: "normal" }];
         } else {
           setStatus("Ce PSD ne contient pas de données d'image exploitables.");
           return;
         }
-        // psd.children is top-most first → reverse to bottom-first
-        const ls: Layer[] = items
-          .slice()
-          .reverse()
-          .map((it) => {
+        // ag-psd children are already ordered bottom-to-top (reader uses
+        // children.unshift while walking layers top-first) — keep that order.
+        const ls: Layer[] = items.map((it) => {
             const l: RasterLayer = {
               ...baseLayer(it.name),
               kind: "raster",
@@ -1644,6 +1695,7 @@ export function ImageStudioDialog({
             };
             l.opacity = it.opacity;
             l.visible = it.visible;
+            l.blend = it.blend;
             return l;
           });
         undoRef.current = [];
@@ -1714,6 +1766,8 @@ export function ImageStudioDialog({
     if (!l.visible || l.opacity <= 0) return;
     ctx.save();
     ctx.globalAlpha = l.opacity;
+    const blend = l.blend || "normal";
+    ctx.globalCompositeOperation = blend === "normal" ? "source-over" : blend;
     ctx.filter = filterCss(l.fx);
     if (l.kind === "raster") {
       ctx.drawImage(bakeRaster(l), l.x, l.y);
@@ -2340,28 +2394,70 @@ export function ImageStudioDialog({
     const reader = new FileReader();
     reader.onload = () => {
       const src = String(reader.result);
-      if (layersRef.current.length === 0) loadDocFromSrc(src);
-      else {
-        // add as a new layer on top of the current document
-        const im = new Image();
-        im.onload = () => {
-          const c = newCanvas(im.naturalWidth, im.naturalHeight);
-          c.getContext("2d")!.drawImage(im, 0, 0);
-          const l: RasterLayer = {
-            ...baseLayer(file.name.replace(/\.[^.]+$/, "")),
-            kind: "raster",
-            canvas: c,
-            x: 0,
-            y: 0,
-            version: 0,
-          };
-          setLayersBoth([...layersRef.current, l]);
-          setSelId(l.id);
-        };
-        im.src = src;
+      if (layersRef.current.length === 0) {
+        loadDocFromSrc(src);
+        return;
       }
+      // untouched blank document → the image becomes the document (canvas adapts)
+      const only = layersRef.current.length === 1 ? layersRef.current[0] : null;
+      const pristine =
+        only !== null &&
+        only.kind === "raster" &&
+        only.name === "Fond" &&
+        only.version === 0 &&
+        docW === 1280 &&
+        docH === 720;
+      if (pristine) {
+        loadDocFromSrc(src);
+        return;
+      }
+      // add as a new layer centered on the doc, then let the canvas adapt to the content
+      const im = new Image();
+      im.onload = () => {
+        const c = newCanvas(im.naturalWidth, im.naturalHeight);
+        c.getContext("2d")!.drawImage(im, 0, 0);
+        const l: RasterLayer = {
+          ...baseLayer(file.name.replace(/\.[^.]+$/, "")),
+          kind: "raster",
+          canvas: c,
+          x: Math.max(0, Math.round((docW - im.naturalWidth) / 2)),
+          y: Math.max(0, Math.round((docH - im.naturalHeight) / 2)),
+          version: 0,
+        };
+        setLayersBoth([...layersRef.current, l]);
+        setSelId(l.id);
+        fitDocToContent();
+      };
+      im.src = src;
     };
     reader.readAsDataURL(file);
+  };
+
+  /** shrink/grow the document so the canvas wraps exactly all layer content */
+  const fitDocToContent = () => {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const l of layersRef.current) {
+      const b = layerBBox(l);
+      if (!b) continue;
+      minX = Math.min(minX, b.x);
+      minY = Math.min(minY, b.y);
+      maxX = Math.max(maxX, b.x + b.w);
+      maxY = Math.max(maxY, b.y + b.h);
+    }
+    if (!isFinite(minX)) return;
+    const w = Math.max(1, Math.round(maxX - minX));
+    const h = Math.max(1, Math.round(maxY - minY));
+    pushHistory();
+    setLayersBoth(
+      layersRef.current.map((l) => ({ ...l, x: l.x - minX, y: l.y - minY }) as Layer),
+    );
+    setDocSize({ w, h });
+    setCrop(null);
+    fitView();
+    setStatus(`✓ Canvas ajusté au contenu (${w} × ${h} px)`);
   };
 
   const exportToCanvas = () => {
@@ -2435,6 +2531,7 @@ export function ImageStudioDialog({
     ],
     Image: [
       { label: "Taille de l'image…", action: openResize },
+      { label: "Ajuster le canvas au contenu", action: fitDocToContent },
       { label: "Recadrer selon le cadre", action: applyCrop, disabled: !crop || crop.w < 2 },
       { label: "Pivoter de 90°", action: rotateDoc, sep: true },
       { label: "Miroir horizontal", action: () => flipDoc("x") },
@@ -3020,6 +3117,29 @@ export function ImageStudioDialog({
                       </button>
                     </>
                   )}
+                </PanelSection>
+              )}
+
+              {/* blend mode of the selected layer */}
+              {sel && (
+                <PanelSection title={`Mode de fusion — ${sel.name}`}>
+                  <select
+                    value={sel.blend || "normal"}
+                    onChange={(e) => {
+                      pushSoon();
+                      patchLayer(sel.id, { blend: e.target.value } as Partial<Layer>);
+                    }}
+                    className="h-8 w-full cursor-pointer rounded border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 hover:border-fuchsia-300"
+                  >
+                    {BLEND_MODES.map((b) => (
+                      <option key={b.value} value={b.value}>
+                        {b.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-[9px] leading-relaxed text-slate-400">
+                    Appliqué entre ce calque et ceux situés en dessous, comme dans Photoshop.
+                  </p>
                 </PanelSection>
               )}
 
