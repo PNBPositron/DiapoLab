@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search, WandSparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -18,6 +18,7 @@ import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
 import { SearchAppDialog } from "../search/SearchApp";
+import { ImageStudioDialog } from "../ImageStudio";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -27,6 +28,7 @@ export function PluginsPanel() {
 
   const [importOpen, setImportOpen] = useState<null | "app" | "pack">(null);
   const [appOpen, setAppOpen] = useState<PluginApp | null>(null);
+  const [studioOpen, setStudioOpen] = useState(false);
   const [pluginCode, setPluginCode] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
@@ -78,6 +80,21 @@ export function PluginsPanel() {
         description="Interactive apps and widget packs — each pack ships its own importable code."
         icon={Puzzle}
       />
+
+      {/* Image Studio — full Photopea integration (advanced editing, not just filters) */}
+      <button
+        onClick={() => setStudioOpen(true)}
+        className="group mx-4 flex items-center gap-3 rounded-2xl border border-fuchsia-300/40 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-3 text-left shadow-[0_10px_30px_rgba(139,92,246,0.25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_rgba(139,92,246,0.4)] active:scale-[0.99]"
+      >
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white shadow-inner">
+          <WandSparkles className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-xs font-bold text-white">Image Studio <span className="rounded-md bg-white/10 px-1 py-px text-[8px] font-bold uppercase tracking-wider text-slate-300">Photopea</span></span>
+          <span className="block truncate text-[10px] leading-relaxed text-slate-400">Advanced image editor — layers, selections, masks, retouch. Import the result onto the slide.</span>
+        </span>
+        <Play className="size-3.5 shrink-0 text-fuchsia-400 transition-transform group-hover:translate-x-0.5" />
+      </button>
 
       {/* Import buttons — apps and packs each have their own code format */}
       <div className="grid grid-cols-2 gap-2 px-4">
@@ -305,6 +322,9 @@ export function PluginsPanel() {
         ) : (
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
+
+      {/* Advanced image editor (Photopea) */}
+      {studioOpen && <ImageStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
 
       {/* Import dialog */}
       <Dialog open={importOpen !== null} onOpenChange={(v) => !v && setImportOpen(null)}>
