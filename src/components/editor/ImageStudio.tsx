@@ -1,22 +1,24 @@
 // Image Studio — a real advanced image editor (layers, selections, masks,
-// filters, text, retouch…) powered by Photopea, embedded in a dialog.
+// filters, text, retouch…) powered by PhotoSplice (photosplice.com/web),
+// embedded in a dialog.
 //
-// Integration per the official Photopea API (photopea.com/api):
-//  - the iframe src is https://www.photopea.com#<encodeURIComponent(JSON)>
-//    with { files: [url], environment: { customIO: { save: "app.activeDocument.saveToOE('png');" } } }
-//  - Photopea posts files back to the parent (OE) as raw ArrayBuffers via
-//    postMessage (triggered by saveToOE or by File → Save)
-//  - we detect the format from the file's magic bytes and drop the image on
-//    the canvas as a new element.
+// PhotoSplice's web build exposes no embed/postMessage API (unlike Photopea):
+//  - the iframe simply loads https://photosplice.com/web
+//  - the user opens an image with File → Open inside PhotoSplice, edits it,
+//    then saves it (File → Save As) — the file lands in their Downloads
+//  - "Importer le résultat" picks that saved file and drops it on the canvas
+//    as a new element (format detected from the file's magic bytes)
+//  - a postMessage listener is kept anyway, in case PhotoSplice ships an
+//    embed API later
 
 import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { newImage, useEditor } from "@/store/editor";
-import { ImageDown, Loader2, WandSparkles, RefreshCw } from "lucide-react";
+import { ExternalLink, ImageDown, Loader2, WandSparkles } from "lucide-react";
 
-const PHOTOPEA_ORIGIN = "https://www.photopea.com";
+const PHOTOSPLICE_WEB = "https://photosplice.com/web";
 
-/** Detect the image MIME type from magic bytes (Photopea can send png/jpg/webp/psd). */
+/** Detect the image MIME type from magic bytes (png/jpg/webp/gif; psd refused). */
 function sniffMime(bytes: Uint8Array): string | null {
   if (bytes.length < 12) return null;
   if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png";
@@ -44,51 +46,15 @@ export function ImageStudioDialog({
   onOpenChange: (v: boolean) => void;
 }) {
   const add = useEditor((s) => s.add);
-  const selectedId = useEditor((s) => s.selectedId);
-  const elements = useEditor((s) => s.elements);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-
-  const selected = elements.find((e) => e.id === selectedId);
-  const selectedImage =
-    selected?.type === "image" && typeof selected.src === "string" && /^https?:\/\//i.test(selected.src)
-      ? selected.src
-      : null;
-
-  // Official config format: JSON object, URI-encoded, after the hash.
-  const studioConfig = {
-    files: selectedImage ? [selectedImage] : [],
-    environment: {
-      // File → Save inside Photopea posts the PNG back to us (saveToOE).
-      customIO: { save: "app.activeDocument.saveToOE('png');" },
-      exportAs: true,
-      localsave: false,
-    },
-  };
-  const studioSrc = `${PHOTOPEA_ORIGIN}#${encodeURIComponent(JSON.stringify(studioConfig))}`;
-
-  const post = (message: string) => {
-    const win = iframeRef.current?.contentWindow;
-    if (win) win.postMessage(message, "*");
-  };
-
-  const openSelectedInStudio = () => {
-    // Reload the iframe — the new config reopens Photopea with the image.
-    setLoaded(false);
-    setStatus(null);
-    if (iframeRef.current) iframeRef.current.src = studioSrc;
-  };
-
-  const importToCanvas = () => {
-    setStatus("Export en cours…");
-    post("app.activeDocument.saveToOE('png');");
-  };
 
   const importBytes = (buffer: ArrayBuffer) => {
     const mime = sniffMime(new Uint8Array(buffer.slice(0, 12)));
     if (!mime) {
-      setStatus("Format non pris en charge — exportez en PNG ou JPG dans Photopea (File → Save for Web).");
+      setStatus("Format non pris en charge — exportez en PNG ou JPG dans PhotoSplice (File → Save As).");
       return;
     }
     try {
@@ -96,15 +62,28 @@ export function ImageStudioDialog({
       add(newImage(dataUrl, { width: 960, height: 540 }));
       setStatus("✓ Image importée sur le canvas");
     } catch {
-      setStatus("Échec de l'import — réessayez (File → Save dans Photopea fonctionne aussi).");
+      setStatus("Échec de l'import — réessayez.");
     }
   };
 
+  const onPickResult = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file
+    if (!file) return;
+    setStatus("Import en cours…");
+    try {
+      importBytes(await file.arrayBuffer());
+    } catch {
+      setStatus("Impossible de lire ce fichier.");
+    }
+  };
+
+  // Kept for forward-compatibility: if PhotoSplice ever posts images back
+  // to the parent (like Photopea's saveToOE), they land on the canvas.
   useEffect(() => {
     if (!open) return;
     const onMessage = async (event: MessageEvent) => {
-      // Only trust messages coming from the Photopea iframe.
-      if (!event.origin || !event.origin.includes("photopea.com")) return;
+      if (!event.origin || !event.origin.includes("photosplice.com")) return;
       const data = event.data;
       try {
         if (data instanceof ArrayBuffer) {
@@ -146,39 +125,41 @@ export function ImageStudioDialog({
             </span>
             Image Studio
             <span className="rounded-md bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
-              Photopea
+              PhotoSplice
             </span>
           </DialogTitle>
           <div className="flex items-center gap-2">
-            {selectedImage ? (
-              <button
-                type="button"
-                onClick={openSelectedInStudio}
-                title="Recharger Photopea avec l'image sélectionnée sur la slide"
-                className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-sky-500 hover:text-sky-700"
-              >
-                <RefreshCw className="size-3" /> Ouvrir l'image sélectionnée
-              </button>
-            ) : (
-              <span className="max-w-[320px] truncate text-[10px] text-slate-400">
-                Astuce : sélectionnez une image sur la slide avant d'ouvrir le studio pour la précharger
-              </span>
-            )}
             <button
               type="button"
-              onClick={importToCanvas}
+              onClick={() => window.open(PHOTOSPLICE_WEB, "_blank", "noopener")}
+              title="Ouvrir PhotoSplice dans un onglet (utile si l'intégration est bloquée)"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 transition hover:border-sky-500 hover:text-sky-700"
+            >
+              <ExternalLink className="size-3" /> Ouvrir dans un onglet
+            </button>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              title="Choisir le fichier enregistré par PhotoSplice (File → Save As) et l'ajouter à la slide"
               className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-fuchsia-600 to-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow-md transition hover:brightness-110"
             >
-              <ImageDown className="size-3.5" /> Importer sur le canvas
+              <ImageDown className="size-3.5" /> Importer le résultat
             </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={onPickResult}
+            />
           </div>
         </DialogHeader>
 
         <div className="relative flex-1 overflow-hidden bg-slate-100">
           <iframe
             ref={iframeRef}
-            src={studioSrc}
-            title="Photopea — éditeur d'image avancé"
+            src={PHOTOSPLICE_WEB}
+            title="PhotoSplice — éditeur d'image avancé"
             allow="clipboard-read; clipboard-write; fullscreen"
             onLoad={() => setLoaded(true)}
             className="h-full w-full border-0 bg-white"
@@ -187,11 +168,11 @@ export function ImageStudioDialog({
             <div className="absolute inset-0 grid place-items-center bg-white">
               <div className="flex flex-col items-center gap-3 text-slate-500">
                 <Loader2 className="size-6 animate-spin" />
-                <p className="text-xs">Chargement de Photopea…</p>
+                <p className="text-xs">Chargement de PhotoSplice…</p>
                 <p className="max-w-[420px] text-center text-[10px] leading-relaxed text-slate-400">
                   Édition avancée : calques, sélections, masques, filtres, texte, retouche.
-                  Nécessite une connexion internet. « File → Save » ou « Importer sur le canvas »
-                  renvoie l'image sur la slide.
+                  Ouvrez votre image via File → Open, puis, une fois modifiée, enregistrez-la
+                  (File → Save As) et cliquez sur « Importer le résultat » pour l'ajouter à la slide.
                 </p>
               </div>
             </div>
