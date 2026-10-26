@@ -150,8 +150,12 @@ export function CanvasElement({
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
   const selected = !presenting && !preview && selectedIds.includes(element.id);
-  // interactive crop mode (double-click an image or press the Crop button)
-  const cropping = !presenting && !preview && useEditor((s) => s.croppingId) === element.id;
+  // Interactive crop mode (double-click an image or press the Crop button).
+  // The zustand hook MUST be called unconditionally — short-circuiting it with
+  // && flips the hook count between renders (React error #311) as soon as
+  // `presenting` or `preview` changes.
+  const croppingId = useEditor((s) => s.croppingId);
+  const cropping = !presenting && !preview && croppingId === element.id;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
