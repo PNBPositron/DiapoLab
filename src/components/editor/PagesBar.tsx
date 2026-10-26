@@ -2,83 +2,17 @@ import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/
 import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import {
-  Ban,
-  Blend,
-  ArrowRight,
-  ZoomIn,
-  FlipHorizontal,
-  Shapes,
-  Zap,
-  MoveLeft,
-  MoveUp,
-  Layers,
-  ChevronDown,
-  MonitorPlay,
-  Sparkles,
-  Box,
-  Cloudy,
-  RotateCw,
-  CircleDot,
-  Aperture,
-  PanelTop,
-  Tornado,
-  Waves,
-  Rainbow,
-  Pyramid,
-  Undo2,
-  Rocket,
-  StretchHorizontal,
-} from "lucide-react";
+  TRANSITION_OPTIONS,
+  TRANSITION_ICONS,
+  ELEMENT_ANIMATION_OPTIONS,
+} from "@/lib/motion-catalog";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
 import { History } from "lucide-react";
-
-const transitionIcons = {
-  none: Ban,
-  fade: Blend,
-  slide: ArrowRight,
-  zoom: ZoomIn,
-  flip: FlipHorizontal,
-  morph: Shapes,
-  tv: MonitorPlay,
-  neon: Zap,
-  cube: Box,
-  blur: Cloudy,
-  "parallax-left": MoveLeft,
-  "parallax-up": MoveUp,
-  "parallax-depth": Layers,
-  reveal: Aperture,
-  shutter: PanelTop,
-  swirl: Tornado,
-  warp: Waves,
-  prism: Rainbow,
-  origami: Pyramid,
-};
-
-const transitionOptions: SlideTransition[] = [
-  "none",
-  "fade",
-  "slide",
-  "zoom",
-  "flip",
-  "morph",
-  "tv",
-  "neon",
-  "cube",
-  "blur",
-  "parallax-left",
-  "parallax-up",
-  "parallax-depth",
-  "reveal",
-  "shutter",
-  "swirl",
-  "warp",
-  "prism",
-  "origami",
-];
 
 export function PagesBar() {
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
@@ -222,14 +156,7 @@ export function PagesBar() {
                       label="Object animations"
                       value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
                       onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
-                      options={( [
-                        ["none", "None", Ban], ["fade-up", "Fade", Blend], ["pop", "Pop", Sparkles],
-                        ["neon", "Glitch", Zap], ["move-left", "Left", MoveLeft], ["move-right", "Right", ArrowRight],
-                        ["move-up", "Rise", MoveUp], ["move-down", "Drop", ChevronDown], ["blur-in", "Blur", Cloudy],
-                        ["spin-in", "Spin", RotateCw], ["bounce-in", "Bounce", CircleDot],
-                        ["flip-in", "Flip", FlipHorizontal], ["swing-in", "Swing", Undo2], ["wobble-in", "Wobble", Waves],
-                        ["slingshot-in", "Slingshot", Rocket], ["flicker-in", "Flicker", Zap], ["stretch-in", "Stretch", StretchHorizontal],
-                      ] as const).map(([value, label, icon]) => ({ value, label, icon }))}
+                      options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({ value, label: short, icon }))}
                     />
                   </div>
                 )}
@@ -254,10 +181,10 @@ export function PagesBar() {
                   value={currentTransition}
                   onChange={setTransition}
                   onPreview={setHoveredTransition}
-                  options={transitionOptions.map((value) => ({
+                  options={TRANSITION_OPTIONS.map((value) => ({
                     value,
                     label: value.replaceAll("-", " "),
-                    icon: transitionIcons[value],
+                    icon: TRANSITION_ICONS[value],
                   }))}
                 />
               </PopoverContent>
