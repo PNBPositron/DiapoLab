@@ -16,7 +16,9 @@ import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import * as LucideIcons from "lucide-react";
-import { HelpCircle, Check, X as XIcon } from "lucide-react";
+import { HelpCircle, Check, X as XIcon, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { supabase } from "@/integrations/supabase/client";
 
 const svgFilterUrl = (inner: string) =>
   `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(
@@ -972,23 +974,51 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   const theme = element.uiStyle ? UI_STYLE_THEMES[element.uiStyle] : undefined;
   const isPoll = element.mode === "poll";
   const [votes, setVotes] = useState<Record<string, number>>({});
-  const chanRef = useRef<BroadcastChannel | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const chanRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const votesRef = useRef(votes);
+  votesRef.current = votes;
+  const elRef = useRef(element);
+  elRef.current = element;
+  const interactiveRef = useRef(interactive);
+  interactiveRef.current = interactive;
+  const pollUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/v/${element.liveKey ?? element.id}`
+      : "";
 
-  // Live poll sync: every open window on the same channel shares the tally.
+  // Live poll sync over supabase realtime broadcast: editor/presenter windows
+  // AND the /v/$key audience page share the same channel. The presenting window
+  // answers "hello" with question + tally so late joiners catch up instantly.
   useEffect(() => {
-    if (!isPoll || typeof BroadcastChannel === "undefined") return;
-    const ch = new BroadcastChannel("poll-" + (element.liveKey ?? element.id));
-    chanRef.current = ch;
-    ch.onmessage = (ev: MessageEvent) => {
-      const d = ev.data as { type: string; optionId?: string };
-      if (d?.type === "vote" && d.optionId) {
-        const optionId = d.optionId;
-        setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
-      }
-      if (d?.type === "reset") setVotes({});
-    };
+    if (!isPoll) return;
+    const chan = supabase.channel("poll-" + (element.liveKey ?? element.id));
+    chanRef.current = chan;
+    chan
+      .on("broadcast", { event: "vote" }, ({ payload }: any) => {
+        const optionId = payload?.optionId;
+        if (optionId) setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
+      })
+      .on("broadcast", { event: "reset" }, () => setVotes({}))
+      .on("broadcast", { event: "tally" }, ({ payload }: any) => {
+        if (payload?.votes) setVotes(payload.votes);
+      })
+      .on("broadcast", { event: "hello" }, () => {
+        if (!interactiveRef.current) return;
+        const el = elRef.current;
+        chan.send({
+          type: "broadcast",
+          event: "state",
+          payload: {
+            question: el.question,
+            options: el.options.map((o) => ({ id: o.id, text: o.text })),
+          },
+        });
+        chan.send({ type: "broadcast", event: "tally", payload: { votes: votesRef.current } });
+      })
+      .subscribe();
     return () => {
-      ch.close();
+      supabase.removeChannel(chan);
       chanRef.current = null;
     };
   }, [isPoll, element.liveKey, element.id]);
@@ -1005,12 +1035,12 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     if (!interactive || picked) return;
     setPicked(optionId);
     setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
-    chanRef.current?.postMessage({ type: "vote", optionId });
+    chanRef.current?.send({ type: "broadcast", event: "vote", payload: { optionId } });
   };
   const resetPoll = () => {
     setPicked(null);
     setVotes({});
-    chanRef.current?.postMessage({ type: "reset" });
+    chanRef.current?.send({ type: "broadcast", event: "reset", payload: {} });
   };
 
   const glassStyle =
@@ -1086,6 +1116,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
       onClick={(e) => interactive && e.stopPropagation()}
       style={{
         ...glassStyle,
+        position: "relative",
         width: "100%",
         height: "100%",
         background:
@@ -1207,11 +1238,21 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             <span>
               {total} vote{total === 1 ? "" : "s"} · live
             </span>
-            {interactive && (
-              <span onClick={resetPoll} style={{ cursor: "pointer", textDecoration: "underline" }}>
-                reset
-              </span>
-            )}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              {interactive && (
+                <span onClick={resetPoll} style={{ cursor: "pointer", textDecoration: "underline" }}>
+                  reset
+                </span>
+              )}
+              {interactive && (
+                <span
+                  onClick={() => setQrOpen(true)}
+                  style={{ cursor: "pointer", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+                >
+                  <QrCode size={14} /> join
+                </span>
+              )}
+            </span>
           </div>
         </div>
       ) : (
@@ -1262,6 +1303,55 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
           })}
         </div>
       )}
+        {qrOpen && (
+          <div
+            onClick={() => setQrOpen(false)}
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+              background: "rgba(5,10,25,0.85)",
+              display: "grid",
+              placeItems: "center",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#ffffff",
+                color: "#0a0f1f",
+                borderRadius: 16,
+                padding: "18px 22px",
+                textAlign: "center",
+                maxWidth: "82%",
+                boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
+              }}
+            >
+              <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 10 }}>Scan to vote</div>
+              <QRCodeSVG value={pollUrl} size={170} />
+              <div style={{ fontSize: 10, marginTop: 10, opacity: 0.6, wordBreak: "break-all" }}>
+                {pollUrl}
+              </div>
+              <button
+                onClick={() => setQrOpen(false)}
+                style={{
+                  marginTop: 12,
+                  border: "2px solid #0a0f1f",
+                  background: "#ffd84a",
+                  fontWeight: 800,
+                  fontSize: 11,
+                  padding: "6px 14px",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
