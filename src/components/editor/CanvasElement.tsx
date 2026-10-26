@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import {
   useEditor,
   UI_STYLE_THEMES,
+  embedProvider,
   type AnyElement,
   type ShapeElement,
   type QuizElement,
@@ -1062,6 +1063,7 @@ export function CanvasElement({
               style={{ width: "100%", height: "100%", position: "relative", background: "#0a0f1f" }}
             >
               <iframe
+                className="embed-live"
                 src={element.src}
                 title={element.title || "Embed"}
                 allow={element.allow}
@@ -1074,6 +1076,63 @@ export function CanvasElement({
                   background: "#000",
                 }}
               />
+              {/* Static fallback card — hidden while editing/presenting, shown
+                  during PNG/JPG/PDF/GIF capture because html-to-image cannot
+                  rasterize cross-origin iframes. Driven purely by CSS
+                  (#canvas-export[data-exporting]) so no React state is needed. */}
+              <div
+                className="embed-fallback"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "none",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 12,
+                  padding: "6%",
+                  boxSizing: "border-box",
+                  background: "linear-gradient(150deg, #101828 0%, #1d2939 100%)",
+                  border: "2px solid #344054",
+                  borderRadius: 14,
+                  color: "#ffffff",
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  textAlign: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ fontSize: "min(72px, 22%)", lineHeight: 1 }}>
+                  {embedProvider(element.src).emoji}
+                </div>
+                <div style={{ fontSize: "max(18px, 7%)", fontWeight: 800, letterSpacing: "-0.01em" }}>
+                  {element.title || embedProvider(element.src).label}
+                </div>
+                <div
+                  style={{
+                    fontSize: "max(12px, 3.5%)",
+                    color: "#94a3b8",
+                    wordBreak: "break-all",
+                    lineHeight: 1.5,
+                    maxWidth: "92%",
+                  }}
+                >
+                  {element.src}
+                </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    border: "2px solid #7df9ff",
+                    borderRadius: 999,
+                    padding: "6px 18px",
+                    fontSize: "max(11px, 3.2%)",
+                    fontWeight: 700,
+                    color: "#7df9ff",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  ▶ OPEN LINK
+                </div>
+              </div>
               {!presenting && (
                 <div
                   // Overlay lets the editor select/drag; iframe still visible but not interactive.
