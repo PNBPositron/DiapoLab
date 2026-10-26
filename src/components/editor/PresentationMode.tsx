@@ -146,14 +146,6 @@ export function PresentationMode() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
       <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center">
-        <button
-          type="button"
-          onClick={() => requestPresentationFullscreen()}
-          className="absolute right-4 top-4 z-[70] rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white/80 backdrop-blur transition hover:bg-black/50 hover:text-white"
-          aria-label="Enter fullscreen presentation"
-        >
-          Fullscreen
-        </button>
         <div
           className="brutal-shadow-lg relative shrink-0"
           style={
