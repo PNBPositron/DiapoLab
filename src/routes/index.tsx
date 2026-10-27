@@ -25,22 +25,12 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   return (
-    <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-white text-slate-900" style={{ background: "linear-gradient(135deg, #f7f3ea 0%, #e8eef7 100%)" }}>
+    <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="relative flex-1 overflow-hidden border-x border-slate-200/70 bg-white">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-35"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px), linear-gradient(180deg, rgba(255,255,255,0.72), rgba(243,240,232,0.9))",
-              backgroundSize: "32px 32px, 32px 32px, 100% 100%",
-              maskImage: "radial-gradient(ellipse at center, black 30%, transparent 82%)",
-            }}
-          />
-          <div className="pointer-events-none absolute left-5 top-4 z-10 hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-slate-400 shadow-sm backdrop-blur md:flex"><span className="size-1.5 rounded-full bg-emerald-500" />Live canvas</div>
+        <main className="relative flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
           <Canvas />
         </main>
         <PropertiesPanel />

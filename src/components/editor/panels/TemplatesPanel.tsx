@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, Rocket, Crown } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -568,6 +569,26 @@ function TemplateCard({
           </span>
         )}
       </div>
+
+      {c.creator_profile?.username && (
+        <Link
+          to="/profile/$username" params={{ username: c.creator_profile.username }}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-2 border-t border-slate-100 px-3 py-2 text-left hover:bg-slate-50"
+          title={`View ${c.creator_profile.display_name || c.creator_profile.username}'s profile`}
+        >
+          {c.creator_profile.avatar_url ? (
+            <img src={c.creator_profile.avatar_url} alt="" className="size-5 rounded-full object-cover" />
+          ) : (
+            <span className="flex size-5 items-center justify-center rounded-full bg-slate-200 text-[9px] font-semibold text-slate-600">
+              {(c.creator_profile.display_name || c.creator_profile.username).slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <span className="min-w-0 truncate text-[10px] font-medium text-slate-600">
+            {c.creator_profile.display_name || `@${c.creator_profile.username}`}
+          </span>
+        </Link>
+      )}
 
       {/* Like — top-right */}
       <button
