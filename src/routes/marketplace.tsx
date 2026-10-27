@@ -6,6 +6,7 @@ import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 import { useEditor, type Page } from "@/store/editor";
 import { usePlugins, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins";
+import { profileLabel } from "@/lib/profiles";
 
 export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
@@ -234,6 +235,7 @@ function Marketplace() {
                         <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
                       </div>
                     </div>
+                      {t.creator_profile?.username && <Link to="/profile/$username" params={{ username: t.creator_profile.username }} onClick={(event) => event.stopPropagation()} className="mt-2 block truncate text-[10px] font-semibold text-blue-600 hover:underline">by {profileLabel(t.creator_profile as any)}</Link>}
                     <ArrowRight className="size-4 shrink-0 text-slate-200 transition-all group-hover:translate-x-0.5 group-hover:text-blue-500" />
                   </div>
                 </button>

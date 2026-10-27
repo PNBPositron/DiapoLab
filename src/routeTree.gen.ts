@@ -26,6 +26,7 @@ import { Route as ApiContextShotRouteImport } from './routes/api.context-shot'
 import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as TIdRouteImport } from './routes/t.$id'
 import { Route as VKeyRouteImport } from './routes/v.$key'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -115,6 +116,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => AuthRoute,
 } as any)
+const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
+  id: '/profile/$username',
+  path: '/profile/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TIdRoute = TIdRouteImport.update({
   id: '/t/$id',
   path: '/t/$id',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   ApiContextShotRoute: typeof ApiContextShotRoute
   ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
+  ProfileUsernameRoute: typeof ProfileUsernameRoute
   TIdRoute: typeof TIdRoute
   VKeyRoute: typeof VKeyRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -410,6 +423,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/profile/$username': {
+      id: '/profile/$username'
+      path: '/profile/$username'
+      fullPath: '/profile/$username'
+      preLoaderRoute: typeof ProfileUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/t/$id': {
       id: '/t/$id'
       path: '/t/$id'
@@ -461,6 +481,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiContextShotRoute: ApiContextShotRoute,
   ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
+  ProfileUsernameRoute: ProfileUsernameRoute,
   TIdRoute: TIdRoute,
   VKeyRoute: VKeyRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
