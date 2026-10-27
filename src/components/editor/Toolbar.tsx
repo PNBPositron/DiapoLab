@@ -332,7 +332,7 @@ export function Toolbar() {
 
           {exportOpen && (
             <div className="toolbar-flyout absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in zoom-in-95">
-              <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="px-3 py-1.5 text-[9px] font-bold tracking-wider text-slate-400">
                 Document formats
               </div>
               {(["png", "jpg", "pdf", "pptx", "markdown", "json", "gif"] as const).map((k) => (
@@ -412,13 +412,13 @@ export function Toolbar() {
             <div className="mt-5 flex gap-2.5">
               <button
                 onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
-                className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-display text-xs tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
               >
                 Copy link
               </button>
               <button
                 onClick={() => setShareLink(null)}
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-display text-xs uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-100 active:scale-95"
+                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100 active:scale-95"
               >
                 Close
               </button>
@@ -509,7 +509,7 @@ function LargeModernHamburger({
           {/* CREATE & AI SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
             <span className="size-1.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[9px] font-bold tracking-wider text-slate-400">
               Create
             </span>
           </div>
@@ -557,7 +557,7 @@ function LargeModernHamburger({
           {/* WORKSPACE SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
             <span className="size-1.5 rounded-full bg-slate-300" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[9px] font-bold tracking-wider text-slate-400">
               Workspace
             </span>
           </div>
@@ -585,7 +585,7 @@ function LargeModernHamburger({
           {/* EXPLORE SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
             <span className="size-1.5 rounded-full bg-blue-400" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[9px] font-bold tracking-wider text-slate-400">
               Explore
             </span>
           </div>
@@ -731,7 +731,7 @@ function UserMenu({ email }: { email: string }) {
       {open && (
         <div className="toolbar-flyout absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active account</p>
+            <p className="text-[10px] font-semibold tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
           <button
@@ -746,3 +746,4 @@ function UserMenu({ email }: { email: string }) {
     </div>
   );
 }
+

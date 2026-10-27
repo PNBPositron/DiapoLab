@@ -524,7 +524,7 @@ function ActionTile({
       <span className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}>
         <Icon className="size-4" />
       </span>
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-600 group-hover:text-slate-800">
+      <span className="text-[10px] font-semibold tracking-wide text-slate-600 group-hover:text-slate-800">
         {label}
       </span>
     </button>
@@ -701,7 +701,7 @@ export function ElementsPanel() {
           </div>
           <p className="text-[10px] leading-relaxed text-slate-500">Drop a connected visual story built from editable shapes, gradients and labels.</p>
           <div className="space-y-1.5">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Theme — from the Presets panel</span>
+            <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Theme — from the Presets panel</span>
             <ChipGroup
               value={flowStyle}
               onChange={restyleFlowGroup}
@@ -711,7 +711,7 @@ export function ElementsPanel() {
           </div>
           {FLOWCRAFT_SECTIONS.map((sec) => (
             <div key={sec.label} className="space-y-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{sec.label}</span>
+              <span className="text-[10px] font-semibold tracking-[0.14em] text-slate-500">{sec.label}</span>
               <div className="grid grid-cols-2 gap-2">
                 {sec.kinds.map((kind) => {
                   const meta = FLOWCRAFT_META[kind];
@@ -814,3 +814,4 @@ export function ElementsPanel() {
     </div>
   );
 }
+

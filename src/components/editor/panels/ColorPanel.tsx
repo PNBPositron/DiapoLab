@@ -118,7 +118,7 @@ export function ColorPanel() {
 
       {/* ------- Image de fond ------- */}
       <div className="space-y-2.5 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] mx-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Background image</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Background image</div>
 
         {bgImage ? (
           <div className="relative">
@@ -175,7 +175,7 @@ export function ColorPanel() {
 
       {/* ------- Couleur de fond (palette) ------- */}
       <div className="space-y-2.5 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Background color</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Background color</div>
         <div className="flex gap-2">
           <button
             onClick={() => setOpenPicker(openPicker === "bg" ? null : "bg")}
@@ -204,7 +204,7 @@ export function ColorPanel() {
 
       {/* ------- Dégradés prédéfinis ------- */}
       <div className="space-y-3 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Gradient packs</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Gradient packs</div>
         <SearchField value={search} onChange={setSearch} placeholder="Search gradients..." />
         <ChipGroup value={packCategory} options={["All", ...GRADIENT_PACKS.map(p => p.name)]} onChange={setPackCategory} label="Gradient categories" />
         <OptionGrid label="Gradient wallpapers" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={GRADIENT_PACKS.filter(p => packCategory === "All" || p.name === packCategory).flatMap(p => p.gradients).filter(g => g.name.toLowerCase().includes(search.toLowerCase())).map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
@@ -212,7 +212,7 @@ export function ColorPanel() {
 
       {/* ------- Dégradé custom ------- */}
       <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] mx-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom gradient</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom gradient</div>
         <button
           className="h-16 w-full rounded-xl border border-slate-200 transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
           style={{ background: customGradient }}
@@ -222,7 +222,7 @@ export function ColorPanel() {
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
-            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tracking-wide transition ${
               openPicker === "from"
                 ? "border-blue-500 bg-blue-50 text-blue-600"
                 : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
@@ -233,7 +233,7 @@ export function ColorPanel() {
           </button>
           <button
             onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
-            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tracking-wide transition ${
               openPicker === "to"
                 ? "border-blue-500 bg-blue-50 text-blue-600"
                 : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
@@ -253,7 +253,7 @@ export function ColorPanel() {
 
         <SegmentedControl label="Gradient type" value={gradientType} onChange={setGradientType} options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]} />
         {gradientType === "linear" && (
-          <label className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-slate-500">
+          <label className="flex items-center gap-2 text-[10px] tracking-wide text-slate-500">
             Angle
             <input
               type="range"
@@ -271,3 +271,4 @@ export function ColorPanel() {
     </div>
   );
 }
+

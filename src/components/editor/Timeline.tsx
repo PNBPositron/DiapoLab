@@ -74,7 +74,7 @@ export function Timeline() {
 
   return (
     <div className="timeline-bar flex items-center gap-3 border-t border-teal/30 bg-transparent px-3 py-2">
-      <span className="font-display text-[10px] tracking-[0.2em] text-teal/70">VIDEO</span>
+      <span className="font-display text-[10px] tracking-[0.2em] text-teal/70">Video</span>
       <div className="flex items-center gap-1">
         <IconBtn onClick={() => { setT(0); setCurrentPage(0); }} title="Restart">
           <SkipBack className="h-3.5 w-3.5" strokeWidth={3} />
@@ -148,7 +148,7 @@ export function Timeline() {
         </IconBtn>
         {animOpen && (
           <div className="absolute bottom-full right-0 z-50 mb-2 w-80 rounded-xl border border-teal/40 bg-ink/95 p-2 shadow-2xl backdrop-blur">
-            <p className="mb-1 px-1 font-mono text-[9px] uppercase tracking-[0.14em] text-teal/70">
+            <p className="mb-1 px-1 font-mono text-[9px] tracking-[0.14em] text-teal/70">
               Slide {currentIndex + 1} · object animations
             </p>
             <div className="max-h-56 overflow-y-auto">
@@ -208,3 +208,4 @@ function IconBtn({ children, onClick, title }: { children: React.ReactNode; onCl
     </button>
   );
 }
+

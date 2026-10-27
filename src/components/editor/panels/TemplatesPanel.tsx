@@ -232,7 +232,7 @@ const filteredCommunity = filterTemplates(community, {
       {/* ── Featured deck ───────────────────────────── */}
       {featured && featured.pages?.[0] && (
         <div className="px-4">
-          <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-slate-400">
             <Crown className="size-3 text-amber-400" /> Featured deck
           </div>
           <button
@@ -248,7 +248,7 @@ const filteredCommunity = filterTemplates(community, {
                 className="aspect-video min-h-[150px] w-full transition-transform duration-300 group-hover:scale-[1.03]"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
-                <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+                <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
                   <Rocket className="size-3 text-blue-600" /> Use this deck
                 </span>
               </div>
@@ -299,7 +299,7 @@ const filteredCommunity = filterTemplates(community, {
 
         {/* Style — titre au-dessus des chips */}
         <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
             <SlidersHorizontal className="size-2.5" />
             Style
           </span>
@@ -325,7 +325,7 @@ const filteredCommunity = filterTemplates(community, {
 
         {/* Creator — titre au-dessus des chips */}
         <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
             <Users className="size-2.5" />
             Creator
           </span>
@@ -348,7 +348,7 @@ const filteredCommunity = filterTemplates(community, {
 
         {/* License — titre au-dessus des chips */}
         <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
             <Layers className="size-2.5" />
             License
           </span>
@@ -549,7 +549,7 @@ function TemplateCard({
           )}
           {/* Hover overlay with CTA */}
           <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
-            <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+            <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
               <Download className="size-3 text-blue-600" /> Use template
             </span>
           </div>
@@ -688,7 +688,7 @@ function AllTemplatesDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden border-slate-200 bg-slate-50 p-0">
         <DialogHeader className="border-b border-slate-200 bg-white px-5 py-4">
-          <DialogTitle className="text-sm font-semibold uppercase tracking-wide text-slate-800">
+          <DialogTitle className="text-sm font-semibold tracking-wide text-slate-800">
             All templates
             <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
               {templates.length}
@@ -701,7 +701,7 @@ function AllTemplatesDialog({
               <button
                 key={s}
                 onClick={() => setSortBy(s)}
-                className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                className={`rounded-md px-3 py-1.5 text-[10px] font-semibold tracking-wide transition ${
                   sortBy === s
                     ? "bg-white text-slate-800 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
@@ -737,3 +737,4 @@ function AllTemplatesDialog({
     </Dialog>
   );
 }
+

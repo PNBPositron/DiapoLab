@@ -235,7 +235,7 @@ function Section({
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between px-3.5 py-2.5 text-left transition hover:bg-slate-50/80"
       >
-        <span className="flex items-center gap-2 text-[11px] font-semibold tracking-wider text-slate-700 uppercase">
+        <span className="flex items-center gap-2 text-[11px] font-semibold tracking-wider text-slate-700">
           {title}
         </span>
         <div className="flex items-center gap-2">
@@ -351,7 +351,7 @@ function ModernColorPicker({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="#000000"
-          className="h-8 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs text-slate-800 uppercase shadow-2xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+          className="h-8 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs text-slate-800 shadow-2xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
         />
         {hasOpacity && (
           <div className="flex items-center rounded-md border border-slate-200 bg-white px-1.5 py-1 font-mono text-[10px] text-slate-700 shadow-2xs">
@@ -477,7 +477,7 @@ export function PropertiesPanel() {
         {/* Type badge */}
         <div className="flex items-center gap-1.5 rounded-full bg-slate-900/95 px-3 py-1.5 shadow-sm">
           <span className="size-1.5 rounded-full bg-sky-400" />
-          <span className="text-[10px] font-bold tracking-wider text-white uppercase">
+          <span className="text-[10px] font-bold tracking-wider text-white">
             {el.type}
           </span>
         </div>
@@ -1406,7 +1406,7 @@ export function PropertiesPanel() {
                   type="button"
                   onClick={applyJson}
                   disabled={!jsonDirty}
-                  className="flex-1 rounded-lg bg-sky-600 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition hover:bg-sky-500 disabled:opacity-40"
+                  className="flex-1 rounded-lg bg-sky-600 py-1.5 text-[10px] font-bold tracking-wider text-white transition hover:bg-sky-500 disabled:opacity-40"
                 >
                   Apply
                 </button>
@@ -1467,4 +1467,5 @@ export function PropertiesPanel() {
     </>
   );
 }
+
 

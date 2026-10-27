@@ -673,7 +673,7 @@ export function CommandPalette({
               return (
                 <div key={c.id}>
                   {showHeader && (
-                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[10px] font-bold tracking-[0.16em] text-slate-500">
                       <span className="text-indigo-400">{GROUP_ICONS[c.group]}</span>
                       {c.group}
                     </div>
@@ -756,3 +756,4 @@ export function CommandPalette({
     </div>
   );
 }
+

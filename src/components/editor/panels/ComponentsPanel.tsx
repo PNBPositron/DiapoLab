@@ -322,7 +322,7 @@ export function ComponentsPanel() {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+            <span className="text-[11px] font-semibold tracking-wider text-slate-400">
               Saved blocks ({blocks.length})
             </span>
           </div>
@@ -370,7 +370,7 @@ export function ComponentsPanel() {
           {/* Widget packs — imported via Add-ons, inserted from My blocks */}
           {pluginWidgets.length > 0 && (
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500 uppercase">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
                 <Puzzle className="size-3" /> Widget packs ({pluginWidgets.length})
               </span>
               <OptionGrid
@@ -398,7 +398,7 @@ export function ComponentsPanel() {
       {section === "ui" && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+            <span className="text-[11px] font-semibold tracking-wider text-slate-400">
               Components ({filteredPresets.length})
             </span>
           </div>
@@ -450,7 +450,7 @@ export function ComponentsPanel() {
           {/* Charts & quiz — former "Blocks" tab now folded into UI */}
           <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3">
             <span className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              <span className="text-[11px] font-semibold tracking-wider text-slate-400">
                 Charts &amp; quiz ({filteredElements.length})
               </span>
             </span>
@@ -468,3 +468,4 @@ export function ComponentsPanel() {
     </div>
   );
 }
+

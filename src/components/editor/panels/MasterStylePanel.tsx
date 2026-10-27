@@ -30,7 +30,7 @@ export function MasterStylePanel() {
         <button type="button" onClick={applyTransitionToDeck} className={btn} title={`Transition: ${transition}`}>
           <Clapperboard className="size-3.5 shrink-0 text-emerald-600" />
           <span className="min-w-0 flex-1">Use this transition on all slides</span>
-          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider text-slate-500">{transition}</span>
+          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] tracking-wider text-slate-500">{transition}</span>
         </button>
       </div>
       <p className="flex items-center gap-1 text-[9px] text-slate-400">
@@ -41,3 +41,4 @@ export function MasterStylePanel() {
 }
 
 export default MasterStylePanel;
+

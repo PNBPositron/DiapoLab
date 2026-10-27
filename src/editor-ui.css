@@ -287,7 +287,6 @@
     font-size: 0.625rem;
     font-weight: 600;
     letter-spacing: 0.14em;
-    text-transform: uppercase;
   }
 
   .editor-side-panel .panel-section-label::after {
@@ -675,3 +674,4 @@
 #canvas-export[data-exporting] .embed-fallback {
   display: flex !important;
 }
+

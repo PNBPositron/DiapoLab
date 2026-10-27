@@ -153,3 +153,4 @@ function ShapePreview({ kind, fill }: { kind: ShapeKind; fill: string }) {
     </svg>
   );
 }
+

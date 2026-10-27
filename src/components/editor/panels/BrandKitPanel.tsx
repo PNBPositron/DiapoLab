@@ -99,7 +99,7 @@ export function BrandKitPanel() {
 
       {/* Couleurs */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Colors</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Colors</div>
         {SWATCHES.map((s) => (
           <div key={s.key}>
             <button
@@ -117,7 +117,7 @@ export function BrandKitPanel() {
               />
               <span className="min-w-0 flex-1">
                 <span className="block text-[11px] font-semibold text-slate-700">{s.label}</span>
-                <span className="block font-mono text-[9px] uppercase text-slate-400">
+                <span className="block font-mono text-[9px] text-slate-400">
                   {brandKit[s.key] as string}
                 </span>
               </span>
@@ -139,7 +139,7 @@ export function BrandKitPanel() {
       <div className="grid grid-cols-2 gap-2 px-4">
         {(["headingFont", "bodyFont"] as const).map((key) => (
           <label key={key} className="block">
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">
               {key === "headingFont" ? "Heading font" : "Body font"}
             </span>
             <Dropdown
@@ -161,7 +161,7 @@ export function BrandKitPanel() {
         >
           <WandSparkles className="size-3.5" /> Adapt presets to slide look
         </button>
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Apply brand kit</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Apply brand kit</div>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={adaptToSlide}
@@ -192,3 +192,4 @@ export function BrandKitPanel() {
     </div>
   );
 }
+

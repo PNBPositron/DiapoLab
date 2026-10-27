@@ -131,7 +131,7 @@ export function PluginsPanel() {
           {/* ---- APPS: interactive mini-tools ---- */}
           {appPlugins.length > 0 && (
             <div>
-              <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-indigo-500">
+              <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold tracking-[0.14em] text-indigo-500">
                 <Brush className="size-2.5" /> Apps ({enabledApps.length})
               </span>
               <div className="space-y-3">
@@ -156,7 +156,7 @@ export function PluginsPanel() {
                       >
                         {p.name}
                         {p.id.startsWith("builtin-") && (
-                          <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+                          <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold tracking-wide text-slate-500">
                             Built-in
                           </span>
                         )}
@@ -224,7 +224,7 @@ export function PluginsPanel() {
 
           {/* ---- WIDGET PACKS: each pack has its own header, widgets & code ---- */}
           <div>
-            <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            <span className="mb-1.5 flex items-center gap-1 text-[9px] font-bold tracking-[0.14em] text-slate-400">
               <Layers className="size-2.5" /> Widget packs ({packPlugins.length})
             </span>
             <div className="space-y-3">
@@ -249,7 +249,7 @@ export function PluginsPanel() {
                     >
                       {p.name}
                       {p.id.startsWith("builtin-") && (
-                        <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+                        <span className="ml-1.5 shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold tracking-wide text-slate-500">
                           Built-in
                         </span>
                       )}
@@ -333,7 +333,7 @@ export function PluginsPanel() {
       <Dialog open={importOpen !== null} onOpenChange={(v) => !v && setImportOpen(null)}>
         <DialogContent className="max-w-xl border-slate-200 bg-white p-0">
           <DialogHeader className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
-            <DialogTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-800">
+            <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide text-slate-800">
               <span className="grid size-7 place-items-center rounded-lg bg-indigo-600 text-white">
                 <Code2 className="size-3.5" />
               </span>
@@ -417,7 +417,7 @@ function PluginRow({
         <div className="flex items-center gap-1.5 truncate text-[11px] font-semibold text-slate-800" title={plugin.name}>
           <span className="truncate">{plugin.name}</span>
           {builtin && (
-            <span className="shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+            <span className="shrink-0 rounded-md bg-slate-100 px-1 py-px text-[8px] font-bold tracking-wide text-slate-500">
               Built-in
             </span>
           )}
@@ -467,3 +467,4 @@ function PluginRow({
     </div>
   );
 }
+

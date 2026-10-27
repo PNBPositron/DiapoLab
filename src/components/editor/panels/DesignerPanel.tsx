@@ -42,7 +42,7 @@ export function DesignerPanel() {
                   />
                 ))}
               </div>
-              <span className="block font-display text-[10px] uppercase tracking-[0.15em]">
+              <span className="block font-display text-[10px] tracking-[0.15em]">
                 {s.label}
               </span>
               <span className="block font-mono text-[9px] opacity-60">{s.hint}</span>
@@ -53,3 +53,4 @@ export function DesignerPanel() {
     </div>
   );
 }
+

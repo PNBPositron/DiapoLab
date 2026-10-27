@@ -63,7 +63,7 @@ export function SizePanel() {
 
       {/* Presets */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Presets</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Presets</div>
         <div className="grid grid-cols-2 gap-2">
           {CANVAS_PRESETS.map((p) => {
             const active = canvasW === p.w && canvasH === p.h;
@@ -98,7 +98,7 @@ export function SizePanel() {
                     style={{ width: tw, height: th }}
                   />
                 </div>
-                <span className={`text-[10px] font-semibold uppercase tracking-wide ${active ? "text-blue-700" : "text-slate-600"}`}>
+                <span className={`text-[10px] font-semibold tracking-wide ${active ? "text-blue-700" : "text-slate-600"}`}>
                   {p.name}
                 </span>
                 <span className="font-mono text-[9px] text-slate-400">
@@ -112,10 +112,10 @@ export function SizePanel() {
 
       {/* Custom */}
       <div className="space-y-2.5 px-4 pb-1">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Custom</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom</div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
           <label className="block">
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-400">W</span>
+            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">W</span>
             <input
               type="number"
               value={w}
@@ -125,7 +125,7 @@ export function SizePanel() {
           </label>
           <span className="pb-2.5 font-mono text-xs text-slate-400">×</span>
           <label className="block">
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-400">H</span>
+            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">H</span>
             <input
               type="number"
               value={h}
@@ -144,3 +144,4 @@ export function SizePanel() {
     </div>
   );
 }
+

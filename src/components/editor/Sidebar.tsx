@@ -76,7 +76,7 @@ export function Sidebar() {
               key={t.id}
               onClick={() => { setTool(t.id); setHovering(true); }}
               title={t.label}
-              className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold uppercase tracking-[0.05em] transition-all duration-200 ${
+              className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
                 active
                   ? "bg-slate-100/90 text-slate-900"
                   : "bg-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
@@ -95,3 +95,4 @@ export function Sidebar() {
     </aside>
   );
 }
+

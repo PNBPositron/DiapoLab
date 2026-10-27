@@ -44,7 +44,7 @@ export function PagesBar() {
 
   return (
     <div className="pages-bar flex h-[94px] shrink-0 items-center gap-3 border-t border-slate-200/70 bg-white/70 px-3 py-2 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
-      <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+      <span className="shrink-0 text-[10px] font-semibold tracking-[0.18em] text-slate-500">
         Pages
       </span>
       <div className="flex min-w-0 flex-1 items-center gap-3 overflow-x-auto py-1">
@@ -116,7 +116,7 @@ export function PagesBar() {
         })}
         <button
           onClick={addPage}
-          className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300/90 bg-white/40 px-4 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
+          className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300/90 bg-white/40 px-4 text-[10px] font-medium tracking-[0.12em] text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
           style={{ height: thumbH + 4 }}
         >
           <Plus className="h-3.5 w-3.5" /> Add
@@ -126,7 +126,7 @@ export function PagesBar() {
         <button type="button" onClick={() => setHistoryOpen(true)} className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white/75 px-2.5 py-2 text-[10px] font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600" title="Slide version history"><History className="size-3.5" /> History</button>
           <div className="flex items-center gap-2 rounded-2xl border border-white/80 bg-white/70 px-2.5 py-1.5 shadow-[0_8px_20px_-14px_rgba(15,23,42,0.4)] backdrop-blur-sm">
           <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-          <label className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <label className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.14em] text-slate-500">
             <span>Transition</span>
             <Popover>
               <PopoverTrigger asChild>
@@ -149,7 +149,7 @@ export function PagesBar() {
                 {selectedId && (
                   <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
                     <div className="mb-1.5 flex items-center justify-between">
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Selected object motion</span>
+                      <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
                       <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
                     </div>
                     <OptionGrid
@@ -193,7 +193,7 @@ export function PagesBar() {
           </label>
           {currentTransition === "zoom" && (
             <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-2.5 py-1.5 shadow-inner shadow-blue-100/60">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+              <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-500">
                 Zoom
               </span>
               <input
@@ -220,7 +220,7 @@ onClick={async () => {
                   const enteredFullscreen = await requestPresentationFullscreen();
                   if (enteredFullscreen) setPresenting(true);
                 }}
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
+          className="flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-semibold tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
           type="button"
         >
           <Play className="h-3.5 w-3.5 fill-white" /> Present
@@ -230,3 +230,4 @@ onClick={async () => {
     </div>
   );
 }
+

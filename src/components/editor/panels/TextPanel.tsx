@@ -98,7 +98,7 @@ export function TextPanel() {
       <PanelHeader kicker="Text" title="Text & fonts" description="Insert styled headings or pick a font from the library." icon={Type} />
       {/* Quick Add Presets */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        <span className="text-[11px] font-semibold tracking-wider text-slate-400">
           Text Styles
         </span>
         <div className="flex flex-col gap-2">
@@ -154,7 +154,7 @@ export function TextPanel() {
       {/* Font Library Header & Filters */}
       <div className="flex flex-col gap-2.5 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-[11px] font-semibold tracking-wider text-slate-400">
             Font Library ({filteredFonts.length})
           </span>
         </div>
@@ -203,7 +203,7 @@ export function TextPanel() {
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-500 transition-colors group-hover:bg-slate-200 group-hover:text-slate-800">
+              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium tracking-wider text-slate-500 transition-colors group-hover:bg-slate-200 group-hover:text-slate-800">
                 {f.category}
               </span>
               <Plus className="size-3 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -220,3 +220,4 @@ export function TextPanel() {
     </div>
   );
 }
+
