@@ -15,7 +15,14 @@ export function Canvas() {
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
 
   useEffect(() => {
-    void ensureFontsForPages(pages.map((page) => ({ elements: page.elements.filter((element): element is Extract<typeof element, { fontFamily?: string }> => "fontFamily" in element) })));
+    void ensureFontsForPages(
+      pages.map((page) => ({
+        elements: page.elements.filter(
+          (element): element is Extract<typeof element, { fontFamily?: string }> =>
+            "fontFamily" in element,
+        ),
+      })),
+    );
   }, [pages]);
 
   useEffect(() => {
@@ -109,7 +116,7 @@ export function Canvas() {
       className="relative h-full w-full overflow-hidden"
       aria-label="Slide preview"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) select(null);
+        if (!(e.target as HTMLElement).closest("[data-canvas-element]")) select(null);
       }}
     >
       <div className="absolute inset-0 overflow-auto pb-16">
@@ -118,7 +125,7 @@ export function Canvas() {
             className="brutal-shadow-lg relative shrink-0"
             style={{ width: canvasW * scale, height: canvasH * scale }}
             onMouseDown={(e) => {
-              if (e.target === e.currentTarget) select(null);
+              if (!(e.target as HTMLElement).closest("[data-canvas-element]")) select(null);
             }}
           >
             <div
@@ -127,7 +134,11 @@ export function Canvas() {
               style={{
                 width: canvasW,
                 height: canvasH,
-                backgroundColor: page.bgImage ? bgColor : bgColor.includes("gradient(") ? undefined : bgColor,
+                backgroundColor: page.bgImage
+                  ? bgColor
+                  : bgColor.includes("gradient(")
+                    ? undefined
+                    : bgColor,
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
               }}
