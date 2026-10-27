@@ -3,7 +3,7 @@
      subtle borders, spring-like hover/press states, refined typography. */
 
   .editor-side-panel {
-    font-family: Inter, system-ui, sans-serif;
+    font-family: Manrope, system-ui, sans-serif;
   }
 
   .editor-tool-rail {
@@ -300,7 +300,7 @@
 
 /* Keep editor chrome readable without overriding slide element font families. */
 .editor-ui {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Manrope, system-ui, sans-serif;
 }
 .editor-ui > header,
 .editor-ui > nav,
@@ -310,7 +310,7 @@
 .editor-ui input,
 .editor-ui textarea,
 .editor-ui select {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Manrope, system-ui, sans-serif;
 }
 
 /* The selector kit owns its color and interaction states, rather than the

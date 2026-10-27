@@ -39,7 +39,7 @@
   --color-selector-accent: var(--selector-accent);
   --color-selector-active: var(--selector-active);
   --font-display: "Manrope", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Manrope", system-ui, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 :root {
@@ -147,6 +147,34 @@
   --accent-foreground: #1e3a8a;
   --border: #bfdbfe;
   --input: #93c5fd;
+  --ring: var(--blue);
+}
+[data-editor-theme="dark"] {
+  --ink: #0b1220;
+  --paper: #111827;
+  --surface: #182235;
+  --surface-2: #22304a;
+  --grid: #334765;
+  --teal: #e5edf8;
+  --teal-deep: #9aabc4;
+  --blue: #8ab4ff;
+  --blue-deep: #6d8ee8;
+  --background: var(--paper);
+  --foreground: var(--teal);
+  --card: var(--surface);
+  --card-foreground: var(--teal);
+  --popover: #1b2940;
+  --popover-foreground: var(--teal);
+  --primary: var(--blue);
+  --primary-foreground: #0b1220;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--teal);
+  --muted: #22304a;
+  --muted-foreground: var(--teal-deep);
+  --accent: #263b61;
+  --accent-foreground: #c8dcff;
+  --border: #334765;
+  --input: #405579;
   --ring: var(--blue);
 }
 [data-editor-theme="glass"] {
@@ -289,19 +317,22 @@
     min-height: 100%;
     background-color: #ffffff;
     color: var(--teal);
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
   }
   h1,
   h2,
   h3,
   h4 {
-    font-family: "Manrope", "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
     letter-spacing: -0.025em;
     text-transform: none;
   }
   .logo-wordmark {
-  font-family: "Orbitron", sans-serif;
-    font-family: "Orbitron", "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
+    font-size: 1.16em;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    text-transform: none;
   }
   button,
   input,

@@ -56,6 +56,8 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          pronouns: string | null
+          username: string | null
           updated_at: string
         }
         Insert: {
@@ -69,7 +71,9 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
-          id?: string
+          pronouns?: string | null
+          username?: string | null
+          created_at?: string
           updated_at?: string
         }
         Relationships: []

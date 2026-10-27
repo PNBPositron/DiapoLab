@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check } from "lucide-react";
+import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, UserRound, Upload } from "lucide-react";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId } from "@/store/settings";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, type PublicTemplate } from "@/lib/designs";
+import { getProfile, saveProfile, type Profile } from "@/lib/profiles";
 
 const title = "text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700";
 const help = "mt-1 text-[10px] leading-relaxed text-slate-400";
@@ -106,11 +107,24 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const [templates, setTemplates] = useState<PublicTemplate[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profileBusy, setProfileBusy] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
 
   useEffect(() => {
-    if (!user) { setTemplates([]); return; }
+    if (!user) { setTemplates([]); setProfile(null); return; }
     listMyPublicTemplates().then(setTemplates).catch((e) => setError(e instanceof Error ? e.message : "Failed to load templates"));
+    getProfile(user.id).then((value) => setProfile(value ?? { id: user.id, display_name: user.user_metadata?.full_name ?? "", username: "", pronouns: "", avatar_url: "" })).catch((e) => setError(e instanceof Error ? e.message : "Failed to load profile"));
   }, [user]);
+
+  const updateProfile = (key: keyof Omit<Profile, "id">, value: string) => setProfile((current) => current ? { ...current, [key]: value } : current);
+  const saveProfileChanges = async () => {
+    if (!profile) return;
+    setProfileBusy(true); setProfileSaved(false);
+    try { setProfile(await saveProfile(profile)); setProfileSaved(true); }
+    catch (e) { setError(e instanceof Error ? e.message : "Failed to save profile"); }
+    finally { setProfileBusy(false); }
+  };
 
   const applyJson = () => {
     try {
@@ -144,6 +158,15 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-3xl border border-slate-200 bg-slate-50/95 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:my-6"
         onClick={(event) => event.stopPropagation()}
       >
+        {user && profile && <Section icon={<UserRound className="size-4" />} label="Your profile" desc="Choose how your published work appears to the community.">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-xs font-medium text-slate-600">Display name<input value={profile.display_name ?? ""} onChange={(e) => updateProfile("display_name", e.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400" placeholder="Your name" /></label>
+            <label className="text-xs font-medium text-slate-600">Username<input value={profile.username ?? ""} onChange={(e) => updateProfile("username", e.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400" placeholder="your_username" /></label>
+            <label className="text-xs font-medium text-slate-600">Pronouns<input value={profile.pronouns ?? ""} onChange={(e) => updateProfile("pronouns", e.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400" placeholder="they/them" /></label>
+            <label className="text-xs font-medium text-slate-600">Profile photo URL<input value={profile.avatar_url ?? ""} onChange={(e) => updateProfile("avatar_url", e.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400" placeholder="https://…" /></label>
+          </div>
+          <div className="mt-4 flex items-center gap-3"><button onClick={saveProfileChanges} disabled={profileBusy} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">{profileBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />} Save profile</button>{profileSaved && <span className="text-xs text-emerald-600">Saved</span>}</div>
+        </Section>}
         {/* Header — gradient + halo + icon */}
         <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50/50 px-4 pb-5 pt-4 sm:px-6">
           <div

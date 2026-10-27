@@ -81,7 +81,7 @@ export const springEasing = (stiffness: number) => {
 export type CustomTheme = { id: string; name: string; tokens: ThemeTokens };
 
 export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> = [
-  { id: "everest", label: "Light", hint: "fixed light editor chrome" },
+  { id: "everest", label: "Light", hint: "bright editor chrome" },
 ];
 
 // Everest is a fixed light palette. It deliberately does not depend on slide colors.
@@ -149,11 +149,8 @@ export const useSettings = create<SettingsState>()(
         return {
           ...previous,
           customThemes: previous?.customThemes ?? [],
-          // Replace all legacy slide-dependent theme values with the fixed light theme.
-          editorTheme:
-            previousTheme === "auto" || previousTheme === "auto-light" || previousTheme === "auto-dark" || previousTheme === "obsidian"
-              ? DEFAULT_EDITOR_THEME
-              : previousTheme ?? DEFAULT_EDITOR_THEME,
+          // Editor chrome is intentionally light; reset removed dark and legacy values.
+          editorTheme: DEFAULT_EDITOR_THEME,
           reduceMotion: true,
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
         };

@@ -19,10 +19,14 @@ import { Route as PrivacypolicyRouteImport } from './routes/privacypolicy'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as WikiRouteImport } from './routes/wiki'
+import { Route as ApiContextFetchRouteImport } from './routes/api.context-fetch'
+import { Route as ApiContextProxyRouteImport } from './routes/api.context-proxy'
 import { Route as ApiContextSearchRouteImport } from './routes/api.context-search'
+import { Route as ApiContextShotRouteImport } from './routes/api.context-shot'
 import { Route as ApiLlamaparseRouteImport } from './routes/api.llamaparse'
 import { Route as ApiSlideAnalysisRouteImport } from './routes/api.slide-analysis'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ProfileUsernameRouteImport } from './routes/profile.$username'
 import { Route as TIdRouteImport } from './routes/t.$id'
 import { Route as VKeyRouteImport } from './routes/v.$key'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -77,9 +81,24 @@ const WikiRoute = WikiRouteImport.update({
   path: '/wiki',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiContextFetchRoute = ApiContextFetchRouteImport.update({
+  id: '/api/context-fetch',
+  path: '/api/context-fetch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiContextProxyRoute = ApiContextProxyRouteImport.update({
+  id: '/api/context-proxy',
+  path: '/api/context-proxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiContextSearchRoute = ApiContextSearchRouteImport.update({
   id: '/api/context-search',
   path: '/api/context-search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiContextShotRoute = ApiContextShotRouteImport.update({
+  id: '/api/context-shot',
+  path: '/api/context-shot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLlamaparseRoute = ApiLlamaparseRouteImport.update({
@@ -96,6 +115,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
   getParentRoute: () => AuthRoute,
+} as any)
+const ProfileUsernameRoute = ProfileUsernameRouteImport.update({
+  id: '/profile/$username',
+  path: '/profile/$username',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TIdRoute = TIdRouteImport.update({
   id: '/t/$id',
@@ -124,10 +148,14 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-fetch': typeof ApiContextFetchRoute
+  '/api/context-proxy': typeof ApiContextProxyRoute
   '/api/context-search': typeof ApiContextSearchRoute
+  '/api/context-shot': typeof ApiContextShotRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -143,10 +171,14 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-fetch': typeof ApiContextFetchRoute
+  '/api/context-proxy': typeof ApiContextProxyRoute
   '/api/context-search': typeof ApiContextSearchRoute
+  '/api/context-shot': typeof ApiContextShotRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -163,10 +195,14 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wiki': typeof WikiRoute
+  '/api/context-fetch': typeof ApiContextFetchRoute
+  '/api/context-proxy': typeof ApiContextProxyRoute
   '/api/context-search': typeof ApiContextSearchRoute
+  '/api/context-shot': typeof ApiContextShotRoute
   '/api/llamaparse': typeof ApiLlamaparseRoute
   '/api/slide-analysis': typeof ApiSlideAnalysisRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/profile/$username': typeof ProfileUsernameRoute
   '/t/$id': typeof TIdRoute
   '/v/$key': typeof VKeyRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -184,10 +220,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-fetch'
+    | '/api/context-proxy'
     | '/api/context-search'
+    | '/api/context-shot'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -203,10 +243,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-fetch'
+    | '/api/context-proxy'
     | '/api/context-search'
+    | '/api/context-shot'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -222,10 +266,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/wiki'
+    | '/api/context-fetch'
+    | '/api/context-proxy'
     | '/api/context-search'
+    | '/api/context-shot'
     | '/api/llamaparse'
     | '/api/slide-analysis'
     | '/auth/callback'
+    | '/profile/$username'
     | '/t/$id'
     | '/v/$key'
     | '/.lovable/oauth/consent'
@@ -242,9 +290,13 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WikiRoute: typeof WikiRoute
+  ApiContextFetchRoute: typeof ApiContextFetchRoute
+  ApiContextProxyRoute: typeof ApiContextProxyRoute
   ApiContextSearchRoute: typeof ApiContextSearchRoute
+  ApiContextShotRoute: typeof ApiContextShotRoute
   ApiLlamaparseRoute: typeof ApiLlamaparseRoute
   ApiSlideAnalysisRoute: typeof ApiSlideAnalysisRoute
+  ProfileUsernameRoute: typeof ProfileUsernameRoute
   TIdRoute: typeof TIdRoute
   VKeyRoute: typeof VKeyRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -322,11 +374,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WikiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/context-fetch': {
+      id: '/api/context-fetch'
+      path: '/api/context-fetch'
+      fullPath: '/api/context-fetch'
+      preLoaderRoute: typeof ApiContextFetchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/context-proxy': {
+      id: '/api/context-proxy'
+      path: '/api/context-proxy'
+      fullPath: '/api/context-proxy'
+      preLoaderRoute: typeof ApiContextProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/context-search': {
       id: '/api/context-search'
       path: '/api/context-search'
       fullPath: '/api/context-search'
       preLoaderRoute: typeof ApiContextSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/context-shot': {
+      id: '/api/context-shot'
+      path: '/api/context-shot'
+      fullPath: '/api/context-shot'
+      preLoaderRoute: typeof ApiContextShotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/llamaparse': {
@@ -349,6 +422,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/profile/$username': {
+      id: '/profile/$username'
+      path: '/profile/$username'
+      fullPath: '/profile/$username'
+      preLoaderRoute: typeof ProfileUsernameRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/t/$id': {
       id: '/t/$id'
@@ -395,9 +475,13 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WikiRoute: WikiRoute,
+  ApiContextFetchRoute: ApiContextFetchRoute,
+  ApiContextProxyRoute: ApiContextProxyRoute,
   ApiContextSearchRoute: ApiContextSearchRoute,
+  ApiContextShotRoute: ApiContextShotRoute,
   ApiLlamaparseRoute: ApiLlamaparseRoute,
   ApiSlideAnalysisRoute: ApiSlideAnalysisRoute,
+  ProfileUsernameRoute: ProfileUsernameRoute,
   TIdRoute: TIdRoute,
   VKeyRoute: VKeyRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,

@@ -55,10 +55,7 @@ const advancedEffects = (f?: ImageFilters): Array<{ key: string; inner: string }
   return list;
 };
 
-const filterCss = (
-  f?: ImageFilters,
-  advancedUrl?: (key: string, inner: string) => string,
-) => {
+const filterCss = (f?: ImageFilters, advancedUrl?: (key: string, inner: string) => string) => {
   const v = { ...DEFAULT_FILTERS, ...(f ?? {}) };
   const temp = v.temperature ?? 0;
   const parts = [
@@ -140,7 +137,15 @@ export type CropRect = { l: number; t: number; r: number; b: number };
 /** Layout of the <img> when a cropRect is active. Returns the absolute
  *  width/height/left/top of the full-size image inside the frame. */
 function cropRectLayout(
-  el: { width: number; height: number; cropRect?: CropRect; cropZoom?: number; cropX?: number; cropY?: number; illustrationFormat?: string },
+  el: {
+    width: number;
+    height: number;
+    cropRect?: CropRect;
+    cropZoom?: number;
+    cropX?: number;
+    cropY?: number;
+    illustrationFormat?: string;
+  },
   nat?: { w: number; h: number } | null,
 ) {
   const cr = el.cropRect;
@@ -254,8 +259,7 @@ export function CanvasElement({
   const cropping = !presenting && !preview && croppingId === element.id;
   // Natural size of the rendered image — needed to lay out PPT-style crop.
   const [natSize, setNatSize] = useState<{ w: number; h: number } | null>(null);
-  const cropLayout =
-    element.type === "image" ? cropRectLayout(element as never, natSize) : null;
+  const cropLayout = element.type === "image" ? cropRectLayout(element as never, natSize) : null;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -295,7 +299,9 @@ export function CanvasElement({
       : undefined;
   const entryAnimRef = useRef<Animation | null>(null);
   const [useCssEntry, setUseCssEntry] = useState(
-    () => typeof window === "undefined" || !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches,
+    () =>
+      typeof window === "undefined" ||
+      !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches,
   );
 
   useEffect(() => {
@@ -670,7 +676,10 @@ export function CanvasElement({
     if (!iw || !ih) return;
     const startX = e.clientX;
     const startY = e.clientY;
-    const x0 = element.x, y0 = element.y, W0 = element.width, H0 = element.height;
+    const x0 = element.x,
+      y0 = element.y,
+      W0 = element.width,
+      H0 = element.height;
     const c0: CropRect = {
       l: element.cropRect?.l ?? 0,
       t: element.cropRect?.t ?? 0,
@@ -685,7 +694,10 @@ export function CanvasElement({
     const onMove = (m: MouseEvent) => {
       const dx = (m.clientX - startX) / scale;
       const dy = (m.clientY - startY) / scale;
-      let nx = x0, ny = y0, nw = W0, nh = H0;
+      let nx = x0,
+        ny = y0,
+        nw = W0,
+        nh = H0;
       const cr: CropRect = { ...c0 };
       if (handle.includes("w")) {
         // left edge: inward (dx > 0) crops more, outward restores (down to l = 0)
@@ -723,6 +735,7 @@ export function CanvasElement({
   return (
     <div
       ref={ref}
+      data-canvas-element="true"
       onMouseDown={onDragStart}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -1067,9 +1080,7 @@ export function CanvasElement({
                 WebkitMaskRepeat: "no-repeat",
                 maskRepeat: "no-repeat",
                 transform: `scale(${element.flipX ? -1 : 1}, ${element.flipY ? -1 : 1})`,
-                filter: [
-                  filterCss(element.filters, (key) => `url("#img-fx-${element.id}-${key}")`),
-                ]
+                filter: [filterCss(element.filters, (key) => `url("#img-fx-${element.id}-${key}")`)]
                   .filter(Boolean)
                   .join(" "),
                 opacity: element.opacity ?? 1,
@@ -1181,10 +1192,50 @@ export function CanvasElement({
                 outlineOffset: "-1px",
               }}
             >
-              <div style={{ position: "absolute", left: "33.333%", top: 0, bottom: 0, width: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", left: "66.667%", top: 0, bottom: 0, width: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", top: "33.333%", left: 0, right: 0, height: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", top: "66.667%", left: 0, right: 0, height: 1, background: "rgba(255,255,255,0.55)", pointerEvents: "none" }} />
+              <div
+                style={{
+                  position: "absolute",
+                  left: "33.333%",
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  background: "rgba(255,255,255,0.55)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  left: "66.667%",
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  background: "rgba(255,255,255,0.55)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "33.333%",
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: "rgba(255,255,255,0.55)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "66.667%",
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: "rgba(255,255,255,0.55)",
+                  pointerEvents: "none",
+                }}
+              />
               <div
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{
@@ -1222,7 +1273,14 @@ export function CanvasElement({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    useEditor.getState().update(element.id, { cropZoom: 1, cropX: 50, cropY: 50, cropRect: undefined });
+                    useEditor
+                      .getState()
+                      .update(element.id, {
+                        cropZoom: 1,
+                        cropX: 50,
+                        cropY: 50,
+                        cropRect: undefined,
+                      });
                   }}
                   style={{
                     border: "2px solid #0a0f1f",
@@ -1268,9 +1326,9 @@ export function CanvasElement({
             );
           }
           const Comp =
-            (
-              LUCIDE_ICONS as unknown as Record<string, React.ComponentType<LucideProps>>
-            )[element.name] ?? HelpCircle;
+            (LUCIDE_ICONS as unknown as Record<string, React.ComponentType<LucideProps>>)[
+              element.name
+            ] ?? HelpCircle;
           return (
             <Comp
               color={element.color}
@@ -1341,7 +1399,9 @@ export function CanvasElement({
                 <div style={{ fontSize: "min(72px, 22%)", lineHeight: 1 }}>
                   {embedProvider(element.src).emoji}
                 </div>
-                <div style={{ fontSize: "max(18px, 7%)", fontWeight: 800, letterSpacing: "-0.01em" }}>
+                <div
+                  style={{ fontSize: "max(18px, 7%)", fontWeight: 800, letterSpacing: "-0.01em" }}
+                >
                   {element.title || embedProvider(element.src).label}
                 </div>
                 <div
@@ -1390,7 +1450,9 @@ export function CanvasElement({
           {(["nw", "ne", "sw", "se"] as Handle[]).map((h) => (
             <div
               key={h}
-              onMouseDown={cropping && element.type === "image" ? onCropHandleStart(h) : onResizeStart(h)}
+              onMouseDown={
+                cropping && element.type === "image" ? onCropHandleStart(h) : onResizeStart(h)
+              }
               style={{
                 position: "absolute",
                 width: cropping ? 24 : 18,
@@ -1680,14 +1742,23 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             </span>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               {interactive && (
-                <span onClick={resetPoll} style={{ cursor: "pointer", textDecoration: "underline" }}>
+                <span
+                  onClick={resetPoll}
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                >
                   reset
                 </span>
               )}
               {interactive && (
                 <span
                   onClick={() => setQrOpen(true)}
-                  style={{ cursor: "pointer", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+                  style={{
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
                 >
                   <QrCode size={14} /> join
                 </span>
@@ -1743,55 +1814,55 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
           })}
         </div>
       )}
-        {qrOpen && (
+      {qrOpen && (
+        <div
+          onClick={() => setQrOpen(false)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 10,
+            background: "rgba(5,10,25,0.85)",
+            display: "grid",
+            placeItems: "center",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+          }}
+        >
           <div
-            onClick={() => setQrOpen(false)}
+            onClick={(e) => e.stopPropagation()}
             style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 10,
-              background: "rgba(5,10,25,0.85)",
-              display: "grid",
-              placeItems: "center",
-              backdropFilter: "blur(4px)",
-              WebkitBackdropFilter: "blur(4px)",
+              background: "#ffffff",
+              color: "#0a0f1f",
+              borderRadius: 16,
+              padding: "18px 22px",
+              textAlign: "center",
+              maxWidth: "82%",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
             }}
           >
-            <div
-              onClick={(e) => e.stopPropagation()}
+            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 10 }}>Scan to vote</div>
+            <QRCodeSVG value={pollUrl} size={170} />
+            <div style={{ fontSize: 10, marginTop: 10, opacity: 0.6, wordBreak: "break-all" }}>
+              {pollUrl}
+            </div>
+            <button
+              onClick={() => setQrOpen(false)}
               style={{
-                background: "#ffffff",
-                color: "#0a0f1f",
-                borderRadius: 16,
-                padding: "18px 22px",
-                textAlign: "center",
-                maxWidth: "82%",
-                boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
+                marginTop: 12,
+                border: "2px solid #0a0f1f",
+                background: "#ffd84a",
+                fontWeight: 800,
+                fontSize: 11,
+                padding: "6px 14px",
+                borderRadius: 8,
+                cursor: "pointer",
               }}
             >
-              <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 10 }}>Scan to vote</div>
-              <QRCodeSVG value={pollUrl} size={170} />
-              <div style={{ fontSize: 10, marginTop: 10, opacity: 0.6, wordBreak: "break-all" }}>
-                {pollUrl}
-              </div>
-              <button
-                onClick={() => setQrOpen(false)}
-                style={{
-                  marginTop: 12,
-                  border: "2px solid #0a0f1f",
-                  background: "#ffd84a",
-                  fontWeight: 800,
-                  fontSize: 11,
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                }}
-              >
-                Close
-              </button>
-            </div>
+              Close
+            </button>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }

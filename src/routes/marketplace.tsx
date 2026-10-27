@@ -6,6 +6,7 @@ import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 import { useEditor, type Page } from "@/store/editor";
 import { usePlugins, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins";
+import { profileLabel } from "@/lib/profiles";
 
 export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
@@ -114,7 +115,7 @@ function Marketplace() {
               <Sparkles className="size-5" />
             </span>
             <div>
-              <p className="logo-wordmark font-orbitron text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">DiapoLab</p>
+              <p className="logo-wordmark text-[11px] text-blue-600">DiapoLab</p>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Marketplace</h1>
             </div>
           </div>
@@ -234,6 +235,7 @@ function Marketplace() {
                         <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
                       </div>
                     </div>
+                      {t.creator_profile?.username && <Link to="/profile/$username" params={{ username: t.creator_profile.username }} onClick={(event) => event.stopPropagation()} className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-blue-600 hover:underline"><span className="grid size-5 shrink-0 place-items-center overflow-hidden rounded-full bg-blue-100 text-[8px] text-blue-600">{t.creator_profile.avatar_url ? <img src={t.creator_profile.avatar_url} alt="" className="size-full object-cover" /> : profileLabel(t.creator_profile).slice(0, 1).toUpperCase()}</span><span className="truncate">by {profileLabel(t.creator_profile as any)}</span></Link>}
                     <ArrowRight className="size-4 shrink-0 text-slate-200 transition-all group-hover:translate-x-0.5 group-hover:text-blue-500" />
                   </div>
                 </button>
