@@ -18,6 +18,11 @@
 //  - .psd import (ag-psd): layers (order preserved), opacity, visibility &
 //    blend modes preserved, and the canvas adapts to the imported image size
 //  - Layer blend modes (Produit, Incrustation, Densité couleur…)
+//  - Selections: rectangle, lasso, magic wand (Ctrl+A / Ctrl+D / Suppr),
+//    filters & painting constrained to the active selection
+//  - Layer masks (add/paint/invert/apply/remove), layer groups (1 level),
+//    adjustment layers, levels / hue-sat / color balance with histogram
+//  - Liquify (radial-feather warp brush), transparent PNG stays transparent
 //  - Precise image resize (pixels), document crop, rotate 90°, flips
 //  - Undo / redo (document snapshots), PNG download, export to the slide
 
@@ -46,6 +51,8 @@ import {
   Plus,
   Redo2,
   Square,
+  SquareDashed,
+  Lasso,
   Trash2,
   Type,
   Undo2,
@@ -92,6 +99,8 @@ type RasterLayer = BaseLayer & {
   y: number;
   /** bumped whenever pixels change, to invalidate the baked-fx cache */
   version: number;
+  /** layer mask (white = visible, black = hidden), doc-sized, optional */
+  mask?: HTMLCanvasElement;
 };
 
 type TextLayer = BaseLayer & {
@@ -119,9 +128,25 @@ type ShapeLayer = BaseLayer & {
   stroke: string | null;
   strokeWidth: number;
 };
+/** adjustment layer — applies its fx to everything below it */
+type AdjLayer = BaseLayer & { kind: "adjustment" };
+/** layer group — renders its children as one composited unit */
+type GroupLayer = BaseLayer & { kind: "group"; open: boolean; children: Layer[] };
 
-type Layer = RasterLayer | TextLayer | ShapeLayer;
-type Tool = "select" | "hand" | "brush" | "eraser" | "text" | "rect" | "ellipse" | "line" | "crop";
+type Layer = RasterLayer | TextLayer | ShapeLayer | AdjLayer | GroupLayer;
+type Tool =
+  | "select"
+  | "hand"
+  | "brush"
+  | "eraser"
+  | "text"
+  | "rect"
+  | "ellipse"
+  | "line"
+  | "crop"
+  | "rectselect"
+  | "lasso"
+  | "wand";
 type View = { zoom: number; x: number; y: number };
 type Snap = { w: number; h: number; selId: string | null; layers: unknown[] };
 type CropFrame = { x: number; y: number; w: number; h: number }; // doc px
@@ -182,12 +207,14 @@ const PSD_BLEND_MAP: Record<string, string> = {
 // Filter engine (menu Filtre) — destructive filters with a live preview
 // ---------------------------------------------------------------------------
 
-type FilterParam = { key: string; label: string; min: number; max: number; def: number; unit?: string };
+type FilterParam = { key: string; label: string; min: number; max: number; def: number; unit?: string; step?: number };
 type FilterDef = {
   id: string;
   label: string;
   group: string;
   params: FilterParam[];
+  /** show a luminance histogram of the source in the dialog (Niveaux…) */
+  histogram?: boolean;
   apply: (src: HTMLCanvasElement, p: Record<string, number>) => HTMLCanvasElement;
 };
 
@@ -358,7 +385,7 @@ function edgesCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
       out.data[i] = m;
       out.data[i + 1] = m;
       out.data[i + 2] = m;
-      out.data[i + 3] = 255;
+      out.data[i + 3] = s[i + 3]; // preserve transparency
     }
   }
   c.getContext("2d")!.putImageData(out, 0, 0);
@@ -612,6 +639,9 @@ function halftoneCanvas(src: HTMLCanvasElement, cell: number): HTMLCanvasElement
       }
     }
   }
+  // preserve the source's transparency (transparent PNGs stay transparent)
+  cx.globalCompositeOperation = "destination-in";
+  cx.drawImage(src, 0, 0);
   return c;
 }
 
@@ -850,7 +880,95 @@ function vignetteCanvas(src: HTMLCanvasElement, amount: number): HTMLCanvasEleme
   return c;
 }
 
+/** Réglages: levels with in/out black/white points + gamma */
+function levelsCanvas(src: HTMLCanvasElement, inB: number, gamma: number, inW: number, outB: number, outW: number): HTMLCanvasElement {
+  const lut = new Uint8ClampedArray(256);
+  const g = Math.max(0.1, gamma / 100);
+  const lo = Math.min(inB, inW - 1);
+  const hi = Math.max(inW, lo + 1);
+  for (let v = 0; v < 256; v++) {
+    let t = (v - lo) / (hi - lo);
+    t = Math.max(0, Math.min(1, t));
+    t = Math.pow(t, 1 / g);
+    lut[v] = Math.round(outB + t * (outW - outB));
+  }
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = lut[d[i]];
+    d[i + 1] = lut[d[i + 1]];
+    d[i + 2] = lut[d[i + 2]];
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
+/** Réglages: hue / saturation / lightness */
+function hueSatCanvas(src: HTMLCanvasElement, hue: number, sat: number, lum: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.filter = `hue-rotate(${hue}deg) saturate(${Math.max(0, 1 + sat / 100)}) brightness(${Math.max(0, 1 + lum / 100)})`;
+  cx.drawImage(src, 0, 0);
+  return c;
+}
+
+/** Réglages: color balance (cyan↔rouge, magenta↔vert, jaune↔bleu) */
+function colorBalanceCanvas(src: HTMLCanvasElement, cr: number, mg: number, yb: number): HTMLCanvasElement {
+  const c = newCanvas(src.width, src.height);
+  const cx = c.getContext("2d")!;
+  cx.drawImage(src, 0, 0);
+  const data = cx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  const k = 1.28;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] += cr * k;
+    d[i + 1] += mg * k;
+    d[i + 2] -= yb * k;
+  }
+  cx.putImageData(data, 0, 0);
+  return c;
+}
+
 const FILTERS: FilterDef[] = [
+  {
+    id: "levels",
+    label: "Niveaux…",
+    group: "Réglages",
+    histogram: true,
+    params: [
+      { key: "inB", label: "Noirs (entrée)", min: 0, max: 254, def: 0 },
+      { key: "gamma", label: "Gamma", min: 10, max: 300, def: 100, unit: " %" },
+      { key: "inW", label: "Blancs (entrée)", min: 1, max: 255, def: 255 },
+      { key: "outB", label: "Sortie — noirs", min: 0, max: 255, def: 0 },
+      { key: "outW", label: "Sortie — blancs", min: 0, max: 255, def: 255 },
+    ],
+    apply: (src, p) => levelsCanvas(src, p.inB, p.gamma, p.inW, p.outB, p.outW),
+  },
+  {
+    id: "huesat",
+    label: "Teinte / Saturation…",
+    group: "Réglages",
+    params: [
+      { key: "hue", label: "Teinte", min: -180, max: 180, def: 0, unit: "°" },
+      { key: "sat", label: "Saturation", min: -100, max: 100, def: 0, unit: " %" },
+      { key: "lum", label: "Luminosité", min: -100, max: 100, def: 0, unit: " %" },
+    ],
+    apply: (src, p) => hueSatCanvas(src, p.hue, p.sat, p.lum),
+  },
+  {
+    id: "colorbal",
+    label: "Balance des couleurs…",
+    group: "Réglages",
+    params: [
+      { key: "cr", label: "Cyan ↔ Rouge", min: -100, max: 100, def: 0 },
+      { key: "mg", label: "Magenta ↔ Vert", min: -100, max: 100, def: 0 },
+      { key: "yb", label: "Jaune ↔ Bleu", min: -100, max: 100, def: 0 },
+    ],
+    apply: (src, p) => colorBalanceCanvas(src, p.cr, p.mg, p.yb),
+  },
   {
     id: "gaussian",
     label: "Flou gaussien…",
@@ -1124,7 +1242,21 @@ const FILTERS: FilterDef[] = [
   },
 ];
 
-const FILTER_GROUP_ORDER = ["Flou", "Netteté", "Distorsion", "Pixelisation", "Bruit", "Style", "Rétro", "Rendu"];
+const FILTER_GROUP_ORDER = ["Réglages", "Flou", "Netteté", "Distorsion", "Pixelisation", "Bruit", "Style", "Rétro", "Rendu"];
+
+/** recursively map a layer tree (goes into groups) */
+function mapLayers(ls: Layer[], fn: (l: Layer) => Layer): Layer[] {
+  return ls.map((l) => {
+    const n = fn(l);
+    if (n.kind === "group") return { ...n, children: mapLayers(n.children, fn) } as Layer;
+    return n;
+  });
+}
+
+/** flatten a layer tree into a list (groups included, then their children) */
+function flatLayers(ls: Layer[]): Layer[] {
+  return ls.flatMap((l) => (l.kind === "group" ? [l, ...flatLayers(l.children)] : [l]));
+}
 
 const DEFAULT_FX: Fx = {
   brightness: 100,
@@ -1235,14 +1367,16 @@ function channelCanvas(src: HTMLCanvasElement, color: string): HTMLCanvasElement
   cx.globalCompositeOperation = "multiply";
   cx.fillStyle = color;
   cx.fillRect(0, 0, c.width, c.height);
+  // restore the source's alpha mask — critical for transparent PNGs
+  cx.globalCompositeOperation = "destination-in";
+  cx.drawImage(src, 0, 0);
   return c;
 }
 
 function glitchCanvas(src: HTMLCanvasElement, n: number): HTMLCanvasElement {
   const c = newCanvas(src.width, src.height);
   const cx = c.getContext("2d")!;
-  cx.fillStyle = "#000";
-  cx.fillRect(0, 0, c.width, c.height);
+  // transparent base (no black fill) — preserves PNG transparency
   cx.globalCompositeOperation = "lighter";
   cx.drawImage(channelCanvas(src, "#ff0000"), -n, 0);
   cx.drawImage(channelCanvas(src, "#00ff00"), 0, Math.round(n / 2));
@@ -1273,6 +1407,7 @@ function SliderRow({
   min,
   max,
   unit,
+  step,
   onChange,
 }: {
   label: string;
@@ -1280,6 +1415,7 @@ function SliderRow({
   min: number;
   max: number;
   unit: string;
+  step?: number;
   onChange: (v: number) => void;
 }) {
   return (
@@ -1295,6 +1431,7 @@ function SliderRow({
         type="range"
         min={min}
         max={max}
+        step={step ?? 1}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full accent-fuchsia-600"
@@ -1445,7 +1582,7 @@ export function ImageStudioDialog({
   const docRef = useRef<HTMLCanvasElement | null>(null);
   const lastPaint = useRef<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{
-    kind: "pan" | "move" | "shape" | "crop" | "paint";
+    kind: "pan" | "move" | "shape" | "crop" | "paint" | "rectsel" | "lasso" | "paintmask";
     startX: number;
     startY: number;
     layerId?: string;
@@ -1454,6 +1591,19 @@ export function ImageStudioDialog({
   const histTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastFilterRef = useRef<{ id: string; params: Record<string, number> } | null>(null);
   const filterPreviewRef = useRef<HTMLCanvasElement>(null);
+  const histDrawRef = useRef<HTMLCanvasElement>(null);
+  const liquifyPreviewRef = useRef<HTMLCanvasElement>(null);
+  /** active selection mask (doc-sized, white = selected) */
+  const selMaskRef = useRef<HTMLCanvasElement | null>(null);
+  /** dashed outline info for rect/lasso selections (doc coords) */
+  const [selOutline, setSelOutline] = useState<{ kind: "rect" | "lasso"; pts: Array<{ x: number; y: number }> } | null>(null);
+  const [wandTol, setWandTol] = useState(32);
+  const lassoPtsRef = useRef<Array<{ x: number; y: number }>>([]);
+  /** mask editing mode: brush/eraser paint the selected layer's mask */
+  const [maskEdit, setMaskEdit] = useState(false);
+  /** liquify workspace */
+  const [liquify, setLiquify] = useState<{ work: HTMLCanvasElement | null; size: number; force: number }>({ work: null, size: 80, force: 50 });
+  const liquifyDragRef = useRef<{ x: number; y: number } | null>(null);
 
   const [layers, setLayers] = useState<Layer[]>([]);
   const [docSize, setDocSize] = useState({ w: 0, h: 0 });
@@ -1479,7 +1629,7 @@ export function ImageStudioDialog({
   layersRef.current = layers;
   const docW = docSize.w;
   const docH = docSize.h;
-  const sel = layers.find((l) => l.id === selId) ?? null;
+  const sel = findLayerById(layers, selId);
 
   const selected = elements.find((e) => e.id === selectedId);
   const selectedImage =
@@ -1502,17 +1652,80 @@ export function ImageStudioDialog({
     setLayers(ls);
   };
 
+  // ---- tree helpers (groups) ------------------------------------------------------
+
+  const findLayerById = (ls: Layer[], id: string | null): Layer | null => {
+    if (!id) return null;
+    for (const l of ls) {
+      if (l.id === id) return l;
+      if (l.kind === "group") {
+        const r = findLayerById(l.children, id);
+        if (r) return r;
+      }
+    }
+    return null;
+  };
+
+  /** the array (root or a group's children) that directly contains the layer */
+  const listContaining = (ls: Layer[], id: string): { arr: Layer[]; index: number } | null => {
+    const i = ls.findIndex((l) => l.id === id);
+    if (i >= 0) return { arr: ls, index: i };
+    for (const l of ls) {
+      if (l.kind === "group") {
+        const r = listContaining(l.children, id);
+        if (r) return r;
+      }
+    }
+    return null;
+  };
+
+  /** deep copy with fresh ids (groups recurse) */
+  const duplicateTree = (l: Layer, suffix = " copie"): Layer => {
+    if (l.kind === "group") {
+      return { ...l, id: uid(), name: `${l.name}${suffix}`, open: l.open, children: l.children.map((c) => duplicateTree(c, "")) };
+    }
+    if (l.kind === "raster") {
+      const c = newCanvas(l.canvas.width, l.canvas.height);
+      c.getContext("2d")!.drawImage(l.canvas, 0, 0);
+      const m = l.mask ? newCanvas(l.mask.width, l.mask.height) : undefined;
+      if (l.mask && m) m.getContext("2d")!.drawImage(l.mask, 0, 0);
+      return { ...l, id: uid(), name: `${l.name}${suffix}`, canvas: c, mask: m, version: 0 };
+    }
+    return { ...l, id: uid(), name: `${l.name}${suffix}` };
+  };
+
   const patchLayer = (id: string, patch: Partial<Layer>) => {
-    setLayersBoth(layersRef.current.map((l) => (l.id === id ? ({ ...l, ...patch } as Layer) : l)));
+    setLayersBoth(mapLayers(layersRef.current, (l) => (l.id === id ? ({ ...l, ...patch } as Layer) : l)));
   };
 
   const patchFx = (id: string, patch: Partial<Fx>) => {
     setLayersBoth(
-      layersRef.current.map((l) => (l.id === id ? ({ ...l, fx: { ...l.fx, ...patch } } as Layer) : l))
+      mapLayers(layersRef.current, (l) => (l.id === id ? ({ ...l, fx: { ...l.fx, ...patch } } as Layer) : l))
     );
   };
 
   // ---- history ---------------------------------------------------------------
+
+  /** snapshot a single layer (recursive for groups) */
+  const snapLayer = (l: Layer): Record<string, unknown> => {
+    if (l.kind === "group") {
+      return { ...l, children: l.children.map(snapLayer) };
+    }
+    if (l.kind === "raster") {
+      return {
+        ...l,
+        canvas: undefined,
+        mask: undefined,
+        cw: l.canvas.width,
+        ch: l.canvas.height,
+        png: l.canvas.toDataURL("image/png"),
+        mPng: l.mask ? l.mask.toDataURL("image/png") : undefined,
+        mw: l.mask?.width,
+        mh: l.mask?.height,
+      };
+    }
+    return { ...l } as unknown as Record<string, unknown>;
+  };
 
   const serialize = (): Snap | null => {
     try {
@@ -1520,18 +1733,7 @@ export function ImageStudioDialog({
         w: docW,
         h: docH,
         selId,
-        layers: layersRef.current.map((l) => {
-          if (l.kind === "raster") {
-            return {
-              ...l,
-              canvas: undefined,
-              cw: l.canvas.width,
-              ch: l.canvas.height,
-              png: l.canvas.toDataURL("image/png"),
-            };
-          }
-          return { ...l };
-        }),
+        layers: layersRef.current.map(snapLayer),
       };
     } catch {
       if (!histWarned) {
@@ -1560,28 +1762,43 @@ export function ImageStudioDialog({
     }, 700);
   };
 
+  /** rebuild a layer from a snapshot (recursive for groups) */
+  const restoreLayer = (l: Record<string, unknown>): Promise<Layer> =>
+    new Promise<Layer>((resolve) => {
+      if (l.kind === "group") {
+        Promise.all(((l.children as Record<string, unknown>[]) ?? []).map(restoreLayer)).then((children) => {
+          resolve({ ...(l as unknown as GroupLayer), children });
+        });
+      } else if (l.kind === "raster") {
+        const c = newCanvas(l.cw as number, l.ch as number);
+        const im = new Image();
+        im.onload = () => {
+          c.getContext("2d")!.drawImage(im, 0, 0);
+          const rest = { ...l } as unknown as RasterLayer;
+          rest.canvas = c;
+          if (l.mPng) {
+            const m = newCanvas((l.mw as number) ?? (l.cw as number), (l.mh as number) ?? (l.ch as number));
+            const mim = new Image();
+            mim.onload = () => {
+              m.getContext("2d")!.drawImage(mim, 0, 0);
+              rest.mask = m;
+              resolve(rest);
+            };
+            mim.onerror = () => resolve(rest);
+            mim.src = l.mPng as string;
+          } else {
+            resolve(rest);
+          }
+        };
+        im.onerror = () => resolve({ ...l } as unknown as Layer);
+        im.src = l.png as string;
+      } else {
+        resolve(l as unknown as Layer);
+      }
+    });
+
   const restore = (snap: Snap) => {
-    Promise.all(
-      (snap.layers as Record<string, unknown>[]).map(
-        (l) =>
-          new Promise<Layer>((resolve) => {
-            if (l.kind === "raster") {
-              const c = newCanvas(l.cw as number, l.ch as number);
-              const im = new Image();
-              im.onload = () => {
-                c.getContext("2d")!.drawImage(im, 0, 0);
-                const rest = { ...l } as unknown as RasterLayer;
-                rest.canvas = c;
-                resolve(rest);
-              };
-              im.onerror = () => resolve({ ...l } as unknown as Layer);
-              im.src = l.png as string;
-            } else {
-              resolve(l as unknown as Layer);
-            }
-          }),
-      ),
-    ).then((ls) => {
+    Promise.all((snap.layers as Record<string, unknown>[]).map(restoreLayer)).then((ls) => {
       setLayersBoth(ls);
       setDocSize({ w: snap.w, h: snap.h });
       setSelId(snap.selId);
@@ -1764,13 +1981,30 @@ export function ImageStudioDialog({
 
   const drawLayerTo = (ctx: CanvasRenderingContext2D, l: Layer) => {
     if (!l.visible || l.opacity <= 0) return;
+    if (l.kind === "adjustment") return; // handled sequentially in compositeDoc
     ctx.save();
     ctx.globalAlpha = l.opacity;
     const blend = l.blend || "normal";
     ctx.globalCompositeOperation = blend === "normal" ? "source-over" : blend;
     ctx.filter = filterCss(l.fx);
-    if (l.kind === "raster") {
-      ctx.drawImage(bakeRaster(l), l.x, l.y);
+    if (l.kind === "group") {
+      // render children into an isolated buffer so group opacity/blend applies as one unit
+      const t = newCanvas(docW, docH);
+      const tcx = t.getContext("2d")!;
+      for (const ch of l.children) drawLayerTo(tcx, ch);
+      ctx.drawImage(t, 0, 0);
+    } else if (l.kind === "raster") {
+      const img = bakeRaster(l);
+      if (l.mask) {
+        const t = newCanvas(docW, docH);
+        const tcx = t.getContext("2d")!;
+        tcx.drawImage(img, l.x, l.y);
+        tcx.globalCompositeOperation = "destination-in";
+        tcx.drawImage(l.mask, 0, 0);
+        ctx.drawImage(t, 0, 0);
+      } else {
+        ctx.drawImage(img, l.x, l.y);
+      }
     } else if (l.kind === "text") {
       ctx.font = `${l.italic ? "italic " : ""}${l.bold ? "700 " : "400 "}${l.size}px ${l.font}`;
       ctx.fillStyle = l.color;
@@ -1812,11 +2046,31 @@ export function ImageStudioDialog({
     }
     const cx = c.getContext("2d")!;
     cx.clearRect(0, 0, docW, docH);
-    for (const l of layersRef.current) drawLayerTo(cx, l);
+    for (const l of layersRef.current) {
+      if (l.kind === "adjustment") {
+        // adjustment layer: re-render everything below with its fx applied
+        if (!l.visible || l.opacity <= 0) continue;
+        const t = newCanvas(docW, docH);
+        const tcx = t.getContext("2d")!;
+        tcx.filter = filterCss(l.fx);
+        tcx.drawImage(c, 0, 0);
+        const outC = l.fx.curve ? applyLut(t, l.fx.curve) : t;
+        const blend = l.blend && l.blend !== "normal" ? l.blend : "source-over";
+        cx.save();
+        cx.globalAlpha = l.opacity;
+        cx.globalCompositeOperation = blend;
+        cx.clearRect(0, 0, docW, docH);
+        cx.drawImage(outC, 0, 0);
+        cx.restore();
+        continue;
+      }
+      drawLayerTo(cx, l);
+    }
     return c;
   };
 
   const layerBBox = (l: Layer): { x: number; y: number; w: number; h: number } | null => {
+    if (l.kind === "adjustment" || l.kind === "group") return null;
     if (l.kind === "raster") return { x: l.x, y: l.y, w: l.canvas.width, h: l.canvas.height };
     if (l.kind === "text") {
       const cx = getScratch();
@@ -1868,8 +2122,8 @@ export function ImageStudioDialog({
     dctx.imageSmoothingEnabled = view.zoom < 3;
     dctx.drawImage(doc, zx, zy, zw, zh);
 
-    // selection outline
-    const sl = layersRef.current.find((l) => l.id === selId);
+    // selection outline (bbox of selected layer)
+    const sl = findLayerById(layersRef.current, selId);
     if (sl) {
       const b = layerBBox(sl);
       if (b) {
@@ -1880,6 +2134,37 @@ export function ImageStudioDialog({
         dctx.strokeRect(zx + b.x * view.zoom, zy + b.y * view.zoom, b.w * view.zoom, b.h * view.zoom);
         dctx.restore();
       }
+    }
+
+    // active selection (marquee): tint + dashed outline
+    const sm = selMaskRef.current;
+    if (sm) {
+      const t = newCanvas(sm.width, sm.height);
+      const tcx = t.getContext("2d")!;
+      tcx.drawImage(sm, 0, 0);
+      tcx.globalCompositeOperation = "source-in";
+      tcx.fillStyle = "#d926a9";
+      tcx.fillRect(0, 0, sm.width, sm.height);
+      dctx.save();
+      dctx.globalAlpha = 0.15;
+      dctx.drawImage(t, zx, zy, sm.width * view.zoom, sm.height * view.zoom);
+      dctx.restore();
+    }
+    if (selOutline) {
+      dctx.save();
+      dctx.setLineDash([6, 4]);
+      dctx.strokeStyle = "#0f172a";
+      dctx.lineWidth = 1;
+      dctx.beginPath();
+      selOutline.pts.forEach((q, i) => {
+        const sx = zx + q.x * view.zoom;
+        const sy = zy + q.y * view.zoom;
+        if (i === 0) dctx.moveTo(sx, sy);
+        else dctx.lineTo(sx, sy);
+      });
+      dctx.closePath();
+      dctx.stroke();
+      dctx.restore();
     }
 
     // crop frame + dimming outside
@@ -1919,18 +2204,30 @@ export function ImageStudioDialog({
     };
   };
 
+  const hitIn = (l: Layer, px: number, py: number): Layer | null => {
+    if (!l.visible || l.kind === "adjustment") return null;
+    if (l.kind === "group") {
+      for (let i = l.children.length - 1; i >= 0; i--) {
+        const h = hitIn(l.children[i], px, py);
+        if (h) return h;
+      }
+      return null;
+    }
+    const b = layerBBox(l);
+    if (b && px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) return l;
+    return null;
+  };
+
   const hitLayer = (px: number, py: number): Layer | null => {
     for (let i = layersRef.current.length - 1; i >= 0; i--) {
-      const l = layersRef.current[i];
-      if (!l.visible) continue;
-      const b = layerBBox(l);
-      if (b && px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) return l;
+      const hit = hitIn(layersRef.current[i], px, py);
+      if (hit) return hit;
     }
     return null;
   };
 
   const ensureRaster = (): RasterLayer => {
-    const s = layersRef.current.find((l) => l.id === selId);
+    const s = findLayerById(layersRef.current, selId);
     if (s && s.kind === "raster") return s;
     const c = newCanvas(docW, docH);
     const l: RasterLayer = { ...baseLayer("Peinture"), kind: "raster", canvas: c, x: 0, y: 0, version: 0 };
@@ -1939,11 +2236,9 @@ export function ImageStudioDialog({
     return l;
   };
 
-  const paintSeg = (l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, erase: boolean) => {
-    const ctx = l.canvas.getContext("2d")!;
-    ctx.save();
+  const strokeSeg = (ctx: CanvasRenderingContext2D, l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, erase: boolean, style: string) => {
     ctx.globalCompositeOperation = erase ? "destination-out" : "source-over";
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = style;
     ctx.lineWidth = brushSize;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -1951,9 +2246,140 @@ export function ImageStudioDialog({
     ctx.moveTo(a.x - l.x, a.y - l.y);
     ctx.lineTo(b.x - l.x, b.y - l.y);
     ctx.stroke();
+  };
+
+  /** paint a segment on the layer, constrained to the active selection (if any) */
+  const paintSeg = (l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, erase: boolean) => {
+    const m = selMaskRef.current;
+    const ctx = l.canvas.getContext("2d")!;
+    ctx.save();
+    if (!m) {
+      strokeSeg(ctx, l, a, b, erase, color);
+    } else {
+      // stroke into an isolated buffer, clip it with the selection, then commit
+      const t = newCanvas(l.canvas.width, l.canvas.height);
+      const tcx = t.getContext("2d")!;
+      strokeSeg(tcx, l, a, b, false, color);
+      tcx.globalCompositeOperation = "destination-in";
+      tcx.drawImage(m, -l.x, -l.y);
+      ctx.globalCompositeOperation = erase ? "destination-out" : "source-over";
+      ctx.drawImage(t, 0, 0);
+    }
     ctx.restore();
     l.version++;
     bakeCache.delete(l.id);
+    bump();
+  };
+
+  /** paint a segment on the selected layer's mask (mask-edit mode) */
+  const paintMaskSeg = (l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, erase: boolean) => {
+    if (!l.mask) return;
+    const ctx = l.mask.getContext("2d")!;
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.strokeStyle = erase ? "#000000" : "#ffffff"; // black hides, white reveals
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    ctx.restore();
+    bump();
+  };
+
+  // ===== wand (magic wand) selection =====
+  const wandSelect = (x: number, y: number) => {
+    if (x < 0 || y < 0 || x >= docW || y >= docH) return;
+    const comp = compositeDoc();
+    const c = comp.getContext("2d")!;
+    const img = c.getImageData(0, 0, docW, docH);
+    const d = img.data;
+    const idx = (y * docW + x) * 4;
+    const t0 = d[idx], t1 = d[idx + 1], t2 = d[idx + 2], t3 = d[idx + 3];
+    const tol = wandTol * 3;
+    const seen = new Uint8Array(docW * docH);
+    const out = new Uint8ClampedArray(docW * docH * 4);
+    // scanline flood fill
+    const stack: number[] = [x, y];
+    while (stack.length) {
+      const py = stack.pop()!;
+      let px = stack.pop()!;
+      // move left
+      while (px >= 0 && !seen[py * docW + px] && Math.abs(d[(py * docW + px) * 4] - t0) + Math.abs(d[(py * docW + px) * 4 + 1] - t1) + Math.abs(d[(py * docW + px) * 4 + 2] - t2) + Math.abs(d[(py * docW + px) * 4 + 3] - t3) <= tol) px--;
+      px++;
+      let spanUp = false, spanDown = false;
+      while (px < docW && !seen[py * docW + px] && Math.abs(d[(py * docW + px) * 4] - t0) + Math.abs(d[(py * docW + px) * 4 + 1] - t1) + Math.abs(d[(py * docW + px) * 4 + 2] - t2) + Math.abs(d[(py * docW + px) * 4 + 3] - t3) <= tol) {
+        seen[py * docW + px] = 1;
+        const o = (py * docW + px) * 4;
+        out[o] = 255; out[o + 1] = 255; out[o + 2] = 255; out[o + 3] = 255;
+        if (py > 0) {
+          if (!seen[(py - 1) * docW + px] && Math.abs(d[((py - 1) * docW + px) * 4] - t0) + Math.abs(d[((py - 1) * docW + px) * 4 + 1] - t1) + Math.abs(d[((py - 1) * docW + px) * 4 + 2] - t2) + Math.abs(d[((py - 1) * docW + px) * 4 + 3] - t3) <= tol) {
+            if (!spanUp) { stack.push(px, py - 1); spanUp = true; }
+          } else spanUp = false;
+        }
+        if (py < docH - 1) {
+          if (!seen[(py + 1) * docW + px] && Math.abs(d[((py + 1) * docW + px) * 4] - t0) + Math.abs(d[((py + 1) * docW + px) * 4 + 1] - t1) + Math.abs(d[((py + 1) * docW + px) * 4 + 2] - t2) + Math.abs(d[((py + 1) * docW + px) * 4 + 3] - t3) <= tol) {
+            if (!spanDown) { stack.push(px, py + 1); spanDown = true; }
+          } else spanDown = false;
+        }
+        px++;
+      }
+    }
+    const mk = newCanvas(docW, docH);
+    mk.getContext("2d")!.putImageData(new ImageData(out, docW, docH), 0, 0);
+    selMaskRef.current = mk;
+    setSelOutline(null);
+    setStatus("Sélection par baguette magique effectuée.");
+    bump();
+  };
+
+  const paintMaskSeg = (l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, black: boolean) => {
+    const cx = l.getContext();
+    cx.save();
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.globalCompositeOperation = "source-over";
+    cx.strokeStyle = black ? "#000" : "#fff";
+    cx.lineWidth = brushSize;
+    cx.lineCap = "round";
+    cx.lineJoin = "round";
+    cx.beginPath();
+    cx.moveTo(a.x - l.x, a.y - l.y);
+    cx.lineTo(b.x - l.x, b.y - l.y);
+    cx.stroke();
+    cx.restore();
+    bump();
+  };
+
+  const selectAll = () => {
+    const mk = newCanvas(docW, docH);
+    const mc = mk.getContext("2d")!;
+    mc.fillStyle = "#fff";
+    mc.fillRect(0, 0, docW, docH);
+    selMaskRef.current = mk;
+    setSelOutline(null);
+    bump();
+  };
+  const deselectAll = () => {
+    selMaskRef.current = null;
+    setSelOutline(null);
+    bump();
+  };
+  const deleteSelection = () => {
+    const mk = selMaskRef.current;
+    const l = findLayerById(layersRef.current, selId);
+    if (!mk || !l || l.kind !== "raster") return;
+    pushHistory();
+    const cx = l.getContext();
+    cx.save();
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.globalCompositeOperation = "destination-out";
+    cx.drawImage(mk, -l.x, -l.y);
+    cx.restore();
+    l.version++;
+    bakeCache.delete(l.id);
+    setStatus("Zone supprimée.");
     bump();
   };
 
@@ -1968,6 +2394,21 @@ export function ImageStudioDialog({
     }
     if (e.button !== 0) return;
 
+    // middle/pan fine; rect/lasso/wand selection tools
+    if (tool === "rectselect") {
+      dragRef.current = { kind: "rectsel", startX: p.x, startY: p.y };
+      return;
+    }
+    if (tool === "lasso") {
+      lassoPtsRef.current = [p];
+      dragRef.current = { kind: "lasso", startX: p.x, startY: p.y };
+      return;
+    }
+    if (tool === "wand") {
+      wandSelect(Math.round(p.x), Math.round(p.y));
+      return;
+    }
+
     switch (tool) {
       case "select": {
         const hit = hitLayer(p.x, p.y);
@@ -1980,8 +2421,20 @@ export function ImageStudioDialog({
       }
       case "brush":
       case "eraser": {
+        // painting on a layer mask
+        if (maskEdit) {
+          const s = findLayerById(layersRef.current, selId);
+          if (!s || s.kind !== "raster" || !s.mask) {
+            setStatus("Activez un calque raster avec un masque.");
+            return;
+          }
+          pushHistory();
+          paintMaskSeg(s, p, p, tool === "eraser");
+          dragRef.current = { kind: "paintmask", startX: 0, startY: 0, layerId: s.id };
+          return;
+        }
         if (tool === "eraser") {
-          const s = layersRef.current.find((l) => l.id === selId);
+          const s = findLayerById(layersRef.current, selId);
           if (!s || s.kind !== "raster") {
             setStatus("Sélectionnez un calque raster à effacer.");
             return;
@@ -2052,17 +2505,32 @@ export function ImageStudioDialog({
     }
     const p = toDoc(e);
     if (d.kind === "move" && d.layerId) {
-      const l = layersRef.current.find((x) => x.id === d.layerId);
+      const l = findLayerById(layersRef.current, d.layerId);
       if (l && d.orig) {
         patchLayer(l.id, { x: d.orig.x + (p.x - d.startX), y: d.orig.y + (p.y - d.startY) } as Partial<Layer>);
       }
     } else if (d.kind === "paint" && d.layerId) {
-      const l = layersRef.current.find((x) => x.id === d.layerId);
+      const l = findLayerById(layersRef.current, d.layerId);
       if (l && l.kind === "raster") {
         paintSeg(l, lastPaint.current ?? p, p, tool === "eraser");
       }
+    } else if (d.kind === "paintmask" && d.layerId) {
+      const l = findLayerById(layersRef.current, d.layerId);
+      if (l && l.kind === "raster") {
+        paintMaskSeg(l, lastPaint.current ?? p, p, tool === "eraser");
+      }
+    } else if (d.kind === "rectsel") {
+      setSelOutline({ kind: "rect", pts: [
+          { x: d.startX, y: d.startY },
+          { x: p.x, y: d.startY },
+          { x: p.x, y: p.y },
+          { x: d.startX, y: p.y },
+        ] });
+    } else if (d.kind === "lasso") {
+      lassoPtsRef.current = [...lassoPtsRef.current, p];
+      setSelOutline({ kind: "lasso", pts: lassoPtsRef.current });
     } else if (d.kind === "shape" && d.layerId) {
-      const l = layersRef.current.find((x) => x.id === d.layerId);
+      const l = findLayerById(layersRef.current, d.layerId);
       if (l && l.kind === "shape") {
         patchLayer(l.id, {
           x: Math.min(d.startX, p.x),
@@ -2080,10 +2548,49 @@ export function ImageStudioDialog({
         h: Math.min(docH, Math.abs(p.y - d.startY)),
       });
     }
-    if (d.kind === "paint") lastPaint.current = p;
+    if (d.kind === "paint" || d.kind === "paintmask") lastPaint.current = p;
   };
 
   const onPointerUp = () => {
+    const d = dragRef.current;
+    if (d && d.kind === "rectsel") {
+      const o = selOutline?.pts[2];
+      if (o && Math.abs(o.x - d.startX) > 1 && Math.abs(o.y - d.startY) > 1) {
+        const x = Math.max(0, Math.floor(Math.min(d.startX, o.x)));
+        const y = Math.max(0, Math.floor(Math.min(d.startY, o.y)));
+        const w = Math.min(docW - x, Math.ceil(Math.abs(o.x - d.startX)));
+        const h = Math.min(docH - y, Math.ceil(Math.abs(o.y - d.startY)));
+        if (w > 0 && h > 0) {
+          const mk = newCanvas(docW, docH);
+          const mc = mk.getContext("2d")!;
+          mc.fillStyle = "#fff";
+          mc.fillRect(x, y, w, h);
+          selMaskRef.current = mk;
+          setStatus(`Sélection ${w}×${h} px.`);
+        }
+      } else {
+        selMaskRef.current = null;
+      }
+      setSelOutline(null);
+    } else if (d && d.kind === "lasso") {
+      const pts = lassoPtsRef.current;
+      if (pts.length > 2) {
+        const mk = newCanvas(docW, docH);
+        const mc = mk.getContext("2d")!;
+        mc.fillStyle = "#fff";
+        mc.beginPath();
+        pts.forEach((q, i) => (i === 0 ? mc.moveTo(q.x, q.y) : mc.lineTo(q.x, q.y)));
+        mc.closePath();
+        mc.fill();
+        selMaskRef.current = mk;
+        setStatus("Sélection lasso effectuée.");
+      } else {
+        selMaskRef.current = null;
+      }
+      lassoPtsRef.current = [];
+      setSelOutline(null);
+      bump();
+    }
     dragRef.current = null;
     lastPaint.current = null;
   };
@@ -2116,11 +2623,16 @@ export function ImageStudioDialog({
     const cw = Math.max(1, Math.min(docW - cx0, Math.floor(crop.w)));
     const ch = Math.max(1, Math.min(docH - cy0, Math.floor(crop.h)));
     bakeCache.clear();
-    const ls = layersRef.current.map((l) => {
+    const ls = mapLayers(layersRef.current, (l) => {
       if (l.kind === "raster") {
         const c = newCanvas(cw, ch);
         c.getContext("2d")!.drawImage(l.canvas, cx0 - l.x, cy0 - l.y, cw, ch, 0, 0, cw, ch);
-        return { ...l, canvas: c, x: 0, y: 0, version: l.version + 1 } as Layer;
+        let m = l.mask;
+        if (m) {
+          m = newCanvas(cw, ch);
+          m.getContext("2d")!.drawImage(l.mask, cx0, cy0, cw, ch, 0, 0, cw, ch);
+        }
+        return { ...l, canvas: c, mask: m, x: 0, y: 0, version: l.version + 1 } as Layer;
       }
       const b = l as TextLayer | ShapeLayer;
       return { ...l, x: b.x - cx0, y: b.y - cy0 } as Layer;
@@ -2135,14 +2647,22 @@ export function ImageStudioDialog({
     if (!docW) return;
     pushHistory();
     bakeCache.clear();
-    const ls = layersRef.current.map((l) => {
+    const ls = mapLayers(layersRef.current, (l) => {
       if (l.kind === "raster") {
         const c = newCanvas(l.canvas.height, l.canvas.width);
         const cx = c.getContext("2d")!;
         cx.translate(c.width / 2, c.height / 2);
         cx.rotate(Math.PI / 2);
         cx.drawImage(l.canvas, -l.canvas.width / 2, -l.canvas.height / 2);
-        return { ...l, canvas: c, x: docH - (l.y + l.canvas.height), y: l.x, version: l.version + 1 } as Layer;
+        let m = l.mask;
+        if (m) {
+          m = newCanvas(docH, docW);
+          const mx = m.getContext("2d")!;
+          mx.translate(m.width / 2, m.height / 2);
+          mx.rotate(Math.PI / 2);
+          mx.drawImage(l.mask, -l.mask.width / 2, -l.mask.height / 2);
+        }
+        return { ...l, canvas: c, mask: m, x: docH - (l.y + l.canvas.height), y: l.x, version: l.version + 1 } as Layer;
       }
       if (l.kind === "text") {
         return { ...l, x: docH - l.y, y: l.x } as Layer;
@@ -2158,7 +2678,7 @@ export function ImageStudioDialog({
     if (!docW) return;
     pushHistory();
     bakeCache.clear();
-    const ls = layersRef.current.map((l) => {
+    const ls = mapLayers(layersRef.current, (l) => {
       if (l.kind === "raster") {
         const c = newCanvas(l.canvas.width, l.canvas.height);
         const cx = c.getContext("2d")!;
@@ -2170,9 +2690,23 @@ export function ImageStudioDialog({
           cx.scale(1, -1);
         }
         cx.drawImage(l.canvas, 0, 0);
+        let m = l.mask;
+        if (m) {
+          m = newCanvas(m.width, m.height);
+          const mx = m.getContext("2d")!;
+          if (axis === "x") {
+            mx.translate(m.width, 0);
+            mx.scale(-1, 1);
+          } else {
+            mx.translate(0, m.height);
+            mx.scale(1, -1);
+          }
+          mx.drawImage(l.mask, 0, 0);
+        }
         return {
           ...l,
           canvas: c,
+          mask: m,
           x: axis === "x" ? docW - (l.x + c.width) : l.x,
           y: axis === "y" ? docH - (l.y + c.height) : l.y,
           version: l.version + 1,
@@ -2203,13 +2737,20 @@ export function ImageStudioDialog({
     bakeCache.clear();
     const sx = resize.w / docW;
     const sy = resize.h / docH;
-    const ls = layersRef.current.map((l) => {
+    const ls = mapLayers(layersRef.current, (l) => {
       if (l.kind === "raster") {
         const c = newCanvas(l.canvas.width * sx, l.canvas.height * sy);
         const cx = c.getContext("2d")!;
         cx.imageSmoothingQuality = "high";
         cx.drawImage(l.canvas, 0, 0, c.width, c.height);
-        return { ...l, canvas: c, x: l.x * sx, y: l.y * sy, version: l.version + 1 } as Layer;
+        let m = l.mask;
+        if (m) {
+          m = newCanvas(m.width * sx, m.height * sy);
+          const mx = m.getContext("2d")!;
+          mx.imageSmoothingQuality = "high";
+          mx.drawImage(l.mask, 0, 0, m.width, m.height);
+        }
+        return { ...l, canvas: c, mask: m, x: l.x * sx, y: l.y * sy, version: l.version + 1 } as Layer;
       }
       if (l.kind === "text") {
         return { ...l, x: l.x * sx, y: l.y * sy, size: Math.max(4, Math.round(l.size * Math.min(sx, sy))) } as Layer;
@@ -2233,62 +2774,239 @@ export function ImageStudioDialog({
   };
 
   const deleteLayer = () => {
-    if (!selId || layersRef.current.length <= 1) return;
+    if (!selId) return;
+    const { arr, index } = listContaining(layersRef.current, selId);
+    if (!arr || arr.length <= 0) return;
+    if (arr === layersRef.current && layersRef.current.length <= 1) return;
     pushHistory();
     bakeCache.delete(selId);
-    const ls = layersRef.current.filter((l) => l.id !== selId);
-    setLayersBoth(ls);
-    setSelId(ls[ls.length - 1]?.id ?? null);
+    arr.splice(index, 1);
+    setLayersBoth([...layersRef.current]);
+    setSelId(arr[Math.max(0, index - 1)]?.id ?? layersRef.current[layersRef.current.length - 1]?.id ?? null);
   };
 
   const duplicateLayer = () => {
-    const s = layersRef.current.find((l) => l.id === selId);
+    const s = findLayerById(layersRef.current, selId);
     if (!s) return;
     pushHistory();
-    let copy: Layer;
-    if (s.kind === "raster") {
-      const c = newCanvas(s.canvas.width, s.canvas.height);
-      c.getContext("2d")!.drawImage(s.canvas, 0, 0);
-      copy = { ...s, id: uid(), name: `${s.name} copie`, canvas: c, version: 0 };
-    } else {
-      copy = { ...s, id: uid(), name: `${s.name} copie` };
-    }
-    const ls = [...layersRef.current, copy];
-    setLayersBoth(ls);
+    const { arr, index } = listContaining(layersRef.current, s.id);
+    const copy = duplicateTree(s);
+    arr.splice(index + 1, 0, copy);
+    setLayersBoth([...layersRef.current]);
     setSelId(copy.id);
   };
 
   const moveLayer = (dir: 1 | -1) => {
     if (!selId) return;
-    const i = layersRef.current.findIndex((l) => l.id === selId);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= layersRef.current.length) return;
+    const { arr, index } = listContaining(layersRef.current, selId);
+    if (!arr) return;
+    const j = index + dir;
+    if (j < 0 || j >= arr.length) return;
     pushSoon();
-    const ls = [...layersRef.current];
-    [ls[i], ls[j]] = [ls[j], ls[i]];
-    setLayersBoth(ls);
+    [arr[index], arr[j]] = [arr[j], arr[index]];
+    setLayersBoth([...layersRef.current]);
   };
 
   const mergeDown = () => {
-    const i = layersRef.current.findIndex((l) => l.id === selId);
-    if (i <= 0 || !docW) return;
+    const { arr, index } = listContaining(layersRef.current, selId);
+    if (!arr || index <= 0 || !docW) return;
     pushHistory();
-    const top = layersRef.current[i];
-    const bottom = layersRef.current[i - 1];
+    const top = arr[index];
+    const bottom = arr[index - 1];
+    if (top.kind === "group" || top.kind === "adjustment" || bottom.kind === "group" || bottom.kind === "adjustment") {
+      setStatus("Fusion : sélectionnez un calque simple au-dessus d'un calque simple.");
+      return;
+    }
     const c = newCanvas(docW, docH);
     const cx = c.getContext("2d")!;
     drawLayerTo(cx, bottom);
     drawLayerTo(cx, top);
     const merged: RasterLayer = { ...baseLayer(bottom.name), kind: "raster", canvas: c, x: 0, y: 0, version: 0 };
-    const ls = [...layersRef.current];
-    ls.splice(i - 1, 2, merged);
+    arr.splice(index - 1, 2, merged);
     bakeCache.clear();
-    setLayersBoth(ls);
+    setLayersBoth([...layersRef.current]);
     setSelId(merged.id);
   };
 
+  // ---- groups, masks, adjustment layers, liquify ----------------------------------
+
+  const addGroup = () => {
+    if (!docW) return;
+    pushHistory();
+    const g: GroupLayer = { ...baseLayer("Groupe"), kind: "group", open: true, children: [] };
+    setLayersBoth([...layersRef.current, g]);
+    setSelId(g.id);
+    setStatus("Groupe créé — glissez-y des calques via « Ajouter au groupe ».");
+  };
+
+  const groupsList = () => flatLayers(layersRef.current).filter((l) => l.kind === "group") as GroupLayer[];
+
+  const addToGroup = (layerId: string, groupId: string) => {
+    const loc = listContaining(layersRef.current, layerId);
+    if (!loc) return;
+    const { arr, index } = loc;
+    const l = arr[index];
+    if (l.kind === "group") {
+      setStatus("Impossible de mettre un groupe dans un groupe (1 niveau max).");
+      return;
+    }
+    pushHistory();
+    arr.splice(index, 1);
+    const g = findLayerById(layersRef.current, groupId);
+    if (g && g.kind === "group") {
+      g.children = [...g.children, l];
+      setLayersBoth([...layersRef.current]);
+      setStatus(`« ${l.name} » ajouté au groupe « ${g.name} ».`);
+    } else {
+      arr.splice(index, 0, l); // restore
+    }
+  };
+
+  const removeFromGroup = (layerId: string) => {
+    const loc = listContaining(layersRef.current, layerId);
+    if (!loc || loc.arr === layersRef.current) return;
+    const { arr, index } = loc;
+    const l = arr[index];
+    pushHistory();
+    arr.splice(index, 1);
+    setLayersBoth([...layersRef.current, l]);
+    setStatus(`« ${l.name} » retiré du groupe.`);
+  };
+
+  const addAdjustmentLayer = () => {
+    if (!docW) return;
+    pushHistory();
+    const a: AdjLayer = { ...baseLayer("Réglage"), kind: "adjustment" };
+    setLayersBoth([...layersRef.current, a]);
+    setSelId(a.id);
+    setStatus("Calque de réglage ajouté — réglez luminosité/contraste/courbes dans le panneau de droite.");
+  };
+
+  const addMask = () => {
+    const l = findLayerById(layersRef.current, selId);
+    if (!l || l.kind !== "raster") {
+      setStatus("Sélectionnez un calque raster pour ajouter un masque.");
+      return;
+    }
+    pushHistory();
+    const m = newCanvas(docW, docH);
+    const mc = m.getContext("2d")!;
+    mc.fillStyle = "#fff";
+    mc.fillRect(0, 0, docW, docH);
+    if (selMaskRef.current) {
+      // initialize from current selection
+      mc.globalCompositeOperation = "destination-in";
+      mc.drawImage(selMaskRef.current, 0, 0);
+    }
+    patchLayer(l.id, { mask: m } as Partial<Layer>);
+    setStatus("Masque ajouté.");
+  };
+
+  const removeMask = () => {
+    const l = findLayerById(layersRef.current, selId);
+    if (!l || l.kind !== "raster" || !l.mask) return;
+    pushHistory();
+    patchLayer(l.id, { mask: undefined } as Partial<Layer>);
+    setMaskEdit(false);
+    setStatus("Masque supprimé.");
+  };
+
+  const applyMask = () => {
+    const l = findLayerById(layersRef.current, selId);
+    if (!l || l.kind !== "raster" || !l.mask) return;
+    pushHistory();
+    const cx = l.canvas.getContext("2d")!;
+    cx.save();
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.globalCompositeOperation = "destination-in";
+    cx.drawImage(l.mask, -l.x, -l.y);
+    cx.restore();
+    l.version++;
+    bakeCache.delete(l.id);
+    patchLayer(l.id, { mask: undefined } as Partial<Layer>);
+    setMaskEdit(false);
+    setStatus("Masque appliqué au calque.");
+  };
+
+  const invertMask = () => {
+    const l = findLayerById(layersRef.current, selId);
+    if (!l || l.kind !== "raster" || !l.mask) return;
+    pushHistory();
+    const mc = l.mask.getContext("2d")!;
+    mc.save();
+    mc.globalCompositeOperation = "difference";
+    mc.fillStyle = "#fff";
+    mc.fillRect(0, 0, l.mask.width, l.mask.height);
+    mc.restore();
+    bump();
+    setStatus("Masque inversé.");
+  };
+
+  // ---- liquify ---------------------------------------------------------------------
+
+  const openLiquify = () => {
+    const l = findLayerById(layersRef.current, selId);
+    if (!l || l.kind !== "raster") {
+      setStatus("Sélectionnez un calque raster pour liquéfier.");
+      return;
+    }
+    const work = newCanvas(l.canvas.width, l.canvas.height);
+    work.getContext("2d")!.drawImage(l.canvas, 0, 0);
+    setLiquify((q) => ({ ...q, work }));
+  };
+
+  const liquifyWarp = (a: { x: number; y: number }, b: { x: number; y: number }) => {
+    const w = liquify.work;
+    if (!w) return;
+    const r = liquify.size / 2;
+    const fx = (b.x - a.x) * (liquify.force / 100);
+    const fy = (b.y - a.y) * (liquify.force / 100);
+    const x0 = Math.max(0, Math.floor(a.x - r));
+    const y0 = Math.max(0, Math.floor(a.y - r));
+    const x1 = Math.min(w.width, Math.ceil(a.x + r));
+    const y1 = Math.min(w.height, Math.ceil(a.y + r));
+    const bw = x1 - x0;
+    const bh = y1 - y0;
+    if (bw <= 0 || bh <= 0) return;
+    const region = newCanvas(bw, bh);
+    const rcx = region.getContext("2d")!;
+    rcx.drawImage(w, x0, y0, bw, bh, 0, 0, bw, bh);
+    // feather edges so the warp blends smoothly
+    rcx.globalCompositeOperation = "destination-in";
+    const grad = rcx.createRadialGradient(bw / 2, bh / 2, 0, bw / 2, bh / 2, Math.max(bw, bh) / 2);
+    grad.addColorStop(0, "rgba(0,0,0,1)");
+    grad.addColorStop(0.75, "rgba(0,0,0,0.9)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    rcx.fillStyle = grad;
+    rcx.fillRect(0, 0, bw, bh);
+    const wcx = w.getContext("2d")!;
+    wcx.drawImage(region, x0 + fx, y0 + fy);
+  };
+
+  const applyLiquify = () => {
+    const l = findLayerById(layersRef.current, selId);
+    const w = liquify.work;
+    if (!l || l.kind !== "raster" || !w) {
+      setLiquify((q) => ({ ...q, work: null }));
+      return;
+    }
+    pushHistory();
+    const cx = l.canvas.getContext("2d")!;
+    cx.save();
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.globalCompositeOperation = "source-over";
+    cx.clearRect(0, 0, l.canvas.width, l.canvas.height);
+    cx.drawImage(w, 0, 0);
+    cx.restore();
+    l.version++;
+    bakeCache.delete(l.id);
+    setLiquify((q) => ({ ...q, work: null }));
+    setStatus("✓ Liquéfaction appliquée.");
+    bump();
+  };
+
   const clearLayer = () => {
-    const s = layersRef.current.find((l) => l.id === selId);
+    const s = findLayerById(layersRef.current, selId);
     if (!s || s.kind !== "raster") return;
     pushHistory();
     s.canvas.getContext("2d")!.clearRect(0, 0, s.canvas.width, s.canvas.height);
@@ -2300,7 +3018,7 @@ export function ImageStudioDialog({
   // ---- filter menu (destructive filters with live preview) -------------------------
 
   const openFilterDialog = (def: FilterDef) => {
-    const l = layersRef.current.find((x) => x.id === selId);
+    const l = findLayerById(layersRef.current, selId);
     if (!l || l.kind !== "raster") {
       setStatus("Sélectionnez d'abord un calque raster (pixels) pour appliquer un filtre.");
       return;
@@ -2326,7 +3044,18 @@ export function ImageStudioDialog({
     cx.save();
     cx.globalCompositeOperation = "source-over";
     cx.clearRect(0, 0, l.canvas.width, l.canvas.height);
-    cx.drawImage(out, 0, 0);
+    // constrain to active selection if any
+    const mk = selMaskRef.current;
+    if (mk) {
+      const clipped = newCanvas(out.width, out.height);
+      const ccx = clipped.getContext("2d")!;
+      ccx.drawImage(out, 0, 0);
+      ccx.globalCompositeOperation = "destination-in";
+      ccx.drawImage(mk, -l.x, -l.y);
+      cx.drawImage(clipped, 0, 0);
+    } else {
+      cx.drawImage(out, 0, 0);
+    }
     cx.restore();
     l.version++;
     bakeCache.delete(l.id);
@@ -2337,7 +3066,7 @@ export function ImageStudioDialog({
 
   const applyFilterDialog = () => {
     if (!filterDlg) return;
-    const l = layersRef.current.find((x) => x.id === selId);
+    const l = findLayerById(layersRef.current, selId);
     if (!l || l.kind !== "raster") return;
     bakeFilterOn(l, filterDlg.def, filterDlg.params);
     setFilterDlg(null);
@@ -2347,7 +3076,7 @@ export function ImageStudioDialog({
     const last = lastFilterRef.current;
     if (!last) return;
     const def = FILTERS.find((f) => f.id === last.id);
-    const l = layersRef.current.find((x) => x.id === selId);
+    const l = findLayerById(layersRef.current, selId);
     if (!def || !l || l.kind !== "raster") {
       setStatus("Sélectionnez un calque raster pour répéter le filtre.");
       return;
@@ -2359,7 +3088,7 @@ export function ImageStudioDialog({
   useEffect(() => {
     if (!filterDlg) return;
     const pv = filterPreviewRef.current;
-    const l = layersRef.current.find((x) => x.id === selId);
+    const l = findLayerById(layersRef.current, selId);
     if (!pv || !l || l.kind !== "raster") return;
     const src = l.canvas;
     const s = Math.min(1, 420 / Math.max(src.width, src.height));
@@ -2378,8 +3107,39 @@ export function ImageStudioDialog({
     const pcx = pv.getContext("2d")!;
     pcx.clearRect(0, 0, pv.width, pv.height);
     pcx.drawImage(out, 0, 0);
+    // histogram (luma) of the unfiltered preview
+    const hc = histDrawRef.current;
+    if (hc && filterDlg.def.histogram) {
+      const hcx = hc.getContext("2d")!;
+      const w = 256;
+      const bins = new Float64Array(w);
+      const hdata = scx.getImageData(0, 0, small.width, small.height).data;
+      let max = 1;
+      for (let i = 0; i < hdata.length; i += 4) {
+        const l = Math.round(((hdata[i] * 0.299 + hdata[i + 1] * 0.587 + hdata[i + 2] * 0.114) / 255) * (w - 1));
+        bins[l]++;
+        if (bins[l] > max) max = bins[l];
+      }
+      hcx.fillStyle = "#0f172a";
+      hcx.fillRect(0, 0, w, hc.height);
+      hcx.fillStyle = "#e879f9";
+      for (let i = 0; i < w; i++) {
+        const h = Math.round((bins[i] / max) * (hc.height - 4));
+        hcx.fillRect(i, hc.height - h, 1, h);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterDlg, selId]);
+
+  // draw the liquify preview whenever the workspace opens or changes
+  useEffect(() => {
+    const pv = liquifyPreviewRef.current;
+    const w = liquify.work;
+    if (!pv || !w) return;
+    pv.width = w.width;
+    pv.height = w.height;
+    pv.getContext("2d")!.drawImage(w, 0, 0);
+  }, [liquify.work]);
 
   // ---- import / export ---------------------------------------------------------------
 
@@ -2439,7 +3199,7 @@ export function ImageStudioDialog({
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
-    for (const l of layersRef.current) {
+    for (const l of flatLayers(layersRef.current)) {
       const b = layerBBox(l);
       if (!b) continue;
       minX = Math.min(minX, b.x);
@@ -2452,7 +3212,7 @@ export function ImageStudioDialog({
     const h = Math.max(1, Math.round(maxY - minY));
     pushHistory();
     setLayersBoth(
-      layersRef.current.map((l) => ({ ...l, x: l.x - minX, y: l.y - minY }) as Layer),
+      mapLayers(layersRef.current, (l) => ({ ...l, x: l.x - minX, y: l.y - minY }) as Layer),
     );
     setDocSize({ w, h });
     setCrop(null);
@@ -2498,7 +3258,24 @@ export function ImageStudioDialog({
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenuOpen(null);
+      const ae = document.activeElement;
+      const typing = ae instanceof HTMLElement && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.isContentEditable);
+      if ((e.key === "Delete" || e.key === "Backspace") && !typing) {
+        e.preventDefault();
+        deleteSelection();
+        return;
+      }
       if (!(e.ctrlKey || e.metaKey)) return;
+      if (e.key.toLowerCase() === "a" && !typing) {
+        e.preventDefault();
+        selectAll();
+        return;
+      }
+      if (e.key.toLowerCase() === "d" && !typing) {
+        e.preventDefault();
+        deselectAll();
+        return;
+      }
       if (e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         undo();
@@ -2537,8 +3314,14 @@ export function ImageStudioDialog({
       { label: "Miroir horizontal", action: () => flipDoc("x") },
       { label: "Miroir vertical", action: () => flipDoc("y") },
     ],
+    Sélection: [
+      { label: "Tout sélectionner (Ctrl+A)", action: selectAll },
+      { label: "Désélectionner (Ctrl+D)", action: deselectAll, sep: true },
+      { label: "Supprimer la zone (Suppr)", action: deleteSelection, disabled: !selMaskRef.current },
+    ],
     Filtre: [
       { label: "Répéter le dernier filtre (Ctrl+F)", action: repeatLastFilter, disabled: !lastFilterRef.current },
+      { label: "Liquéfier…", action: openLiquify, disabled: !sel || sel.kind !== "raster", sep: true },
       ...FILTER_GROUP_ORDER.map((g, gi) => ({
         label: g,
         sep: gi === 0,
@@ -2551,8 +3334,28 @@ export function ImageStudioDialog({
     ],
     Calque: [
       { label: "Nouveau calque de peinture", action: addLayer },
+      { label: "Nouveau groupe", action: addGroup, sep: true },
+      {
+        label: "Ajouter au groupe",
+        disabled: !selId || groupsList().length === 0 || (sel?.kind === "group"),
+        sub: groupsList().map((g) => ({
+          label: g.name,
+          disabled: !selId || selId === g.id,
+          action: () => selId && addToGroup(selId, g.id),
+        })),
+      },
+      { label: "Retirer du groupe", action: () => selId && removeFromGroup(selId), disabled: !selId },
+      {
+        label: "Nouveau calque de réglage",
+        action: addAdjustmentLayer,
+        sep: true,
+      },
+      { label: "Ajouter un masque", action: addMask, disabled: !sel || sel.kind !== "raster" || !!sel.mask },
+      { label: "Appliquer le masque", action: applyMask, disabled: !sel || sel.kind !== "raster" || !sel.mask },
+      { label: "Inverser le masque", action: invertMask, disabled: !sel || sel.kind !== "raster" || !sel.mask },
+      { label: "Supprimer le masque", action: removeMask, disabled: !sel || sel.kind !== "raster" || !sel.mask, sep: true },
       { label: "Dupliquer le calque", action: duplicateLayer, disabled: !selId },
-      { label: "Fusionner vers le bas", action: mergeDown, disabled: !selId, sep: true },
+      { label: "Fusionner vers le bas", action: mergeDown, disabled: !selId },
       { label: "Supprimer le calque", action: deleteLayer, disabled: !selId || layers.length <= 1 },
     ],
     Affichage: [
@@ -2573,6 +3376,9 @@ export function ImageStudioDialog({
     ellipse: "crosshair",
     line: "crosshair",
     crop: "crosshair",
+    rectselect: "crosshair",
+    lasso: "crosshair",
+    wand: "crosshair",
   };
 
   /** recursive menu renderer — supports hover submenus (menu Filtre) */
@@ -2699,6 +3505,16 @@ export function ImageStudioDialog({
             </ToolButton>
             <ToolButton title="Texte" active={tool === "text"} onClick={() => setTool("text")}>
               <Type className="size-4" />
+            </ToolButton>
+            <div className="my-0.5 h-px w-7 bg-slate-200" />
+            <ToolButton title="Sélection rectangulaire" active={tool === "rectselect"} onClick={() => setTool("rectselect")}>
+              <SquareDashed className="size-4" />
+            </ToolButton>
+            <ToolButton title="Lasso (sélection libre)" active={tool === "lasso"} onClick={() => setTool("lasso")}>
+              <Lasso className="size-4" />
+            </ToolButton>
+            <ToolButton title="Baguette magique" active={tool === "wand"} onClick={() => setTool("wand")}>
+              <WandSparkles className="size-4" />
             </ToolButton>
             <div className="my-0.5 h-px w-7 bg-slate-200" />
             <ToolButton title="Rectangle" active={tool === "rect"} onClick={() => setTool("rect")}>
@@ -2851,6 +3667,9 @@ export function ImageStudioDialog({
                       style={{ maxHeight: 160 }}
                     />
                   </div>
+                  {filterDlg.def.histogram && (
+                    <canvas ref={histDrawRef} width={256} height={60} className="w-full rounded border border-slate-200 bg-slate-900" />
+                  )}
                   {filterDlg.def.params.map((p) => (
                     <SliderRow
                       key={p.key}
@@ -2899,6 +3718,81 @@ export function ImageStudioDialog({
                 </div>
               </div>
             )}
+
+            {/* liquify overlay */}
+            {liquify.work && (
+              <div className="absolute inset-0 z-40 grid place-items-center bg-slate-900/40">
+                <div className="w-80 space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl">
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-slate-700">Liquéfier</h3>
+                  <div className="grid place-items-center overflow-hidden rounded border border-slate-200">
+                    <canvas
+                      ref={liquifyPreviewRef}
+                      className="max-h-52 max-w-full object-contain"
+                      onPointerDown={(e) => {
+                        const c = e.currentTarget;
+                        const r = c.getBoundingClientRect();
+                        const w = liquify.work!;
+                        const x = ((e.clientX - r.left) / r.width) * w.width;
+                        const y = ((e.clientY - r.top) / r.height) * w.height;
+                        liquifyDragRef.current = { x, y };
+                      }}
+                      onPointerMove={(e) => {
+                        const dr = liquifyDragRef.current;
+                        const w = liquify.work;
+                        if (!dr || !w) return;
+                        const r = e.currentTarget.getBoundingClientRect();
+                        const x = ((e.clientX - r.left) / r.width) * w.width;
+                        const y = ((e.clientY - r.top) / r.height) * w.height;
+                        liquifyWarp(dr, { x, y });
+                        liquifyDragRef.current = { x, y };
+                        // redraw preview
+                        const pv = liquifyPreviewRef.current;
+                        if (pv) {
+                          pv.width = w.width;
+                          pv.height = w.height;
+                          pv.getContext("2d")!.drawImage(w, 0, 0);
+                        }
+                      }}
+                      onPointerUp={() => {
+                        liquifyDragRef.current = null;
+                      }}
+                    />
+                  </div>
+                  <SliderRow
+                    label="Taille du pinceau"
+                    value={liquify.size}
+                    min={10}
+                    max={400}
+                    unit=" px"
+                    onChange={(v) => setLiquify((q) => ({ ...q, size: v }))}
+                  />
+                  <SliderRow
+                    label="Pression"
+                    value={liquify.force}
+                    min={5}
+                    max={100}
+                    unit=" %"
+                    onChange={(v) => setLiquify((q) => ({ ...q, force: v }))}
+                  />
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={applyLiquify}
+                      className="flex-1 rounded-lg bg-fuchsia-600 py-1.5 text-[11px] font-bold text-white hover:brightness-110"
+                    >
+                      Appliquer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLiquify((q) => ({ ...q, work: null }))}
+                      className="flex-1 rounded-lg border border-slate-200 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right panel */}
@@ -2919,6 +3813,34 @@ export function ImageStudioDialog({
                     </label>
                   )}
                   <SliderRow label="Taille" value={brushSize} min={1} max={200} unit=" px" onChange={setBrushSize} />
+                </PanelSection>
+              )}
+
+              {tool === "wand" && (
+                <PanelSection title="Baguette magique">
+                  <SliderRow label="Tolérance" value={wandTol} min={1} max={128} unit="" onChange={setWandTol} />
+                  <p className="mt-1 text-[9px] leading-relaxed text-slate-400">
+                    Plus la tolérance est élevée, plus la sélection s'étend aux couleurs proches.
+                  </p>
+                </PanelSection>
+              )}
+
+              {(tool === "rectselect" || tool === "lasso") && (
+                <PanelSection title="Sélection">
+                  <p className="text-[10px] leading-relaxed text-slate-500">
+                    Tracez la sélection sur l'image (rectangle ou contour libre). Ctrl+A tout, Ctrl+D rien, Suppr efface.
+                  </p>
+                  <div className="flex gap-1.5">
+                    <button type="button" onClick={selectAll} className="flex-1 rounded border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-50">
+                      Tout
+                    </button>
+                    <button type="button" onClick={deselectAll} className="flex-1 rounded border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-50">
+                      Aucune
+                    </button>
+                    <button type="button" onClick={deleteSelection} className="flex-1 rounded border border-rose-200 bg-rose-50 px-2 py-1 text-[10px] font-bold text-rose-600 hover:bg-rose-100">
+                      Suppr.
+                    </button>
+                  </div>
                 </PanelSection>
               )}
 
@@ -3143,6 +4065,39 @@ export function ImageStudioDialog({
                 </PanelSection>
               )}
 
+              {/* layer mask controls */}
+              {sel?.kind === "raster" && (
+                <PanelSection title="Masque de calque">
+                  {sel.mask ? (
+                    <>
+                      <label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        <input type="checkbox" checked={maskEdit} onChange={(e) => setMaskEdit(e.target.checked)} /> Peindre le
+                        masque (pinceau = révéler, gomme = masquer)
+                      </label>
+                      <div className="flex gap-1.5">
+                        <button type="button" onClick={invertMask} className="flex-1 rounded border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-50">
+                          Inverser
+                        </button>
+                        <button type="button" onClick={applyMask} className="flex-1 rounded border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-50">
+                          Appliquer
+                        </button>
+                        <button type="button" onClick={removeMask} className="flex-1 rounded border border-rose-200 bg-rose-50 px-2 py-1 text-[10px] font-bold text-rose-600 hover:bg-rose-100">
+                          Supprimer
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={addMask}
+                      className="w-full rounded-lg bg-fuchsia-600 px-2 py-1.5 text-[11px] font-bold text-white hover:brightness-110"
+                    >
+                      Ajouter un masque
+                    </button>
+                  )}
+                </PanelSection>
+              )}
+
               {/* filters of the selected layer */}
               {sel && (
                 <PanelSection title={`Filtres — ${sel.name}`}>
@@ -3225,43 +4180,67 @@ export function ImageStudioDialog({
                 </div>
               </div>
               <div className="space-y-1">
-                {[...layers].reverse().map((l) => (
-                  <div
-                    key={l.id}
-                    onClick={() => setSelId(l.id)}
-                    className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2 py-1.5 text-[11px] transition ${
-                      l.id === selId ? "border-fuchsia-400 bg-fuchsia-50" : "border-slate-100 hover:bg-slate-50"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      title={l.visible ? "Masquer" : "Afficher"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        patchLayer(l.id, { visible: !l.visible } as Partial<Layer>);
-                      }}
-                      className="text-slate-500 hover:text-fuchsia-600"
-                    >
-                      {l.visible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
-                    </button>
-                    <span className="flex-1 truncate font-medium text-slate-700">
-                      {l.name}
-                      <span className="ml-1 text-[9px] uppercase text-slate-400">
-                        {l.kind === "raster" ? "pixels" : l.kind === "text" ? "texte" : "forme"}
-                      </span>
-                    </span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={Math.round(l.opacity * 100)}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => patchLayer(l.id, { opacity: Number(e.target.value) / 100 } as Partial<Layer>)}
-                      className="w-12 accent-fuchsia-600"
-                      title="Opacité"
-                    />
-                  </div>
-                ))}
+                {(() => {
+                  const kindLabel = (k: Layer["kind"]) =>
+                    k === "raster" ? "pixels" : k === "text" ? "texte" : k === "shape" ? "forme" : k === "group" ? "groupe" : "réglage";
+                  const renderRow = (l: Layer, depth: number): React.ReactNode =>
+                    [l, ...("children" in l && l.kind === "group" && l.open ? [...l.children].reverse() : [])]
+                      .flatMap((item) =>
+                        item === l ? (
+                          <div
+                            key={l.id}
+                            onClick={() => setSelId(l.id)}
+                            style={{ marginLeft: depth * 12 }}
+                            className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2 py-1.5 text-[11px] transition ${
+                              l.id === selId ? "border-fuchsia-400 bg-fuchsia-50" : "border-slate-100 hover:bg-slate-50"
+                            }`}
+                          >
+                            {l.kind === "group" ? (
+                              <button
+                                type="button"
+                                title={l.open ? "Fermer le groupe" : "Ouvrir le groupe"}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  patchLayer(l.id, { open: !l.open } as Partial<Layer>);
+                                }}
+                                className="text-slate-500 hover:text-fuchsia-600"
+                              >
+                                <ChevronRight className={`size-3.5 transition ${l.open ? "rotate-90" : ""}`} />
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              title={l.visible ? "Masquer" : "Afficher"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                patchLayer(l.id, { visible: !l.visible } as Partial<Layer>);
+                              }}
+                              className="text-slate-500 hover:text-fuchsia-600"
+                            >
+                              {l.visible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+                            </button>
+                            <span className="flex-1 truncate font-medium text-slate-700">
+                              {l.name}
+                              <span className="ml-1 text-[9px] uppercase text-slate-400">{kindLabel(l.kind)}</span>
+                            </span>
+                            <input
+                              type="range"
+                              min={0}
+                              max={100}
+                              value={Math.round(l.opacity * 100)}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => patchLayer(l.id, { opacity: Number(e.target.value) / 100 } as Partial<Layer>)}
+                              className="w-12 accent-fuchsia-600"
+                              title="Opacité"
+                            />
+                          </div>
+                        ) : (
+                          renderRow(item, depth + 1)
+                        ),
+                      )
+                      .filter(Boolean);
+                  return [...layers].reverse().map((l) => renderRow(l, 0));
+                })()}
               </div>
             </div>
           </div>
