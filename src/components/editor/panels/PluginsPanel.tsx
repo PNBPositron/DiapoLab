@@ -19,7 +19,7 @@ import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
 import { SearchAppDialog } from "../search/SearchApp";
 import { RuntimeAppDialog } from "../runtime/RuntimeApp";
-import { ImageStudioDialog } from "../ImageStudio";
+import { PhotopeaStudioDialog } from "../PhotopeaStudio";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -82,8 +82,8 @@ export function PluginsPanel() {
         icon={Puzzle}
       />
 
-      {/* Image Studio — DiapoLab's own built-in image editor (brush, eraser,
-          crop, rotate/flip, live adjustments). Same card style as the import buttons. */}
+      {/* Photopea — integrated image editor embedded via the Photopea Live
+          Messaging API (iframe + postMessage). Same card style as the import buttons. */}
       <div className="px-4">
         <button
           onClick={() => setStudioOpen(true)}
@@ -92,7 +92,7 @@ export function PluginsPanel() {
           <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
             <WandSparkles className="size-3.5" />
           </span>
-          <span className="min-w-0 flex-1 text-left">Image Studio — éditeur d'images intégré</span>
+          <span className="min-w-0 flex-1 text-left">Photopea — éditeur d'images intégré</span>
           <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
@@ -327,7 +327,7 @@ export function PluginsPanel() {
         ))}
 
       {/* Built-in image editor */}
-      {studioOpen && <ImageStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
+      {studioOpen && <PhotopeaStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
 
       {/* Import dialog */}
       <Dialog open={importOpen !== null} onOpenChange={(v) => !v && setImportOpen(null)}>
