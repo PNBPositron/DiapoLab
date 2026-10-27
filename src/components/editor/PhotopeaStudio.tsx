@@ -15,6 +15,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { newImage, useEditor } from "@/store/editor";
 import { Download, ExternalLink, ImageDown, Loader2 } from "lucide-react";
 
+/** Mini logo Photopea — « P » stylisé sur fond dégradé teal, à la marque. */
+export function PhotopeaLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="pp-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#22d3ee" />
+          <stop offset="1" stopColor="#0e7490" />
+        </linearGradient>
+      </defs>
+      <rect x="0.75" y="0.75" width="22.5" height="22.5" rx="6" fill="url(#pp-grad)" />
+      <path
+        d="M9 18.2V6h4.3c2.1 0 3.5 1.4 3.5 3.3 0 2-1.4 3.4-3.5 3.4h-2.2"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="2.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="11.1" cy="16.4" r="1.35" fill="#fff" />
+    </svg>
+  );
+}
+
 export function PhotopeaStudioDialog({
   open,
   onOpenChange,
@@ -119,31 +143,8 @@ export function PhotopeaStudioDialog({
   const downloadPng = () =>
     runScript('app.activeDocument.saveToOE("png");', "download");
 
-/** Mini logo Photopea — « P » stylisé sur fond dégradé teal, à la marque. */
-export function PhotopeaLogo({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="pp-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#22d3ee" />
-          <stop offset="1" stopColor="#0e7490" />
-        </linearGradient>
-      </defs>
-      <rect x="0.75" y="0.75" width="22.5" height="22.5" rx="6" fill="url(#pp-grad)" />
-      <path
-        d="M9 18.2V6h4.3c2.1 0 3.5 1.4 3.5 3.3 0 2-1.4 3.4-3.5 3.4h-2.2"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="11.1" cy="16.4" r="1.35" fill="#fff" />
-    </svg>
-  );
-}
-
-export function PhotopeaStudioDialog({
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[92vh] w-[96vw] max-w-[1500px] flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="flex-row items-center justify-between border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-3">
           <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide text-slate-800">
