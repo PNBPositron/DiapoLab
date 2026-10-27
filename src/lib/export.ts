@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import { toJpeg, toPng } from "html-to-image";
 import { useEditor, type Page } from "@/store/editor";
 import { ensureFontsForPages } from "@/lib/fontLoader";
@@ -244,6 +245,97 @@ export async function exportPDF(name: string) {
 }
 
 
+/* ------------------------------------------------------------------ */
+/* PPTX motion — slide transitions & entrance animations                */
+/*                                                                     */
+/* pptxgenjs can not write transitions or animations, so the generated  */
+/* file is post-processed with JSZip: raw OOXML <p:transition> and      */
+/* <p:timing> trees are injected into each slide XML.                   */
+/* ------------------------------------------------------------------ */
+
+/** DiapoLab transition → OOXML transition element. Styles without a real
+ *  PowerPoint equivalent fall back to the closest classic transition. */
+const TRANSITION_XML: Record<string, string> = {
+  fade: "<p:fade/>",
+  slide: '<p:push dir="l"/>',
+  zoom: '<p:zoom dir="in"/>',
+  flip: '<p:wipe dir="l"/>',
+  tv: "<p:dissolve/>",
+  neon: "<p:newsflash/>",
+  cube: '<p:cover dir="l"/>',
+  blur: "<p:dissolve/>",
+  "parallax-left": '<p:cover dir="l"/>',
+  "parallax-up": '<p:cover dir="u"/>',
+  "parallax-depth": '<p:zoom dir="in"/>',
+  reveal: "<p:circle/>",
+  shutter: '<p:split orient="vert" dir="out"/>',
+  swirl: "<p:wedge/>",
+  warp: '<p:strips dir="ld"/>',
+  prism: "<p:plus/>",
+  origami: "<p:diamond/>",
+};
+
+/** PowerPoint "Morph" lives behind a 2015 namespace — emit it through
+ *  mc:AlternateContent so older readers gracefully fall back to a fade. */
+function transitionXml(transition: string): string {
+  if (transition === "morph") {
+    return (
+      '<mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">' +
+      '<mc:Choice xmlns:p159="http://schemas.microsoft.com/office/powerpoint/2015/09/main" Requires="p159">' +
+      '<p:transition spd="slow" p14:dur="1000" xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main">' +
+      '<p159:morph option="byObject"/>' +
+      "</p:transition></mc:Choice>" +
+      '<mc:Fallback><p:transition spd="slow"><p:fade/></p:transition></mc:Fallback>' +
+      "</mc:AlternateContent>"
+    );
+  }
+  const inner = TRANSITION_XML[transition];
+  return inner ? `<p:transition spd="slow">${inner}</p:transition>` : "";
+}
+
+/** Entrance timing tree: a mainSeq with one fade entrance (presetID 10) per
+ *  animated shape. Delays mirror each element's animationDelay, so the
+ *  stagger authored in DiapoLab plays identically in PowerPoint; the motion
+ *  style itself degrades to the universally-supported fade entrance. */
+function entranceTimingXml(effects: Array<{ spid: string; delay: number }>): string {
+  if (effects.length === 0) return "";
+  let id = 5; // ids 1..4 are taken by the wrapper nodes
+  const pars = effects
+    .map((e, i) => {
+      const nodeType = i === 0 ? "afterEffect" : "withEffect";
+      const delay = Math.max(0, Math.round(e.delay));
+      const a = id++;
+      const b = id++;
+      const c = id++;
+      return (
+        `<p:par><p:cTn id="${a}" presetID="10" presetClass="entr" presetSubtype="0" fill="hold" grpId="0" nodeType="${nodeType}">` +
+        `<p:stCondLst><p:cond delay="${delay}"/></p:stCondLst><p:childTnLst>` +
+        `<p:set><p:cBhvr><p:cTn id="${b}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>` +
+        `<p:tgtEl><p:spTgt spid="${e.spid}"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr>` +
+        `<p:to><p:strVal val="visible"/></p:to></p:set>` +
+        `<p:animEffect transition="in" filter="fade"><p:cBhvr><p:cTn id="${c}" dur="500"/>` +
+        `<p:tgtEl><p:spTgt spid="${e.spid}"/></p:tgtEl></p:cBhvr></p:animEffect>` +
+        "</p:childTnLst></p:cTn></p:par>"
+      );
+    })
+    .join("");
+  return (
+    "<p:timing><p:tnLst><p:par>" +
+    '<p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>' +
+    '<p:seq concurrent="1" nextAc="seek">' +
+    '<p:cTn id="2" dur="indefinite" nodeType="mainSeq"><p:childTnLst>' +
+    '<p:par><p:cTn id="3" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>' +
+    '<p:par><p:cTn id="4" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>' +
+    pars +
+    "</p:childTnLst></p:cTn></p:par>" +
+    "</p:childTnLst></p:cTn></p:par>" +
+    "</p:childTnLst></p:cTn>" +
+    '<p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>' +
+    '<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst>' +
+    "</p:seq></p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>"
+  );
+}
+
 export async function exportPPTX(name: string) {
   const { pages, canvasW, canvasH } = useEditor.getState();
   if (pages.length === 0) return;
@@ -259,11 +351,18 @@ export async function exportPPTX(name: string) {
   const px = (value: number) => value / 96;
   pptx.defineLayout({ name: "POS", width: wIn, height: hIn });
   pptx.layout = "POS";
+  // Per-slide motion metadata, aligned with the order shapes are added:
+  // the slide transition, plus one entry per animated element (delay in ms).
+  const motion: Array<{ transition: string; anims: Array<{ delay: number }> }> = [];
   for (const page of pages) {
     const slide = pptx.addSlide();
     const bgBase = gradientColors(page.bgColor ?? "")?.[0] ?? page.bgColor ?? "";
     slide.background = { color: cssColorToHex(bgBase) || "FFFFFF" };
+    const anims: Array<{ delay: number }> = [];
     for (const element of page.elements) {
+      if (element.animation && element.animation !== "none" && element.type !== "ui") {
+        anims.push({ delay: Math.max(0, Math.round(element.animationDelay ?? 0)) });
+      }
       const box = {
         x: px(element.x),
         y: px(element.y),
@@ -314,8 +413,56 @@ export async function exportPPTX(name: string) {
         });
       }
     }
+    motion.push({ transition: page.transition ?? "none", anims });
   }
-  await pptx.writeFile({ fileName: `${name || "positron"}-${Date.now()}.pptx` });
+
+  // ---- write the deck, then post-process the zip to inject motion ----
+  const writer = pptx as unknown as { write: (o: unknown) => Promise<unknown> };
+  let written: unknown;
+  try {
+    written = await writer.write({ outputType: "blob" });
+  } catch {
+    written = await writer.write("blob");
+  }
+  const raw = written instanceof Blob ? written : new Blob([written as BlobPart]);
+  const zip = await JSZip.loadAsync(raw);
+  for (let i = 0; i < pages.length; i++) {
+    const m = motion[i];
+    if (!m || (m.transition === "none" && m.anims.length === 0)) continue;
+    const path = `ppt/slides/slide${i + 1}.xml`;
+    const entry = zip.file(path);
+    if (!entry) continue;
+    const xml = await entry.async("string");
+    // Shape ids in document order — the k-th id matches the k-th recorded
+    // animation, because shapes are added to the slide in element order.
+    let spids: string[] = [];
+    try {
+      const doc = new DOMParser().parseFromString(xml, "application/xml");
+      spids = Array.from(doc.getElementsByTagName("*"))
+        .filter((el) => ["sp", "pic", "graphicFrame", "cxnSp"].includes(el.localName ?? ""))
+        .map((s) => {
+          const cnv = Array.from(s.getElementsByTagName("*")).find((e) => e.localName === "cNvPr");
+          return cnv?.getAttribute("id") ?? "";
+        })
+        .filter(Boolean);
+    } catch {
+      spids = [];
+    }
+    const anims = m.anims.slice(0, spids.length).map((a, k) => ({ ...a, spid: spids[k] }));
+    const inject = transitionXml(m.transition) + entranceTimingXml(anims);
+    if (!inject) continue;
+    zip.file(path, xml.replace(/<\/p:sld>\s*$/, inject + "</p:sld>"));
+  }
+  const finalBlob = await zip.generateAsync({
+    type: "blob",
+    mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  });
+  const url = URL.createObjectURL(finalBlob);
+  const link = document.createElement("a");
+  link.download = `${name || "positron"}-${Date.now()}.pptx`;
+  link.href = url;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function exportMarkdown(name: string) {

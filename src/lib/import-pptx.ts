@@ -6,6 +6,8 @@ import {
   newShape,
   type Page,
   type AnyElement,
+  type ElementAnimation,
+  type SlideTransition,
 } from "@/store/editor";
 
 /* PPTX import: unzip the deck, read slide XML + embedded media, and map
@@ -264,6 +266,81 @@ async function resolveSlideBg(
   return resolved;
 }
 
+/* ---- Slide transitions & entrance animations (kept across imports) ---- */
+
+/** OOXML transition element → DiapoLab transition. */
+const OOXML_TO_TRANSITION: Record<string, SlideTransition> = {
+  fade: "fade",
+  push: "slide",
+  cover: "slide",
+  pull: "slide",
+  zoom: "zoom",
+  dissolve: "blur",
+  wipe: "reveal",
+  circle: "reveal",
+  diamond: "reveal",
+  newsflash: "tv",
+  split: "shutter",
+  comb: "shutter",
+  blinds: "shutter",
+  checker: "shutter",
+  randomBar: "shutter",
+  wedge: "swirl",
+  wheel: "swirl",
+  strips: "swirl",
+  plus: "prism",
+  flip: "flip",
+  morph: "morph",
+};
+
+/** Read a slide's <p:transition> (also inside mc:AlternateContent) —
+ *  null when the slide has none. */
+function parseSlideTransition(doc: Document): SlideTransition | null {
+  const tr = Array.from(doc.getElementsByTagName("*")).find((el) => el.localName === "transition");
+  if (!tr) return null;
+  for (const child of Array.from(tr.getElementsByTagName("*"))) {
+    if (child.localName === "morph") return "morph";
+    const mapped = OOXML_TO_TRANSITION[child.localName ?? ""];
+    if (mapped) return mapped;
+  }
+  return "fade";
+}
+
+/** Entrance effects from the timing tree: shape id → animation + delay (ms).
+ *  PowerPoint preset IDs are mapped onto the closest DiapoLab animation. */
+function parseEntranceTimings(
+  doc: Document,
+): Array<{ spid: string | null; animation: ElementAnimation; delay: number }> {
+  const out: Array<{ spid: string | null; animation: ElementAnimation; delay: number }> = [];
+  for (const el of Array.from(doc.getElementsByTagName("*"))) {
+    if (el.localName !== "cTn" || el.getAttribute("presetClass") !== "entr") continue;
+    const preset = Number(el.getAttribute("presetID") ?? 0);
+    if (preset === 1) continue; // "appear" — instant, nothing to replay
+    const subtype = Number(el.getAttribute("presetSubtype") ?? 0);
+    let animation: ElementAnimation = "fade-up";
+    if (preset === 2) {
+      // Fly In: subtype gives the origin edge
+      animation =
+        subtype === 4 ? "move-up" :
+        subtype === 1 ? "move-down" :
+        subtype === 2 ? "move-right" :
+        subtype === 8 ? "move-left" : "fade-up";
+    } else if (preset === 16) animation = "pop";
+    else if (preset === 23) animation = "flip-in";
+    else if (preset === 26) animation = "spin-in";
+    // start delay of the effect inside its group
+    let delay = 0;
+    const st = Array.from(el.children).find((c) => c.localName === "stCondLst");
+    const cond = st ? Array.from(st.children).find((c) => c.localName === "cond") : null;
+    const rawDelay = Number(cond?.getAttribute("delay") ?? 0);
+    if (Number.isFinite(rawDelay) && rawDelay > 0) delay = rawDelay;
+    const spTgt = Array.from(el.getElementsByTagName("*")).find((e) => e.localName === "spTgt");
+    const spid = spTgt?.getAttribute("spid") ?? null;
+    if (spid) out.push({ spid, animation, delay });
+  }
+  return out;
+}
+
 export async function importPPTXFile(file: File): Promise<void> {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
 
@@ -311,6 +388,7 @@ export async function importPPTXFile(file: File): Promise<void> {
     if (!doc) continue;
     const rels = await parseRels(zip, slidePath);
     const elements: AnyElement[] = [];
+    const spidToElement = new Map<string, AnyElement>();
 
     // spTree holds sp (text/shape) and pic (picture) nodes
     const spTree = Array.from(doc.getElementsByTagName("*")).find(
@@ -323,11 +401,18 @@ export async function importPPTXFile(file: File): Promise<void> {
       : [];
 
     for (const node of nodes) {
+      // PPTX shape id — used to re-attach entrance animations parsed later
+      const cnvPr = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "cNvPr");
+      const spid = cnvPr?.getAttribute("id") ?? null;
+      const push = (el: AnyElement) => {
+        if (spid) spidToElement.set(spid, el);
+        elements.push(el);
+      };
       if (node.localName === "sp") {
         const box = parseXfrm(node);
         const body = parseTextBody(node);
         if (body) {
-          elements.push(
+          push(
             newText({
               ...(box ?? {}),
               text: body.text,
@@ -348,7 +433,7 @@ export async function importPPTXFile(file: File): Promise<void> {
           const lnSolid = ln ? Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null : null;
           const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 0;
           const cornerRadius = roundRectRadius(node, box);
-          elements.push(
+          push(
             newShape(kind as never, {
               ...box,
               fill: colorFrom(solid) ?? "#e2e8f0",
@@ -369,7 +454,7 @@ export async function importPPTXFile(file: File): Promise<void> {
           const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 2;
           const t = Math.max(2, Math.round((lnWpt || 2) * (96 / 72)));
           const horizontal = (box.width ?? 0) >= (box.height ?? 0);
-          elements.push(
+          push(
             newShape("rect", {
               ...box,
               ...(horizontal ? { height: t } : { width: t }),
@@ -388,7 +473,7 @@ export async function importPPTXFile(file: File): Promise<void> {
         if (!rid || !box) continue;
         const src = await mediaToDataUrl(zip, rid, rels);
         if (src) {
-          elements.push(newImage(src, { ...box, fit: "contain" }));
+          push(newImage(src, { ...box, fit: "contain" }));
         }
       }
       // graphicFrame (tables, charts) — not yet supported, skipped.
@@ -396,11 +481,21 @@ export async function importPPTXFile(file: File): Promise<void> {
 
     // Real slide background: slide → layout → master inheritance chain.
     const bg = await resolveSlideBg(zip, doc, rels, bgCache);
+    // Slide transition + entrance animations from the PPTX timing tree.
+    const transition = parseSlideTransition(doc);
+    for (const en of parseEntranceTimings(doc)) {
+      const el = en.spid ? spidToElement.get(en.spid) : undefined;
+      if (el) {
+        el.animation = en.animation;
+        el.animationDelay = Math.max(0, en.delay);
+      }
+    }
     pages.push({
       id: Math.random().toString(36).slice(2, 10),
       elements,
       bgColor: bg.color,
       ...(bg.image ? { bgImage: bg.image } : {}),
+      ...(transition && transition !== "none" ? { transition } : {}),
       duration: 3,
     });
   }
