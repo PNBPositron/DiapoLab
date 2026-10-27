@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 4693bce1b55b72291435dd3e662631abb22054b8)
 successfully downloaded text file (SHA: 8e6f1c1a5223460ef4dc77179d7a219f6c464378)
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -99,16 +100,12 @@ export function PresentationMode() {
 
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    // Exempt the presentation from the prefers-reduced-motion kill-switch
-    // (styles.css): a presenter explicitly chose to run animated slides.
-    document.body.classList.add("presenting-mode");
 
     return () => {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
       document.removeEventListener("fullscreenchange", onFsChange);
       document.body.style.overflow = prev;
-      document.body.classList.remove("presenting-mode");
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

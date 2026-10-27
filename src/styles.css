@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 666e838c0874ba0b73c9be737b9334c94fc910ce)
 successfully downloaded text file (SHA: 86283def7356b1c0ae3d8f9d9b6012480e90fb76)
 successfully downloaded text file (SHA: 1cd9106d1675c9e0754458685f036cded428c9d3)
 @import "tailwindcss" source(none);
@@ -1623,21 +1624,5 @@ successfully downloaded text file (SHA: 1cd9106d1675c9e0754458685f036cded428c9d3
   100% {
     transform: none;
     opacity: 1;
-  }
-}
-
-
-/* "Reduce motion" is honored everywhere EXCEPT while presenting: the
-   presenter explicitly chose animated slides, so entrance animations and
-   slide transitions must keep playing (body.presenting-mode is toggled by
-   PresentationMode). Kept at top level — @layer utilities is parsed by
-   Tailwind as utility candidates and mangles descendant selectors. */
-@media (prefers-reduced-motion: reduce) {
-  body:not(.presenting-mode) *,
-  body:not(.presenting-mode) *::before,
-  body:not(.presenting-mode) *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
   }
 }

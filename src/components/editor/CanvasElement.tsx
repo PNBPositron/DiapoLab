@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 55a16e1266cad69717e95c8f3cbd5a80300d4f0d)
 successfully downloaded text file (SHA: b10d1cc76747414d09b751dc1efd1a2ae2966f8c)
 import { useRef, useState, useEffect } from "react";
 import {
@@ -164,6 +165,67 @@ function cropRectLayout(
   return { s, imgW, imgH, left: offX - l * imgW, top: offY - t * imgH };
 }
 
+/* ------------------------------------------------------------------ */
+/* Present-mode entrance animations via the Web Animations API         */
+/* ------------------------------------------------------------------ */
+
+/** Convert a kebab-case CSS property to camelCase (WAAPI keyframe names). */
+const camel = (prop: string) => prop.replace(/-(.)/g, (_, c: string) => c.toUpperCase());
+
+/**
+ * Read `@keyframes <name>` from the live stylesheets and convert the rule
+ * into WAAPI keyframes. Present-mode entrance animations run through WAAPI
+ * (not the CSS `animation` property) because the global reduced-motion
+ * rule in styles.css forces `animation-duration: 0.01ms !important` on *,
+ * which would kill CSS entrance animations even while presenting — and the
+ * presenter explicitly chose to run an animated deck. WAAPI ignores that
+ * rule. Returns null when the keyframes rule cannot be found.
+ */
+function cssKeyframes(name: string): Keyframe[] | null {
+  const scan = (rules: CSSRuleList | null): Keyframe[] | null => {
+    if (!rules) return null;
+    for (const rule of Array.from(rules)) {
+      if (rule instanceof CSSKeyframesRule) {
+        if (rule.name !== name) continue;
+        const frames: Keyframe[] = [];
+        for (const kr of Array.from(rule.cssRules)) {
+          if (!(kr instanceof CSSKeyframeRule)) continue;
+          const offsets = kr.keyText
+            .split(",")
+            .map((s) => parseFloat(s))
+            .filter((v) => Number.isFinite(v))
+            .map((v) => Math.min(1, Math.max(0, v / 100)));
+          if (!offsets.length) continue;
+          const props: Record<string, string> = {};
+          for (let i = 0; i < kr.style.length; i++) {
+            const prop = kr.style.item(i);
+            props[camel(prop)] = kr.style.getPropertyValue(prop);
+          }
+          for (const offset of offsets) frames.push({ ...props, offset });
+        }
+        frames.sort((a, b) => (a.offset ?? 0) - (b.offset ?? 0));
+        return frames.length ? frames : null;
+      }
+      if ("cssRules" in rule) {
+        const nested = scan((rule as CSSMediaRule).cssRules);
+        if (nested) return nested;
+      }
+    }
+    return null;
+  };
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList | null = null;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue; // cross-origin sheet
+    }
+    const frames = scan(rules);
+    if (frames) return frames;
+  }
+  return null;
+}
+
 export function CanvasElement({
   element,
   scale,
@@ -221,24 +283,34 @@ export function CanvasElement({
     };
   }, [element.hoverTilt, presenting]);
 
-  // Entrance animation (present mode) — computed once so the inline style and
-  // the replay effect below share the exact same shorthand (delay included).
-  const entryAnimation =
-    presenting && !preview && !morph && element.animation && element.animation !== "none"
-      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
-      : undefined;
+  // Entrance animation (present mode) — played through the Web Animations
+  // API (see cssKeyframes above), replayable on demand (press R while
+  // presenting or use the presenter-view Replay button).
+  const entryAnimRef = useRef<Animation | null>(null);
+  const [cssEntryFallback, setCssEntryFallback] = useState(false);
 
-  // Replay the entrance animation on demand (press R while presenting).
-  // Restarting a CSS animation requires a reflow between the two writes.
   useEffect(() => {
-    if (!replayEpoch || !entryAnimation) return;
+    entryAnimRef.current?.cancel();
+    entryAnimRef.current = null;
+    if (!presenting || preview || morph) return;
+    if (!element.animation || element.animation === "none") return;
     const node = ref.current;
     if (!node) return;
-    node.style.animation = "none";
-    void node.offsetWidth;
-    node.style.animation = entryAnimation;
+    const frames = cssKeyframes(`el-${element.animation}`);
+    if (!frames) {
+      // Keyframes unreachable (exotic stylesheet setup) — fall back to the
+      // inline CSS animation shorthand below.
+      setCssEntryFallback(true);
+      return;
+    }
+    entryAnimRef.current = node.animate(frames, {
+      duration: 680,
+      delay: Math.max(0, Math.min(10000, element.animationDelay ?? 0)),
+      easing: "cubic-bezier(0.22,1,0.36,1)",
+      fill: "both",
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [replayEpoch]);
+  }, [presenting, preview, morph, element.animation, replayEpoch]);
 
   const interaction = element.interaction;
   const activateInteraction = () => {
@@ -665,7 +737,11 @@ export function CanvasElement({
         height: element.height,
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
-        animation: entryAnimation,
+        animation:
+          cssEntryFallback &&
+          presenting && !preview && !morph && element.animation && element.animation !== "none"
+            ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
+            : undefined,
         transition: morph
           ? undefined
           : element.hoverTilt && presenting
