@@ -235,7 +235,7 @@ function Marketplace() {
                         <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                      {t.creator_profile?.username && <Link to="/profile/$username" params={{ username: t.creator_profile.username }} onClick={(event) => event.stopPropagation()} className="mt-2 block truncate text-[10px] font-semibold text-blue-600 hover:underline">by {profileLabel(t.creator_profile as any)}</Link>}
+                      {t.creator_profile?.username && <Link to="/profile/$username" params={{ username: t.creator_profile.username }} onClick={(event) => event.stopPropagation()} className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-blue-600 hover:underline"><span className="grid size-5 shrink-0 place-items-center overflow-hidden rounded-full bg-blue-100 text-[8px] text-blue-600">{t.creator_profile.avatar_url ? <img src={t.creator_profile.avatar_url} alt="" className="size-full object-cover" /> : profileLabel(t.creator_profile).slice(0, 1).toUpperCase()}</span><span className="truncate">by {profileLabel(t.creator_profile as any)}</span></Link>}
                     <ArrowRight className="size-4 shrink-0 text-slate-200 transition-all group-hover:translate-x-0.5 group-hover:text-blue-500" />
                   </div>
                 </button>

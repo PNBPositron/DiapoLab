@@ -149,6 +149,34 @@
   --input: #93c5fd;
   --ring: var(--blue);
 }
+[data-editor-theme="dark"] {
+  --ink: #0b1220;
+  --paper: #111827;
+  --surface: #182235;
+  --surface-2: #22304a;
+  --grid: #334765;
+  --teal: #e5edf8;
+  --teal-deep: #9aabc4;
+  --blue: #8ab4ff;
+  --blue-deep: #6d8ee8;
+  --background: var(--paper);
+  --foreground: var(--teal);
+  --card: var(--surface);
+  --card-foreground: var(--teal);
+  --popover: #1b2940;
+  --popover-foreground: var(--teal);
+  --primary: var(--blue);
+  --primary-foreground: #0b1220;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--teal);
+  --muted: #22304a;
+  --muted-foreground: var(--teal-deep);
+  --accent: #263b61;
+  --accent-foreground: #c8dcff;
+  --border: #334765;
+  --input: #405579;
+  --ring: var(--blue);
+}
 [data-editor-theme="glass"] {
   --ink: oklch(0.18 0.02 260);
   --paper: oklch(0.24 0.03 260);

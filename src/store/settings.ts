@@ -81,7 +81,8 @@ export const springEasing = (stiffness: number) => {
 export type CustomTheme = { id: string; name: string; tokens: ThemeTokens };
 
 export const EDITOR_THEMES: Array<{ id: string; label: string; hint: string }> = [
-  { id: "everest", label: "Light", hint: "fixed light editor chrome" },
+  { id: "everest", label: "Light", hint: "bright editor chrome" },
+  { id: "dark", label: "Dark", hint: "low-glare editor chrome" },
 ];
 
 // Everest is a fixed light palette. It deliberately does not depend on slide colors.

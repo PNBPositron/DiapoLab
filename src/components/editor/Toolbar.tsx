@@ -36,8 +36,6 @@ import { importPPTXFile } from "@/lib/import-pptx";
 import {
   exportPNG,
   exportJPG,
-  exportPDF,
-  exportPDFPrint,
   exportPPTX,
   exportGIF,
   exportMarkdown,
@@ -100,21 +98,19 @@ export function Toolbar() {
     return () => clearTimeout(t);
   }, [savedAt]);
 
-  const [exporting, setExporting] = useState<null | "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "markdown" | "json">(null);
+  const [exporting, setExporting] = useState<null | "png" | "jpg" | "pptx" | "gif" | "markdown" | "json">(null);
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportRef = useClickOutside<HTMLDivElement>(() => setExportOpen(false));
   const importRef = useRef<HTMLInputElement>(null);
 
-  const runExport = async (kind: "png" | "jpg" | "pdf" | "pdf-print" | "pptx" | "gif" | "markdown" | "json") => {
+  const runExport = async (kind: "png" | "jpg" | "pptx" | "gif" | "markdown" | "json") => {
     setExportOpen(false);
     setExporting(kind);
     try {
       const n = designName || "positron";
       if (kind === "png") await exportPNG(n);
       else if (kind === "jpg") await exportJPG(n);
-      else if (kind === "pdf") await exportPDF(n);
-      else if (kind === "pdf-print") exportPDFPrint(n);
       else if (kind === "pptx") await exportPPTX(n);
       else if (kind === "markdown") exportMarkdown(n);
       else if (kind === "json") exportJSON(n);
@@ -337,7 +333,7 @@ export function Toolbar() {
               <div className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                 Document formats
               </div>
-              {(["png", "jpg", "pdf-print", "pdf", "pptx", "markdown", "json", "gif"] as const).map((k) => (
+              {(["png", "jpg", "pptx", "markdown", "json", "gif"] as const).map((k) => (
                 <button
                   key={k}
                   onClick={() => runExport(k)}
@@ -347,8 +343,6 @@ export function Toolbar() {
                   <span className="font-mono text-[10px] text-slate-400">
                     {k === "png"
                       ? "Current slide"
-                      : k === "pdf-print"
-                      ? "Vector · selectable"
                       : k === "gif"
                       ? "Animated"
                       : k === "json"
