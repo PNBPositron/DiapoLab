@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -20,6 +21,14 @@ import { VideoAppDialog } from "../video/VideoApp";
 import { SearchAppDialog } from "../search/SearchApp";
 import { RuntimeAppDialog } from "../runtime/RuntimeApp";
 import { PhotopeaStudioDialog, PhotopeaLogo } from "../PhotopeaStudio";
+
+/** Per-type look & feel for app tiles — icon, label and gradient chip. */
+const APP_META: Record<PluginApp["type"], { tint: string; Icon: LucideIcon; label: string }> = {
+  paint: { tint: "bg-gradient-to-br from-indigo-500 to-blue-600", Icon: Brush, label: "Paint" },
+  video: { tint: "bg-gradient-to-br from-rose-500 to-orange-500", Icon: Clapperboard, label: "Video" },
+  search: { tint: "bg-gradient-to-br from-emerald-500 to-teal-600", Icon: Search, label: "Search" },
+  runtime: { tint: "bg-gradient-to-br from-violet-500 to-fuchsia-600", Icon: Code2, label: "Runtime" },
+};
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -87,11 +96,15 @@ export function PluginsPanel() {
       <div className="px-4">
         <button
           onClick={() => setStudioOpen(true)}
-          className="group flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-indigo-300 hover:text-indigo-600 active:scale-[0.98]"
+          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-cyan-200/70 bg-gradient-to-r from-cyan-50 via-white to-indigo-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_14px_30px_-12px_rgba(6,182,212,0.45)] active:translate-y-0 active:scale-[0.99]"
         >
-          <PhotopeaLogo className="size-6 shrink-0 rounded-lg" />
-          <span className="min-w-0 flex-1 text-left">Photopea — éditeur d'images intégré</span>
-          <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
+          <span className="absolute -top-8 -right-8 size-24 rounded-full bg-cyan-100/40 blur-xl transition-transform duration-300 group-hover:scale-125" />
+          <PhotopeaLogo className="size-9 shrink-0 rounded-xl" />
+          <span className="relative min-w-0 flex-1">
+            <span className="block truncate text-xs font-bold text-slate-800">Photopea — éditeur d'images</span>
+            <span className="block truncate text-[10px] font-medium text-slate-500">Photoshop complet dans DiapoLab — PSD, calques, filtres</span>
+          </span>
+          <Play className="relative size-4 shrink-0 text-cyan-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-cyan-600" />
         </button>
       </div>
 
@@ -136,14 +149,14 @@ export function PluginsPanel() {
                 {appPlugins.map((p) => (
                   <div
                     key={p.id}
-                    className={`rounded-2xl border p-2.5 transition-opacity ${
-                      p.enabled ? "border-slate-200 bg-white" : "border-slate-200 bg-white opacity-60"
+                    className={`rounded-2xl border p-2.5 shadow-sm transition-all duration-200 hover:shadow-[0_12px_30px_-16px_rgba(79,70,229,0.4)] ${
+                      p.enabled ? "border-slate-200 bg-gradient-to-b from-white to-slate-50/60" : "border-slate-200 bg-white opacity-60"
                     }`}
                   >
                     <div className="mb-2 flex items-center gap-2">
                       <span
-                        className={`grid size-6 shrink-0 place-items-center rounded-lg ${
-                          p.enabled ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                        className={`grid size-7 shrink-0 place-items-center rounded-xl shadow-xs ${
+                          p.enabled ? "bg-gradient-to-br from-indigo-500 to-blue-600 text-white" : "bg-slate-100 text-slate-400"
                         }`}
                       >
                         <Brush className="size-3.5" />
@@ -196,22 +209,30 @@ export function PluginsPanel() {
                     </div>
                     {p.enabled && (
                       <div className="grid grid-cols-2 gap-1.5">
-                        {(p.apps ?? []).map((app, i) => (
-                          <button
-                            key={`${p.id}:app:${i}`}
-                            title={app.description || p.name}
-                            onClick={() => setAppOpen(app)}
-                            className="group flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2 py-1.5 text-left transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-100/60 active:scale-[0.97]"
-                          >
-                            <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                              {app.type === "video" ? <Clapperboard className="size-3" /> : app.type === "search" ? <Search className="size-3" /> : app.type === "runtime" ? <Code2 className="size-3" /> : <Brush className="size-3" />}
-                            </span>
-                            <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-slate-700">
-                              {app.name}
-                            </span>
-                            <Play className="size-2.5 shrink-0 text-indigo-400 transition-colors group-hover:text-indigo-600" />
-                          </button>
-                        ))}
+                        {(p.apps ?? []).map((app, i) => {
+                          const meta = APP_META[app.type];
+                          return (
+                            <button
+                              key={`${p.id}:app:${i}`}
+                              title={app.description || app.name}
+                              onClick={() => setAppOpen(app)}
+                              className="group flex flex-col gap-1 rounded-xl border border-slate-200/80 bg-white/80 px-2.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-[0_10px_22px_-8px_rgba(79,70,229,0.3)] active:translate-y-0 active:scale-[0.97]"
+                            >
+                              <span className="flex w-full items-center gap-1.5">
+                                <span className={`grid size-6 shrink-0 place-items-center rounded-lg text-white shadow-xs ${meta.tint}`}>
+                                  <meta.Icon className="size-3" />
+                                </span>
+                                <span className="min-w-0 flex-1 truncate text-[10px] font-bold text-slate-700 group-hover:text-indigo-700">
+                                  {app.name}
+                                </span>
+                                <Play className="size-3 shrink-0 text-indigo-300 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-indigo-600" />
+                              </span>
+                              <span className="line-clamp-1 text-[9px] leading-tight text-slate-400">
+                                {app.description || meta.label}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -229,14 +250,14 @@ export function PluginsPanel() {
               {packPlugins.map((p) => (
                 <div
                   key={p.id}
-                  className={`rounded-2xl border p-2.5 transition-opacity ${
-                    p.enabled ? "border-slate-200 bg-white" : "border-slate-200 bg-white opacity-60"
+                  className={`rounded-2xl border p-2.5 shadow-sm transition-all duration-200 hover:shadow-[0_12px_30px_-16px_rgba(79,70,229,0.4)] ${
+                    p.enabled ? "border-slate-200 bg-gradient-to-b from-white to-slate-50/60" : "border-slate-200 bg-white opacity-60"
                   }`}
                 >
                   <div className="mb-2 flex items-center gap-2">
                     <span
-                      className={`grid size-6 shrink-0 place-items-center rounded-lg ${
-                        p.enabled ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                      className={`grid size-7 shrink-0 place-items-center rounded-xl shadow-xs ${
+                        p.enabled ? "bg-gradient-to-br from-indigo-500 to-blue-600 text-white" : "bg-slate-100 text-slate-400"
                       }`}
                     >
                       <Puzzle className="size-3.5" />
