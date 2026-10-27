@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 8e6f1c1a5223460ef4dc77179d7a219f6c464378)
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEditor } from "@/store/editor";
@@ -25,6 +26,8 @@ export function PresentationMode() {
   const [scale, setScale] = useState(1);
   const [presenterOpen, setPresenterOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  // bump to replay the current slide's entrance animations (key R)
+  const [replayEpoch, setReplayEpoch] = useState(0);
   // key -> geometry of the element on the OUTGOING slide
   const prevGeomRef = useRef<Map<string, MorphGeometry>>(new Map());
 
@@ -73,6 +76,10 @@ export function PresentationMode() {
         e.preventDefault();
         setPresenterOpen((o) => !o);
       }
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        setReplayEpoch((n) => n + 1);
+      }
       if (/^[1-9]$/.test(e.key)) {
         const n = parseInt(e.key, 10) - 1;
         if (n < useEditor.getState().pages.length) setCurrentPage(n);
@@ -92,12 +99,16 @@ export function PresentationMode() {
 
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Exempt the presentation from the prefers-reduced-motion kill-switch
+    // (styles.css): a presenter explicitly chose to run animated slides.
+    document.body.classList.add("presenting-mode");
 
     return () => {
       obs.disconnect();
       window.removeEventListener("keydown", onKey);
       document.removeEventListener("fullscreenchange", onFsChange);
       document.body.style.overflow = prev;
+      document.body.classList.remove("presenting-mode");
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -240,7 +251,7 @@ export function PresentationMode() {
                       <CanvasElement element={el} scale={scale} morph />
                     </MorphItem>
                   ) : (
-                    <CanvasElement key={el.id} element={el} scale={scale} />
+                    <CanvasElement key={el.id} element={el} scale={scale} replayEpoch={replayEpoch} />
                   ),
                 )}
                 <TransitionFx name={page.transition} />
@@ -255,6 +266,7 @@ export function PresentationMode() {
             <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">Presenter · slide {currentIndex + 1}/{pages.length}</span>
             <span className="font-mono text-sm tabular-nums text-white/90">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
             <div className="flex items-center gap-2">
+              <button onClick={() => setReplayEpoch((n) => n + 1)} title="Replay object animations (R)" className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Replay</button>
               <button onClick={() => setElapsed(0)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Reset</button>
               <button onClick={() => setPresenterOpen(false)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Close</button>
             </div>

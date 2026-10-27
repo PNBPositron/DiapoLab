@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 1b88de4f92eea101c16bf675d64fe9ee6ccf89b5)
 import { create } from "zustand";
 
 export type ElementBase = {
@@ -12,6 +13,8 @@ export type ElementBase = {
   perspective?: number; // px — 0/undefined = flat (2D), 400..1200 = typical 3D depth
   hoverTilt?: boolean; // tilt toward the cursor while presenting
   animation?: ElementAnimation;
+  /** entrance-animation delay in ms while presenting (stagger objects) */
+  animationDelay?: number;
   interaction?: ElementInteraction;
   shadow?: ElementShadow;
   /** elements sharing a groupId are selected & moved together (plugin widgets) */

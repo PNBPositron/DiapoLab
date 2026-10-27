@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: 1cd9106d1675c9e0754458685f036cded428c9d3)
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -365,10 +366,13 @@
     outline: 2px solid var(--blue);
     outline-offset: 2px;
   }
+  /* "Reduce motion" is honored everywhere EXCEPT while presenting: the
+     presenter explicitly chose animated slides, so entrance animations and
+     slide transitions must keep playing (body.presenting-mode). */
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    body:not(.presenting-mode) *,
+    body:not(.presenting-mode) *::before,
+    body:not(.presenting-mode) *::after {
       scroll-behavior: auto !important;
       transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;

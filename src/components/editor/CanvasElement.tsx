@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: b10d1cc76747414d09b751dc1efd1a2ae2966f8c)
 import { useRef, useState, useEffect } from "react";
 import {
   useEditor,
@@ -168,6 +169,7 @@ export function CanvasElement({
   scale,
   morph = false,
   preview = false,
+  replayEpoch = 0,
 }: {
   element: AnyElement;
   scale: number;
@@ -175,6 +177,8 @@ export function CanvasElement({
   morph?: boolean;
   /** when true renders read-only (thumbnails): no selection outline or resize handles */
   preview?: boolean;
+  /** bump to replay the entrance animation while presenting (key R) */
+  replayEpoch?: number;
 }) {
   const { selectedId, selectedIds, select, toggleSelect, update, setCurrentPage } = useEditor();
   const presenting = useEditor((s) => s.presenting);
@@ -216,6 +220,25 @@ export function CanvasElement({
       node.removeEventListener("mouseleave", onLeave);
     };
   }, [element.hoverTilt, presenting]);
+
+  // Entrance animation (present mode) — computed once so the inline style and
+  // the replay effect below share the exact same shorthand (delay included).
+  const entryAnimation =
+    presenting && !preview && !morph && element.animation && element.animation !== "none"
+      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
+      : undefined;
+
+  // Replay the entrance animation on demand (press R while presenting).
+  // Restarting a CSS animation requires a reflow between the two writes.
+  useEffect(() => {
+    if (!replayEpoch || !entryAnimation) return;
+    const node = ref.current;
+    if (!node) return;
+    node.style.animation = "none";
+    void node.offsetWidth;
+    node.style.animation = entryAnimation;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replayEpoch]);
 
   const interaction = element.interaction;
   const activateInteraction = () => {
@@ -642,10 +665,7 @@ export function CanvasElement({
         height: element.height,
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
-        animation:
-          presenting && !preview && !morph && element.animation && element.animation !== "none"
-            ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) both`
-            : undefined,
+        animation: entryAnimation,
         transition: morph
           ? undefined
           : element.hoverTilt && presenting

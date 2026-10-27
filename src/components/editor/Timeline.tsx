@@ -1,11 +1,14 @@
+successfully downloaded text file (SHA: 320dfac56e030e65f757626512f23f9d38ff38f9)
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, SkipBack, RotateCcw } from "lucide-react";
+import { Play, Pause, SkipBack, RotateCcw, Sparkles } from "lucide-react";
 import { useEditor } from "@/store/editor";
+import { ELEMENT_ANIMATION_LABELS } from "@/lib/motion-catalog";
 
 export function Timeline() {
-  const { pages, currentIndex, setCurrentPage, setPageDuration } = useEditor();
+  const { pages, currentIndex, setCurrentPage, setPageDuration, update } = useEditor();
   const [playing, setPlaying] = useState(false);
   const [t, setT] = useState(0); // elapsed seconds
+  const [animOpen, setAnimOpen] = useState(false);
   const rafRef = useRef<number | null>(null);
   const lastRef = useRef<number>(0);
 
@@ -137,6 +140,59 @@ export function Timeline() {
           className="brutal-border w-14 bg-surface px-2 py-0.5 font-mono text-[10px] text-teal focus:outline-none focus:border-teal"
         />
         <span className="font-mono text-[9px] text-teal/60">s</span>
+      </div>
+
+      {/* per-object entrance animations (played in present mode) */}
+      <div className="relative">
+        <IconBtn onClick={() => setAnimOpen((o) => !o)} title="Object animations">
+          <Sparkles className="h-3.5 w-3.5" strokeWidth={3} />
+        </IconBtn>
+        {animOpen && (
+          <div className="absolute bottom-full right-0 z-50 mb-2 w-80 rounded-xl border border-teal/40 bg-ink/95 p-2 shadow-2xl backdrop-blur">
+            <p className="mb-1 px-1 font-mono text-[9px] uppercase tracking-[0.14em] text-teal/70">
+              Slide {currentIndex + 1} · object animations
+            </p>
+            <div className="max-h-56 overflow-y-auto">
+              {(pages[currentIndex]?.elements ?? []).map((el) => (
+                <div key={el.id} className="flex items-center gap-1.5 px-1 py-1">
+                  <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-teal/80">
+                    {el.type === "text" && "text" in el && typeof el.text === "string"
+                      ? el.text.slice(0, 16) || "text"
+                      : el.type}
+                  </span>
+                  <select
+                    value={el.animation ?? "none"}
+                    onChange={(e) => update(el.id, { animation: e.target.value } as never)}
+                    title="Entrance animation"
+                    className="brutal-border max-w-[96px] bg-surface px-1 py-0.5 font-mono text-[9px] text-teal focus:outline-none"
+                  >
+                    {ELEMENT_ANIMATION_LABELS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    min={0}
+                    max={10000}
+                    step={100}
+                    value={el.animationDelay ?? 0}
+                    onChange={(e) =>
+                      update(el.id, {
+                        animationDelay: Math.max(0, Math.min(10000, parseFloat(e.target.value) || 0)),
+                      } as never)
+                    }
+                    title="Delay before the entrance animation (ms)"
+                    className="brutal-border w-14 bg-surface px-1 py-0.5 font-mono text-[9px] text-teal focus:outline-none"
+                  />
+                  <span className="font-mono text-[8px] text-teal/50">ms</span>
+                </div>
+              ))}
+              {(pages[currentIndex]?.elements ?? []).length === 0 && (
+                <p className="px-1 py-2 font-mono text-[9px] text-teal/50">No objects on this slide.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
