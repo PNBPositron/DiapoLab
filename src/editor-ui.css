@@ -644,6 +644,27 @@
   transition-duration: 90ms;
 }
 
+/* ── Chrome text casing ─────────────────────────────────────────────────────
+   Labels in the editor chrome (sidebar, toolbar, bottom bars) are authored
+   in sentence case; assorted Tailwind `uppercase` utilities and the
+   .panel-section-label rule forced full caps. Normalize to sentence case
+   across the chrome only — slide content is untouched (scoped selectors,
+   unlayered so they win over the utilities layer). */
+.editor-ui header,
+.editor-ui nav,
+.editor-ui footer,
+.editor-ui .toolbar,
+.editor-ui .toolbar-flyout,
+.editor-ui .pages-bar,
+.editor-ui .timeline-bar,
+.editor-ui .zoom-dock,
+.editor-ui .editor-tool-rail,
+.editor-ui .editor-side-panel,
+.editor-ui .editor-inspector,
+.editor-ui .panel-section-label {
+  text-transform: none;
+}
+
 /* ── Web embeds: export fallback ──────────────────────────────────────────
    While capturing the canvas (PNG / JPG / PDF / GIF), html-to-image cannot
    rasterize cross-origin iframes — swap the live iframe for the static
