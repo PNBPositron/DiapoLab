@@ -1,3 +1,4 @@
+successfully downloaded text file (SHA: b7cf10f19f6e078d2eb567acefea290f0b523710)
 import { useEffect, useState } from "react";
 import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search, WandSparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +19,7 @@ import { PanelHeader } from "../ui/selectors";
 import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
 import { SearchAppDialog } from "../search/SearchApp";
+import { RuntimeAppDialog } from "../runtime/RuntimeApp";
 import { ImageStudioDialog } from "../ImageStudio";
 
 export function PluginsPanel() {
@@ -205,7 +207,7 @@ export function PluginsPanel() {
                             className="group flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/60 px-2 py-1.5 text-left transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-100/60 active:scale-[0.97]"
                           >
                             <span className="grid size-5 shrink-0 place-items-center rounded-md text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-                              {app.type === "video" ? <Clapperboard className="size-3" /> : app.type === "search" ? <Search className="size-3" /> : <Brush className="size-3" />}
+                              {app.type === "video" ? <Clapperboard className="size-3" /> : app.type === "search" ? <Search className="size-3" /> : app.type === "runtime" ? <Code2 className="size-3" /> : <Brush className="size-3" />}
                             </span>
                             <span className="min-w-0 flex-1 truncate text-[10px] font-semibold text-slate-700">
                               {app.name}
@@ -319,6 +321,8 @@ export function PluginsPanel() {
           <VideoAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ) : appOpen.type === "search" ? (
           <SearchAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
+        ) : appOpen.type === "runtime" ? (
+          <RuntimeAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ) : (
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
