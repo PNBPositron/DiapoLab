@@ -287,7 +287,7 @@ export function ComponentsPanel() {
         <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
       </div>
 
-      {/* Charts & quiz presets now live inside the UI tab */}
+      {/* Charts & quiz presets live in the My blocks tab */}
 
       {/* My blocks — save the current selection and reuse it everywhere.
           Widget packs (imported in Add-ons) are inserted from here too. */}
@@ -391,6 +391,24 @@ export function ComponentsPanel() {
               </p>
             </div>
           )}
+
+          {/* Charts & quiz — moved here from the UI tab */}
+          <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
+              <ChartColumn className="size-3" /> Charts &amp; quiz ({filteredElements.length})
+            </span>
+            <OptionGrid
+              label="Charts and quiz"
+              options={filteredElements.map((e) => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))}
+              onChange={(label) => {
+                const preset = filteredElements.find((e) => e.label === label);
+                if (preset) add(preset.create());
+              }}
+            />
+            <p className="text-[9px] leading-snug text-slate-400">
+              Charts and quizzes follow the visual theme selected above.
+            </p>
+          </div>
         </div>
       )}
 
@@ -447,22 +465,6 @@ export function ComponentsPanel() {
             </div>
           )}
 
-          {/* Charts & quiz — former "Blocks" tab now folded into UI */}
-          <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-3">
-            <span className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold tracking-wider text-slate-400">
-                Charts &amp; quiz ({filteredElements.length})
-              </span>
-            </span>
-            <OptionGrid
-              label="Charts and quiz"
-              options={filteredElements.map((e) => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))}
-              onChange={(label) => {
-                const preset = filteredElements.find((e) => e.label === label);
-                if (preset) add(preset.create());
-              }}
-            />
-          </div>
         </div>
       )}
     </div>
