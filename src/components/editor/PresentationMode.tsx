@@ -240,15 +240,18 @@ export function PresentationMode() {
                   } as React.CSSProperties
                 }
               >
-                {page.elements.map((el) =>
-                  morphing ? (
-                    <MorphItem key={el.id} element={el} prevGeom={prevGeomRef.current.get(el.id)}>
+                {page.elements.map((el) => {
+                  const geom = morphing ? prevGeomRef.current.get(el.id) : undefined;
+                  return geom ? (
+                    <MorphItem key={el.id} element={el} prevGeom={geom}>
                       <CanvasElement element={el} scale={scale} morph />
                     </MorphItem>
                   ) : (
+                    // Elements with no morph match (new on this slide) keep
+                    // their entrance animation even during a morph transition.
                     <CanvasElement key={el.id} element={el} scale={scale} replayEpoch={replayEpoch} />
-                  ),
-                )}
+                  );
+                })}
                 <TransitionFx name={page.transition} />
               </motion.div>
             </AnimatePresence>

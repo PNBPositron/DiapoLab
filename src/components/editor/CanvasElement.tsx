@@ -281,26 +281,51 @@ export function CanvasElement({
     };
   }, [element.hoverTilt, presenting]);
 
-  // Entrance animation (present mode) — played through the Web Animations
-  // API (see cssKeyframes above), replayable on demand (press R while
-  // presenting or use the presenter-view Replay button).
+  // Entrance animation (present mode). Two paths:
+  //  • default: the inline CSS `animation` shorthand (applied in the style
+  //    object below) — but that is clipped to 0.01ms by the global
+  //    reduced-motion rule in styles.css.
+  //  • reduced-motion presenters: the Web Animations API (cssKeyframes
+  //    above) — WAAPI ignores the reduced-motion rule, so a deck the
+  //    presenter chose to animate keeps playing.
+  // Both paths replay on demand (press R / presenter Replay button).
+  const entryShorthand =
+    element.animation && element.animation !== "none"
+      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
+      : undefined;
   const entryAnimRef = useRef<Animation | null>(null);
-  const [cssEntryFallback, setCssEntryFallback] = useState(false);
+  const [useCssEntry, setUseCssEntry] = useState(
+    () => typeof window === "undefined" || !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches,
+  );
 
   useEffect(() => {
     entryAnimRef.current?.cancel();
     entryAnimRef.current = null;
     if (!presenting || preview || morph) return;
-    if (!element.animation || element.animation === "none") return;
+    if (!entryShorthand) return;
     const node = ref.current;
     if (!node) return;
-    const frames = cssKeyframes(`el-${element.animation}`);
-    if (!frames) {
-      // Keyframes unreachable (exotic stylesheet setup) — fall back to the
-      // inline CSS animation shorthand below.
-      setCssEntryFallback(true);
+    const restartCss = () => {
+      // Re-running a CSS animation requires a reflow between the two writes.
+      if (!replayEpoch) return;
+      node.style.animation = "none";
+      void node.offsetWidth;
+      node.style.animation = entryShorthand;
+    };
+    const reduced = !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (!reduced) {
+      setUseCssEntry(true);
+      restartCss();
       return;
     }
+    const frames = cssKeyframes(`el-${element.animation}`);
+    if (!frames) {
+      // Keyframes unreadable — CSS fallback (clipped, but the element stays visible).
+      setUseCssEntry(true);
+      restartCss();
+      return;
+    }
+    setUseCssEntry(false);
     entryAnimRef.current = node.animate(frames, {
       duration: 680,
       delay: Math.max(0, Math.min(10000, element.animationDelay ?? 0)),
@@ -735,11 +760,7 @@ export function CanvasElement({
         height: element.height,
         transform,
         transformStyle: allow3d || tilt ? "preserve-3d" : undefined,
-        animation:
-          cssEntryFallback &&
-          presenting && !preview && !morph && element.animation && element.animation !== "none"
-            ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
-            : undefined,
+        animation: useCssEntry && presenting && !preview && !morph ? entryShorthand : undefined,
         transition: morph
           ? undefined
           : element.hoverTilt && presenting
