@@ -218,7 +218,7 @@ export function Toolbar() {
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
           <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]" />
-          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
+          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-800 transition-colors hover:text-blue-600">DiapoLab</Link>
         </div>
 
         {/* Decorative vertical divider */}
@@ -298,7 +298,7 @@ export function Toolbar() {
             ) : (
               <Save className="h-3.5 w-3.5 text-slate-500" strokeWidth={2.4} />
             )}
-            <span>SAVE</span>
+            <span>Save</span>
           </button>
         ) : (
           <Link
@@ -323,7 +323,7 @@ export function Toolbar() {
             ) : (
               <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            <span>{exporting ? exporting.toUpperCase() : "EXPORT"}</span>
+            <span>{exporting ? exporting : "Export"}</span>
             <ChevronDown
               className={`h-3 w-3 transition-transform duration-200 ${exportOpen ? "rotate-180" : ""}`}
               strokeWidth={2.5}
