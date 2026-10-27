@@ -307,7 +307,7 @@ export function Toolbar() {
             className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95"
           >
             <Cloud className="h-3.5 w-3.5 text-blue-500" strokeWidth={2.4} />
-            <span>SIGN IN</span>
+            <span>Sign in</span>
           </Link>
         )}
 
@@ -398,7 +398,7 @@ export function Toolbar() {
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-2 font-display text-sm tracking-wider text-emerald-600">
-              <CheckCircle2 className="size-5" /> PUBLISHED SUCCESSFULLY
+              <CheckCircle2 className="size-5" /> Published successfully
             </div>
             <p className="mt-2 font-mono text-xs text-slate-500">
               Your presentation is now online. Anyone with this link can view it.
