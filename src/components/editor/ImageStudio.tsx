@@ -1629,7 +1629,17 @@ export function ImageStudioDialog({
   layersRef.current = layers;
   const docW = docSize.w;
   const docH = docSize.h;
-  const sel = findLayerById(layers, selId);
+  // inline recursive lookup (findLayerById is declared later — TDZ-safe here)
+  const sel = (function find(ls: Layer[]): Layer | null {
+    for (const l of ls) {
+      if (l.id === selId) return l;
+      if (l.kind === "group") {
+        const r = find(l.children);
+        if (r) return r;
+      }
+    }
+    return null;
+  })(layers);
 
   const selected = elements.find((e) => e.id === selectedId);
   const selectedImage =
