@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search, WandSparkles } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import {
@@ -19,7 +19,7 @@ import { PaintAppDialog } from "../paint/PaintApp";
 import { VideoAppDialog } from "../video/VideoApp";
 import { SearchAppDialog } from "../search/SearchApp";
 import { RuntimeAppDialog } from "../runtime/RuntimeApp";
-import { PhotopeaStudioDialog } from "../PhotopeaStudio";
+import { PhotopeaStudioDialog, PhotopeaLogo } from "../PhotopeaStudio";
 
 export function PluginsPanel() {
   const addGroup = useEditor((s) => s.addGroup);
@@ -89,9 +89,7 @@ export function PluginsPanel() {
           onClick={() => setStudioOpen(true)}
           className="group flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-indigo-300 hover:text-indigo-600 active:scale-[0.98]"
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-fuchsia-500 to-indigo-600 text-white">
-            <WandSparkles className="size-3.5" />
-          </span>
+          <PhotopeaLogo className="size-6 shrink-0 rounded-lg" />
           <span className="min-w-0 flex-1 text-left">Photopea — éditeur d'images intégré</span>
           <Play className="size-3.5 shrink-0 text-indigo-400 transition-transform group-hover:translate-x-0.5" />
         </button>
@@ -326,7 +324,7 @@ export function PluginsPanel() {
           <PaintAppDialog app={appOpen} open onOpenChange={(v) => !v && setAppOpen(null)} />
         ))}
 
-      {/* Built-in image editor */}
+      {/* Photopea — embedded image editor */}
       {studioOpen && <PhotopeaStudioDialog open onOpenChange={(v) => !v && setStudioOpen(false)} />}
 
       {/* Import dialog */}
