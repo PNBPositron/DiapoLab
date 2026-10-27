@@ -1,4 +1,3 @@
-successfully downloaded text file (SHA: 320dfac56e030e65f757626512f23f9d38ff38f9)
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, SkipBack, RotateCcw, Sparkles } from "lucide-react";
 import { useEditor } from "@/store/editor";

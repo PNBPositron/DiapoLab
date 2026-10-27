@@ -1,4 +1,3 @@
-successfully downloaded text file (SHA: 1b88de4f92eea101c16bf675d64fe9ee6ccf89b5)
 import { create } from "zustand";
 
 export type ElementBase = {

@@ -1,4 +1,3 @@
-successfully downloaded text file (SHA: 4df68b6d682fed4849bc7b07862f73c7e8c6d7f9)
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AnyElement } from "@/store/editor";
