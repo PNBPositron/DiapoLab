@@ -101,7 +101,7 @@ function Wiki() {
               <BookOpen className="size-5" />
             </span>
             <div>
-              <p className="logo-wordmark text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">DiapoLab</p>
+              <p className="logo-wordmark text-[11px] text-blue-600">DiapoLab</p>
               <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Wiki</h1>
             </div>
           </div>

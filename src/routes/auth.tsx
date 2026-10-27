@@ -83,7 +83,7 @@ function AuthPage() {
 
           <Link to="/" className="relative flex items-center gap-3">
             <img src="/favicon.ico" alt="DiapoLab" className="size-10 rounded-xl object-contain" />
-            <span className="font-display text-lg font-semibold uppercase tracking-[0.22em]">
+            <span className="font-display text-lg font-semibold">
               <span className="logo-wordmark">DiapoLab</span>
             </span>
           </Link>
