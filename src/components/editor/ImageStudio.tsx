@@ -2335,23 +2335,6 @@ export function ImageStudioDialog({
     bump();
   };
 
-  const paintMaskSeg = (l: RasterLayer, a: { x: number; y: number }, b: { x: number; y: number }, black: boolean) => {
-    const cx = l.getContext();
-    cx.save();
-    cx.setTransform(1, 0, 0, 1, 0, 0);
-    cx.globalCompositeOperation = "source-over";
-    cx.strokeStyle = black ? "#000" : "#fff";
-    cx.lineWidth = brushSize;
-    cx.lineCap = "round";
-    cx.lineJoin = "round";
-    cx.beginPath();
-    cx.moveTo(a.x - l.x, a.y - l.y);
-    cx.lineTo(b.x - l.x, b.y - l.y);
-    cx.stroke();
-    cx.restore();
-    bump();
-  };
-
   const selectAll = () => {
     const mk = newCanvas(docW, docH);
     const mc = mk.getContext("2d")!;
@@ -2371,7 +2354,7 @@ export function ImageStudioDialog({
     const l = findLayerById(layersRef.current, selId);
     if (!mk || !l || l.kind !== "raster") return;
     pushHistory();
-    const cx = l.getContext();
+    const cx = l.canvas.getContext("2d")!;
     cx.save();
     cx.setTransform(1, 0, 0, 1, 0, 0);
     cx.globalCompositeOperation = "destination-out";
