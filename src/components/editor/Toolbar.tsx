@@ -218,7 +218,7 @@ export function Toolbar() {
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
           <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]" />
-          <Link to="/" className="logo-wordmark font-orbitron text-base font-bold tracking-[0.2em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
+          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-800 transition-colors hover:text-blue-600">DIAPOLAB</Link>
         </div>
 
         {/* Decorative vertical divider */}

@@ -39,7 +39,7 @@
   --color-selector-accent: var(--selector-accent);
   --color-selector-active: var(--selector-active);
   --font-display: "Manrope", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Manrope", system-ui, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 :root {
@@ -317,19 +317,19 @@
     min-height: 100%;
     background-color: #ffffff;
     color: var(--teal);
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
   }
   h1,
   h2,
   h3,
   h4 {
-    font-family: "Manrope", "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
     letter-spacing: -0.025em;
     text-transform: none;
   }
   .logo-wordmark {
-  font-family: "Orbitron", sans-serif;
-    font-family: "Orbitron", "Inter", system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
+    letter-spacing: -0.03em;
   }
   button,
   input,

@@ -12,9 +12,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DiapoLab — Design & Presentation Editor" },
-      { name: "description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
-      { property: "og:title", content: "DiapoLab — Neobrutalist Design Editor" },
-      { property: "og:description", content: "A loud, neobrutalist design editor for posters, social posts and graphics. Drag, drop, type, ship." },
+      { name: "description", content: "A focused workspace for making polished presentations, posters, and graphics." },
+      { property: "og:title", content: "DiapoLab — Design workspace" },
+      { property: "og:description", content: "A focused workspace for making polished presentations, posters, and graphics." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://diapolab.lovable.app/" },
