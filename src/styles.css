@@ -328,8 +328,8 @@
     text-transform: none;
   }
   .logo-wordmark {
-    font-family: "Manrope", system-ui, sans-serif;
-    letter-spacing: -0.03em;
+    font-family: "Unica One", "Manrope", system-ui, sans-serif;
+    letter-spacing: 0.02em;
   }
   button,
   input,

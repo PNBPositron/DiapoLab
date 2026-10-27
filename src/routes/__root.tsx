@@ -73,7 +73,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DiapoLab — Design & Presentation Editor" },
+      { title: "DiapoLab-The Next-Generation Open-Source Presentation Editor" },
       { name: "description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
       { name: "author", content: "DiapoLab" },
       { name: "robots", content: "index, follow" },
@@ -94,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=JetBrains+Mono:wght@400..800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=JetBrains+Mono:wght@400..800&family=Unica+One&display=swap",
       },
       {
         rel: "stylesheet",
