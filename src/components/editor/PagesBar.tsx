@@ -100,7 +100,7 @@ export function PagesBar() {
   };
 
   return (
-    <div className="pages-bar flex shrink-0 flex-col border-t border-slate-200/70 bg-white/70 px-3 pt-2 pb-1 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
+    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 px-3 py-2 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
       <div className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
@@ -267,11 +267,6 @@ export function PagesBar() {
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-      <div className="flex shrink-0 items-center justify-center pt-0.5">
-        <span className="text-[10px] text-slate-400">
-          {currentIndex + 1} / {pages.length}
-        </span>
       </div>
     </div>
   );
