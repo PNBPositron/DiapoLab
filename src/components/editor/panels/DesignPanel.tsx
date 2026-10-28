@@ -101,8 +101,8 @@ export function DesignPanel() {
           title="Brand kit"
           subtitle="Shared typography & colors"
           Icon={Sparkles}
-          iconBg="bg-amber-50 text-amber-600 dark:bg-amber-950/40"
-          iconColor="text-amber-600"
+          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          iconColor="text-blue-600"
         >
           <BrandKitPanel />
         </SectionRow>
@@ -111,8 +111,8 @@ export function DesignPanel() {
           title="Background fill"
           subtitle="Solid, gradient, or canvas texture"
           Icon={Palette}
-          iconBg="bg-violet-50 text-violet-600 dark:bg-violet-950/40"
-          iconColor="text-violet-600"
+          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          iconColor="text-blue-600"
         >
           <ColorPanel />
         </SectionRow>
@@ -121,8 +121,8 @@ export function DesignPanel() {
           title="Master style"
           subtitle="Push this slide's style deck-wide"
           Icon={Clapperboard}
-          iconBg="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40"
-          iconColor="text-emerald-600"
+          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
+          iconColor="text-blue-600"
         >
           <MasterStylePanel />
         </SectionRow>

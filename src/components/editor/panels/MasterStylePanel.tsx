@@ -19,7 +19,7 @@ export function MasterStylePanel() {
       </p>
       <div className="flex flex-col gap-2">
         <button type="button" onClick={applyBackgroundToDeck} className={btn} title={bgImage ? "Push color + background image to all slides" : "Push background color to all slides"}>
-          <Layers className="size-3.5 shrink-0 text-violet-600" />
+          <Layers className="size-3.5 shrink-0 text-blue-600" />
           <span className="min-w-0 flex-1">Use this background on all slides</span>
           <span
             aria-hidden="true"
@@ -28,7 +28,7 @@ export function MasterStylePanel() {
           />
         </button>
         <button type="button" onClick={applyTransitionToDeck} className={btn} title={`Transition: ${transition}`}>
-          <Clapperboard className="size-3.5 shrink-0 text-emerald-600" />
+          <Clapperboard className="size-3.5 shrink-0 text-blue-600" />
           <span className="min-w-0 flex-1">Use this transition on all slides</span>
           <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] tracking-wider text-slate-500">{transition}</span>
         </button>

@@ -253,7 +253,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               </span>
             </span>
             {notice && (
-              <span className="ml-auto animate-in fade-in-50 rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+              <span className="ml-auto animate-in fade-in-50 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600">
                 {notice}
               </span>
             )}

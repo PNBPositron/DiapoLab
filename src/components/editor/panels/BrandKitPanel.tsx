@@ -157,7 +157,7 @@ export function BrandKitPanel() {
         <button
           type="button"
           onClick={adaptToSlide}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-[11px] font-semibold text-violet-700 transition hover:border-violet-300 hover:bg-violet-100"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100"
         >
           <WandSparkles className="size-3.5" /> Adapt presets to slide look
         </button>

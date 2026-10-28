@@ -222,7 +222,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   className="h-72 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
                 />
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className={`font-mono text-[10px] ${jsonStatus?.includes("updated") ? "text-emerald-400" : "text-slate-400"}`}>
+                  <span className={`font-mono text-[10px] ${jsonStatus?.includes("updated") ? "text-blue-400" : "text-slate-400"}`}>
                     {jsonStatus ?? `${pages.length} slides loaded`}
                   </span>
                   <button

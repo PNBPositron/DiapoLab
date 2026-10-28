@@ -411,7 +411,7 @@ export function VideoAppDialog({
                   title="Use the current frame as poster (shown before playback)"
                   className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition-all ${
                     poster
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-600"
+                      ? "border-blue-500 bg-blue-50 text-blue-600"
                       : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
                   }`}
                 >

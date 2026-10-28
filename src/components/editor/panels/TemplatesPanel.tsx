@@ -222,7 +222,7 @@ const filteredCommunity = filterTemplates(community, {
           onClick={() => useEditor.getState().setPresenting(true)}
           className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.97]"
         >
-          <span className="grid size-8 place-items-center rounded-lg bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+          <span className="grid size-8 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <Presentation className="size-4" />
           </span>
           <span className="text-[10px] font-semibold text-slate-700">Present</span>
@@ -233,7 +233,7 @@ const filteredCommunity = filterTemplates(community, {
       {featured && featured.pages?.[0] && (
         <div className="px-4">
           <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-slate-400">
-            <Crown className="size-3 text-amber-400" /> Featured deck
+            <Crown className="size-3 text-blue-400" /> Featured deck
           </div>
           <button
             onClick={() => loadTemplate(featured)}
