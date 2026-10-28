@@ -1,16 +1,41 @@
 import { useEffect, useRef, useState } from "react";
-import { useEditor } from "@/store/editor";
+import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/editor";
 import { CanvasElement } from "./CanvasElement";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Scan } from "lucide-react";
+import { Minus, Plus, Scan, History, WandSparkles, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { OptionGrid, PanelHeader } from "./ui/selectors";
+import { VersionHistoryDialog } from "./VersionHistoryDialog";
+import {
+  TRANSITION_OPTIONS,
+  TRANSITION_ICONS,
+  ELEMENT_ANIMATION_OPTIONS,
+} from "@/lib/motion-catalog";
 
 export function Canvas() {
-  const { elements, bgColor, select, guides, canvasW, canvasH, pages, currentIndex } = useEditor();
+  const {
+    elements,
+    bgColor,
+    select,
+    guides,
+    canvasW,
+    canvasH,
+    pages,
+    currentIndex,
+    selectedId,
+    update,
+    setTransition,
+    setTransitionZoom,
+  } = useEditor();
   const page = pages[currentIndex];
+  const currentTransition: SlideTransition = page.transition ?? "none";
+  const currentZoom = page.transitionZoom ?? 0.5;
   const wrapRef = useRef<HTMLDivElement>(null);
   const [fitScale, setFitScale] = useState(0.5);
   const [zoom, setZoom] = useState<number | null>(null);
+  const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const scale = zoom ?? fitScale;
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
 
@@ -240,7 +265,103 @@ export function Canvas() {
         <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">
           {canvasW}×{canvasH}
         </span>
+        <span className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden="true" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title="Slide version history"
+          aria-label="Slide version history"
+          onClick={() => setHistoryOpen(true)}
+        >
+          <History className="size-4" />
+        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              aria-label="Slide transition"
+              title="Slide transition & animations"
+              className="h-7 gap-1.5 px-2 text-[11px] capitalize text-slate-600"
+            >
+              <WandSparkles className="size-3.5" aria-hidden="true" />
+              {currentTransition.replaceAll("-", " ")}
+              <ChevronDown className="size-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            side="top"
+            align="end"
+            className="selector-panel space-y-3 rounded-xl p-3"
+          >
+            <PanelHeader title="Slide transition" />
+            {selectedId && (
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
+                  <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                </div>
+                <OptionGrid
+                  columns={3}
+                  label="Object animations"
+                  value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
+                  onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
+                  options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({ value, label: short, icon }))}
+                />
+              </div>
+            )}
+            <div
+              className="transition-mini"
+              role="img"
+              aria-label={`${hoveredTransition ?? currentTransition} transition preview`}
+            >
+              <div
+                key={hoveredTransition ?? currentTransition}
+                className="transition-mini-stage"
+                data-transition={hoveredTransition ?? currentTransition}
+              >
+                <span className="transition-mini-mark" />
+                <span className="transition-mini-line" />
+                <span className="transition-mini-line" />
+              </div>
+            </div>
+            <OptionGrid
+              columns={3}
+              label="Slide transitions"
+              value={currentTransition}
+              onChange={setTransition}
+              onPreview={setHoveredTransition}
+              options={TRANSITION_OPTIONS.map((value) => ({
+                value,
+                label: value.replaceAll("-", " "),
+                icon: TRANSITION_ICONS[value],
+              }))}
+            />
+          </PopoverContent>
+        </Popover>
+        {currentTransition === "zoom" && (
+          <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-2.5 py-1 shadow-inner shadow-blue-100/60">
+            <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-500">Zoom</span>
+            <input
+              aria-label="Transition zoom"
+              type="range"
+              min={50}
+              max={200}
+              step={5}
+              value={Math.round(currentZoom * 100)}
+              onChange={(event) => setTransitionZoom(Number(event.target.value) / 100)}
+              className="h-1.5 w-16 accent-blue-600"
+            />
+            <span className="min-w-[2.5rem] text-center font-mono text-[10px] font-medium text-slate-700">
+              {Math.round(currentZoom * 100)}%
+            </span>
+          </div>
+        )}
+
       </div>
+
+      <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );
 }

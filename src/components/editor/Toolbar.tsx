@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Sliders,
   Presentation,
+  Play,
   Puzzle,
   LayoutTemplate,
   BookOpen,
@@ -32,6 +33,7 @@ import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import { SettingsDialog } from "./SettingsDialog";
+import { requestPresentationFullscreen } from "./PresentationMode";
 import { importPPTXFile } from "@/lib/import-pptx";
 import {
   exportPNG,
@@ -78,6 +80,7 @@ export function Toolbar() {
     canvasH,
     loadPages,
     setTool,
+    setPresenting,
   } = useEditor();
 
   const { user } = useAuth();
@@ -356,6 +359,19 @@ export function Toolbar() {
             </div>
           )}
         </div>
+
+        {/* Present */}
+        <button
+          onClick={async () => {
+            const enteredFullscreen = await requestPresentationFullscreen();
+            if (enteredFullscreen) setPresenting(true);
+          }}
+          title="Present"
+          type="button"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
+        >
+          <Play className="h-3.5 w-3.5 fill-white" /> Present
+        </button>
 
         {/* GitHub repository */}
         <button

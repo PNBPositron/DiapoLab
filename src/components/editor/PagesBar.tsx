@@ -1,23 +1,8 @@
-import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/editor";
-import { Plus, Copy, Trash2, Play, ChevronLeft, ChevronRight, WandSparkles } from "lucide-react";
+import { useEditor } from "@/store/editor";
+import { Plus, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import {
-  TRANSITION_OPTIONS,
-  TRANSITION_ICONS,
-  ELEMENT_ANIMATION_OPTIONS,
-} from "@/lib/motion-catalog";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { OptionGrid, PanelHeader } from "./ui/selectors";
-import { VersionHistoryDialog } from "./VersionHistoryDialog";
-import { History } from "lucide-react";
-import { requestPresentationFullscreen } from "./PresentationMode";
 
 export function PagesBar() {
-  const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
   const {
     pages,
     currentIndex,
@@ -28,16 +13,8 @@ export function PagesBar() {
     movePage,
     canvasW,
     canvasH,
-    setTransition,
-    setTransitionZoom,
-    setPresenting,
-    selectedId,
-    elements,
-    update,
   } = useEditor();
 
-  const currentTransition: SlideTransition = pages[currentIndex]?.transition ?? "none";
-  const currentZoom = pages[currentIndex]?.transitionZoom ?? 0.5;
   const ratio = canvasW / canvasH;
   const thumbW = ratio >= 1 ? 116 : 116 * ratio;
   const thumbH = ratio >= 1 ? 116 / ratio : 116 * ratio;
@@ -120,111 +97,10 @@ export function PagesBar() {
         </button>
       </div>
       <div className="flex shrink-0 items-center justify-center gap-2">
-        <button type="button" onClick={() => setHistoryOpen(true)} className="flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white/75 px-2.5 py-2 text-[10px] font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-600" title="Slide version history"><History className="size-3.5" /> History</button>
-          <div className="flex items-center gap-2 rounded-2xl border border-white/80 bg-white/70 px-2.5 py-1.5 shadow-[0_8px_20px_-14px_rgba(15,23,42,0.4)] backdrop-blur-sm">
-          <WandSparkles className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-          <label className="flex items-center gap-2 text-[9px] font-semibold tracking-[0.14em] text-slate-500">
-            <span>Transition</span>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  aria-label="Slide transition"
-                  className="h-7 gap-2 bg-selector-muted px-2 text-[11px] capitalize text-selector-ink"
-                >
-                  {currentTransition.replaceAll("-", " ")}
-                  <ChevronDown className="size-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                side="top"
-                align="end"
-                className="selector-panel space-y-3 rounded-xl p-3"
-              >
-                <PanelHeader title="Slide transition" />
-                {selectedId && (
-                  <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
-                    <div className="mb-1.5 flex items-center justify-between">
-                      <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
-                      <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
-                    </div>
-                    <OptionGrid
-                      columns={3}
-                      label="Object animations"
-                      value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
-                      onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
-                      options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({ value, label: short, icon }))}
-                    />
-                  </div>
-                )}
-                <div
-                  className="transition-mini"
-                  role="img"
-                  aria-label={`${hoveredTransition ?? currentTransition} transition preview`}
-                >
-                  <div
-                    key={hoveredTransition ?? currentTransition}
-                    className="transition-mini-stage"
-                    data-transition={hoveredTransition ?? currentTransition}
-                  >
-                    <span className="transition-mini-mark" />
-                    <span className="transition-mini-line" />
-                    <span className="transition-mini-line" />
-                  </div>
-                </div>
-                <OptionGrid
-                  columns={3}
-                  label="Slide transitions"
-                  value={currentTransition}
-                  onChange={setTransition}
-                  onPreview={setHoveredTransition}
-                  options={TRANSITION_OPTIONS.map((value) => ({
-                    value,
-                    label: value.replaceAll("-", " "),
-                    icon: TRANSITION_ICONS[value],
-                  }))}
-                />
-              </PopoverContent>
-            </Popover>
-          </label>
-          {currentTransition === "zoom" && (
-            <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-2.5 py-1.5 shadow-inner shadow-blue-100/60">
-              <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-500">
-                Zoom
-              </span>
-              <input
-                aria-label="Transition zoom"
-                type="range"
-                min={50}
-                max={200}
-                step={5}
-                value={Math.round(currentZoom * 100)}
-                onChange={(event) => setTransitionZoom(Number(event.target.value) / 100)}
-                className="h-1.5 w-16 accent-blue-600"
-              />
-              <span className="min-w-[2.75rem] text-center text-[9px] font-medium text-slate-700">
-                {Math.round(currentZoom * 100)}%
-              </span>
-            </div>
-          )}
-        </div>
         <span className="text-[10px] text-slate-400">
           {currentIndex + 1} / {pages.length}
         </span>
-        <button
-onClick={async () => {
-                  const enteredFullscreen = await requestPresentationFullscreen();
-                  if (enteredFullscreen) setPresenting(true);
-                }}
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-[10px] font-semibold tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
-          type="button"
-        >
-          <Play className="h-3.5 w-3.5 fill-white" /> Present
-        </button>
       </div>
-      <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );
 }
-
