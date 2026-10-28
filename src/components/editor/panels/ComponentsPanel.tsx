@@ -59,7 +59,7 @@ import {
   type UserBlock,
 } from "@/lib/user-blocks";
 
-type PresetSection = "ui" | "blocks";
+type PresetSection = "ui" | "blocks" | "charts";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -279,15 +279,16 @@ export function ComponentsPanel() {
       <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets and charts onto the slide." icon={Blocks} />
       <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
         { value: "ui", label: "UI", icon: Blocks },
+        { value: "charts", label: "Charts", icon: ChartColumn },
         { value: "blocks", label: "My blocks", icon: Bookmark },
       ]} />
-      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : "blocks"}...`} />
+      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : "blocks"}...`} />
       <div className="space-y-2">
         <span className="text-xs text-selector-subtle">Visual theme</span>
         <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
       </div>
 
-      {/* Charts & quiz presets live in the My blocks tab */}
+      {/* Charts & quiz presets live in the Charts tab */}
 
       {/* My blocks — save the current selection and reuse it everywhere.
           Widget packs (imported in Add-ons) are inserted from here too. */}
@@ -392,23 +393,39 @@ export function ComponentsPanel() {
             </div>
           )}
 
-          {/* Charts & quiz — moved here from the UI tab */}
-          <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
-            <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
-              <ChartColumn className="size-3" /> Charts &amp; quiz ({filteredElements.length})
-            </span>
-            <OptionGrid
-              label="Charts and quiz"
-              options={filteredElements.map((e) => ({ value: e.label, label: e.label, icon: e.Icon, title: e.description }))}
-              onChange={(label) => {
-                const preset = filteredElements.find((e) => e.label === label);
-                if (preset) add(preset.create());
-              }}
-            />
-            <p className="text-[9px] leading-snug text-slate-400">
-              Charts and quizzes follow the visual theme selected above.
-            </p>
+        </div>
+      )}
+
+      {/* Charts & quiz — dedicated Charts tab */}
+      {section === "charts" && (
+        <div className="flex flex-col gap-2 pb-6">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
+            <ChartColumn className="size-3" /> Charts &amp; quiz ({filteredElements.length})
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            {filteredElements.map((e) => (
+              <button
+                key={e.label}
+                type="button"
+                onClick={() => add(e.create())}
+                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2.5 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-sm"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                  <e.Icon className="size-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-semibold text-slate-700">{e.label}</span>
+                  <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
+                </span>
+              </button>
+            ))}
           </div>
+          {filteredElements.length === 0 && (
+            <div className="py-6 text-center text-xs text-slate-400">No chart matches your search.</div>
+          )}
+          <p className="text-[9px] leading-snug text-slate-400">
+            Charts and quizzes follow the visual theme selected above.
+          </p>
         </div>
       )}
 

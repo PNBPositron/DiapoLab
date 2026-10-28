@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TrafficLights } from "../ui/TrafficLights";
 import type { PluginApp } from "@/lib/plugins";
 import { newImage, newText, useEditor } from "@/store/editor";
 
@@ -37,6 +38,8 @@ const faviconOf = (url?: string) =>
   url ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostOf(url) ?? "")}&sz=64` : "";
 
 export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
@@ -215,9 +218,26 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl gap-0 overflow-hidden border-slate-200/80 bg-white p-0 shadow-[0_40px_120px_-30px_rgba(8,145,178,0.35)] sm:rounded-3xl">
+      <DialogContent
+        className={`gap-0 overflow-hidden border-slate-200/80 bg-white p-0 shadow-[0_40px_120px_-30px_rgba(8,145,178,0.35)] sm:rounded-3xl ${
+          maximized
+            ? "h-[92vh] w-[96vw] max-w-none sm:rounded-none"
+            : minimized
+              ? "max-h-none w-[min(96vw,48rem)]"
+              : "max-w-3xl"
+        }`}
+      >
         {/* ---- Header ---- */}
         <DialogHeader className="relative border-b border-slate-100 px-6 py-5">
+          <div className="mb-2">
+            <TrafficLights
+              minimized={minimized}
+              maximized={maximized}
+              onClose={() => onOpenChange(false)}
+              onMinimize={() => setMinimized((m) => !m)}
+              onMaximize={() => setMaximized((m) => !m)}
+            />
+          </div>
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(18rem_10rem_at_15%_-40%,rgba(34,211,238,0.25),transparent),radial-gradient(16rem_9rem_at_95%_140%,rgba(129,140,248,0.22),transparent)]"
@@ -240,6 +260,8 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
           </DialogTitle>
         </DialogHeader>
 
+        {!minimized && (
+        <>
         {/* ---- Preview popup ---- */}
         {preview ? (
           <div className="flex flex-col">
@@ -442,6 +464,8 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               </p>
             )}
           </div>
+        )}
+        </>
         )}
       </DialogContent>
     </Dialog>

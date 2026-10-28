@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { TrafficLights } from "../ui/TrafficLights";
 import {
   Clapperboard,
   Upload,
@@ -48,6 +49,8 @@ export function VideoAppDialog({
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
 
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
   const [src, setSrc] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [duration, setDuration] = useState(0);
@@ -172,8 +175,25 @@ export function VideoAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl">
+      <DialogContent
+        className={`gap-0 border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl ${
+          maximized
+            ? "h-[92vh] w-[96vw] max-w-none overflow-hidden sm:rounded-none"
+            : minimized
+              ? "max-h-none w-[min(96vw,36rem)] overflow-hidden"
+              : "max-h-[88vh] max-w-xl overflow-y-auto"
+        }`}
+      >
         <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 px-5 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <TrafficLights
+              minimized={minimized}
+              maximized={maximized}
+              onClose={() => onOpenChange(false)}
+              onMinimize={() => setMinimized((m) => !m)}
+              onMaximize={() => setMaximized((m) => !m)}
+            />
+          </div>
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">
             <span className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.35)]">
               <Clapperboard className="size-4" />
@@ -187,6 +207,7 @@ export function VideoAppDialog({
           </DialogTitle>
         </DialogHeader>
 
+        {!minimized && (
         <div className="flex flex-col gap-3 p-4">
           <input ref={fileRef} type="file" accept="video/*" onChange={onFile} className="hidden" />
 
@@ -423,6 +444,7 @@ export function VideoAppDialog({
             </>
           )}
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );

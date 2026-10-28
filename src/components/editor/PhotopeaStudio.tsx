@@ -14,6 +14,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { newImage, useEditor } from "@/store/editor";
 import { Download, ExternalLink, ImageDown, Loader2 } from "lucide-react";
+import { TrafficLights } from "./ui/TrafficLights";
+
+// Photopea suit par défaut la langue du navigateur ; on force l'interface en
+// anglais via le paramètre d'environnement de son API.
+const PHOTOPEA_SRC = `https://www.photopea.com/#${encodeURIComponent(
+  JSON.stringify({ environment: { lang: "en" } }),
+)}`;
 
 /** Mini logo Photopea — « P » stylisé sur fond dégradé teal, à la marque. */
 export function PhotopeaLogo({ className }: { className?: string }) {
@@ -53,6 +60,8 @@ export function PhotopeaStudioDialog({
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
 
   // Réception d'un PNG (ArrayBuffer) renvoyé par saveToOE : soit on l'insère
   // sur la diapo, soit on le télécharge — selon le bouton cliqué.
@@ -145,8 +154,23 @@ export function PhotopeaStudioDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[92vh] w-[96vw] max-w-[1500px] flex-col gap-0 overflow-hidden p-0">
+      <DialogContent
+          className={`flex flex-col gap-0 overflow-hidden p-0 ${
+            maximized
+              ? "h-screen w-screen max-w-none sm:rounded-none"
+              : minimized
+                ? "h-auto w-[96vw] max-w-[1500px]"
+                : "h-[92vh] w-[96vw] max-w-[1500px]"
+          }`}
+        >
         <DialogHeader className="flex-row items-center justify-between border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-3">
+          <TrafficLights
+            minimized={minimized}
+            maximized={maximized}
+            onClose={() => onOpenChange(false)}
+            onMinimize={() => setMinimized((m) => !m)}
+            onMaximize={() => setMaximized((m) => !m)}
+          />
           <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide text-slate-800">
             <PhotopeaLogo className="size-7 shrink-0" />
             Photopea
@@ -179,10 +203,10 @@ export function PhotopeaStudioDialog({
           </div>
         </DialogHeader>
 
-        <div className="relative min-h-0 flex-1">
+        <div className={`relative min-h-0 flex-1 ${minimized ? "hidden" : ""}`}>
           <iframe
             ref={frameRef}
-            src="https://www.photopea.com/"
+            src={PHOTOPEA_SRC}
             title="Photopea"
             className="h-full w-full border-0"
             allow="clipboard-read; clipboard-write; fullscreen"
@@ -197,13 +221,13 @@ export function PhotopeaStudioDialog({
           )}
         </div>
 
-        {busy && (
+        {!minimized && busy && (
           <div className="flex items-center justify-center gap-2 border-t border-slate-200 bg-slate-50 px-5 py-2 text-[11px] font-medium text-slate-600">
             <Loader2 className="size-3.5 animate-spin text-indigo-500" />
             Export de l'image en cours…
           </div>
         )}
-        {!busy && status && (
+        {!minimized && !busy && status && (
           <div className="border-t border-slate-200 bg-slate-50 px-5 py-2 text-center text-[11px] font-medium text-slate-600">
             {status}
           </div>

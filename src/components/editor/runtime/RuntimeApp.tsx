@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Code2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { TrafficLights } from "../ui/TrafficLights";
 import {
   useEditor,
   newText,
@@ -108,6 +109,8 @@ export function RuntimeAppDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
   const [inserted, setInserted] = useState(0);
 
   useEffect(() => {
@@ -141,8 +144,25 @@ export function RuntimeAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl border-slate-200 bg-white p-0">
+      <DialogContent
+        className={`border-slate-200 bg-white p-0 ${
+          maximized
+            ? "h-[92vh] w-[96vw] max-w-none overflow-hidden sm:rounded-none"
+            : minimized
+              ? "max-h-none w-[min(96vw,48rem)] overflow-hidden"
+              : "max-w-3xl"
+        }`}
+      >
         <DialogHeader className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <TrafficLights
+              minimized={minimized}
+              maximized={maximized}
+              onClose={() => onOpenChange(false)}
+              onMinimize={() => setMinimized((m) => !m)}
+              onMaximize={() => setMaximized((m) => !m)}
+            />
+          </div>
           <DialogTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-800">
             <span className="grid size-7 place-items-center rounded-lg bg-indigo-600 text-white">
               <Code2 className="size-3.5" />
@@ -153,6 +173,7 @@ export function RuntimeAppDialog({
             </span>
           </DialogTitle>
         </DialogHeader>
+        {!minimized && (
         <div className="p-3">
           <iframe
             title={app.name}
@@ -174,6 +195,7 @@ export function RuntimeAppDialog({
             </p>
           )}
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );

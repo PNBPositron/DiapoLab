@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { TrafficLights } from "../ui/TrafficLights";
 import {
   Brush,
   Eraser,
@@ -165,6 +166,8 @@ export function PaintAppDialog({
   const outW = cfg.width ?? Math.round(canvasW / 2);
   const outH = cfg.height ?? Math.round((outW * canvasH) / canvasW);
   const defaultBg = cfg.bg && cfg.bg !== "transparent" ? cfg.bg : "#ffffff";
+  const [minimized, setMinimized] = useState(false);
+  const [maximized, setMaximized] = useState(false);
   const [bg, setBg] = useState(defaultBg);
   const transparent = bg === "transparent";
 
@@ -413,8 +416,25 @@ export function PaintAppDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] max-w-xl gap-0 overflow-y-auto border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl">
+      <DialogContent
+        className={`gap-0 border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl ${
+          maximized
+            ? "h-[92vh] w-[96vw] max-w-none overflow-hidden sm:rounded-none"
+            : minimized
+              ? "max-h-none w-[min(96vw,36rem)] overflow-hidden"
+              : "max-h-[88vh] max-w-xl overflow-y-auto"
+        }`}
+      >
         <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 px-5 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <TrafficLights
+              minimized={minimized}
+              maximized={maximized}
+              onClose={() => onOpenChange(false)}
+              onMinimize={() => setMinimized((m) => !m)}
+              onMaximize={() => setMaximized((m) => !m)}
+            />
+          </div>
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">
             <span className="grid size-8 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-[0_6px_14px_rgba(79,70,229,0.35)]">
               <Brush className="size-4" />
@@ -428,6 +448,7 @@ export function PaintAppDialog({
           </DialogTitle>
         </DialogHeader>
 
+        {!minimized && (
         <div className="flex flex-col gap-3 p-4">
           {/* Tools row — floating toolbar island */}
           <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
@@ -611,6 +632,7 @@ export function PaintAppDialog({
             </button>
           </div>
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );

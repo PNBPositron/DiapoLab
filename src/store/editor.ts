@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { DEFAULT_PAGES } from "@/lib/default-deck";
 
 export type ElementBase = {
   id: string;
@@ -1263,7 +1264,10 @@ const newPage = (overrides: Partial<Page> = {}): Page => ({
   ...overrides,
 });
 
-const initialPage = newPage();
+/** Fresh copy of the built-in starter deck — new designs open on it. */
+const cloneDefaultPages = (): Page[] =>
+  DEFAULT_PAGES.map((p) => ({ ...p, elements: p.elements.map((e) => ({ ...e })) }));
+const initialPages = cloneDefaultPages();
 
 export const useEditor = create<State>((set, get) => {
   const snap = (): HistorySnap => ({
@@ -1284,10 +1288,10 @@ export const useEditor = create<State>((set, get) => {
   };
 
   return {
-    pages: [initialPage],
+    pages: initialPages,
     currentIndex: 0,
-    elements: initialPage.elements,
-    bgColor: initialPage.bgColor,
+    elements: initialPages[0].elements,
+    bgColor: initialPages[0].bgColor,
     selectedId: null,
     selectedIds: [],
     tool: "home",
@@ -1712,9 +1716,8 @@ export const useEditor = create<State>((set, get) => {
       });
     },
     newDesign: () => {
-      const fresh = newPage();
       set({
-        ...syncCurrent([fresh], 0),
+        ...syncCurrent(cloneDefaultPages(), 0),
         canvasW: DEFAULT_W,
         canvasH: DEFAULT_H,
         designId: null,
