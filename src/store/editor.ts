@@ -262,6 +262,8 @@ export type VideoElement = ElementBase & {
   end?: number;
   /** playback rate — 1 = normal speed */
   rate?: number;
+  /** how the video blends with the slide below (overlay, screen, multiply…) */
+  blendMode?: BlendMode;
 };
 
 export type IconElement = ElementBase & {

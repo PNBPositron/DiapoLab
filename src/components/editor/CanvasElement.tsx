@@ -997,6 +997,10 @@ export function CanvasElement({
             objectFit: element.fit ?? "cover",
             display: "block",
             borderRadius: 0,
+            mixBlendMode:
+              element.blendMode && element.blendMode !== "normal"
+                ? element.blendMode
+                : undefined,
           }}
         />
       )}
