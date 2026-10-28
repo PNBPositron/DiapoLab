@@ -357,14 +357,45 @@ export function Toolbar() {
           )}
         </div>
 
+        {/* GitHub repository */}
+        <button
+          onClick={() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer")}
+          title="GitHub repository"
+          aria-label="GitHub repository"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        >
+          <Github className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+
+        {/* Private share */}
+        {user && (
+          <button
+            onClick={handlePrivateShare}
+            disabled={publishing}
+            title="Copy private share link"
+            aria-label="Copy private share link"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 disabled:opacity-60"
+          >
+            {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" strokeWidth={2.2} />}
+          </button>
+        )}
+
+        {/* Settings */}
+        <button
+          onClick={() => setSettingsDialogOpen(true)}
+          title="Settings"
+          aria-label="Settings"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        >
+          <Settings className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+
         {/* User profile */}
         {user && <UserMenu email={user.email ?? ""} />}
 
         {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
         <LargeModernHamburger
-          onSettings={() => setSettingsDialogOpen(true)}
           onNewDesign={newDesign}
-          onShare={handlePrivateShare}
           onPublish={handlePublish}
           onClear={clear}
           onAssistant={() => setTool("plugins")}
@@ -434,18 +465,14 @@ export function Toolbar() {
  * BIGGER, BETTER-LOOKING & STRUCTURED HAMBURGER MENU
  */
 function LargeModernHamburger({
-  onSettings,
   onNewDesign,
-  onShare,
   onPublish,
   onClear,
   onAssistant,
   publishing,
   isAuthenticated,
 }: {
-  onSettings: () => void;
   onNewDesign: () => void;
-  onShare: () => void;
   onPublish: () => void;
   onClear: () => void;
   onAssistant: () => void;
@@ -533,13 +560,6 @@ function LargeModernHamburger({
           {isAuthenticated && (
             <>
               <MenuCardItem
-                icon={publishing ? Loader2 : Share2}
-                title={publishing ? "Working…" : "Copy private link"}
-                subtitle="Share this slideshow privately"
-                disabled={publishing}
-                onClick={() => handleAction(onShare)}
-              />
-              <MenuCardItem
                 icon={publishing ? Loader2 : Upload}
                 iconColor="text-blue-600"
                 iconBg="bg-blue-50 group-hover:bg-blue-100/80"
@@ -553,31 +573,6 @@ function LargeModernHamburger({
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-
-          {/* WORKSPACE SECTION */}
-          <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
-            <span className="size-1.5 rounded-full bg-slate-300" />
-            <span className="text-[9px] font-bold tracking-wider text-slate-400">
-              Workspace
-            </span>
-          </div>
-
-          <MenuCardItem
-            icon={Settings}
-            title="Settings"
-            subtitle="Editing preferences & appearance"
-            onClick={() => handleAction(onSettings)}
-          />
-
-
-            <MenuCardItem
-            icon={Github}
-            iconColor="text-slate-800"
-            iconBg="bg-slate-100 group-hover:bg-slate-200/80"
-            title="GitHub repository"
-            subtitle="Source code · issues & contributions"
-            onClick={() => handleAction(() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer"))}
-          />
 
           {/* SEPARATOR */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
