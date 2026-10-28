@@ -67,7 +67,7 @@ export function Sidebar() {
 
   return (
     <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-      <nav className="editor-tool-rail flex h-full w-[4.5rem] flex-col justify-center gap-1.5 p-2 pt-4">
+      <nav className="editor-tool-rail flex h-full w-[4.5rem] flex-col justify-between gap-1.5 p-2 py-4">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
