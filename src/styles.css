@@ -48,10 +48,10 @@
   --selector-ink: oklch(0.28 0.035 257);
   --selector-subtle: oklch(0.55 0.035 257);
   --selector-border: oklch(0.91 0.014 255);
-  --selector-accent: oklch(0.4 0.015 255);
-  --selector-active: oklch(0.955 0.005 255);
-  --selector-shadow: none;
-  --selector-panel-shadow: none;
+  --selector-accent: oklch(0.58 0.19 255);
+  --selector-active: oklch(0.96 0.035 255);
+  --selector-shadow: 0 3px 10px oklch(0.28 0.035 257 / 0.07);
+  --selector-panel-shadow: 0 12px 32px oklch(0.28 0.035 257 / 0.14);
   --radius: 0.75rem;
   --ink: #faf9f7;
   --paper: #f5f4f1;
@@ -74,10 +74,10 @@
   --secondary-foreground: var(--teal);
   --muted: #eef2f7;
   --muted-foreground: var(--teal-deep);
-  --accent: #f1f5f9;
-  --accent-foreground: var(--teal);
-  --border: #e5e7eb;
-  --input: #d1d5db;
+  --accent: #e8f0fe;
+  --accent-foreground: var(--blue-deep);
+  --border: #dbe2ec;
+  --input: #d5dce8;
   --ring: var(--blue);
 }
 

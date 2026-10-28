@@ -24,10 +24,10 @@ import { PhotopeaStudioDialog, PhotopeaLogo } from "../PhotopeaStudio";
 
 /** Per-type look & feel for app tiles — icon, label and gradient chip. */
 const APP_META: Record<PluginApp["type"], { tint: string; Icon: LucideIcon; label: string }> = {
-  paint: { tint: "bg-gradient-to-br from-indigo-500 to-blue-600", Icon: Brush, label: "Paint" },
-  video: { tint: "bg-gradient-to-br from-rose-500 to-orange-500", Icon: Clapperboard, label: "Video" },
-  search: { tint: "bg-gradient-to-br from-emerald-500 to-teal-600", Icon: Search, label: "Search" },
-  runtime: { tint: "bg-gradient-to-br from-violet-500 to-fuchsia-600", Icon: Code2, label: "Runtime" },
+  paint: { tint: "bg-gradient-to-br from-blue-500 to-indigo-600", Icon: Brush, label: "Paint" },
+  video: { tint: "bg-gradient-to-br from-blue-500 to-sky-600", Icon: Clapperboard, label: "Video" },
+  search: { tint: "bg-gradient-to-br from-blue-500 to-cyan-600", Icon: Search, label: "Search" },
+  runtime: { tint: "bg-gradient-to-br from-indigo-500 to-blue-700", Icon: Code2, label: "Runtime" },
 };
 
 export function PluginsPanel() {
@@ -96,15 +96,15 @@ export function PluginsPanel() {
       <div className="px-4">
         <button
           onClick={() => setStudioOpen(true)}
-          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-cyan-200/70 bg-gradient-to-r from-cyan-50 via-white to-indigo-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_14px_30px_-12px_rgba(6,182,212,0.45)] active:translate-y-0 active:scale-[0.99]"
+          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-white to-indigo-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_14px_30px_-12px_rgba(37,99,235,0.45)] active:translate-y-0 active:scale-[0.99]"
         >
-          <span className="absolute -top-8 -right-8 size-24 rounded-full bg-cyan-100/40 blur-xl transition-transform duration-300 group-hover:scale-125" />
+          <span className="absolute -top-8 -right-8 size-24 rounded-full bg-blue-100/40 blur-xl transition-transform duration-300 group-hover:scale-125" />
           <PhotopeaLogo className="size-9 shrink-0 rounded-xl" />
           <span className="relative min-w-0 flex-1">
             <span className="block truncate text-xs font-bold text-slate-800">Photopea — image editor</span>
             <span className="block truncate text-[10px] font-medium text-slate-500">Full Photoshop inside DiapoLab — PSD, layers, filters</span>
           </span>
-          <Play className="relative size-4 shrink-0 text-cyan-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-cyan-600" />
+          <Play className="relative size-4 shrink-0 text-blue-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-600" />
         </button>
       </div>
 
@@ -382,7 +382,7 @@ export function PluginsPanel() {
               </div>
             )}
             {importSuccess && (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-medium text-emerald-600">
+              <div className="rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-xs font-medium text-blue-600">
                 {importSuccess}
               </div>
             )}

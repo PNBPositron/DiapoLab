@@ -236,8 +236,8 @@ export function Toolbar() {
           </div>
 
           {savedAt && (
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-emerald-700 animate-in fade-in">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-blue-700 animate-in fade-in">
+              <span className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
               Saved
             </div>
           )}
@@ -397,7 +397,7 @@ export function Toolbar() {
       {shareLink && (
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-2 font-display text-sm tracking-wider text-emerald-600">
+            <div className="flex items-center gap-2 font-display text-sm tracking-wider text-blue-600">
               <CheckCircle2 className="size-5" /> Published successfully
             </div>
             <p className="mt-2 font-mono text-xs text-slate-500">
@@ -508,7 +508,7 @@ function LargeModernHamburger({
         <div className="toolbar-flyout absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_24px_56px_-12px_rgba(15,23,42,0.24)] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
           {/* CREATE & AI SECTION */}
           <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
-            <span className="size-1.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500" />
+            <span className="size-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" />
             <span className="text-[9px] font-bold tracking-wider text-slate-400">
               Create
             </span>
@@ -523,8 +523,8 @@ function LargeModernHamburger({
 
           <MenuCardItem
             icon={Puzzle}
-            iconColor="text-indigo-600"
-            iconBg="bg-indigo-50 group-hover:bg-indigo-100/80"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="Plugins"
             subtitle="Import & manage widget packs"
             onClick={() => handleAction(onAssistant)}
@@ -600,24 +600,24 @@ function LargeModernHamburger({
           />
           <MenuCardItem
             icon={BookOpen}
-            iconColor="text-indigo-600"
-            iconBg="bg-indigo-50 group-hover:bg-indigo-100/80"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="Wiki"
             subtitle="Guides, shortcuts & FAQ"
             onClick={() => handleAction(() => navigate({ to: "/wiki" }))}
           />
           <MenuCardItem
             icon={Scale}
-            iconColor="text-amber-600"
-            iconBg="bg-amber-50 group-hover:bg-amber-100/80"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="License"
             subtitle="Terms & usage rights"
             onClick={() => handleAction(() => navigate({ to: "/license" }))}
           />
           <MenuCardItem
             icon={ShieldCheck}
-            iconColor="text-emerald-600"
-            iconBg="bg-emerald-50 group-hover:bg-emerald-100/80"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="Privacy policy"
             subtitle="How your data is handled"
             onClick={() => handleAction(() => navigate({ to: "/privacypolicy" }))}
@@ -694,7 +694,7 @@ function MenuCardItem({
       </div>
 
       {badge ? (
-        <span className="rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 px-2 py-0.5 text-[9px] font-bold text-purple-700 shadow-sm ring-1 ring-purple-200/60">
+        <span className="rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 px-2 py-0.5 text-[9px] font-bold text-blue-700 shadow-sm ring-1 ring-blue-200/60">
           {badge}
         </span>
       ) : (
