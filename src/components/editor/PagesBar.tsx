@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, newVideo, type BlendMode, type SlideTransition } from "@/store/editor";
 import {
   Plus,
@@ -53,9 +53,27 @@ export function PagesBar() {
   const [slideDuration, setSlideDuration] = useState(3);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [rowWidth, setRowWidth] = useState(0);
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const update = () => setRowWidth(el.clientWidth);
+    update();
+    const obs = new ResizeObserver(update);
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Slightly larger previews by default; they shrink to fit the row instead
+  // of overflowing once there are too many slides.
+  const BASE_THUMB = 126;
+  const fit = Math.floor((rowWidth - 96 - 12) / Math.max(1, pages.length)) - 12;
+  const size = rowWidth > 0 ? Math.max(48, Math.min(BASE_THUMB, fit)) : BASE_THUMB;
   const ratio = canvasW / canvasH;
-  const thumbW = ratio >= 1 ? 116 : 116 * ratio;
-  const thumbH = ratio >= 1 ? 116 / ratio : 116 * ratio;
+  const thumbW = ratio >= 1 ? size : size * ratio;
+  const thumbH = ratio >= 1 ? size / ratio : size;
 
   const closeAdd = () => {
     setAddOpen(false);
@@ -98,7 +116,7 @@ export function PagesBar() {
         width: canvasW,
         height: canvasH,
         fit: "cover",
-        loop: true,
+        loop: false,
         muted: true,
         blendMode,
       }),
@@ -110,7 +128,7 @@ export function PagesBar() {
 
   return (
     <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 px-3 py-2 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
+      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (

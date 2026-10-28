@@ -134,6 +134,22 @@ export function PresentationMode() {
     return () => clearTimeout(t);
   }, [presenting, currentIndex, page.autoAdvance, page.duration]);
 
+  // A transition video that finishes before the auto-advance duration
+  // advances the deck immediately — the video straddles the boundary
+  // between the slide before and the slide after.
+  useEffect(() => {
+    const onVideoEnded = () => {
+      const s = useEditor.getState();
+      if (!s.presenting) return;
+      const p = s.pages[s.currentIndex];
+      if (p?.autoAdvance && s.currentIndex < s.pages.length - 1) {
+        s.setCurrentPage(s.currentIndex + 1);
+      }
+    };
+    window.addEventListener("diapolab:video-ended", onVideoEnded);
+    return () => window.removeEventListener("diapolab:video-ended", onVideoEnded);
+  }, []);
+
   // Explicit outgoing-slide backdrop: while a transition plays, the previous
   // slide stays painted under the entering one (instead of the empty frame),
   // then it is cleared. Independent of AnimatePresence exit behavior.
