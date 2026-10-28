@@ -122,6 +122,18 @@ export function PresentationMode() {
     return () => clearInterval(t);
   }, [presenterOpen]);
 
+  // Auto-advance: transition slides (preset or video) hold for their chosen
+  // duration, then move to the next slide automatically. Manual navigation
+  // cancels the pending advance for the slide being left.
+  useEffect(() => {
+    if (!presenting || !page.autoAdvance || !page.duration) return;
+    const t = setTimeout(() => {
+      const { currentIndex: i, pages: ps } = useEditor.getState();
+      if (i === currentIndex && i < ps.length - 1) setCurrentPage(i + 1);
+    }, Math.max(0.2, page.duration) * 1000);
+    return () => clearTimeout(t);
+  }, [presenting, currentIndex, page.autoAdvance, page.duration]);
+
   // Explicit outgoing-slide backdrop: while a transition plays, the previous
   // slide stays painted under the entering one (instead of the empty frame),
   // then it is cleared. Independent of AnimatePresence exit behavior.

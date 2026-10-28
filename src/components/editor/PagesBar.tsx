@@ -42,12 +42,15 @@ export function PagesBar() {
     addPage,
     add,
     setTransition,
+    setPageDuration,
+    setPageAutoAdvance,
   } = useEditor();
 
   const [addOpen, setAddOpen] = useState(false);
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [videoName, setVideoName] = useState("");
   const [blendMode, setBlendMode] = useState<BlendMode>("overlay");
+  const [slideDuration, setSlideDuration] = useState(3);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const ratio = canvasW / canvasH;
@@ -76,13 +79,17 @@ export function PagesBar() {
   };
 
   const createTransitionSlide = (effect: SlideTransition) => {
+    const index = currentIndex + 1;
     addPage();
     setTransition(effect);
+    setPageDuration(index, slideDuration);
+    setPageAutoAdvance(index, true);
     closeAdd();
   };
 
   const createVideoTransition = () => {
     if (!videoSrc) return;
+    const index = currentIndex + 1;
     addPage();
     add(
       newVideo(videoSrc, {
@@ -96,6 +103,8 @@ export function PagesBar() {
         blendMode,
       }),
     );
+    setPageDuration(index, slideDuration);
+    setPageAutoAdvance(index, true);
     closeAdd();
   };
 
@@ -194,6 +203,28 @@ export function PagesBar() {
                   <span className="block text-[9px] text-slate-400">Empty slide, ready to compose</span>
                 </span>
               </button>
+
+              {/* Auto-advance duration — applies to both transition types */}
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-2">
+                <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-500">
+                  Auto-advance
+                </span>
+                <div className="flex flex-1 justify-end gap-1">
+                  {[1, 2, 3, 5, 10].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSlideDuration(s)}
+                      className={`rounded-full px-2 py-1 text-[9px] font-semibold transition ${
+                        slideDuration === s
+                          ? "bg-blue-600 text-white"
+                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                      }`}
+                    >
+                      {s}s
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Transition slide */}
               <div className="rounded-xl border border-slate-200 bg-white p-2.5">
