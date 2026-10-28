@@ -3,7 +3,7 @@ import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/
 import { CanvasElement } from "./CanvasElement";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Scan, History, WandSparkles, ChevronDown } from "lucide-react";
+import { Minus, Plus, History, WandSparkles, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
@@ -251,16 +251,6 @@ export function Canvas() {
           onClick={() => changeZoom(scale + 0.1)}
         >
           <Plus />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          title="Fit slide"
-          aria-label="Fit slide"
-          onClick={() => setZoom(null)}
-        >
-          <Scan />
         </Button>
         <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">
           {canvasW}×{canvasH}
