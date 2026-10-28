@@ -101,8 +101,8 @@ export function PluginsPanel() {
           <span className="absolute -top-8 -right-8 size-24 rounded-full bg-cyan-100/40 blur-xl transition-transform duration-300 group-hover:scale-125" />
           <PhotopeaLogo className="size-9 shrink-0 rounded-xl" />
           <span className="relative min-w-0 flex-1">
-            <span className="block truncate text-xs font-bold text-slate-800">Photopea — éditeur d'images</span>
-            <span className="block truncate text-[10px] font-medium text-slate-500">Photoshop complet dans DiapoLab — PSD, calques, filtres</span>
+            <span className="block truncate text-xs font-bold text-slate-800">Photopea — image editor</span>
+            <span className="block truncate text-[10px] font-medium text-slate-500">Full Photoshop inside DiapoLab — PSD, layers, filters</span>
           </span>
           <Play className="relative size-4 shrink-0 text-cyan-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-cyan-600" />
         </button>

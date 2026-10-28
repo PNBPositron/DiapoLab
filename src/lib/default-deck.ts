@@ -8,24 +8,24 @@ import type {
 
 /* ------------------------------------------------------------------ */
 /* Built-in starter deck — the default design shown on a new file.     */
-/* Cyber theme (dark canvas, cyan accent, glitch titles, pill nav,    */
+/* Light theme (white canvas, indigo accent, glitch titles, pill nav,    */
 /* progress bar) reusing the layout of the AI deck, re-themed as a     */
 /* presentation of DiapoLab itself. Text & shapes only — no assets.   */
 /* ------------------------------------------------------------------ */
 
-const BG = "#050508";
-const CYAN = "#00f5ff";
-const CYAN_SOFT = "#7dfbff";
-const INK = "#f4fffe";
-const SUB = "#d3e6e8";
-const MUTED = "#6f8f95";
-const RULE = "#16313a";
-const PROG_BG = "#0a1a20";
+const BG = "#ffffff";
+const CYAN = "#4f46e5"; // accent (indigo) — legacy constant name kept
+const CYAN_SOFT = "#6366f1";
+const INK = "#0f172a";
+const SUB = "#475569";
+const MUTED = "#94a3b8";
+const RULE = "#e2e8f0";
+const PROG_BG = "#eef2f7";
 const GREEN = "#27ff5a";
 const RED = "#ff1a3c";
 const BLUE = "#2f5bff";
-const ALERT = "#ff2a3d";
-const QUIZ_BG = "#091217";
+const ALERT = "#dc2626";
+const QUIZ_BG = "#f6f8fc";
 
 let seq = 0;
 const nid = (p: string) => `dd_${p}_${(seq++).toString(36)}`;
@@ -168,7 +168,7 @@ const footer = (els: AnyElement[], idx: number, name: string, total = 9) => {
       fontSize: 22,
       align: "center",
       fontWeight: 700,
-      color: prevIdx >= 1 ? CYAN : "#1f4a52",
+      color: prevIdx >= 1 ? CYAN : "#cbd5e1",
       ...(prevIdx >= 1 ? { interaction: { moveToSlide: prevIdx } } : {}),
     }),
   );
@@ -196,7 +196,7 @@ const footer = (els: AnyElement[], idx: number, name: string, total = 9) => {
       fontSize: 22,
       align: "center",
       fontWeight: 700,
-      color: hasNext ? BG : "#1f4a52",
+      color: hasNext ? BG : "#cbd5e1",
       ...(hasNext ? { interaction: { moveToSlide: nextIdx } } : {}),
     }),
   );
@@ -360,9 +360,9 @@ const quizEl = (
     height: 366,
     rotation: 0,
     bgColor: QUIZ_BG,
-    fgColor: CYAN,
+    fgColor: "#10131a",
     accentColor: CYAN,
-    uiStyle: "midnight",
+    uiStyle: "aqua",
     question,
     options: options.map((text) => ({ id: nid("o"), text })),
   } as unknown as QuizElement;
