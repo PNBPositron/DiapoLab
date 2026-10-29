@@ -11,7 +11,7 @@ import {
 } from "@/store/editor";
 
 /* PPTX import: unzip the deck, read slide XML + embedded media, and map
-   them onto DiapoLab pages. Handles text boxes, pictures, and basic shapes.
+   them onto DiapoLab pages. Handles text boxes, pictures, basic shapes, groups (flattened), tables and speaker notes.
    EMU (English Metric Units) → px: 1 inch = 914400 EMU = 96 px. */
 
 const EMU_PER_PX = 9525;
@@ -169,6 +169,137 @@ async function mediaToDataUrl(zip: JSZip, relId: string, rels: Map<string, strin
     ext === "svg" ? "image/svg+xml" :
     ext === "webp" ? "image/webp" : "image/png";
   return `data:${mime};base64,${base64}`;
+}
+
+/* ---- Groups (grpSp): flatten nested groups with a translate+scale ---- */
+
+type GroupXf = { x: number; y: number; sx: number; sy: number };
+const IDENTITY_XF: GroupXf = { x: 0, y: 0, sx: 1, sy: 1 };
+
+/** A group maps its child coordinate space (chOff/chExt) onto the slide
+ *  (off/ext) — return the translate+scale converting child px to slide px. */
+function parseGroupXf(grp: Element): GroupXf {
+  const xfrm = firstChildByLocal(grp, "xfrm");
+  if (!xfrm) return IDENTITY_XF;
+  const off = firstChildByLocal(xfrm, "off");
+  const ext = firstChildByLocal(xfrm, "ext");
+  const chOff = firstChildByLocal(xfrm, "chOff");
+  const chExt = firstChildByLocal(xfrm, "chExt");
+  const ox = px(off?.getAttribute("x"));
+  const oy = px(off?.getAttribute("y"));
+  const cw = px(ext?.getAttribute("cx")) || 1;
+  const ch = px(ext?.getAttribute("cy")) || 1;
+  const cox = px(chOff?.getAttribute("x"));
+  const coy = px(chOff?.getAttribute("y"));
+  const ccw = px(chExt?.getAttribute("cx")) || cw;
+  const cch = px(chExt?.getAttribute("cy")) || ch;
+  const sx = cw / ccw;
+  const sy = ch / cch;
+  return { x: ox - cox * sx, y: oy - coy * sy, sx, sy };
+}
+
+function composeXf(a: GroupXf, b: GroupXf): GroupXf {
+  return { x: a.x + b.x * a.sx, y: a.y + b.y * a.sy, sx: a.sx * b.sx, sy: a.sy * b.sy };
+}
+
+/** Apply a group transform to a parsed shape box (px units). */
+function applyXf(box: Partial<Xfrm>, xf: GroupXf): Partial<Xfrm> {
+  const out: Partial<Xfrm> = {};
+  if (box.x !== undefined) out.x = Math.round(xf.x + box.x * xf.sx);
+  if (box.y !== undefined) out.y = Math.round(xf.y + box.y * xf.sy);
+  if (box.width !== undefined) out.width = Math.max(1, Math.round(box.width * xf.sx));
+  if (box.height !== undefined) out.height = Math.max(1, Math.round(box.height * xf.sy));
+  if (box.rotation) out.rotation = box.rotation;
+  return out;
+}
+
+/** Flatten the spTree: leaves are sp/pic/cxnSp/graphicFrame nodes, each
+ *  carrying the accumulated transform of its enclosing groups. */
+function collectLeafNodes(root: Element): Array<{ node: Element; xf: GroupXf }> {
+  const out: Array<{ node: Element; xf: GroupXf }> = [];
+  const walk = (parent: Element, xf: GroupXf) => {
+    for (const child of Array.from(parent.children)) {
+      const local = child.localName ?? "";
+      if (local === "grpSp") {
+        walk(child, composeXf(xf, parseGroupXf(child)));
+      } else if (local === "sp" || local === "pic" || local === "cxnSp" || local === "graphicFrame") {
+        out.push({ node: child, xf });
+      }
+    }
+  };
+  walk(root, IDENTITY_XF);
+  return out;
+}
+
+/** Tables (graphicFrame + a:tbl): map each non-empty cell onto a text
+ *  element positioned with the frame grid geometry. */
+function tableToTexts(frame: Element, box: Partial<Xfrm>): AnyElement[] {
+  const tbl = firstChildByLocal(frame, "tbl");
+  if (!tbl) return [];
+  const cols = children(tbl, "gridCol").map((c) => px(c.getAttribute("w")));
+  const rows = children(tbl, "tr");
+  const rowHs = rows.map((tr) => Math.max(2, px(tr.getAttribute("h"))));
+  const totalW = cols.reduce((a, b) => a + b, 0) || 1;
+  const totalH = rowHs.reduce((a, b) => a + b, 0) || 1;
+  const scaleX = (box.width ?? 0) / totalW;
+  const scaleY = (box.height ?? 0) / totalH;
+  const out: AnyElement[] = [];
+  let y = box.y ?? 0;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const cells = children(rows[ri], "tc");
+    const rowH = rowHs[ri] * scaleY;
+    let x = box.x ?? 0;
+    for (let ci = 0; ci < cells.length; ci++) {
+      const colW = Math.max(2, cols[ci] ?? Math.round(totalW / Math.max(1, cells.length))) * scaleX;
+      const tc = cells[ci];
+      const txBody = firstChildByLocal(tc, "txBody");
+      const text = txBody
+        ? children(txBody, "p")
+            .map((p) =>
+              children(p, "r")
+                .map((r) => firstChildByLocal(r, "t")?.textContent ?? "")
+                .join(""),
+            )
+            .join("\n")
+            .trim()
+        : "";
+      if (text) {
+        out.push(
+          newText({
+            x: x + 4,
+            y: y + 2,
+            width: Math.max(10, Math.round(colW - 8)),
+            height: Math.max(10, Math.round(rowH - 4)),
+            rotation: 0,
+            text,
+            fontSize: 16,
+            color: "#0f172a",
+            fontWeight: 500,
+            align: "left",
+          }),
+        );
+      }
+      x += colW;
+    }
+    y += rowH;
+  }
+  return out;
+}
+
+/** Speaker notes attached to a slide via its notesSlide relationship. */
+async function parseSlideNotes(zip: JSZip, rels: Map<string, string>): Promise<string | undefined> {
+  const target = Array.from(rels.values()).find((t) => /notesSlides\/notesSlide\d+\.xml$/.test(t));
+  if (!target) return undefined;
+  const path = "ppt/" + target.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
+  const doc = await parseXml(zip, path);
+  if (!doc) return undefined;
+  const text = Array.from(doc.getElementsByTagName("*"))
+    .filter((el) => el.localName === "t")
+    .map((el) => el.textContent ?? "")
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || undefined;
 }
 
 async function parseRels(zip: JSZip, partPath: string): Promise<Map<string, string>> {
@@ -390,17 +521,14 @@ export async function importPPTXFile(file: File): Promise<void> {
     const elements: AnyElement[] = [];
     const spidToElement = new Map<string, AnyElement>();
 
-    // spTree holds sp (text/shape) and pic (picture) nodes
+    // spTree holds sp (text/shape) and pic (picture) nodes, possibly nested
+    // inside groups (grpSp) — groups are flattened with their transform.
     const spTree = Array.from(doc.getElementsByTagName("*")).find(
       (el) => el.localName === "spTree",
     );
-    const nodes = spTree
-      ? Array.from(spTree.getElementsByTagName("*")).filter(
-          (el) => el.localName === "sp" || el.localName === "pic" || el.localName === "cxnSp" || el.localName === "graphicFrame",
-        )
-      : [];
+    const leaves = spTree ? collectLeafNodes(spTree) : [];
 
-    for (const node of nodes) {
+    for (const { node, xf } of leaves) {
       // PPTX shape id — used to re-attach entrance animations parsed later
       const cnvPr = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "cNvPr");
       const spid = cnvPr?.getAttribute("id") ?? null;
@@ -409,7 +537,7 @@ export async function importPPTXFile(file: File): Promise<void> {
         elements.push(el);
       };
       if (node.localName === "sp") {
-        const box = parseXfrm(node);
+        const box = applyXf(parseXfrm(node), xf);
         const body = parseTextBody(node);
         if (body) {
           push(
@@ -428,7 +556,9 @@ export async function importPPTXFile(file: File): Promise<void> {
         if (kind && box) {
           const spPr = firstChildByLocal(node, "spPr");
           // Direct children only, so a line-only solidFill is not mistaken for the fill.
-          const solid = spPr ? Array.from(spPr.children).find((e) => e.localName === "solidFill") ?? null : null;
+          // solidFill or the first gradient stop; noFill keeps the shape hollow.
+          const fillEl = spPr ? Array.from(spPr.children).find((e) => e.localName === "solidFill" || e.localName === "gradFill") ?? null : null;
+          const noFill = spPr ? Array.from(spPr.children).some((e) => e.localName === "noFill") : false;
           const ln = spPr ? Array.from(spPr.children).find((e) => e.localName === "ln") ?? null : null;
           const lnSolid = ln ? Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null : null;
           const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 0;
@@ -436,7 +566,7 @@ export async function importPPTXFile(file: File): Promise<void> {
           push(
             newShape(kind as never, {
               ...box,
-              fill: colorFrom(solid) ?? "#e2e8f0",
+              fill: noFill ? "transparent" : (colorFrom(fillEl) ?? "#e2e8f0"),
               stroke: colorFrom(lnSolid) ?? "transparent",
               strokeWidth: lnWpt > 0 ? Math.max(1, Math.round(lnWpt * (96 / 72))) : 0,
               ...(cornerRadius ? { cornerRadius } : {}),
@@ -447,7 +577,7 @@ export async function importPPTXFile(file: File): Promise<void> {
       }
       if (node.localName === "cxnSp") {
         // Connector/line: approximate with a thin rect using the line color.
-        const box = parseXfrm(node);
+        const box = applyXf(parseXfrm(node), xf);
         if (box) {
           const ln = firstChildByLocal(node, "ln");
           const lnSolid = ln ? Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null : null;
@@ -467,7 +597,7 @@ export async function importPPTXFile(file: File): Promise<void> {
         continue;
       }
       if (node.localName === "pic") {
-        const box = parseXfrm(node);
+        const box = applyXf(parseXfrm(node), xf);
         const blip = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "blip");
         const rid = blip?.getAttribute("r:embed");
         if (!rid || !box) continue;
@@ -476,7 +606,10 @@ export async function importPPTXFile(file: File): Promise<void> {
           push(newImage(src, { ...box, fit: "contain" }));
         }
       }
-      // graphicFrame (tables, charts) — not yet supported, skipped.
+      if (node.localName === "graphicFrame") {
+        // Tables become a grid of text elements at the frame position.
+        for (const t of tableToTexts(node, applyXf(parseXfrm(node), xf))) push(t);
+      }
     }
 
     // Real slide background: slide → layout → master inheritance chain.
@@ -490,12 +623,14 @@ export async function importPPTXFile(file: File): Promise<void> {
         el.animationDelay = Math.max(0, en.delay);
       }
     }
+    const notes = await parseSlideNotes(zip, rels);
     pages.push({
       id: Math.random().toString(36).slice(2, 10),
       elements,
       bgColor: bg.color,
       ...(bg.image ? { bgImage: bg.image } : {}),
       ...(transition && transition !== "none" ? { transition } : {}),
+      ...(notes ? { notes } : {}),
       duration: 3,
     });
   }

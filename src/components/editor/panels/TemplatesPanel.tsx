@@ -16,7 +16,6 @@ import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { importPPTXFile } from "@/lib/import-pptx";
-import { STARTER_DECKS, type StarterDeck } from "@/lib/starter-decks";
 
 /* ------------------------------------------------------------------ */
 /* Style definitions                                                    */
@@ -131,13 +130,6 @@ export function TemplatesPanel() {
     }
   };
 
-  const loadStarterDeck = (d: StarterDeck) => {
-    if (!window.confirm(`Load "${d.name}" — this replaces your current pages.`)) return;
-    const s = useEditor.getState();
-    s.setCanvasSize(1920, 1080);
-    s.loadPages(d.pages);
-  };
-
   const loadTemplate = (c: PublicTemplate) => {
     if (!window.confirm(`Load "${c.name}" — this replaces your current pages.`)) return;
     useEditor.getState().loadPages(c.pages as Page[]);
@@ -235,38 +227,6 @@ const filteredCommunity = filterTemplates(community, {
           </span>
           <span className="text-[10px] font-semibold text-slate-700">Present</span>
         </button>
-      </div>
-
-      {/* ── Built-in starter decks (offline) ────────────── */}
-      <div className="px-4">
-        <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-slate-400">
-          <Layers className="size-3 text-blue-400" /> Starter decks
-        </div>
-        <div className="grid grid-cols-1 gap-2">
-          {STARTER_DECKS.map((d) => (
-            <button
-              key={d.id}
-              onClick={() => loadStarterDeck(d)}
-              title={`Load "${d.name}" (${d.pages.length} slides)`}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.98]"
-            >
-              <span
-                className="grid size-9 shrink-0 place-items-center rounded-lg text-[13px] font-black text-white"
-                style={{ backgroundColor: d.accent }}
-              >
-                {d.name.slice(0, 1)}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-semibold text-slate-800">{d.name}</span>
-                <span className="block truncate text-[10px] text-slate-400">{d.description}</span>
-              </span>
-              <span className="flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">
-                <Layers className="size-2.5" />
-                {d.pages.length}
-              </span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ── Featured deck ───────────────────────────── */}

@@ -231,19 +231,42 @@ export async function exportPNG(name: string) {
 }
 
 export async function exportPDF(name: string) {
-  const { canvasW, canvasH } = useEditor.getState();
+  const { canvasW, canvasH, designName, pages } = useEditor.getState();
   const shots = await captureAllPages("jpeg");
   if (shots.length === 0) return;
   const { jsPDF } = await import("jspdf");
   const orientation = canvasW >= canvasH ? "landscape" : "portrait";
-  const pdf = new jsPDF({ orientation, unit: "px", format: [canvasW, canvasH] });
+  // compress further shrinks the embedded JPEGs; metadata makes the file
+  // searchable and properly attributed in PDF readers.
+  const pdf = new jsPDF({ orientation, unit: "px", format: [canvasW, canvasH], compress: true });
+  pdf.setProperties({
+    title: designName || name || "DiapoLab presentation",
+    creator: "DiapoLab",
+  });
   shots.forEach((src, i) => {
     if (i > 0) pdf.addPage([canvasW, canvasH], orientation);
     pdf.addImage(src, "JPEG", 0, 0, canvasW, canvasH, undefined, "FAST");
+    // Invisible text layer built from the page text elements: the PDF stays
+    // pixel-perfect, but its text becomes selectable and searchable, and
+    // copy/paste works in any PDF reader.
+    const texts: string[] = [];
+    for (const element of pages[i]?.elements ?? []) {
+      if (element.type === "text") {
+        const t = (element as unknown as { text?: string }).text?.trim();
+        if (t) texts.push(t);
+      }
+    }
+    if (texts.length > 0) {
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(8);
+      pdf.text(texts.join("\n").slice(0, 4000), 8, canvasH - 8, {
+        renderingMode: "invisible",
+        maxWidth: canvasW - 16,
+      });
+    }
   });
   pdf.save(`${name || "positron"}-${Date.now()}.pdf`);
 }
-
 
 /* ------------------------------------------------------------------ */
 /* PPTX motion — slide transitions & entrance animations                */
