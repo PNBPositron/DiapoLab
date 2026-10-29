@@ -256,7 +256,6 @@ export function Canvas() {
         <span className="px-2 font-mono text-[10px] text-slate-500">
           {currentIndex + 1} / {pages.length}
         </span>
-        <span className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden="true" />
         <Button
           variant="ghost"
           size="icon"
