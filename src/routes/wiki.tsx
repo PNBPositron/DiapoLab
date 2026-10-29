@@ -37,8 +37,10 @@ export const Route = createFileRoute("/wiki")({
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
+      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
     ],
-    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/wiki" }],
+    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/wiki" }],
   }),
 });
 

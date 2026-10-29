@@ -5,7 +5,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { getProfileByUsername, isSubscribed, toggleSubscription, profileLabel, type Profile } from "@/lib/profiles";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 
-export const Route = createFileRoute("/profile/$username")({ component: PublicProfile });
+export const Route = createFileRoute("/profile/$username")({
+  component: PublicProfile,
+  head: () => ({
+    meta: [
+      { title: "Creator profile — DiapoLab" },
+      { name: "description", content: "Browse published decks and templates by DiapoLab community creators." },
+      { property: "og:title", content: "Creator profile — DiapoLab" },
+      { property: "og:description", content: "Community creator profile on DiapoLab." },
+      { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+});
 
 function PublicProfile() {
   const { username } = Route.useParams();

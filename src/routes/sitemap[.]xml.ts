@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "https://diapolab.lovable.app";
+const BASE_URL = "https://diapolab.vercel.app";
 
 interface SitemapEntry {
   path: string;
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/marketplace", changefreq: "daily", priority: "0.8" },
+          { path: "/wiki", changefreq: "monthly", priority: "0.7" },
           { path: "/license", changefreq: "yearly", priority: "0.4" },
           { path: "/privacypolicy", changefreq: "yearly", priority: "0.4" },
           { path: "/settings", changefreq: "monthly", priority: "0.3" },

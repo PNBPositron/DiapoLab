@@ -9,6 +9,7 @@ export const Route = createFileRoute("/v/$key")({
     meta: [
       { title: "Live poll — DiapoLab" },
       { name: "description", content: "Vote live on a DiapoLab poll from your phone." },
+      { name: "robots", content: "noindex" },
     ],
   }),
 });

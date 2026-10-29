@@ -18,6 +18,8 @@ export const Route = createFileRoute("/t/$id")({
       { property: "og:description", content: "View a deck shared publicly from DiapoLab." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
+      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
     ],
   }),
 });

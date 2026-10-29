@@ -18,9 +18,11 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "A focused workspace for making polished presentations, posters, and graphics." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "https://diapolab.lovable.app/" },
+      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
+      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
+      { property: "og:url", content: "https://diapolab.vercel.app/" },
     ],
-    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/" }],
   }),
 });
 

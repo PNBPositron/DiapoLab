@@ -18,8 +18,10 @@ export const Route = createFileRoute("/privacypolicy")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
+      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
     ],
-    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/privacypolicy" }],
+    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/privacypolicy" }],
   }),
 });
 
