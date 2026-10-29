@@ -35,6 +35,7 @@ import {
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
   User,
   WandSparkles,
+  Shuffle,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -53,6 +54,8 @@ import {
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ColorPicker } from "../ColorPicker";
+import { FONTS } from "./TextPanel";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
 import {
   loadBlocks,
@@ -177,18 +180,22 @@ const UI_PRESETS: Array<{
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 
 // ---- Visual theme creator: build a custom style pack (glass, cyber…) ----
-const CREATOR_FONTS = [
-  { label: "Inter", stack: "'Inter', system-ui, sans-serif" },
-  { label: "Manrope", stack: "'Manrope', system-ui, sans-serif" },
-  { label: "Poppins", stack: "'Poppins', 'Inter', sans-serif" },
-  { label: "Orbitron", stack: "'Orbitron', 'Inter', sans-serif" },
-  { label: "Archivo Black", stack: "'Archivo Black', 'Inter', sans-serif" },
-  { label: "Playfair Display", stack: "'Playfair Display', Georgia, serif" },
-  { label: "Quicksand", stack: "'Quicksand', 'Nunito', sans-serif" },
-  { label: "Caveat", stack: "'Caveat', cursive" },
-  { label: "JetBrains Mono", stack: "'JetBrains Mono', monospace" },
-  { label: "Roboto", stack: "'Roboto', 'Inter', sans-serif" },
-  { label: "Tahoma", stack: "'Tahoma', 'Verdana', sans-serif" },
+const CREATOR_FONT_STACK = (family: string) => "'" + family + "', system-ui, sans-serif";
+
+/** Built-in packs offered as starting templates in the creator. */
+const TEMPLATE_STYLES: UiStyle[] = [
+  "glass",
+  "cyber",
+  "neobrutalist",
+  "sketch",
+  "xp",
+  "aqua",
+  "midnight",
+  "pastel",
+  "vapor",
+  "material",
+  "matrix",
+  "swiss",
 ];
 
 const SHADOW_PRESETS = [
@@ -214,6 +221,89 @@ const relLuminance = (hex: string) => {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 };
 
+/** Extract a hex + alpha from any theme color (hex, rgba, or gradient stop). */
+function parseThemeColor(str: string): { hex: string; alpha: number } {
+  const rgbaMatch = /rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+))?\)/.exec(str);
+  if (rgbaMatch) {
+    const [r, g, b] = rgbaMatch.slice(1, 4).map(Number);
+    const a = rgbaMatch[4] !== undefined ? Number(rgbaMatch[4]) : 1;
+    const hex = "#" + [r, g, b]
+      .map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"))
+      .join("");
+    return { hex, alpha: a };
+  }
+  const hexMatch = /#[0-9a-fA-F]{6}/.exec(str);
+  if (hexMatch) return { hex: hexMatch[0], alpha: 1 };
+  return { hex: "#ffffff", alpha: 1 };
+}
+
+const shadowPresetOf = (shadow: string): string => {
+  if (shadow === "none") return "none";
+  if (shadow === "0 12px 34px rgba(15,23,42,0.18)") return "soft";
+  if (shadow === "0 18px 44px rgba(0,0,0,0.45)") return "depth";
+  if (shadow === "10px 10px 0 0 rgba(10,10,10,0.85)") return "hard";
+  if (shadow.includes("0 0 22px")) return "neon";
+  return "soft";
+};
+
+const blurOf = (backdrop?: string): number => {
+  const m = /blur\((\d+)px\)/.exec(backdrop ?? "");
+  return m ? Number(m[1]) : 0;
+};
+
+/** Turn one of the built-in packs (glass, cyber…) into an editable draft. */
+function themeToDraft(theme: UiTheme): CreatorDraft {
+  const bg = parseThemeColor(theme.bg);
+  return {
+    bg: bg.hex,
+    bgAlpha: Math.round(bg.alpha * 100),
+    fg: parseThemeColor(theme.fg).hex,
+    accent: parseThemeColor(theme.accent).hex,
+    border: parseThemeColor(theme.border).hex,
+    font: theme.font,
+    radius: theme.radius,
+    borderWidth: theme.borderWidth,
+    shadow: shadowPresetOf(theme.shadow),
+    blur: blurOf(theme.backdrop),
+    uppercase: theme.uppercase,
+    dark: !!theme.dark,
+    spacing: parseFloat(theme.letterSpacing || "0") || 0,
+  };
+}
+
+const hslToHex = (h: number, s: number, l: number): string => {
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const v = l - a * Math.max(-1, Math.min(Math.min(k - 3, 9 - k, 1), -1));
+    return Math.round(255 * v).toString(16).padStart(2, "0");
+  };
+  return "#" + f(0) + f(8) + f(4);
+};
+
+/** Random draft — a curated dice roll that avoids unreadable combos. */
+function randomDraft(): CreatorDraft {
+  const hue = Math.floor(Math.random() * 360);
+  const dark = Math.random() > 0.5;
+  const accentHue = (hue + 150 + Math.floor(Math.random() * 60)) % 360;
+  const font = FONTS[Math.floor(Math.random() * FONTS.length)];
+  return {
+    bg: dark ? hslToHex((hue + 180) % 360, 0.6, 0.12) : hslToHex(hue, 0.7, 0.92),
+    bgAlpha: [15, 30, 45, 70, 100][Math.floor(Math.random() * 5)],
+    fg: dark ? "#e8ecf4" : "#10131a",
+    accent: hslToHex(accentHue, 0.85, 0.55),
+    border: dark ? hslToHex((hue + 180) % 360, 0.6, 0.8) : "#ffffff",
+    font: CREATOR_FONT_STACK(font.family),
+    radius: [0, 4, 12, 20, 28, 36][Math.floor(Math.random() * 6)],
+    borderWidth: [0, 1, 2, 4][Math.floor(Math.random() * 4)],
+    shadow: SHADOW_PRESETS[Math.floor(Math.random() * SHADOW_PRESETS.length)].value,
+    blur: [0, 0, 8, 12, 18][Math.floor(Math.random() * 5)],
+    uppercase: Math.random() > 0.7,
+    dark,
+    spacing: [0, 0.01, 0.04, 0.08, 0.14][Math.floor(Math.random() * 5)],
+  };
+}
+
 type CreatorDraft = {
   bg: string;
   bgAlpha: number;
@@ -236,7 +326,7 @@ const DEFAULT_DRAFT: CreatorDraft = {
   fg: "#0b1220",
   accent: "#2563eb",
   border: "#ffffff",
-  font: CREATOR_FONTS[0].stack,
+  font: CREATOR_FONT_STACK("Inter"),
   radius: 20,
   borderWidth: 1,
   shadow: "soft",
@@ -279,21 +369,18 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
   const set = <K extends keyof CreatorDraft>(key: K, value: CreatorDraft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
 
-  const colorInput = (label: string, key: "bg" | "fg" | "accent" | "border") => (
-    <label className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
-      <span>{label}</span>
-      <input
-        type="color"
-        value={draft[key]}
-        onChange={(e) => set(key, e.target.value)}
-        className="h-6 w-10 cursor-pointer rounded border border-slate-200 bg-white p-0.5"
-      />
-    </label>
-  );
+  const SWATCHES: Array<{ key: "bg" | "fg" | "accent" | "border"; label: string }> = [
+    { key: "bg", label: "Background" },
+    { key: "fg", label: "Text" },
+    { key: "accent", label: "Accent" },
+    { key: "border", label: "Border" },
+  ];
+  const [activeSwatch, setActiveSwatch] = useState<"bg" | "fg" | "accent" | "border">("bg");
+  const isBg = activeSwatch === "bg";
 
   const slider = (
     label: string,
-    key: "radius" | "borderWidth" | "blur" | "bgAlpha" | "spacing",
+    key: "radius" | "borderWidth" | "blur" | "spacing",
     min: number,
     max: number,
     step: number,
@@ -318,13 +405,30 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
 
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-        {colorInput("Background", "bg")}
-        {colorInput("Text", "fg")}
-        {colorInput("Accent", "accent")}
-        {colorInput("Border", "border")}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          {SWATCHES.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              title={s.label + " color"}
+              onClick={() => setActiveSwatch(s.key)}
+              className={"h-6 w-6 rounded-lg border transition " + (activeSwatch === s.key ? "border-blue-500 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-blue-300")}
+              style={{ background: draft[s.key] }}
+            />
+          ))}
+        </div>
+        <span className="text-[10px] font-semibold tracking-wider text-slate-400">
+          {SWATCHES.find((s) => s.key === activeSwatch)?.label}{isBg ? " + transparency" : ""}
+        </span>
       </div>
-      {slider("Transparency", "bgAlpha", 5, 100, 5, (v) => v + "%")}
+      <ColorPicker
+        value={draft[activeSwatch]}
+        onChange={(hex) => set(activeSwatch, hex)}
+        opacity={isBg ? draft.bgAlpha / 100 : undefined}
+        onOpacityChange={isBg ? (v) => set("bgAlpha", Math.round(v * 100)) : undefined}
+      />
+
       <label className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
         <span>Font</span>
         <select
@@ -332,8 +436,11 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
           onChange={(e) => set("font", e.target.value)}
           className="max-w-[150px] rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 outline-none focus:border-blue-400"
         >
-          {CREATOR_FONTS.map((f) => (
-            <option key={f.label} value={f.stack}>{f.label}</option>
+          {!FONTS.some((f) => CREATOR_FONT_STACK(f.family) === draft.font) && (
+            <option value={draft.font}>{draft.font}</option>
+          )}
+          {FONTS.map((f) => (
+            <option key={f.family} value={CREATOR_FONT_STACK(f.family)}>{f.family}</option>
           ))}
         </select>
       </label>
@@ -362,6 +469,34 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
           <input type="checkbox" checked={draft.dark} onChange={(e) => set("dark", e.target.checked)} className="accent-blue-600" />
           Dark surface
         </label>
+      </div>
+
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-semibold tracking-wider text-slate-400">Templates</span>
+          <button
+            type="button"
+            title="Random theme"
+            onClick={() => setDraft(randomDraft())}
+            className="flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700 transition hover:bg-blue-100"
+          >
+            <Shuffle className="size-3" /> Random
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {TEMPLATE_STYLES.map((value) => (
+            <button
+              key={value}
+              type="button"
+              title={"Start from " + UI_STYLE_THEMES[value].label}
+              onClick={() => setDraft(themeToDraft(UI_STYLE_THEMES[value]))}
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+            >
+              <span className="h-2.5 w-2.5 rounded-full border border-slate-300" style={{ background: UI_STYLE_THEMES[value].bg }} />
+              {UI_STYLE_THEMES[value].label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="rounded-xl p-3" style={{ background: "linear-gradient(140deg,#c7d2fe,#fbcfe8,#fde68a)" }}>
@@ -524,7 +659,7 @@ export function ComponentsPanel() {
                 <WandSparkles className="size-3" /> Create
               </button>
             </PopoverTrigger>
-            <PopoverContent side="left" align="start" className="selector-panel w-[264px] space-y-3 rounded-xl p-3">
+            <PopoverContent side="left" align="start" className="selector-panel max-h-[min(72vh,640px)] w-[264px] space-y-3 overflow-y-auto rounded-xl p-3">
               <div className="selector-header"><h3>Theme creator</h3></div>
               <ThemeCreator
                 onApply={(theme) => {
