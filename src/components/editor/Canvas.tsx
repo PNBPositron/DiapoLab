@@ -26,11 +26,9 @@ export function Canvas() {
     selectedId,
     update,
     setTransition,
-    setTransitionZoom,
   } = useEditor();
   const page = pages[currentIndex];
   const currentTransition: SlideTransition = page.transition ?? "none";
-  const currentZoom = page.transitionZoom ?? 0.5;
   const wrapRef = useRef<HTMLDivElement>(null);
   const [fitScale, setFitScale] = useState(0.5);
   const [zoom, setZoom] = useState<number | null>(null);
@@ -333,24 +331,6 @@ export function Canvas() {
             />
           </PopoverContent>
         </Popover>
-        {currentTransition === "zoom" && (
-          <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-2.5 py-1 shadow-inner shadow-blue-100/60">
-            <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-500">Zoom</span>
-            <input
-              aria-label="Transition zoom"
-              type="range"
-              min={50}
-              max={200}
-              step={5}
-              value={Math.round(currentZoom * 100)}
-              onChange={(event) => setTransitionZoom(Number(event.target.value) / 100)}
-              className="h-1.5 w-16 accent-blue-600"
-            />
-            <span className="min-w-[2.5rem] text-center font-mono text-[10px] font-medium text-slate-700">
-              {Math.round(currentZoom * 100)}%
-            </span>
-          </div>
-        )}
 
       </div>
 
