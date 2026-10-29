@@ -27,6 +27,7 @@ import {
   BookOpen,
   Scale,
   ShieldCheck,
+  Search,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
@@ -289,6 +290,16 @@ export function Toolbar() {
             e.target.value = "";
           }}
         />
+        {/* Find & replace */}
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
+          title="Find & replace (Ctrl+F)"
+          aria-label="Find & replace"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        >
+          <Search className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+
         {/* Save / Sign-in button */}
         {user ? (
           <button

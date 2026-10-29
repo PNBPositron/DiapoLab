@@ -769,6 +769,8 @@ type State = {
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
   setPageDuration: (index: number, seconds: number) => void;
+  /** find & replace across every text field of the whole deck (one undo step) */
+  replaceAllText: (find: string, replaceWith: string, matchCase?: boolean) => number;
   // Master style: push the current page's look to the whole deck
   applyBackgroundToDeck: () => void;
   applyTransitionToDeck: () => void;
@@ -1709,6 +1711,52 @@ export const useEditor = create<State>((set, get) => {
       const d = Math.max(0.2, Math.min(60, seconds));
       const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
       set(syncCurrent(next, currentIndex));
+    },
+
+    // ---- Find & replace: every element type that carries editable copy ----
+    replaceAllText: (find, replaceWith, matchCase) => {
+      if (!find) return 0;
+      const { pages, currentIndex } = get();
+      let count = 0;
+      const rx = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), matchCase ? "g" : "gi");
+      const sub = (s: string) => {
+        if (!s) return s;
+        const hits = s.match(rx);
+        rx.lastIndex = 0;
+        if (!hits) return s;
+        count += hits.length;
+        return s.replace(rx, replaceWith);
+      };
+      const next = pages.map((p) => ({
+        ...p,
+        elements: p.elements.map((e): AnyElement => {
+          switch (e.type) {
+            case "text":
+            case "button":
+              return { ...e, text: sub(e.text) };
+            case "ui":
+              return { ...e, title: sub(e.title), body: sub(e.body), items: e.items.map(sub) };
+            case "quiz":
+              return {
+                ...e,
+                question: sub(e.question),
+                options: e.options.map((o) => ({ ...o, text: sub(o.text) })),
+              };
+            case "chart":
+              return {
+                ...e,
+                title: e.title != null ? sub(e.title) : e.title,
+                data: e.data.map((d) => ({ ...d, label: sub(d.label) })),
+              };
+            default:
+              return e;
+          }
+        }),
+      }));
+      if (!count) return 0;
+      pushHistory();
+      set(syncCurrent(next, currentIndex));
+      return count;
     },
 
     // ---- Master style: current page becomes the deck-wide template ----

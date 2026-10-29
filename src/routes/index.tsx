@@ -6,6 +6,7 @@ import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
+import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -38,6 +39,7 @@ function Editor() {
       <PagesBar />
       <PresentationMode />
       <WelcomeDialog />
+      <FindReplaceDialog />
     </div>
   );
 }
