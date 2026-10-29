@@ -219,17 +219,18 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        docked={minimized}
         className={`gap-0 overflow-hidden border-slate-200/80 bg-white p-0 shadow-[0_40px_120px_-30px_rgba(8,145,178,0.35)] sm:rounded-3xl ${
           maximized
             ? "h-[92vh] w-[96vw] max-w-none sm:rounded-none"
             : minimized
-              ? "max-h-none w-[min(96vw,48rem)]"
+              ? "sm:rounded-2xl"
               : "max-w-3xl"
         }`}
       >
         {/* ---- Header ---- */}
-        <DialogHeader className="relative border-b border-slate-100 px-6 py-5">
-          <div className="mb-2">
+        <DialogHeader className={`relative border-slate-100 ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "border-b px-6 py-5"}`}>
+          <div className={minimized ? "mb-0" : "mb-2"}>
             <TrafficLights
               minimized={minimized}
               maximized={maximized}
@@ -238,19 +239,23 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               onMaximize={() => setMaximized((m) => !m)}
             />
           </div>
+          {!minimized && (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(18rem_10rem_at_15%_-40%,rgba(34,211,238,0.25),transparent),radial-gradient(16rem_9rem_at_95%_140%,rgba(129,140,248,0.22),transparent)]"
           />
+          )}
           <DialogTitle className="relative flex items-center gap-3">
             <span className="grid size-9 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-600 text-white shadow-lg shadow-cyan-500/30">
               <Sparkles className="size-4" />
             </span>
             <span className="flex flex-col">
               <span className="text-sm font-extrabold tracking-tight text-slate-900">{app.name}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                Context web search
-              </span>
+              {!minimized && (
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  Context web search
+                </span>
+              )}
             </span>
             {notice && (
               <span className="ml-auto animate-in fade-in-50 rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-600">

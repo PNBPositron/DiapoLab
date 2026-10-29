@@ -155,15 +155,16 @@ export function PhotopeaStudioDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+          docked={minimized}
           className={`flex flex-col gap-0 overflow-hidden p-0 ${
             maximized
               ? "h-screen w-screen max-w-none sm:rounded-none"
               : minimized
-                ? "h-auto w-[96vw] max-w-[1500px]"
+                ? "sm:rounded-2xl"
                 : "h-[92vh] w-[96vw] max-w-[1500px]"
           }`}
         >
-        <DialogHeader className="flex-row items-center justify-between border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-3">
+        <DialogHeader className={`flex-row items-center justify-between border-slate-200 bg-gradient-to-r from-slate-50 to-white ${minimized ? "gap-2 border-b-0 px-3 py-2" : "border-b px-5 py-3"}`}>
           <TrafficLights
             minimized={minimized}
             maximized={maximized}
@@ -174,6 +175,7 @@ export function PhotopeaStudioDialog({
           <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide text-slate-800">
             <PhotopeaLogo className="size-7 shrink-0" />
             Photopea
+            {!minimized && (
             <a
               href="https://www.photopea.com"
               target="_blank"
@@ -182,7 +184,9 @@ export function PhotopeaStudioDialog({
             >
               photopea.com <ExternalLink className="size-3" />
             </a>
+            )}
           </DialogTitle>
+          {!minimized && (
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -201,6 +205,7 @@ export function PhotopeaStudioDialog({
               <Download className="size-3.5" /> Télécharger PNG
             </button>
           </div>
+          )}
         </DialogHeader>
 
         <div className={`relative min-h-0 flex-1 ${minimized ? "hidden" : ""}`}>

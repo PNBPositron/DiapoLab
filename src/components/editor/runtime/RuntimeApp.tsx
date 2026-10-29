@@ -145,16 +145,17 @@ export function RuntimeAppDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        docked={minimized}
         className={`border-slate-200 bg-white p-0 ${
           maximized
             ? "h-[92vh] w-[96vw] max-w-none overflow-hidden sm:rounded-none"
             : minimized
-              ? "max-h-none w-[min(96vw,48rem)] overflow-hidden"
+              ? "overflow-hidden sm:rounded-2xl"
               : "max-w-3xl"
         }`}
       >
-        <DialogHeader className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
-          <div className="mb-2 flex items-center justify-between">
+        <DialogHeader className={`border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}>
+          <div className={`${minimized ? "mb-0" : "mb-2"} flex items-center justify-between`}>
             <TrafficLights
               minimized={minimized}
               maximized={maximized}
@@ -168,9 +169,11 @@ export function RuntimeAppDialog({
               <Code2 className="size-3.5" />
             </span>
             {app.name}
+            {!minimized && (
             <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
               Runtime · sandboxed
             </span>
+            )}
           </DialogTitle>
         </DialogHeader>
         {!minimized && (

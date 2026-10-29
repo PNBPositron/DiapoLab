@@ -417,16 +417,17 @@ export function PaintAppDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        docked={minimized}
         className={`gap-0 border border-slate-200/70 bg-white p-0 shadow-[0_24px_60px_-20px_rgba(15,23,42,0.28)] sm:rounded-3xl ${
           maximized
             ? "h-[92vh] w-[96vw] max-w-none overflow-hidden sm:rounded-none"
             : minimized
-              ? "max-h-none w-[min(96vw,36rem)] overflow-hidden"
+              ? "overflow-hidden sm:rounded-2xl"
               : "max-h-[88vh] max-w-xl overflow-y-auto"
         }`}
       >
-        <DialogHeader className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 px-5 py-4">
-          <div className="mb-2 flex items-center justify-between">
+        <DialogHeader className={`border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}>
+          <div className={`${minimized ? "mb-0" : "mb-2"} flex items-center justify-between`}>
             <TrafficLights
               minimized={minimized}
               maximized={maximized}
@@ -440,7 +441,7 @@ export function PaintAppDialog({
               <Brush className="size-4" />
             </span>
             Paint
-            {app.description && (
+            {!minimized && app.description && (
               <span className="truncate text-[11px] font-medium text-slate-400">
                 — {app.description}
               </span>
