@@ -76,7 +76,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               <HardDriveDownload className="size-4.5" />
             </div>
             <div>
-              <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-slate-800">
+              <h2 className="font-display text-lg font-semibold tracking-tight text-slate-800">
                 Projects
               </h2>
               {items && (

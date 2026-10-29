@@ -7,7 +7,7 @@ import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, type PublicTemplate } from "@/lib/designs";
 import { getProfile, saveProfile, type Profile } from "@/lib/profiles";
 
-const title = "text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-700";
+const title = "text-[11px] font-semibold tracking-[0.04em] text-slate-700";
 const help = "mt-1 text-[10px] leading-relaxed text-slate-400";
 
 /** Section card with icon + title + help text + optional trailing node. */
@@ -181,7 +181,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               <SettingsIcon className="size-4.5" />
             </div>
             <div className="min-w-0">
-              <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-slate-800">
+              <h2 className="font-display text-lg font-semibold tracking-tight text-slate-800">
                 Settings
               </h2>
               <p className="mt-0.5 truncate text-xs text-slate-500">
