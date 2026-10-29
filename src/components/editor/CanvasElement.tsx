@@ -784,7 +784,6 @@ export function CanvasElement({
         cursor: editing ? "text" : "move",
         outline: selected ? "3px solid #2b6cff" : "none",
         outlineOffset: "2px",
-        mixBlendMode: "blendMode" in element ? (element.blendMode ?? "normal") : "normal",
         filter:
           element.shadow && !["text", "shape", "button"].includes(element.type)
             ? shadowFilter(element.shadow)
@@ -991,22 +990,12 @@ export function CanvasElement({
               else v.pause();
             }
           }}
-          onEnded={() => {
-            // video-transition slides advance as soon as their video ends
-            if (useEditor.getState().presenting) {
-              window.dispatchEvent(new CustomEvent("diapolab:video-ended"));
-            }
-          }}
           style={{
             width: "100%",
             height: "100%",
             objectFit: element.fit ?? "cover",
             display: "block",
             borderRadius: 0,
-            mixBlendMode:
-              element.blendMode && element.blendMode !== "normal"
-                ? element.blendMode
-                : undefined,
           }}
         />
       )}

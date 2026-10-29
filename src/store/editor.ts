@@ -80,7 +80,6 @@ export type TextElement = ElementBase & {
   shadow?: ElementShadow;
   gradient?: ShapeGradient;
   gradientOpacity?: number;
-  blendMode?: BlendMode;
   imageOverlay?: string;
   interaction?: ElementInteraction;
     /** clip the element's silhouette by a shape (works like image masks) */
@@ -150,7 +149,6 @@ export type ShapeKind =
   | "leaf"
   | "ribbon";
 export type ShapeEffect = "none" | "liquid_glass" | "neon" | "soft_shadow" | "inner_glow" | "holographic" | "glitch" | "honeycomb";
-export type BlendMode = "normal" | "screen" | "overlay" | "multiply" | "color-dodge";
 export type ElementShadow = {
   x: number;
   y: number;
@@ -174,7 +172,6 @@ export type ShapeElement = ElementBase & {
   gradient?: ShapeGradient;
   cornerRadius?: number; // px, used by rect
   opacity?: number; // 0..1
-  blendMode?: BlendMode;
   imageOverlay?: string;
   strokeStyle?: "solid" | "dashed" | "dotted";
   /** clip the element's silhouette by a shape (works like image masks) */
@@ -262,8 +259,6 @@ export type VideoElement = ElementBase & {
   end?: number;
   /** playback rate — 1 = normal speed */
   rate?: number;
-  /** how the video blends with the slide below (overlay, screen, multiply…) */
-  blendMode?: BlendMode;
 };
 
 export type IconElement = ElementBase & {
@@ -672,8 +667,6 @@ export type Page = {
   bgFit?: BgFit;
   transition?: SlideTransition;
   transitionZoom?: number; // starting scale of the zoom transition (0.5–2)
-  /** auto-advance to the next slide while presenting (transition slides) */
-  autoAdvance?: boolean;
   /** presenter notes — shown in presenter view, never on the slide */
   notes?: string;
 };
@@ -776,7 +769,6 @@ type State = {
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
   setPageDuration: (index: number, seconds: number) => void;
-  setPageAutoAdvance: (index: number, on: boolean) => void;
   // Master style: push the current page's look to the whole deck
   applyBackgroundToDeck: () => void;
   applyTransitionToDeck: () => void;
@@ -1716,13 +1708,6 @@ export const useEditor = create<State>((set, get) => {
       if (index < 0 || index >= pages.length) return;
       const d = Math.max(0.2, Math.min(60, seconds));
       const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
-      set(syncCurrent(next, currentIndex));
-    },
-
-    setPageAutoAdvance: (index, on) => {
-      const { pages, currentIndex } = get();
-      if (index < 0 || index >= pages.length) return;
-      const next = pages.map((p, i) => (i === index ? { ...p, autoAdvance: on } : p));
       set(syncCurrent(next, currentIndex));
     },
 
