@@ -1,0 +1,23 @@
+name: Cleanup unused illustrations
+on:
+  push:
+    paths:
+      - "scripts/cleanup-illustrations.txt"
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove unused illustration assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          xargs -d '\n' -a scripts/cleanup-illustrations.txt git rm -q --ignore-unmatch
+          git rm -q --ignore-unmatch scripts/cleanup-illustrations.txt .github/workflows/cleanup-illustrations.yml
+          if git diff --cached --quiet; then echo Nothing to remove; exit 0; fi
+          git commit -m "chore: remove 635 unused illustration assets (macOS ._ junk + unreferenced art)"
+          git push
