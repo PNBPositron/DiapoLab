@@ -344,7 +344,8 @@ export type UiStyle =
   | "vapor"
   | "material"
   | "matrix"
-  | "swiss";
+  | "swiss"
+  | "custom";
 export type UiKind =
   | "card"
   | "stat"
@@ -606,7 +607,49 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
     uppercase: true,
     onAccent: "#ffffff",
   },
+  custom: {
+    label: "Custom",
+    bg: "rgba(125,211,252,0.3)",
+    fg: "#0b1220",
+    muted: "rgba(11,18,32,0.65)",
+    accent: "#2563eb",
+    border: "#ffffff",
+    borderWidth: 1,
+    radius: 20,
+    shadow: "0 12px 34px rgba(15,23,42,0.18)",
+    font: "'Inter', system-ui, sans-serif",
+    letterSpacing: "0.01em",
+    uppercase: false,
+    backdrop: "blur(12px) saturate(160%)",
+    onAccent: "#ffffff",
+  },
 };
+
+// ---- Custom visual theme (built in Presets -> Create, persisted locally) ----
+const CUSTOM_THEME_KEY = "diapolab.custom-ui-theme";
+
+/** Overwrite the "custom" style pack from the theme creator and persist it. */
+export function saveCustomUiTheme(theme: UiTheme) {
+  UI_STYLE_THEMES.custom = { ...theme, label: "Custom" };
+  try {
+    localStorage.setItem(CUSTOM_THEME_KEY, JSON.stringify(theme));
+  } catch {
+    /* storage unavailable — theme still applies for this session */
+  }
+}
+
+/** Restore the last saved custom theme (runs once at module load). */
+export function loadCustomUiTheme() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_THEME_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Partial<UiTheme>;
+    UI_STYLE_THEMES.custom = { ...UI_STYLE_THEMES.custom, ...parsed, label: "Custom" };
+  } catch {
+    /* corrupted entry — keep the defaults */
+  }
+}
+loadCustomUiTheme();
 
 export type AnyElement =
   | TextElement
@@ -930,6 +973,7 @@ export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
     material: ["#6750a4", "#00897b", "#ef6c00", "#c62828", "#1565c0", "#2e7d32"],
     matrix: ["#37ff7f", "#a6ff00", "#1c8c3f", "#7dffb0", "#00c853", "#d4ff4d"],
     swiss: ["#e2231a", "#111111", "#0057b7", "#f2b705", "#767676", "#3d8361"],
+    custom: ["#2563eb", "#7dd3fc", "#f472b6", "#facc15", "#34d399", "#a78bfa"],
   };
   return { uiStyle, bgColor: t.bg, fgColor: t.fg, colors: palettes[uiStyle] };
 };

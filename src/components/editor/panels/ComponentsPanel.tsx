@@ -34,6 +34,7 @@ import {
   TrendingUp,
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
   User,
+  WandSparkles,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -44,11 +45,14 @@ import {
   useEditor,
   chartStylePatch,
   quizStylePatch,
+  saveCustomUiTheme,
+  type UiTheme,
   type UiKind,
   type UiStyle,
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
 import {
   loadBlocks,
@@ -172,6 +176,230 @@ const UI_PRESETS: Array<{
 
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
 
+// ---- Visual theme creator: build a custom style pack (glass, cyber…) ----
+const CREATOR_FONTS = [
+  { label: "Inter", stack: "'Inter', system-ui, sans-serif" },
+  { label: "Manrope", stack: "'Manrope', system-ui, sans-serif" },
+  { label: "Poppins", stack: "'Poppins', 'Inter', sans-serif" },
+  { label: "Orbitron", stack: "'Orbitron', 'Inter', sans-serif" },
+  { label: "Archivo Black", stack: "'Archivo Black', 'Inter', sans-serif" },
+  { label: "Playfair Display", stack: "'Playfair Display', Georgia, serif" },
+  { label: "Quicksand", stack: "'Quicksand', 'Nunito', sans-serif" },
+  { label: "Caveat", stack: "'Caveat', cursive" },
+  { label: "JetBrains Mono", stack: "'JetBrains Mono', monospace" },
+  { label: "Roboto", stack: "'Roboto', 'Inter', sans-serif" },
+  { label: "Tahoma", stack: "'Tahoma', 'Verdana', sans-serif" },
+];
+
+const SHADOW_PRESETS = [
+  { value: "none", label: "None" },
+  { value: "soft", label: "Soft" },
+  { value: "depth", label: "Depth" },
+  { value: "hard", label: "Hard offset" },
+  { value: "neon", label: "Neon glow" },
+];
+
+function hexToRgb(hex: string): [number, number, number] {
+  const m = hex.replace("#", "");
+  const full = m.length === 3 ? m.split("").map((ch) => ch + ch).join("") : m;
+  const n = parseInt(full, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const withAlpha = (hex: string, a: number) => {
+  const [r, g, b] = hexToRgb(hex);
+  return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+};
+const relLuminance = (hex: string) => {
+  const [r, g, b] = hexToRgb(hex);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+};
+
+type CreatorDraft = {
+  bg: string;
+  bgAlpha: number;
+  fg: string;
+  accent: string;
+  border: string;
+  font: string;
+  radius: number;
+  borderWidth: number;
+  shadow: string;
+  blur: number;
+  uppercase: boolean;
+  dark: boolean;
+  spacing: number;
+};
+
+const DEFAULT_DRAFT: CreatorDraft = {
+  bg: "#7dd3fc",
+  bgAlpha: 30,
+  fg: "#0b1220",
+  accent: "#2563eb",
+  border: "#ffffff",
+  font: CREATOR_FONTS[0].stack,
+  radius: 20,
+  borderWidth: 1,
+  shadow: "soft",
+  blur: 12,
+  uppercase: false,
+  dark: false,
+  spacing: 0.01,
+};
+
+const shadowFor = (preset: string, accentHex: string): string => {
+  if (preset === "soft") return "0 12px 34px rgba(15,23,42,0.18)";
+  if (preset === "depth") return "0 18px 44px rgba(0,0,0,0.45)";
+  if (preset === "hard") return "10px 10px 0 0 rgba(10,10,10,0.85)";
+  if (preset === "neon")
+    return "0 0 22px " + withAlpha(accentHex, 0.55) + ", inset 0 0 24px " + withAlpha(accentHex, 0.18);
+  return "none";
+};
+
+const buildCustomTheme = (d: CreatorDraft): UiTheme => ({
+  label: "Custom",
+  bg: withAlpha(d.bg, d.bgAlpha / 100),
+  fg: d.fg,
+  muted: withAlpha(d.fg, 0.65),
+  accent: d.accent,
+  border: d.border,
+  borderWidth: d.borderWidth,
+  radius: d.radius,
+  shadow: shadowFor(d.shadow, d.accent),
+  font: d.font,
+  letterSpacing: d.spacing + "em",
+  uppercase: d.uppercase,
+  backdrop: d.blur > 0 ? "blur(" + d.blur + "px) saturate(160%)" : undefined,
+  onAccent: relLuminance(d.accent) > 0.6 ? "#0a0a0a" : "#ffffff",
+  dark: d.dark,
+});
+
+function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
+  const [draft, setDraft] = useState<CreatorDraft>(DEFAULT_DRAFT);
+  const theme = buildCustomTheme(draft);
+  const set = <K extends keyof CreatorDraft>(key: K, value: CreatorDraft[K]) =>
+    setDraft((d) => ({ ...d, [key]: value }));
+
+  const colorInput = (label: string, key: "bg" | "fg" | "accent" | "border") => (
+    <label className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
+      <span>{label}</span>
+      <input
+        type="color"
+        value={draft[key]}
+        onChange={(e) => set(key, e.target.value)}
+        className="h-6 w-10 cursor-pointer rounded border border-slate-200 bg-white p-0.5"
+      />
+    </label>
+  );
+
+  const slider = (
+    label: string,
+    key: "radius" | "borderWidth" | "blur" | "bgAlpha" | "spacing",
+    min: number,
+    max: number,
+    step: number,
+    format: (v: number) => string,
+  ) => (
+    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
+      <span>{label}</span>
+      <span className="flex items-center gap-2">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={draft[key]}
+          onChange={(e) => set(key, Number(e.target.value))}
+          className="h-1.5 w-24 accent-blue-600"
+        />
+        <span className="w-9 text-right font-mono text-[10px] text-slate-500">{format(draft[key])}</span>
+      </span>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+        {colorInput("Background", "bg")}
+        {colorInput("Text", "fg")}
+        {colorInput("Accent", "accent")}
+        {colorInput("Border", "border")}
+      </div>
+      {slider("Transparency", "bgAlpha", 5, 100, 5, (v) => v + "%")}
+      <label className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
+        <span>Font</span>
+        <select
+          value={draft.font}
+          onChange={(e) => set("font", e.target.value)}
+          className="max-w-[150px] rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 outline-none focus:border-blue-400"
+        >
+          {CREATOR_FONTS.map((f) => (
+            <option key={f.label} value={f.stack}>{f.label}</option>
+          ))}
+        </select>
+      </label>
+      {slider("Corners", "radius", 0, 40, 1, (v) => v + "px")}
+      {slider("Border width", "borderWidth", 0, 6, 1, (v) => v + "px")}
+      <label className="flex items-center justify-between gap-2 text-[11px] text-slate-600">
+        <span>Effect (shadow)</span>
+        <select
+          value={draft.shadow}
+          onChange={(e) => set("shadow", e.target.value)}
+          className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 outline-none focus:border-blue-400"
+        >
+          {SHADOW_PRESETS.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
+      </label>
+      {slider("Glass blur", "blur", 0, 24, 1, (v) => v + "px")}
+      {slider("Letter spacing", "spacing", -0.02, 0.16, 0.01, (v) => v.toFixed(2))}
+      <div className="flex items-center gap-4 text-[11px] text-slate-600">
+        <label className="flex items-center gap-1.5">
+          <input type="checkbox" checked={draft.uppercase} onChange={(e) => set("uppercase", e.target.checked)} className="accent-blue-600" />
+          UPPERCASE
+        </label>
+        <label className="flex items-center gap-1.5">
+          <input type="checkbox" checked={draft.dark} onChange={(e) => set("dark", e.target.checked)} className="accent-blue-600" />
+          Dark surface
+        </label>
+      </div>
+
+      <div className="rounded-xl p-3" style={{ background: "linear-gradient(140deg,#c7d2fe,#fbcfe8,#fde68a)" }}>
+        <div
+          className="flex flex-col gap-1.5"
+          style={{
+            background: theme.bg,
+            color: theme.fg,
+            border: draft.borderWidth + "px solid " + theme.border,
+            borderRadius: theme.radius,
+            boxShadow: theme.shadow,
+            backdropFilter: theme.backdrop,
+            fontFamily: theme.font,
+            letterSpacing: theme.letterSpacing,
+            padding: 14,
+          }}
+        >
+          <div style={{ fontWeight: 800, fontSize: 14, textTransform: draft.uppercase ? "uppercase" : "none" }}>Custom card</div>
+          <div style={{ fontSize: 10, color: theme.muted }}>Your colors, font, corners &amp; effects.</div>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span style={{ background: theme.accent, color: theme.onAccent, borderRadius: 999, fontSize: 9, fontWeight: 700, padding: "3px 8px" }}>Action</span>
+            <span style={{ background: theme.accent, width: 34, height: 5, borderRadius: 3 }} />
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onApply(buildCustomTheme(draft))}
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+      >
+        <WandSparkles className="size-3.5" /> Apply custom theme
+      </button>
+    </div>
+  );
+}
+
+
 export function ComponentsPanel() {
   const { add, addGroup, selectedId, selectedIds, elements, update } = useEditor();
   const [style, setStyle] = useState<UiStyle>("cyber");
@@ -284,8 +512,36 @@ export function ComponentsPanel() {
       ]} />
       <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : "blocks"}...`} />
       <div className="space-y-2">
-        <span className="text-xs text-selector-subtle">Visual theme</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-selector-subtle">Visual theme</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                title="Create your own visual theme"
+                className="flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700 transition hover:bg-blue-100"
+              >
+                <WandSparkles className="size-3" /> Create
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="left" align="start" className="selector-panel w-[264px] space-y-3 rounded-xl p-3">
+              <div className="selector-header"><h3>Theme creator</h3></div>
+              <ThemeCreator
+                onApply={(theme) => {
+                  saveCustomUiTheme(theme);
+                  pickStyle("custom");
+                }}
+              />
+              <p className="text-[9px] leading-snug text-slate-400">
+                The saved theme becomes the “Custom” chip above — components, charts and quizzes all follow it.
+              </p>
+            </PopoverContent>
+          </Popover>
+        </div>
         <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
+        {style === "custom" && (
+          <p className="text-[10px] leading-snug text-slate-400">Custom theme active — tweak it any time with “Create”.</p>
+        )}
       </div>
 
       {/* Charts & quiz presets live in the Charts tab */}
