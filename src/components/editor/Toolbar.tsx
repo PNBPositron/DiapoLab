@@ -14,6 +14,7 @@ import {
   Github,
   Loader2,
   User as UserIcon,
+  UserRound,
   ChevronDown,
   Share2,
   Upload,
@@ -34,6 +35,7 @@ import { useSettings } from "@/store/settings";
 import { saveDesign, publishAsTemplate, createPrivateShare } from "@/lib/designs";
 import { PublishMetaDialog, type PublishMeta } from "./PublishMetaDialog";
 import { SettingsDialog } from "./SettingsDialog";
+import { ProfileDialog } from "./ProfileDialog";
 import { requestPresentationFullscreen } from "./PresentationMode";
 import { importPPTXFile } from "@/lib/import-pptx";
 import {
@@ -93,6 +95,7 @@ export function Toolbar() {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
@@ -418,7 +421,7 @@ export function Toolbar() {
         </button>
 
         {/* User profile */}
-        {user && <UserMenu email={user.email ?? ""} />}
+        {user && <UserMenu email={user.email ?? ""} onEditProfile={() => setProfileDialogOpen(true)} />}
 
         {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
         <LargeModernHamburger
@@ -436,6 +439,10 @@ export function Toolbar() {
           sticky/backdrop-blur header does not become its containing block */}
       {settingsDialogOpen &&
         createPortal(<SettingsDialog onClose={() => setSettingsDialogOpen(false)} />, document.body)}
+
+      {/* Profile dialog — standalone, outside Settings */}
+      {profileDialogOpen &&
+        createPortal(<ProfileDialog onClose={() => setProfileDialogOpen(false)} />, document.body)}
 
 
       {/* Publish dialog */}
@@ -737,7 +744,7 @@ function MenuCardItem({
   );
 }
 
-function UserMenu({ email }: { email: string }) {
+function UserMenu({ email, onEditProfile }: { email: string; onEditProfile: () => void }) {
   const [open, setOpen] = useState(false);
   const userRef = useClickOutside<HTMLDivElement>(() => setOpen(false));
 
@@ -756,6 +763,13 @@ function UserMenu({ email }: { email: string }) {
             <p className="text-[10px] font-semibold tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
+          <button
+            onClick={() => { setOpen(false); onEditProfile(); }}
+            className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+          >
+            <UserRound className="h-4 w-4" />
+            <span>Edit profile</span>
+          </button>
           <button
             onClick={() => signOut()}
             className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
