@@ -53,7 +53,7 @@ import {
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ColorPicker } from "../ColorPicker";
 import { FONTS } from "./TextPanel";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
@@ -543,6 +543,7 @@ export function ComponentsPanel() {
   const [blocks, setBlocks] = useState<UserBlock[]>(() => loadBlocks());
   const [blockName, setBlockName] = useState("");
   const [blockSaved, setBlockSaved] = useState(false);
+  const [creatorOpen, setCreatorOpen] = useState(false);
 
   const selected = elements.find((element) => element.id === selectedId);
 
@@ -649,8 +650,8 @@ export function ComponentsPanel() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs text-selector-subtle">Visual theme</span>
-          <Popover>
-            <PopoverTrigger asChild>
+          <Dialog open={creatorOpen} onOpenChange={setCreatorOpen}>
+            <DialogTrigger asChild>
               <button
                 type="button"
                 title="Create your own visual theme"
@@ -658,20 +659,26 @@ export function ComponentsPanel() {
               >
                 <WandSparkles className="size-3" /> Create
               </button>
-            </PopoverTrigger>
-            <PopoverContent side="left" align="start" className="selector-panel max-h-[min(72vh,640px)] w-[264px] space-y-3 overflow-y-auto rounded-xl p-3">
-              <div className="selector-header"><h3>Theme creator</h3></div>
+            </DialogTrigger>
+            <DialogContent className="selector-panel max-h-[82vh] max-w-[320px] space-y-3 overflow-y-auto rounded-2xl p-4">
+              <DialogHeader className="space-y-1 text-left">
+                <DialogTitle className="text-sm font-semibold tracking-tight text-slate-900">Theme creator</DialogTitle>
+                <DialogDescription className="text-[10px] leading-relaxed text-slate-500">
+                  Build your own visual theme pack — colors, font, corners, effects and transparency.
+                </DialogDescription>
+              </DialogHeader>
               <ThemeCreator
                 onApply={(theme) => {
                   saveCustomUiTheme(theme);
                   pickStyle("custom");
+                  setCreatorOpen(false);
                 }}
               />
               <p className="text-[9px] leading-snug text-slate-400">
                 The saved theme becomes the “Custom” chip above — components, charts and quizzes all follow it.
               </p>
-            </PopoverContent>
-          </Popover>
+            </DialogContent>
+          </Dialog>
         </div>
         <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
         {style === "custom" && (
