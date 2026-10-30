@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEditor, type Page } from "@/store/editor";
 import { PresentationMode, requestPresentationFullscreen } from "@/components/editor/PresentationMode";
@@ -30,6 +31,7 @@ function SharedTemplate() {
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [ready, setReady] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
   const pageCount = useEditor((s) => s.pages.length);
 
   useEffect(() => {
@@ -62,6 +64,7 @@ function SharedTemplate() {
         st.setDesignMeta({ id: null, name: shared.name });
         setName(shared.name);
         setReady(true);
+        setShareUrl(window.location.href);
         return;
       }
       const { data, error: err } = await supabase
@@ -80,6 +83,7 @@ function SharedTemplate() {
       st.setDesignMeta({ id: null, name: data.name });
       setName(data.name);
       setReady(true);
+      setShareUrl(window.location.href);
     })();
     return () => {
       cancelled = true;
@@ -128,6 +132,16 @@ function SharedTemplate() {
               {ready ? <Play className="size-4 fill-white" /> : <Loader2 className="size-4 animate-spin" />}
               {ready ? "Present" : "Preparing…"}
             </button>
+            {ready && shareUrl && (
+              <div className="mt-7 flex flex-col items-center gap-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.25)]">
+                  <QRCodeSVG value={shareUrl} size={92} level="M" marginSize={1} />
+                </div>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  Scan to open this deck on your phone
+                </span>
+              </div>
+            )}
           </>
         )}
         <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Made with DiapoLab</p>

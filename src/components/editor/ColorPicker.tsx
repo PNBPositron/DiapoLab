@@ -41,10 +41,37 @@ function hsvToRgb(h: number, s: number, v: number): RGB {
   return { r: (rn + m) * 255, g: (gn + m) * 255, b: (bn + m) * 255 };
 }
 
+/* ------- Couleurs récentes (localStorage, partagé par tous les pickers) ------- */
+const RECENT_COLORS_KEY = "diapolab.recentColors";
+const MAX_RECENT = 10;
+
+function readRecentColors(): string[] {
+  try {
+    const raw = typeof window === "undefined" ? null : localStorage.getItem(RECENT_COLORS_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((c): c is string => typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c))
+      .map((c) => c.toLowerCase())
+      .slice(0, MAX_RECENT);
+  } catch {
+    return [];
+  }
+}
+
+function writeRecentColors(colors: string[]) {
+  try {
+    localStorage.setItem(RECENT_COLORS_KEY, JSON.stringify(colors));
+  } catch {
+    /* stockage indisponible (mode privé, quota…) — on ignore */
+  }
+}
+
 /**
  * ColorPicker maison — remplace <input type="color"> natif.
  * Zone saturation/valeur + slider de teinte + hex + pipette (EyeDropper API).
  * Slider d'opacité optionnel : ne s'affiche que si `opacity` + `onOpacityChange` sont fournis.
+ * Mémorise les 10 dernières couleurs utilisées (localStorage) et les propose en raccourcis.
  */
 export function ColorPicker({
   value,
@@ -61,8 +88,12 @@ export function ColorPicker({
   const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
   const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
   const [hexDraft, setHexDraft] = useState(safeHex);
+  const [recentColors, setRecentColors] = useState<string[]>(() =>
+    typeof window === "undefined" ? [] : readRecentColors(),
+  );
   const svRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+  const lastEmitted = useRef(safeHex);
   const showOpacity = opacity !== undefined && !!onOpacityChange;
 
   // Sync quand la valeur change de l'extérieur
@@ -70,14 +101,41 @@ export function ColorPicker({
     if (/^#[0-9a-fA-F]{6}$/.test(value)) {
       setHsv(rgbToHsv(hexToRgb(value)));
       setHexDraft(value);
+      lastEmitted.current = value;
     }
   }, [value]);
+
+  const recordRecent = (hex: string) => {
+    const h = hex.toLowerCase();
+    if (!/^#[0-9a-f]{6}$/.test(h)) return;
+    setRecentColors((prev) => {
+      if (prev[0] === h) return prev;
+      const next = [h, ...prev.filter((c) => c !== h)].slice(0, MAX_RECENT);
+      writeRecentColors(next);
+      return next;
+    });
+  };
+
+  /** Applique un hex complet (swatch récent, hex saisie, pipette) */
+  const applyHex = (hex: string) => {
+    const h = hex.toLowerCase();
+    setHsv(rgbToHsv(hexToRgb(h)));
+    setHexDraft(h);
+    lastEmitted.current = h;
+    onChange(h);
+    recordRecent(h);
+  };
 
   const emit = (h: number, s: number, v: number) => {
     setHsv({ h, s, v });
     const hex = rgbToHex(hsvToRgb(h, s, v));
     setHexDraft(hex);
+    lastEmitted.current = hex;
     onChange(hex);
+  };
+
+  const commitRecent = () => {
+    if (!dragging.current) recordRecent(lastEmitted.current);
   };
 
   const applyFromPointer = (clientX: number, clientY: number) => {
@@ -99,6 +157,7 @@ export function ColorPicker({
   };
   const onSvUp = () => {
     dragging.current = false;
+    recordRecent(lastEmitted.current);
   };
 
   const pickWithEyedropper = async () => {
@@ -106,7 +165,7 @@ export function ColorPicker({
     if (!EyeDropper) return;
     try {
       const res = await new EyeDropper().open();
-      if (res?.sRGBHex) onChange(res.sRGBHex);
+      if (res?.sRGBHex) applyHex(res.sRGBHex);
     } catch {
       /* utilisateur a annulé */
     }
@@ -116,6 +175,26 @@ export function ColorPicker({
 
   return (
     <div className="space-y-2.5">
+      {/* Couleurs récentes */}
+      {recentColors.length > 0 && (
+        <div className="space-y-1.5">
+          <div className="text-[10px] font-semibold tracking-wide text-slate-400">Recent colors</div>
+          <div className="flex flex-wrap gap-1.5">
+            {recentColors.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => applyHex(c)}
+                title={c}
+                aria-label={`Use recent color ${c}`}
+                className="size-6 rounded-md border border-slate-200 shadow-2xs transition hover:scale-110 hover:border-sky-400"
+                style={{ background: c }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Zone saturation / valeur */}
       <div
         ref={svRef}
@@ -145,6 +224,9 @@ export function ColorPicker({
         max={360}
         value={Math.round(hsv.h)}
         onChange={(e) => emit(+e.target.value, hsv.s, hsv.v)}
+        onPointerUp={commitRecent}
+        onKeyUp={commitRecent}
+        onBlur={commitRecent}
         className="h-2.5 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
         style={{
           background:
@@ -188,8 +270,9 @@ export function ColorPicker({
           onChange={(e) => {
             const v = e.target.value.startsWith("#") ? e.target.value : "#" + e.target.value;
             setHexDraft(v);
-            if (/^#[0-9a-fA-F]{6}$/.test(v)) onChange(v.toLowerCase());
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) applyHex(v);
           }}
+          onBlur={commitRecent}
           spellCheck={false}
           placeholder="#000000"
           className="h-7 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 font-mono text-[11px] text-slate-800 shadow-2xs outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
@@ -207,4 +290,3 @@ export function ColorPicker({
     </div>
   );
 }
-
