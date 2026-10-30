@@ -432,8 +432,8 @@ export function PaintAppDialog({
               minimized={minimized}
               maximized={maximized}
               onClose={() => onOpenChange(false)}
-              onMinimize={() => setMinimized((m) => !m)}
-              onMaximize={() => setMaximized((m) => !m)}
+              onMinimize={() => setMinimized(true)}
+              onMaximize={() => (minimized ? setMinimized(false) : setMaximized((m) => !m))}
             />
           </div>
           <DialogTitle className="flex items-center gap-2 text-sm font-bold text-slate-800">

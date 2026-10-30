@@ -161,8 +161,8 @@ export function PhotopeaStudioDialog({
             minimized={minimized}
             maximized={maximized}
             onClose={() => onOpenChange(false)}
-            onMinimize={() => setMinimized((m) => !m)}
-            onMaximize={() => setMaximized((m) => !m)}
+            onMinimize={() => setMinimized(true)}
+            onMaximize={() => (minimized ? setMinimized(false) : setMaximized((m) => !m))}
           />
           <DialogTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide text-slate-800">
             <PhotopeaLogo className="size-7 shrink-0" />
