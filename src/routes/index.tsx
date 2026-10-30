@@ -31,17 +31,15 @@ function Editor() {
     <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
       <Toolbar />
-      {/* Sidebar spans the canvas area only, so its centered rail aligns
-          with the page; the rail's bottom button sits right above the
-          pages bar and stays visible and clickable. */}
+      {/* Sidebar spans the full workspace height (it runs alongside the
+          pages bar), but the rail buttons are centered against the canvas
+          area only — see the measured inset in Sidebar. */}
       <div className="flex min-h-0 flex-1">
+        <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex min-h-0 flex-1">
-            <Sidebar />
-            <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
-              <Canvas />
-            </main>
-          </div>
+          <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
+            <Canvas />
+          </main>
           <PagesBar />
         </div>
         <PropertiesPanel />
