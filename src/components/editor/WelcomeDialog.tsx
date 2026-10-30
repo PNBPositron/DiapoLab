@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, LayoutGrid, Type, Shapes, Camera, Image, Layers, Palette, Puzzle, Check, MonitorPlay } from "lucide-react";
+import { Loader2, LayoutGrid, Type, Shapes, Library, Layers, Palette, Puzzle, Check, MonitorPlay } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useEditor, CANVAS_PRESETS, type Page } from "@/store/editor";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
@@ -14,8 +14,7 @@ const PANEL_OPTIONS = [
   { id: "home", label: "Templates", icon: LayoutGrid, hint: "Browse community decks" },
   { id: "text", label: "Text", icon: Type, hint: "Add titles & paragraphs" },
   { id: "elements", label: "Elements", icon: Shapes, hint: "Shapes & icons" },
-  { id: "unsplash", label: "Unsplash", icon: Camera, hint: "Free photos" },
-  { id: "illustrations", label: "Illustrations", icon: Image, hint: "Vector art" },
+  { id: "library", label: "Library", icon: Library, hint: "Photos & illustrations" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },
   { id: "plugins", label: "Plugins", icon: Puzzle, hint: "Import widget packs" }

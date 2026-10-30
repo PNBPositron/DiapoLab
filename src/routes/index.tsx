@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { CommandPalette } from "@/components/editor/CommandPalette";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { Sidebar } from "@/components/editor/Sidebar";
 import { Canvas } from "@/components/editor/Canvas";
@@ -27,6 +29,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Editor() {
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // ⌘K / Ctrl+K toggles the command palette from anywhere in the editor.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
       <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
@@ -47,6 +63,7 @@ function Editor() {
       <PresentationMode />
       <WelcomeDialog />
       <FindReplaceDialog />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
     </div>
   );
 }

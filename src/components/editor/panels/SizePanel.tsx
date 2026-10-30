@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Wand2, Check } from "lucide-react";
+import { Wand2 } from "lucide-react";
 import { useEditor, CANVAS_PRESETS } from "@/store/editor";
 import { PanelHeader } from "./TextPanel";
+import { OptionGrid } from "../ui/selectors";
 
 export function SizePanel() {
   const { canvasW, canvasH, setCanvasSize, magicResize } = useEditor();
@@ -61,55 +62,33 @@ export function SizePanel() {
         </button>
       </div>
 
-      {/* Presets */}
+      {/* Presets — shared OptionGrid tiles, same component as every panel */}
       <div className="space-y-2 px-4">
         <div className="text-[10px] font-semibold tracking-wide text-slate-500">Presets</div>
-        <div className="grid grid-cols-2 gap-2">
-          {CANVAS_PRESETS.map((p) => {
-            const active = canvasW === p.w && canvasH === p.h;
-            const max = 44;
+        <OptionGrid
+          label="Canvas format presets"
+          value={CANVAS_PRESETS.find((p) => p.w === canvasW && p.h === canvasH)?.name}
+          onChange={(name) => {
+            const preset = CANVAS_PRESETS.find((p) => p.name === name);
+            if (!preset) return;
+            resize(preset.w, preset.h);
+            setW(preset.w);
+            setH(preset.h);
+          }}
+          options={CANVAS_PRESETS.map((p) => {
             const ratio = p.w / p.h;
+            const max = 34;
             const tw = ratio >= 1 ? max : max * ratio;
             const th = ratio >= 1 ? max / ratio : max;
-            return (
-              <button
-                key={p.name}
-                onClick={() => {
-                  resize(p.w, p.h);
-                  setW(p.w);
-                  setH(p.h);
-                }}
-                className={`relative flex flex-col items-center gap-1.5 rounded-xl border p-2.5 transition-all duration-200 ${
-                  active
-                    ? "border-blue-500 bg-blue-50/50 shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
-                    : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-                }`}
-              >
-                {active && (
-                  <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-blue-600 text-white">
-                    <Check className="size-2.5" strokeWidth={3} />
-                  </span>
-                )}
-                <div className="grid h-12 w-full place-items-center">
-                  <div
-                    className={`rounded-[2px] border-2 ${
-                      active ? "border-blue-500 bg-blue-100/40" : "border-slate-300 bg-slate-50"
-                    }`}
-                    style={{ width: tw, height: th }}
-                  />
-                </div>
-                <span className={`text-[10px] font-semibold tracking-wide ${active ? "text-blue-700" : "text-slate-600"}`}>
-                  {p.name}
-                </span>
-                <span className="font-mono text-[9px] text-slate-400">
-                  {p.w}×{p.h}
-                </span>
-              </button>
-            );
+            return {
+              value: p.name,
+              label: `${p.name} · ${p.w}×${p.h}`,
+              title: p.name,
+              preview: <span className="rounded-[2px] border-2 border-slate-300 bg-slate-50" style={{ width: tw, height: th }} />,
+            };
           })}
-        </div>
+        />
       </div>
-
       {/* Custom */}
       <div className="space-y-2.5 px-4 pb-1">
         <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom</div>
