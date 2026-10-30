@@ -67,7 +67,7 @@ export function Sidebar() {
 
   return (
     <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-      <nav className="editor-tool-rail flex h-full w-[4.5rem] min-h-0 flex-col justify-between gap-1.5 overflow-y-auto overscroll-contain p-2 py-4">
+      <nav className="editor-tool-rail flex h-full w-[4.5rem] min-h-0 flex-col justify-between gap-0.5 overflow-y-auto overscroll-contain p-2 py-3">
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
@@ -76,7 +76,7 @@ export function Sidebar() {
               key={t.id}
               onClick={() => { setTool(t.id); setHovering(true); }}
               title={t.label}
-              className={`group relative flex w-full flex-col items-center gap-1 border-0 py-3 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
+              className={`group relative flex w-full flex-col items-center gap-0.5 border-0 py-1.5 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
                 active
                   ? "bg-slate-100/90 text-slate-900"
                   : "bg-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
