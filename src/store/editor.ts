@@ -63,6 +63,29 @@ export type SlideTransition =
   | "origami";
 export type BgFit = "cover" | "contain";
 
+/** ── Video project (multi-track timeline) ───────────────────────────────
+ *  Scenes mirror the deck pages 1:1; objects and audio live on their own
+ *  draggable tracks with absolute time positions (seconds). */
+export type VideoClipKind = "scene" | "object" | "audio";
+export type VideoClip = {
+  id: string;
+  kind: VideoClipKind;
+  label: string;
+  start: number; // seconds
+  duration: number; // seconds
+  pageId?: string; // scene clips
+  elementId?: string; // object clips
+  src?: string; // audio clips (object URL / data URL)
+  /** transition played when this clip starts (dragged from the Transitions panel) */
+  transition?: SlideTransition;
+};
+export type VideoTrack = {
+  id: string;
+  kind: "scene" | "object" | "audio";
+  label: string;
+  clips: VideoClip[];
+};
+
 export type TextElement = ElementBase & {
   type: "text";
   text: string;
@@ -713,6 +736,8 @@ type State = {
   presenting: boolean;
   /** video mode: the bottom bar shows a timeline instead of the slide previews */
   videoMode: boolean;
+  /** multi-track video project — scene track mirrors the pages */
+  videoTracks: VideoTrack[];
   // cloud-saved design metadata
   designId: string | null;
   designName: string;
@@ -758,6 +783,12 @@ type State = {
   ) => void;
   setPresenting: (v: boolean) => void;
   setVideoMode: (v: boolean) => void;
+  /** rebuild the scene track from pages; creates default tracks on first run */
+  syncVideoScenes: () => void;
+  addVideoClip: (trackId: string, clip: VideoClip) => void;
+  moveVideoClip: (clipId: string, trackId: string, start: number) => void;
+  removeVideoClip: (clipId: string) => void;
+  setClipTransition: (clipId: string, transition: SlideTransition) => void;
   setGuides: (g: { v: number[]; h: number[] }) => void;
   /** id of the image element currently in interactive crop mode (double-click) */
   croppingId: string | null;
@@ -1352,6 +1383,7 @@ export const useEditor = create<State>((set, get) => {
     versions: [],
     presenting: false,
     videoMode: false,
+    videoTracks: [],
     designId: null,
     designName: "untitled.design",
     guides: { v: [], h: [] },
@@ -1452,6 +1484,64 @@ export const useEditor = create<State>((set, get) => {
     },
     setPresenting: (presenting) => set({ presenting }),
     setVideoMode: (videoMode) => set({ videoMode }),
+
+    // ---- Video project: multi-track timeline ----
+    syncVideoScenes: () => {
+      const { pages, videoTracks } = get();
+      const sceneClips: VideoClip[] = pages.map((p, i) => ({
+        id: `scene-${p.id}`,
+        kind: "scene",
+        label: `Scene ${i + 1}`,
+        start: pages.slice(0, i).reduce((s, q) => s + q.duration, 0),
+        duration: p.duration,
+        pageId: p.id,
+      }));
+      const tracks: VideoTrack[] = videoTracks.length
+        ? videoTracks
+        : [
+            { id: "scenes", kind: "scene", label: "Scenes", clips: [] },
+            { id: "overlay", kind: "object", label: "Overlay objects", clips: [] },
+            { id: "audio-1", kind: "audio", label: "Audio 1", clips: [] },
+          ];
+      set({
+        videoTracks: tracks.map((tr) =>
+          tr.id === "scenes" ? { ...tr, clips: sceneClips } : tr
+        ),
+      });
+    },
+    addVideoClip: (trackId, clip) =>
+      set({
+        videoTracks: get().videoTracks.map((tr) =>
+          tr.id === trackId ? { ...tr, clips: [...tr.clips, clip] } : tr
+        ),
+      }),
+    moveVideoClip: (clipId, trackId, start) => {
+      const tracks = get().videoTracks;
+      const clip = tracks.flatMap((tr) => tr.clips).find((c) => c.id === clipId);
+      if (!clip) return;
+      set({
+        videoTracks: tracks.map((tr) => {
+          const others = tr.clips.filter((c) => c.id !== clipId);
+          return tr.id === trackId
+            ? { ...tr, clips: [...others, { ...clip, start }] }
+            : { ...tr, clips: others };
+        }),
+      });
+    },
+    removeVideoClip: (clipId) =>
+      set({
+        videoTracks: get().videoTracks.map((tr) => ({
+          ...tr,
+          clips: tr.clips.filter((c) => c.id !== clipId),
+        })),
+      }),
+    setClipTransition: (clipId, transition) =>
+      set({
+        videoTracks: get().videoTracks.map((tr) => ({
+          ...tr,
+          clips: tr.clips.map((c) => (c.id === clipId ? { ...c, transition } : c)),
+        })),
+      }),
     setGuides: (guides) => set({ guides }),
     setCroppingId: (croppingId) => set({ croppingId }),
     copySelected: () => {

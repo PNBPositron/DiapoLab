@@ -7,7 +7,7 @@ import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
-import { Timeline } from "@/components/editor/Timeline";
+import { MultiTrackTimeline } from "@/components/editor/MultiTrackTimeline";
 import { useEditor } from "@/store/editor";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
 import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
@@ -60,7 +60,7 @@ function Editor() {
           <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
             <Canvas />
           </main>
-          {videoMode ? <Timeline /> : <PagesBar />}
+          {videoMode ? <MultiTrackTimeline /> : <PagesBar />}
         </div>
         <PropertiesPanel />
       </div>
