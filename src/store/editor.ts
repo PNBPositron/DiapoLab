@@ -19,6 +19,8 @@ export type ElementBase = {
   shadow?: ElementShadow;
   /** elements sharing a groupId are selected & moved together (plugin widgets) */
   groupId?: string;
+  /** CSS mix-blend-mode — how the element composites onto the slide (undefined = normal) */
+  blendMode?: string;
 };
 
 export type ElementAnimation =
@@ -174,6 +176,8 @@ export type ShapeElement = ElementBase & {
   opacity?: number; // 0..1
   imageOverlay?: string;
   strokeStyle?: "solid" | "dashed" | "dotted";
+  /** soft-edge feather — blur the shape silhouette, 0 = crisp */
+  feather?: number;
   /** clip the element's silhouette by a shape (works like image masks) */
   maskShape?: ShapeKind;
   /** fill source: own color, or the slide's background (knockout) */

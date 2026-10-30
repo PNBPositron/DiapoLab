@@ -782,6 +782,10 @@ export function CanvasElement({
               : "transform 60ms linear"
             : undefined,
         cursor: editing ? "text" : "move",
+        mixBlendMode:
+          element.blendMode && element.blendMode !== "normal"
+            ? (element.blendMode as React.CSSProperties["mixBlendMode"])
+            : undefined,
         outline: selected ? "3px solid #2b6cff" : "none",
         outlineOffset: "2px",
         filter:
@@ -929,7 +933,13 @@ export function CanvasElement({
                 position: "absolute",
                 inset: 0,
                 ...fx,
-                filter: [fx.filter, sFilter].filter(Boolean).join(" ") || undefined,
+                filter: [
+                  fx.filter,
+                  sFilter,
+                  element.feather ? `blur(${element.feather}px)` : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ") || undefined,
               }}
             >
               {/* Slide-bg knockout: an overlay clipped by the shape's own

@@ -198,6 +198,31 @@ const IMAGE_FILTER_PRESETS: Array<{
   { name: "Gameboy", description: "Dotted handheld", filters: { ...DEFAULT_FILTERS, pixelate: 12, grayscale: 100, contrast: 145, brightness: 105 }, preview: "grayscale(1) contrast(1.45) brightness(1.05)" },
 ];
 
+const BLEND_MODES = [
+  "normal",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity",
+];
+
+const ASPECT_RATIOS: Array<{ label: string; value: number }> = [
+  { label: "1:1", value: 1 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "16:9", value: 16 / 9 },
+  { label: "9:16", value: 9 / 16 },
+  { label: "4:5", value: 4 / 5 },
+];
+
 const SWATCHES = [
   "#000000",
   "#ffffff",
@@ -413,6 +438,7 @@ export function PropertiesPanel() {
   const [jsonDraft, setJsonDraft] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [jsonDirty, setJsonDirty] = useState(false);
+  const [ratioLock, setRatioLock] = useState(true);
   const croppingId = useEditor((s) => s.croppingId);
 
   const el = elements.find((e) => e.id === selectedId);
@@ -707,6 +733,95 @@ export function PropertiesPanel() {
 
           {/* Body */}
           <div className="flex-1 space-y-3 overflow-y-auto p-3.5 text-xs text-slate-700">
+            {/* POSITION & SIZE — numeric transform, all element types */}
+            <Section title="Position & Size">
+              <div className="grid grid-cols-2 gap-2">
+                {(["x", "y"] as const).map((key) => (
+                  <label
+                    key={key}
+                    className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs"
+                  >
+                    <span className="w-3 text-[10px] font-bold uppercase text-slate-400">{key}</span>
+                    <input
+                      type="number"
+                      value={Math.round(el[key] as number)}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (Number.isFinite(val)) update(el.id, { [key]: val } as never);
+                      }}
+                      className="w-full min-w-0 border-0 bg-transparent text-right font-mono text-[11px] text-slate-800 outline-none"
+                    />
+                  </label>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs">
+                  <span className="w-3 text-[10px] font-bold uppercase text-slate-400">w</span>
+                  <input
+                    type="number"
+                    min={20}
+                    value={Math.round(el.width)}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (!Number.isFinite(val) || val < 20) return;
+                      if (ratioLock)
+                        update(el.id, {
+                          width: val,
+                          height: Math.max(20, Math.round((val * el.height) / el.width)),
+                        } as never);
+                      else update(el.id, { width: val } as never);
+                    }}
+                    className="w-full min-w-0 border-0 bg-transparent text-right font-mono text-[11px] text-slate-800 outline-none"
+                  />
+                </label>
+                <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs">
+                  <span className="w-3 text-[10px] font-bold uppercase text-slate-400">h</span>
+                  <input
+                    type="number"
+                    min={20}
+                    value={Math.round(el.height)}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (!Number.isFinite(val) || val < 20) return;
+                      if (ratioLock)
+                        update(el.id, {
+                          height: val,
+                          width: Math.max(20, Math.round((val * el.width) / el.height)),
+                        } as never);
+                      else update(el.id, { height: val } as never);
+                    }}
+                    className="w-full min-w-0 border-0 bg-transparent text-right font-mono text-[11px] text-slate-800 outline-none"
+                  />
+                </label>
+              </div>
+              <SliderWithInput
+                label="Rotation"
+                min={-180}
+                max={180}
+                value={Math.round(el.rotation)}
+                unit="°"
+                onChange={(val) => update(el.id, { rotation: val } as never)}
+              />
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-[11px] font-medium text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={ratioLock}
+                    onChange={(e) => setRatioLock(e.target.checked)}
+                    className="accent-sky-600"
+                  />
+                  Lock aspect ratio
+                </label>
+                <button
+                  type="button"
+                  onClick={() => update(el.id, { rotation: 0 } as never)}
+                  className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
+                >
+                  Reset rotation
+                </button>
+              </div>
+            </Section>
+
             {/* UI ELEMENTS */}
             {el.type === "ui" && (
               <Section title="Appearance & Content">
@@ -947,7 +1062,78 @@ export function PropertiesPanel() {
                       onOpacityChange={(v) => update(el.id, { opacity: v })}
                     />
                   )}
-                <Field label="Replace image">
+                                  <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-slate-600">Gradient fill</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(el.id, {
+                            gradient: el.gradient
+                              ? undefined
+                              : { from: el.color, to: "#6366f1", angle: 90, type: "linear" },
+                          })
+                        }
+                        className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600 transition hover:border-sky-300 hover:text-sky-700"
+                      >
+                        {el.gradient ? "Remove" : "Add"}
+                      </button>
+                    </div>
+                    {el.gradient && (
+                      <>
+                        <SegmentedControl
+                          value={el.gradient.type ?? "linear"}
+                          onChange={(type) =>
+                            update(el.id, { gradient: { ...el.gradient!, type: type as ShapeGradient["type"] } })
+                          }
+                          options={[
+                            { value: "linear", label: "Linear" },
+                            { value: "radial", label: "Radial" },
+                          ]}
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
+                            <input
+                              type="color"
+                              value={el.gradient.from}
+                              onChange={(e) => update(el.id, { gradient: { ...el.gradient!, from: e.target.value } })}
+                              className="size-6 cursor-pointer border-0 bg-transparent p-0"
+                              aria-label="Gradient start color"
+                            />
+                            Start
+                          </label>
+                          <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
+                            <input
+                              type="color"
+                              value={el.gradient.to}
+                              onChange={(e) => update(el.id, { gradient: { ...el.gradient!, to: e.target.value } })}
+                              className="size-6 cursor-pointer border-0 bg-transparent p-0"
+                              aria-label="Gradient end color"
+                            />
+                            End
+                          </label>
+                        </div>
+                        {(el.gradient.type ?? "linear") === "linear" && (
+                          <SliderWithInput
+                            label="Angle"
+                            min={0}
+                            max={360}
+                            value={el.gradient.angle}
+                            unit="°"
+                            onChange={(angle) => update(el.id, { gradient: { ...el.gradient!, angle } })}
+                          />
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <Field label="Blend mode">
+                    <Dropdown
+                      value={el.blendMode ?? "normal"}
+                      options={BLEND_MODES}
+                      onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                    />
+                  </Field>
+                  <Field label="Replace image">
                   <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50">
                     <Upload className="size-3.5" aria-hidden="true" />
                     Choose another image
@@ -1088,6 +1274,21 @@ export function PropertiesPanel() {
                     onChange={(val) => update(el.id, { cornerRadius: val })}
                   />
                 )}
+                <SliderWithInput
+                  label="Feather (soft edge)"
+                  min={0}
+                  max={40}
+                  value={el.feather ?? 0}
+                  unit="px"
+                  onChange={(val) => update(el.id, { feather: val } as never)}
+                />
+                <Field label="Blend mode">
+                  <Dropdown
+                    value={el.blendMode ?? "normal"}
+                    options={BLEND_MODES}
+                    onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                  />
+                </Field>
               </Section>
             )}
 
@@ -1331,6 +1532,60 @@ export function PropertiesPanel() {
                   unit="px"
                   onChange={(val) => update(el.id, { cornerRadius: val })}
                 />
+
+                <SliderWithInput
+                  label="Opacity"
+                  min={0}
+                  max={100}
+                  value={Math.round((el.opacity ?? 1) * 100)}
+                  unit="%"
+                  onChange={(val) => update(el.id, { opacity: val / 100 })}
+                />
+
+                <Field label="Border">
+                  <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                    <SliderWithInput
+                      label="Border Width"
+                      min={0}
+                      max={24}
+                      value={el.borderWidth ?? 0}
+                      unit="px"
+                      onChange={(val) => update(el.id, { borderWidth: val })}
+                    />
+                    {(el.borderWidth ?? 0) > 0 && (
+                      <ModernColorPicker
+                        label="Border Color"
+                        value={el.borderColor ?? "#000000"}
+                        onChange={(c) => update(el.id, { borderColor: c })}
+                      />
+                    )}
+                  </div>
+                </Field>
+
+                <Field label="Aspect ratio">
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {ASPECT_RATIOS.map((r) => (
+                      <button
+                        key={r.label}
+                        type="button"
+                        onClick={() =>
+                          update(el.id, { height: Math.max(20, Math.round(el.width / r.value)) } as never)
+                        }
+                        className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+
+                <Field label="Blend mode">
+                  <Dropdown
+                    value={el.blendMode ?? "normal"}
+                    options={BLEND_MODES}
+                    onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                  />
+                </Field>
 
                 <button
                   type="button"
