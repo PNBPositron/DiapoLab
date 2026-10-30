@@ -60,6 +60,12 @@ export function DesignPanel() {
   const [section, setSection] = useState<SectionId>("canvas");
   const active = SECTIONS.find((s) => s.id === section) ?? SECTIONS[0];
   const ActiveIcon = active.Icon;
+  const SHORT: Record<SectionId, string> = {
+    canvas: "Fmt",
+    brand: "Brand",
+    background: "BG",
+    master: "Master",
+  };
 
   return (
     <div className="space-y-4">
@@ -78,7 +84,7 @@ export function DesignPanel() {
           label="Design category"
           options={SECTIONS.map(({ id, title, subtitle, Icon }) => ({
             value: id,
-            label: title.split(" ")[0],
+            label: SHORT[id],
             title: title + " — " + subtitle,
             icon: Icon,
           }))}
