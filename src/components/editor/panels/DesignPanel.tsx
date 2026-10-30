@@ -18,45 +18,55 @@ interface SectionConfig {
   title: string;
   subtitle: string;
   Icon: LucideIcon;
-  iconBg: string;
-  iconColor: string;
   children: ReactNode;
   defaultOpen?: boolean;
 }
 
+/** Accordion row — same card language as the other panels (rounded-2xl,
+ * white card, soft lift on hover, slate chip that turns blue, blue chevron). */
 function SectionRow({
   title,
   subtitle,
   Icon,
-  iconBg,
-  iconColor,
   children,
   defaultOpen = false,
 }: Omit<SectionConfig, "id">) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="transition-colors duration-150">
+    <div
+      className={`overflow-hidden rounded-2xl border bg-white transition-all duration-200 ${
+        open
+          ? "border-blue-200/80 shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)]"
+          : "border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.25)]"
+      }`}
+    >
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="group flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-slate-50/80 active:bg-slate-100/60"
+        className="group flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-slate-50/80 active:bg-slate-100/60"
       >
-        {/* Soft Tinted Icon Chip */}
+        {/* Icon chip — matches the TextPanel preset rows */}
         <div
-          className={`flex size-7 shrink-0 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 ${iconBg} ${iconColor}`}
+          className={`grid size-8 shrink-0 place-items-center rounded-lg transition-colors duration-200 ${
+            open
+              ? "bg-blue-50 text-blue-600"
+              : "bg-slate-100/80 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600"
+          }`}
         >
-          <Icon className="size-3.5" />
+          <Icon className="size-4" />
         </div>
 
-        {/* Title & Micro-detail */}
-        <div className="flex flex-col min-w-0">
-          <span className="text-[12px] font-medium text-slate-850 leading-tight">
+        {/* Title & micro-detail */}
+        <div className="flex min-w-0 flex-col">
+          <span className={`text-xs font-semibold leading-tight ${
+            open ? "text-slate-900" : "text-slate-800 group-hover:text-slate-950"
+          }`}>
             {title}
           </span>
           {!open && (
-            <span className="text-[10px] text-slate-400 font-normal leading-tight">
+            <span className="text-[10px] font-normal leading-tight text-slate-400">
               {subtitle}
             </span>
           )}
@@ -64,15 +74,15 @@ function SectionRow({
 
         {/* Chevron */}
         <ChevronRight
-          className={`ml-auto size-3.5 text-slate-300 transition-transform duration-200 ease-out group-hover:text-slate-500 ${
-            open ? "rotate-90 text-slate-700" : ""
+          className={`ml-auto size-4 transition-transform duration-200 ease-out ${
+            open ? "rotate-90 text-blue-600" : "text-slate-300 group-hover:text-slate-500"
           }`}
         />
       </button>
 
-      {/* Expanded Child Panel */}
+      {/* Expanded child panel */}
       {open && (
-        <div className="border-t border-slate-100/80 bg-slate-50/40 px-3.5 py-3 animate-in fade-in-50 duration-150">
+        <div className="animate-in fade-in-50 border-t border-slate-100 bg-slate-50/50 px-3 py-3 duration-150">
           {children}
         </div>
       )}
@@ -82,16 +92,14 @@ function SectionRow({
 
 export function DesignPanel() {
   return (
-    <div className="flex flex-col gap-3 p-1 text-slate-800">
+    <div className="flex flex-col gap-4 p-3 text-slate-800">
       <PanelHeader kicker="Design" title="Shape your slide" description="Tune the canvas, brand language, and background from one place." icon={Palette} />
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)] divide-y divide-slate-100/80">
+      <div className="flex flex-col gap-2.5">
         <SectionRow
           title="Canvas format"
           subtitle="16:9 Presentation (1920 × 1080)"
           Icon={Maximize2}
-          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
-          iconColor="text-blue-600"
           defaultOpen
         >
           <SizePanel />
@@ -101,8 +109,6 @@ export function DesignPanel() {
           title="Brand kit"
           subtitle="Shared typography & colors"
           Icon={Sparkles}
-          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
-          iconColor="text-blue-600"
         >
           <BrandKitPanel />
         </SectionRow>
@@ -111,8 +117,6 @@ export function DesignPanel() {
           title="Background fill"
           subtitle="Solid, gradient, or canvas texture"
           Icon={Palette}
-          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
-          iconColor="text-blue-600"
         >
           <ColorPanel />
         </SectionRow>
@@ -121,8 +125,6 @@ export function DesignPanel() {
           title="Master style"
           subtitle="Push this slide's style deck-wide"
           Icon={Clapperboard}
-          iconBg="bg-blue-50 text-blue-600 dark:bg-blue-950/40"
-          iconColor="text-blue-600"
         >
           <MasterStylePanel />
         </SectionRow>
@@ -132,4 +134,3 @@ export function DesignPanel() {
 }
 
 export default DesignPanel;
-
