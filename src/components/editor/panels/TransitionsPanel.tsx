@@ -21,7 +21,7 @@ export function TransitionsPanel() {
       <PanelHeader
         kicker="Video"
         title="Transitions"
-        description="How each scene flows into the next — hit play in the timeline to preview."
+        description="Pick a transition, or drag one straight onto a clip in the timeline."
         icon={MonitorPlay}
       />
 
@@ -34,7 +34,7 @@ export function TransitionsPanel() {
           columns={3}
           value={current}
           onChange={(t) => setTransition(t)}
-          options={TRANSITION_OPTIONS.map((t) => ({
+          dragPayload={(t) => JSON.stringify({ type: "transition", value: t })}
             value: t,
             label: cap(t),
             title: cap(t),

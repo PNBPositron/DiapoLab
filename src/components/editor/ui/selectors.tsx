@@ -64,15 +64,20 @@ export function ChipGroup<T extends string>({ value, options, onChange, label = 
   </div>;
 }
 
-export function OptionGrid<T extends string>({ value, options, onChange, columns = 2, onPreview, label = "Options", className }: {
+export function OptionGrid<T extends string>({ value, options, onChange, columns = 2, onPreview, label = "Options", className, dragPayload }: {
   value?: T; options: SelectorOption<T>[]; onChange: (value: T) => void; columns?: 2 | 3;
   onPreview?: (value: T | null) => void; label?: string; className?: string;
+  /** when set, every tile becomes draggable and carries this text payload —
+   *  lets panels feed external drop targets (e.g. the video timeline). */
+  dragPayload?: (value: T) => string;
 }) {
   return <div className={cn("selector-grid", columns === 3 ? "grid-cols-3" : "grid-cols-2", className)} role="group" aria-label={label} onMouseLeave={() => onPreview?.(null)}>
     {options.map(option => {
       const Icon = option.icon;
       return <Button key={option.value} type="button" variant="ghost" title={option.title ?? (typeof option.label === "string" ? option.label : undefined)}
         aria-pressed={value === undefined ? undefined : value === option.value}
+        draggable={!!dragPayload}
+        onDragStart={(e) => dragPayload && e.dataTransfer.setData("text/plain", dragPayload(option.value))}
         className="selector-option group rounded-xl" onClick={() => onChange(option.value)}
         onMouseEnter={() => onPreview?.(option.value)} onFocus={() => onPreview?.(option.value)} onBlur={() => onPreview?.(null)}>
         <span className="selector-option-art">{option.preview ?? (Icon && <Icon className="size-5" aria-hidden="true" />)}</span>
