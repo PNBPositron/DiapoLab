@@ -80,11 +80,27 @@ export function SizePanel() {
             const max = 34;
             const tw = ratio >= 1 ? max : max * ratio;
             const th = ratio >= 1 ? max / ratio : max;
+            const landscape = ratio >= 1;
             return {
               value: p.name,
               label: `${p.name} · ${p.w}×${p.h}`,
-              title: p.name,
-              preview: <span className="rounded-[2px] border-2 border-slate-300 bg-slate-50" style={{ width: tw, height: th }} />,
+              title: `${p.name} — ${p.w}×${p.h}`,
+              /* Mini slide mockup: title bar + text lines, scaled to the
+                 real aspect ratio so each preset reads at a glance. */
+              preview: (
+                <span
+                  className="relative flex flex-col justify-between overflow-hidden rounded-[3px] border border-slate-300 bg-gradient-to-br from-white to-slate-100 p-[3px] shadow-[0_1px_2px_rgba(15,23,42,0.08)]"
+                  style={{ width: tw, height: th }}
+                >
+                  <span
+                    className={landscape ? "h-[3px] w-3/5 rounded-[1px] bg-blue-500/80" : "h-[2px] w-3/4 rounded-[1px] bg-blue-500/80"}
+                  />
+                  <span className="flex flex-col gap-[2px]">
+                    <span className={landscape ? "h-[2px] w-full rounded-[1px] bg-slate-300" : "h-[2px] w-full rounded-[1px] bg-slate-300"} />
+                    <span className="h-[2px] w-2/3 rounded-[1px] bg-slate-200" />
+                  </span>
+                </span>
+              ),
             };
           })}
         />
