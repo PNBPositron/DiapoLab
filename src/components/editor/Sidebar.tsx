@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
-import { Home, Type, Shapes, Layers, Palette, Puzzle, Folder, Library } from "lucide-react";
+import { Home, Type, Shapes, Layers, Palette, Puzzle, Folder, Library, Clapperboard } from "lucide-react";
 import "@/editor-ui.css";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -12,6 +12,7 @@ import { DesignPanel } from "./panels/DesignPanel";
 import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { PluginsPanel } from "./panels/PluginsPanel";
 import { MyDesignsDialog } from "./MyDesignsDialog";
+import { TransitionsPanel } from "./panels/TransitionsPanel";
 
 const TOOLS = [
   { id: "home", label: "Home", icon: Home },
@@ -24,8 +25,10 @@ const TOOLS = [
   { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
+const TRANSITIONS_TOOL = { id: "transitions", label: "Transitions", icon: Clapperboard } as const;
+
 export function Sidebar() {
-  const { tool, setTool } = useEditor();
+  const { tool, setTool, videoMode } = useEditor();
   const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme } = useSettings();
   const [hovering, setHovering] = useState(false);
   const [systemReduced, setSystemReduced] = useState(false);
@@ -68,7 +71,11 @@ export function Sidebar() {
   const noMotion = reduceMotion || systemReduced;
   const dur = noMotion ? 0 : panelDurationMs;
   const panelTransition = `transform ${dur}ms ${springEasing(panelStiffness)}, opacity ${Math.round(dur * 0.62)}ms ease, filter ${Math.round(dur * 0.7)}ms ease-out`;
-  const visible = TOOLS.filter((t) => panels[t.id as PanelId] !== false);
+  // Video mode adds the Transitions tool to the rail (own panel).
+  const RAIL_TOOLS = videoMode
+    ? [...TOOLS.filter((t) => t.id !== "my-designs"), TRANSITIONS_TOOL, TOOLS[TOOLS.length - 1]]
+    : TOOLS;
+  const visible = RAIL_TOOLS.filter((t) => (panels as Record<string, boolean>)[t.id] !== false);
   const visibleKey = visible.map((t) => t.id).join(",");
 
   useEffect(() => {
@@ -103,7 +110,7 @@ export function Sidebar() {
         })}
       </nav>
       <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
-        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "library" && <LibraryPanel />}{tool === "design" && <DesignPanel />}{tool === "plugins" && <PluginsPanel />}
+        {tool === "home" && <TemplatesPanel />}{tool === "text" && <TextPanel />}{tool === "components" && <ComponentsPanel />}{tool === "elements" && <ElementsPanel />}{tool === "library" && <LibraryPanel />}{tool === "design" && <DesignPanel />}{tool === "plugins" && <PluginsPanel />}{tool === "transitions" && <TransitionsPanel />}
       </div>
       {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}
     </aside>

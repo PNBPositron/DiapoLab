@@ -7,6 +7,8 @@ import { Canvas } from "@/components/editor/Canvas";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
+import { Timeline } from "@/components/editor/Timeline";
+import { useEditor } from "@/store/editor";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
 import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
 
@@ -30,6 +32,8 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // Video mode swaps the slide-preview bar for the video timeline.
+  const videoMode = useEditor((s) => s.videoMode);
 
   // ⌘K / Ctrl+K toggles the command palette from anywhere in the editor.
   useEffect(() => {
@@ -56,7 +60,7 @@ function Editor() {
           <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
             <Canvas />
           </main>
-          <PagesBar />
+          {videoMode ? <Timeline /> : <PagesBar />}
         </div>
         <PropertiesPanel />
       </div>

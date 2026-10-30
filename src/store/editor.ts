@@ -689,7 +689,7 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "my-designs";
+type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "transitions" | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };
@@ -711,6 +711,8 @@ type State = {
   saveVersion: (name?: string) => void;
   restoreVersion: (id: string) => void;
   presenting: boolean;
+  /** video mode: the bottom bar shows a timeline instead of the slide previews */
+  videoMode: boolean;
   // cloud-saved design metadata
   designId: string | null;
   designName: string;
@@ -755,6 +757,7 @@ type State = {
     scope: "slide" | "deck",
   ) => void;
   setPresenting: (v: boolean) => void;
+  setVideoMode: (v: boolean) => void;
   setGuides: (g: { v: number[]; h: number[] }) => void;
   /** id of the image element currently in interactive crop mode (double-click) */
   croppingId: string | null;
@@ -1348,6 +1351,7 @@ export const useEditor = create<State>((set, get) => {
     future: [],
     versions: [],
     presenting: false,
+    videoMode: false,
     designId: null,
     designName: "untitled.design",
     guides: { v: [], h: [] },
@@ -1447,6 +1451,7 @@ export const useEditor = create<State>((set, get) => {
       set({ ...syncCurrent(JSON.parse(JSON.stringify(version.pages)), version.currentIndex), selectedId: null, selectedIds: [] });
     },
     setPresenting: (presenting) => set({ presenting }),
+    setVideoMode: (videoMode) => set({ videoMode }),
     setGuides: (guides) => set({ guides }),
     setCroppingId: (croppingId) => set({ croppingId }),
     copySelected: () => {

@@ -29,6 +29,7 @@ import {
   Scale,
   ShieldCheck,
   Search,
+  Clapperboard,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
@@ -84,6 +85,8 @@ export function Toolbar() {
     loadPages,
     setTool,
     setPresenting,
+    videoMode,
+    setVideoMode,
   } = useEditor();
 
   const { user } = useAuth();
@@ -429,6 +432,8 @@ export function Toolbar() {
           onPublish={handlePublish}
           onClear={clear}
           onAssistant={() => setTool("plugins")}
+          onToggleVideoMode={() => setVideoMode(!videoMode)}
+          videoMode={videoMode}
           publishing={publishing}
           isAuthenticated={!!user}
         />
@@ -503,6 +508,8 @@ function LargeModernHamburger({
   onPublish,
   onClear,
   onAssistant,
+  onToggleVideoMode,
+  videoMode,
   publishing,
   isAuthenticated,
 }: {
@@ -510,6 +517,8 @@ function LargeModernHamburger({
   onPublish: () => void;
   onClear: () => void;
   onAssistant: () => void;
+  onToggleVideoMode: () => void;
+  videoMode: boolean;
   publishing: boolean;
   isAuthenticated: boolean;
 }) {
@@ -580,6 +589,19 @@ function LargeModernHamburger({
             title="New design"
             subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
+          />
+
+          <MenuCardItem
+            icon={Clapperboard}
+            iconColor="text-indigo-600"
+            iconBg="bg-indigo-50 group-hover:bg-indigo-100/80"
+            title={videoMode ? "Back to slides editor" : "Create a video project"}
+            subtitle={
+              videoMode
+                ? "Switch the timeline back to slide previews"
+                : "Same editor, with a video timeline & transitions"
+            }
+            onClick={() => handleAction(onToggleVideoMode)}
           />
 
           <MenuCardItem
