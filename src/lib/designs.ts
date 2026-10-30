@@ -78,6 +78,50 @@ export async function createPrivateShare(designId: string): Promise<string> {
   return token;
 }
 
+/* ---------------- Private share links ---------------- */
+
+export type ShareLink = {
+  id: string;
+  design_id: string;
+  token: string;
+  created_at: string;
+  /** Nom du design lié — null si le design a été supprimé depuis. */
+  design_name: string | null;
+};
+
+/** Liste les liens de partage privés de l'utilisateur courant (RLS owner). */
+export async function listMyShareLinks(): Promise<ShareLink[]> {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) return [];
+  const { data, error } = await (supabase as any)
+    .from("design_shares")
+    .select("id, design_id, token, created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = (data ?? []) as Array<{
+    id: string;
+    design_id: string;
+    token: string;
+    created_at: string;
+  }>;
+  // Résolution des noms de designs séparément (le design peut avoir été supprimé).
+  const ids = [...new Set(rows.map((r) => r.design_id))];
+  const names = new Map<string, string>();
+  if (ids.length) {
+    const { data: designs } = await supabase.from("designs").select("id, name").in("id", ids);
+    for (const d of (designs ?? []) as Array<{ id: string; name: string }>) {
+      names.set(d.id, d.name);
+    }
+  }
+  return rows.map((r) => ({ ...r, design_name: names.get(r.design_id) ?? null }));
+}
+
+/** Révoque un lien de partage privé (RLS owner delete). */
+export async function deleteShareLink(id: string): Promise<void> {
+  const { error } = await (supabase as any).from("design_shares").delete().eq("id", id);
+  if (error) throw error;
+}
+
 /* ---------------- Public templates ---------------- */
 
 export type PublicTemplate = {
