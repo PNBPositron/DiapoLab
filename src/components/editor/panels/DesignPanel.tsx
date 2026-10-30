@@ -86,7 +86,6 @@ export function DesignPanel() {
             value: id,
             label: SHORT[id],
             title: title + " — " + subtitle,
-            icon: Icon,
           }))}
         />
       </div>
