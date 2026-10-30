@@ -500,7 +500,7 @@
 
 /* Keep the chrome transparent while giving each actionable control its own lift. */
 .editor-tool-rail {
-  gap: 0.125rem;
+  gap: 0.25rem;
   padding: 0.5rem;
 }
 
