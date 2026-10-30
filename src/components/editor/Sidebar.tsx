@@ -31,6 +31,9 @@ export function Sidebar() {
   const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme } = useSettings();
   const [hovering, setHovering] = useState(false);
   const [systemReduced, setSystemReduced] = useState(false);
+  // Height of the bottom pages bar: the rail runs full height, but the
+  // centered buttons must align with the canvas area only.
+  const [pagesInset, setPagesInset] = useState(0);
   const panelOpen = hovering;
   const customThemes = useSettings((s) => s.customThemes);
 
@@ -54,6 +57,16 @@ export function Sidebar() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
+  useEffect(() => {
+    const bar = document.querySelector(".pages-bar");
+    if (!bar) return;
+    const measure = () => setPagesInset(bar.getBoundingClientRect().height);
+    measure();
+    const obs = new ResizeObserver(measure);
+    obs.observe(bar);
+    return () => obs.disconnect();
+  }, []);
+
   const noMotion = reduceMotion || systemReduced;
   const dur = noMotion ? 0 : panelDurationMs;
   const panelTransition = `transform ${dur}ms ${springEasing(panelStiffness)}, opacity ${Math.round(dur * 0.62)}ms ease, filter ${Math.round(dur * 0.7)}ms ease-out`;
@@ -67,7 +80,10 @@ export function Sidebar() {
 
   return (
     <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-      <nav className="editor-tool-rail flex h-full w-[4.5rem] min-h-0 flex-col justify-center gap-2.5 overflow-y-auto overscroll-contain p-2 pt-3 pb-6">
+      <nav
+        style={{ paddingBottom: pagesInset || undefined }}
+        className="editor-tool-rail flex h-full w-[4.5rem] min-h-0 flex-col justify-center gap-2.5 overflow-y-auto overscroll-contain p-2 pt-3 pb-6"
+      >
         {visible.map((t) => {
           const Icon = t.icon;
           const active = tool === t.id;
