@@ -8,7 +8,7 @@ const cap = (s: string) =>
 
 /**
  * TransitionsPanel — video-mode sidebar tool: pick how each scene flows
- * into the next. Uses the shared OptionGrid, like every other panel.
+ * into the next. Every tile is also draggable onto a timeline clip.
  */
 export function TransitionsPanel() {
   const { pages, currentIndex, setTransition, setTransitionZoom, applyTransitionToDeck } = useEditor();
@@ -35,6 +35,7 @@ export function TransitionsPanel() {
           value={current}
           onChange={(t) => setTransition(t)}
           dragPayload={(t) => JSON.stringify({ type: "transition", value: t })}
+          options={TRANSITION_OPTIONS.map((t) => ({
             value: t,
             label: cap(t),
             title: cap(t),
