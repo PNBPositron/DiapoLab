@@ -10,7 +10,7 @@ import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
-import { PanelHeader } from "../ui/selectors";
+import { PanelHeader, SegmentedControl } from "../ui/selectors";
 
 type SectionId = "canvas" | "brand" | "background" | "master";
 
@@ -52,9 +52,9 @@ const SECTIONS: {
 ];
 
 /**
- * DesignPanel — organised like the Templates (presets) panel:
- * a grid of quick tiles to pick the active tool, a micro-caption section
- * label, then the tool's content below.
+ * DesignPanel — organised exactly like the Components (presets) panel:
+ * PanelHeader, then the shared SegmentedControl to pick the active tool,
+ * a micro-caption section label, then the tool's content below.
  */
 export function DesignPanel() {
   const [section, setSection] = useState<SectionId>("canvas");
@@ -70,41 +70,19 @@ export function DesignPanel() {
         icon={Palette}
       />
 
-      {/* ── Quick tiles — same grid as the TemplatesPanel quick start ── */}
-      <div className="grid grid-cols-4 gap-2 px-4">
-        {SECTIONS.map(({ id, title, Icon }) => {
-          const on = id === section;
-          return (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setSection(id)}
-              aria-pressed={on}
-              className={`group flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] ${
-                on
-                  ? "border-blue-600 bg-blue-50/70 shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)]"
-                  : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)]"
-              }`}
-            >
-              <span
-                className={`grid size-8 place-items-center rounded-lg transition-colors ${
-                  on
-                    ? "bg-blue-600 text-white"
-                    : "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
-                }`}
-              >
-                <Icon className="size-4" />
-              </span>
-              <span
-                className={`text-[10px] font-semibold leading-tight ${
-                  on ? "text-blue-700" : "text-slate-700"
-                }`}
-              >
-                {title.split(" ")[0]}
-              </span>
-            </button>
-          );
-        })}
+      {/* ── Same shared SegmentedControl as the ComponentsPanel ── */}
+      <div className="px-4">
+        <SegmentedControl
+          value={section}
+          onChange={setSection}
+          label="Design category"
+          options={SECTIONS.map(({ id, title, subtitle, Icon }) => ({
+            value: id,
+            label: title.split(" ")[0],
+            title: title + " — " + subtitle,
+            icon: Icon,
+          }))}
+        />
       </div>
 
       {/* ── Active section — micro-caption label, then content ── */}
