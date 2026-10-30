@@ -209,12 +209,15 @@
     color: #475569;
   }
 
-  .editor-side-panel button:not(:disabled):focus-visible,
+  .editor-side-panel button:not(:disabled):focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.45);
+    outline-offset: 2px;
+  }
+  /* Inputs keep their soft :focus border + shadow instead of a rectangle. */
   .editor-side-panel input:focus-visible,
   .editor-side-panel textarea:focus-visible,
   .editor-side-panel select:focus-visible {
-    outline: 2px solid rgba(59, 130, 246, 0.45);
-    outline-offset: 2px;
+    outline: none;
   }
 
   .editor-side-panel .panel-intro {
@@ -431,12 +434,14 @@
   border-color: color-mix(in srgb, var(--blue) 42%, var(--border));
   box-shadow: 0 8px 20px -10px rgba(79, 70, 229, 0.35);
 }
-.editor-ui button:focus-visible,
+.editor-ui button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
+  outline-offset: 2px;
+}
 .editor-ui input:focus-visible,
 .editor-ui textarea:focus-visible,
 .editor-ui select:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
-  outline-offset: 2px;
+  outline: none;
 }
 .editor-ui .bg-paper {
   background: var(--paper);
@@ -588,12 +593,14 @@
 }
 
 /* Discreet focus: thin ring instead of a heavy outline. */
-.editor-ui button:focus-visible,
+.editor-ui button:focus-visible {
+  outline: 1.5px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
 .editor-ui input:focus-visible,
 .editor-ui textarea:focus-visible,
 .editor-ui select:focus-visible {
-  outline: 1.5px solid rgba(37, 99, 235, 0.45);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Hover lift kept minimal everywhere in the chrome. */
