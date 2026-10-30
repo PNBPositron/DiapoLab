@@ -689,7 +689,7 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "illustrations" | "unsplash" | "my-designs";
+type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };

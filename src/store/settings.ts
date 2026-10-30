@@ -7,10 +7,9 @@ export type PanelId =
   | "text"
   | "components"
   | "elements"
-  | "illustrations"
+  | "library"
   | "design"
   | "plugins"
-  | "unsplash"
   | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
@@ -18,10 +17,9 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   text: "Text",
   components: "Components",
   elements: "Elements",
-  illustrations: "Illus.",
+  library: "Library",
   design: "Design",
   plugins: "Plugins",
-  unsplash: "Unsplash",
   "my-designs": "Projects",
 };
 
@@ -92,10 +90,9 @@ const ALL_ON: Record<PanelId, boolean> = {
   text: true,
   components: true,
   elements: true,
-  illustrations: true,
+  library: true,
   design: true,
   plugins: true,
-  unsplash: true,
   "my-designs": true,
 };
 
@@ -142,12 +139,20 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 6,
+      version: 7,
       migrate: (state) => {
         const previous = state as SettingsState;
         const previousTheme = previous?.editorTheme;
+        // Unsplash + Illustrations merged into the Library panel — carry the
+        // old visibility flags over so the rail button stays visible.
+        const prevPanels = (previous?.panels ?? {}) as Record<string, boolean | undefined>;
+        const panels = { ...prevPanels } as Record<PanelId, boolean>;
+        delete (panels as Record<string, boolean | undefined>).unsplash;
+        delete (panels as Record<string, boolean | undefined>).illustrations;
+        if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         return {
           ...previous,
+          panels,
           customThemes: previous?.customThemes ?? [],
           // Editor chrome is intentionally light; reset removed dark and legacy values.
           editorTheme: DEFAULT_EDITOR_THEME,

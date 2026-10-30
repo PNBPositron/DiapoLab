@@ -10,7 +10,7 @@ type UnsplashPhoto = {
   user: { name: string; links: { html: string } };
 };
 
-export function UnsplashPanel() {
+export function UnsplashPanel({ embedded = false }: { embedded?: boolean } = {}) {
   const { add, setBgImage } = useEditor();
   const [query, setQuery] = useState("abstract presentation");
   const [photos, setPhotos] = useState<UnsplashPhoto[]>([]);
@@ -55,7 +55,7 @@ export function UnsplashPanel() {
 
   return (
     <div className="panel-content">
-      <PanelHeader kicker="Unsplash" title="Photos" description="Free photos from Unsplash creators — click to add, or set as background." icon={Camera} />
+      {!embedded && <PanelHeader kicker="Unsplash" title="Photos" description="Free photos from Unsplash creators — click to add, or set as background." icon={Camera} />}
 
       <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-400 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.14)]">
         <Search className="size-4" />

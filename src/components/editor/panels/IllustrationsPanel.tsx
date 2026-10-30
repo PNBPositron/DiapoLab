@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, X, Check, Sparkles, User, Filter, Boxes } from "lucide-react";
 import { newImage, useEditor } from "@/store/editor";
 import { useSettings } from "@/store/settings";
-import { PanelHeader } from "../ui/selectors";
+import { PanelHeader, SegmentedControl } from "../ui/selectors";
 
 const HIGHLIGHTS = [
   ...Array.from({ length: 17 }, (_, i) => `Arrow-${i + 1}.svg`),
@@ -73,7 +73,7 @@ function displayName(file: string): string {
 
 type Collection = "Highlights" | "Transhumans" | "Icons";
 
-export function IllustrationsPanel() {
+export function IllustrationsPanel({ embedded = false }: { embedded?: boolean } = {}) {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
   const isDark = editorTheme?.includes("dark");
@@ -113,53 +113,19 @@ export function IllustrationsPanel() {
 
   return (
     <div className="flex h-full flex-col gap-3.5 p-1 text-slate-800 dark:text-slate-100">
-      <PanelHeader kicker="Illus." title="Illustrations" description="Hand-drawn highlights, characters and 3D icons for your slides." icon={Sparkles} />
+      {!embedded && <PanelHeader kicker="Illus." title="Illustrations" description="Hand-drawn highlights, characters and 3D icons for your slides." icon={Sparkles} />}
 
-      {/* Tabs — single row */}
-      <div className="flex rounded-xl bg-slate-100/90 p-1 backdrop-blur-sm dark:bg-slate-850">
-        <button
-          type="button"
-          onClick={() => setActiveTab("Highlights")}
-          title="Highlights"
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "Highlights"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <Sparkles className="size-3.5" />
-          <span>Highl.</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("Transhumans")}
-          title="Transhumans"
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "Transhumans"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <User className="size-3.5" />
-          <span>Transhumans</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("Icons")}
-          title="3D Icons"
-          className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
-            activeTab === "Icons"
-              ? "bg-white text-slate-900 shadow-sm dark:bg-slate-750 dark:text-white"
-              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-          }`}
-        >
-          <Boxes className="size-3.5" />
-          <span>3D</span>
-        </button>
-      </div>
-
+      {/* Tabs — shared SegmentedControl, same as every other panel */}
+      <SegmentedControl
+        label="Illustration collection"
+        value={activeTab}
+        onChange={setActiveTab}
+        options={[
+          { value: "Highlights", label: "Highl.", icon: Sparkles, title: "Highlights" },
+          { value: "Transhumans", label: "Transhumans", icon: User, title: "Transhumans characters" },
+          { value: "Icons", label: "3D", icon: Boxes, title: "3D icons" },
+        ]}
+      />
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
