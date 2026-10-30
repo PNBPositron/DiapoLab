@@ -32,11 +32,22 @@ export function PagesBar() {
   // Slightly larger previews by default; they shrink to fit the row instead
   // of overflowing once there are too many slides.
   const BASE_THUMB = 126;
+  // Portrait formats (A4, Story…) would make the bar grow very tall if sized
+  // from width alone — cap the thumbnail height so the bar stays slim and
+  // never eats the workspace (it used to overlap the sidebar rail bottom).
+  const MAX_THUMB_H = 84;
   const fit = Math.floor((rowWidth - 96 - 12) / Math.max(1, pages.length)) - 12;
   const size = rowWidth > 0 ? Math.max(48, Math.min(BASE_THUMB, fit)) : BASE_THUMB;
   const ratio = canvasW / canvasH;
-  const thumbW = ratio >= 1 ? size : size * ratio;
-  const thumbH = ratio >= 1 ? size / ratio : size;
+  let thumbW: number;
+  let thumbH: number;
+  if (ratio >= 1) {
+    thumbW = size;
+    thumbH = size / ratio;
+  } else {
+    thumbH = Math.min(size, MAX_THUMB_H);
+    thumbW = thumbH * ratio;
+  }
 
   return (
     <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 py-2 pl-[4.5rem] pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
