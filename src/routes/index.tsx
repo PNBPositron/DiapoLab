@@ -16,10 +16,10 @@ export const Route = createFileRoute("/")({
   component: Editor,
   head: () => ({
     meta: [
-      { title: "DiapoLab — Design & Presentation Editor" },
-      { name: "description", content: "DiapoLab - Next generation open source presentation editor" },
-      { property: "og:title", content: "DiapoLab — Design workspace" },
-      { property: "og:description", content: "DiapoLab - Next generation open source presentation editor" },
+      { title: "DiapoLab-NextGen Open Source Presentation Editor" },
+      { name: "description", content: "DiapoLab-NextGen Open Source Presentation Editor" },
+      { property: "og:title", content: "DiapoLab-NextGen Open Source Presentation Editor" },
+      { property: "og:description", content: "DiapoLab-NextGen Open Source Presentation Editor" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
@@ -53,7 +53,7 @@ function Editor() {
 
   return (
     <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
-      <h1 className="sr-only">DiapoLab — Design &amp; Presentation Editor</h1>
+      <h1 className="sr-only">DiapoLab-NextGen Open Source Presentation Editor</h1>
       <Toolbar />
       {/* Sidebar spans the full workspace height (it runs alongside the
           pages bar), but the rail buttons are centered against the canvas
