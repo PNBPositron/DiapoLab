@@ -31,7 +31,11 @@ export type BrandKit = {
   text: string;
   headingFont: string;
   bodyFont: string;
+  /** when true, the kit cannot be edited (protected against accidents) */
+  locked?: boolean;
 };
+
+export type CustomFont = { id: string; name: string; dataUrl: string };
 
 export const DEFAULT_BRAND_KIT: BrandKit = {
   primary: "#2b6bff",
@@ -52,7 +56,11 @@ type SettingsState = {
   reduceMotion: boolean;
   brandKit: BrandKit;
   appAccent: string;
+  customFonts: CustomFont[];
   customThemes: CustomTheme[];
+  customFonts: CustomFont[];
+  addCustomFont: (f: CustomFont) => void;
+  removeCustomFont: (id: string) => void;
   addCustomTheme: (t: CustomTheme) => void;
   removeCustomTheme: (id: string) => void;
   setBrandKit: (patch: Partial<BrandKit>) => void;
@@ -108,6 +116,11 @@ export const useSettings = create<SettingsState>()(
       brandKit: { ...DEFAULT_BRAND_KIT },
       appAccent: "#4f46e5",
       customThemes: [],
+      customFonts: [],
+      addCustomFont: (f) =>
+        set((s) => ({ customFonts: [...s.customFonts.filter((x) => x.id !== f.id), f] })),
+      removeCustomFont: (id) =>
+        set((s) => ({ customFonts: s.customFonts.filter((x) => x.id !== id) })),
       addCustomTheme: (t) =>
         set((s) => ({ customThemes: [...s.customThemes.filter((x) => x.id !== t.id), t] })),
       removeCustomTheme: (id) =>
@@ -139,7 +152,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 7,
+      version: 8,
       migrate: (state) => {
         const previous = state as SettingsState;
         const previousTheme = previous?.editorTheme;
@@ -152,6 +165,7 @@ export const useSettings = create<SettingsState>()(
         if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         return {
           ...previous,
+          customFonts: previous?.customFonts ?? [],
           panels,
           customThemes: previous?.customThemes ?? [],
           // Editor chrome is intentionally light; reset removed dark and legacy values.

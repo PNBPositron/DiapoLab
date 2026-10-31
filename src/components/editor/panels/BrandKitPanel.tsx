@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { useSettings, DEFAULT_BRAND_KIT, type BrandKit } from "@/store/settings";
-import { WandSparkles, Check, Layers, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useSettings, DEFAULT_BRAND_KIT, type BrandKit, type CustomFont } from "@/store/settings";
+import { WandSparkles, Check, Layers, RotateCcw, Upload, Trash2, Lock, LockOpen } from "lucide-react";
 import { EDITOR_COLOR_PALETTE, useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { Dropdown } from "../ui/Dropdown";
+import { registerCustomFont, unregisterCustomFont } from "@/lib/fontLoader";
 
 const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
   { key: "primary", label: "Primary", hint: "Main brand color — buttons, highlights" },
@@ -15,7 +16,7 @@ const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
 ];
 
 export function BrandKitPanel() {
-  const { brandKit, setBrandKit, resetBrandKit } = useSettings();
+  const { brandKit, setBrandKit, resetBrandKit, customFonts, addCustomFont, removeCustomFont } = useSettings();
   const applyBrandKit = useEditor((s) => s.applyBrandKit);
   const currentPage = useEditor((s) => s.pages[s.currentIndex]);
   const adaptToSlide = () => {
@@ -42,6 +43,37 @@ export function BrandKitPanel() {
   };
   const [generating, setGenerating] = useState(false);
   const [openKey, setOpenKey] = useState<keyof BrandKit | null>(null);
+  const locked = !!brandKit.locked;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingFont, setUploadingFont] = useState(false);
+
+  useEffect(() => {
+    for (const f of customFonts) void registerCustomFont(f.name, f.dataUrl);
+  }, [customFonts]);
+
+  const onFontUpload = async (file: File) => {
+    setUploadingFont(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+      const name =
+        file.name.replace(/\.(ttf|otf|woff2?)$/i, "").replace(/[_-]+/g, " ").trim() ||
+        "Custom font";
+      await registerCustomFont(name, dataUrl);
+      addCustomFont({ id: crypto.randomUUID(), name, dataUrl });
+    } finally {
+      setUploadingFont(false);
+    }
+  };
+
+  const onFontDelete = (f: CustomFont) => {
+    unregisterCustomFont(f.name);
+    removeCustomFont(f.id);
+  };
 
   const generateRandomKit = () => {
     setGenerating(true);
@@ -54,6 +86,23 @@ export function BrandKitPanel() {
     <div className="space-y-4">
       <PanelHeader title="Brand Kit" />
 
+      {/* Verrou : protège le kit contre les modifications accidentelles */}
+      <div className="px-4">
+        <button
+          type="button"
+          onClick={() => setBrandKit({ locked: !locked })}
+          className={`flex w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[11px] font-semibold transition ${
+            locked
+              ? "border-amber-300 bg-amber-50 text-amber-700"
+              : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
+          }`}
+        >
+          {locked ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
+          {locked ? "Brand kit locked - unlock to edit" : "Lock brand kit"}
+        </button>
+      </div>
+
+      <div className={locked ? "pointer-events-none opacity-60" : ""}>
       {/* Générateur */}
       <div className="px-4">
         <button
@@ -144,12 +193,52 @@ export function BrandKitPanel() {
             </span>
             <Dropdown
               value={brandKit[key]}
-              options={FONTS.map((f) => f.family)}
+              options={[...FONTS.map((f) => f.family), ...customFonts.map((f) => f.name)]}
               onChange={(v) => setBrandKit({ [key]: v })}
               className="text-[11px]"
             />
           </label>
         ))}
+      </div>
+
+      {/* Polices personnalisées (upload) */}
+      <div className="space-y-2 px-4">
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom fonts</div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void onFontUpload(file);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          disabled={uploadingFont}
+          onClick={() => fileInputRef.current?.click()}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-60"
+        >
+          <Upload className="size-3.5" /> {uploadingFont ? "Importing..." : "Upload a font (.ttf, .otf, .woff, .woff2)"}
+        </button>
+        {customFonts.map((f) => (
+          <div key={f.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2">
+            <span className="truncate text-[12px] text-slate-800" style={{ fontFamily: f.name }}>
+              {f.name}
+            </span>
+            <button
+              type="button"
+              onClick={() => onFontDelete(f)}
+              className="text-slate-400 transition hover:text-red-500"
+              title={`Remove ${f.name}`}
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
       </div>
 
       {/* Application */}

@@ -7,6 +7,44 @@
 const loadedLinks = new Set<string>();
 const loadedFonts = new Set<string>();
 
+// User-uploaded fonts (Brand Kit): name (lowercased) -> data URL.
+const customFontUrls = new Map<string, string>();
+const customFontFaces = new Map<string, FontFace>();
+
+/** Register a user-uploaded font file (data URL) as a usable CSS family. */
+export function registerCustomFont(name: string, dataUrl: string): Promise<void> {
+  const key = name.toLowerCase();
+  if (customFontUrls.has(key)) return Promise.resolve();
+  customFontUrls.set(key, dataUrl);
+  try {
+    const face = new FontFace(name, `url(${dataUrl})`);
+    return face
+      .load()
+      .then((loaded) => {
+        customFontFaces.set(key, loaded);
+        document.fonts.add(loaded);
+      })
+      .catch(() => {});
+  } catch {
+    return Promise.resolve();
+  }
+}
+
+/** Remove a previously registered custom font (Brand Kit deletion). */
+export function unregisterCustomFont(name: string) {
+  const key = name.toLowerCase();
+  customFontUrls.delete(key);
+  const face = customFontFaces.get(key);
+  if (face) {
+    try {
+      document.fonts.delete(face);
+    } catch {
+      /* ignore */
+    }
+    customFontFaces.delete(key);
+  }
+}
+
 /** Extract the first, clean font family name from a CSS font-family value. */
 export function parseFirstFamily(raw: string): string | null {
   const first = raw.split(",")[0] ?? "";
@@ -67,7 +105,7 @@ export async function ensureFontFamily(family?: string | null) {
   const name = parseFirstFamily(clean);
   if (!name) return;
 
-  await injectStylesheet(name);
+  // Custom fonts are registered locally — never hit Google Fonts for them.
 
   const key = name.toLowerCase();
   if (loadedFonts.has(key)) return;

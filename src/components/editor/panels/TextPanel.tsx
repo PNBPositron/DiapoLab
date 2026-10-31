@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Type, Heading1, Heading2, AlignLeft, Plus } from "lucide-react";
 import { useEditor, newText } from "@/store/editor";
+import { useSettings } from "@/store/settings";
 import { PanelHeader, SearchField, ChipGroup } from "../ui/selectors";
 export { PanelHeader } from "../ui/selectors";
 
@@ -78,20 +79,25 @@ export const FONTS: FontDef[] = [
   { family: "Space Mono", weight: 700, category: "Mono" },
 ];
 
-const CATEGORIES = ["All", ...Array.from(new Set(FONTS.map((f) => f.category)))];
+const CATEGORIES = ["All", ...Array.from(new Set([...FONTS.map((f) => f.category), "Custom"]))];
 
 export function TextPanel() {
   const { add } = useEditor();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const customFonts = useSettings((s) => s.customFonts);
+  const allFonts = useMemo(
+    () => [...FONTS, ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" }))],
+    [customFonts],
+  );
 
   const filteredFonts = useMemo(() => {
-    return FONTS.filter((font) => {
+    return allFonts.filter((font) => {
       const matchesCategory = activeCategory === "All" || font.category === activeCategory;
       const matchesSearch = font.family.toLowerCase().includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [search, activeCategory]);
+  }, [allFonts, search, activeCategory]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-3 text-slate-800">

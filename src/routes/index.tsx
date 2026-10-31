@@ -9,6 +9,8 @@ import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
 import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
+import { useSettings } from "@/store/settings";
+import { registerCustomFont } from "@/lib/fontLoader";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -30,6 +32,12 @@ export const Route = createFileRoute("/")({
 
 function Editor() {
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const customFonts = useSettings((s) => s.customFonts);
+
+  // Re-register user-uploaded fonts (from the Brand Kit) on every load.
+  useEffect(() => {
+    for (const f of customFonts) void registerCustomFont(f.name, f.dataUrl);
+  }, [customFonts]);
 
   // ⌘K / Ctrl+K toggles the command palette from anywhere in the editor.
   useEffect(() => {
