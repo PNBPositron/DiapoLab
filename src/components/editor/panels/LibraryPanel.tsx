@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Camera, Sparkles } from "lucide-react";
+import { Camera, Sparkles, Shapes } from "lucide-react";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 import { UnsplashPanel } from "./UnsplashPanel";
 import { IllustrationsPanel } from "./IllustrationsPanel";
+import { IconsPanel } from "./IconsPanel";
 
-type LibTab = "photos" | "illus";
+type LibTab = "photos" | "illus" | "icons";
 
 /**
  * LibraryPanel — Unsplash photos and illustrations merged into one tool.
@@ -19,7 +20,7 @@ export function LibraryPanel() {
       <PanelHeader
         kicker="Library"
         title="Photos & illustrations"
-        description="Free Unsplash photos, hand-drawn highlights, characters and 3D icons."
+        description="Free Unsplash photos, illustrations, and recolorable vector icons."
         icon={Camera}
       />
 
@@ -31,11 +32,18 @@ export function LibraryPanel() {
           options={[
             { value: "photos", label: "Photos", icon: Camera, title: "Unsplash photos" },
             { value: "illus", label: "Illus.", icon: Sparkles, title: "Highlights, characters & 3D icons" },
+            { value: "icons", label: "Icons", icon: Shapes, title: "Recolorable vector icons" },
           ]}
         />
       </div>
 
-      {tab === "photos" ? <UnsplashPanel embedded /> : <IllustrationsPanel embedded />}
+      {tab === "photos" ? (
+        <UnsplashPanel embedded />
+      ) : tab === "illus" ? (
+        <IllustrationsPanel embedded />
+      ) : (
+        <IconsPanel embedded />
+      )}
     </div>
   );
 }
