@@ -134,6 +134,16 @@ type Handle = "nw" | "ne" | "sw" | "se";
  *  handles changes the frame while the image content stays pixel-still. */
 export type CropRect = { l: number; t: number; r: number; b: number };
 
+/** Smart-crop ratio presets (Canva-style): refit the image frame to a fixed
+ *  aspect ratio while keeping its center (the crop window cover-fits inside). */
+const CROP_RATIOS: Array<{ label: string; r: number }> = [
+  { label: "1:1", r: 1 },
+  { label: "4:3", r: 4 / 3 },
+  { label: "3:2", r: 3 / 2 },
+  { label: "16:9", r: 16 / 9 },
+  { label: "9:16", r: 9 / 16 },
+];
+
 /** Layout of the <img> when a cropRect is active. Returns the absolute
  *  width/height/left/top of the full-size image inside the frame. */
 function cropRectLayout(
@@ -732,6 +742,24 @@ export function CanvasElement({
     window.addEventListener("mouseup", onUp);
   };
 
+  // Smart-crop: refit the frame to a fixed aspect ratio, keeping its center.
+  const applyCropRatio = (r: number) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const W = element.width;
+    const H = element.height;
+    const cur = W / H;
+    let nw = W;
+    let nh = H;
+    if (r > cur) nh = Math.max(20, W / r);
+    else nw = Math.max(20, H * r);
+    update(element.id, {
+      x: element.x + (W - nw) / 2,
+      y: element.y + (H - nh) / 2,
+      width: nw,
+      height: nh,
+    } as never);
+  };
+
   return (
     <div
       ref={ref}
@@ -1305,6 +1333,43 @@ export function CanvasElement({
                 >
                   Réinitialiser
                 </button>
+              </div>
+              <div
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  top: 48,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex",
+                  gap: 4,
+                  whiteSpace: "nowrap",
+                  zIndex: 2,
+                }}
+              >
+                {CROP_RATIOS.map((c) => {
+                  const active = Math.abs(element.width / element.height - c.r) < 0.005;
+                  return (
+                    <button
+                      key={c.label}
+                      type="button"
+                      onClick={applyCropRatio(c.r)}
+                      style={{
+                        border: "2px solid #0a0f1f",
+                        background: active ? "#ffd84a" : "#ffffff",
+                        color: "#0a0f1f",
+                        fontWeight: active ? 800 : 700,
+                        fontSize: 10,
+                        padding: "4px 8px",
+                        borderRadius: 7,
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
+                      }}
+                    >
+                      {c.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
