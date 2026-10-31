@@ -106,6 +106,9 @@ export async function ensureFontFamily(family?: string | null) {
   if (!name) return;
 
   // Custom fonts are registered locally — never hit Google Fonts for them.
+  if (customFontUrls.has(name.toLowerCase())) return;
+
+  await injectStylesheet(name);
 
   const key = name.toLowerCase();
   if (loadedFonts.has(key)) return;

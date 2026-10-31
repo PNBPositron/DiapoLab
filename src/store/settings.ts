@@ -58,7 +58,6 @@ type SettingsState = {
   appAccent: string;
   customFonts: CustomFont[];
   customThemes: CustomTheme[];
-  customFonts: CustomFont[];
   addCustomFont: (f: CustomFont) => void;
   removeCustomFont: (id: string) => void;
   addCustomTheme: (t: CustomTheme) => void;
