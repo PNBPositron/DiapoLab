@@ -17,9 +17,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DiapoLab — Design & Presentation Editor" },
-      { name: "description", content: "A focused workspace for making polished presentations, posters, and graphics." },
+      { name: "description", content: "DiapoLab - Next generation open source presentation editor" },
       { property: "og:title", content: "DiapoLab — Design workspace" },
-      { property: "og:description", content: "A focused workspace for making polished presentations, posters, and graphics." },
+      { property: "og:description", content: "DiapoLab - Next generation open source presentation editor" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
