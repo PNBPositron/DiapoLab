@@ -77,7 +77,7 @@ function parseXfrm(sp: Element): Partial<Xfrm> {
   return { x, y, width: width || 200, height: height || 60, rotation };
 }
 
-function parseTextBody(sp: Element): { text: string; fontSize: number; color: string; bold: boolean; align: "left" | "center" | "right"; } | null {
+function parseTextBody(sp: Element): { text: string; fontSize: number; color: string; bold: boolean; italic: boolean; underline: boolean; align: "left" | "center" | "right"; } | null {
   const txBody = firstChildByLocal(sp, "txBody");
   if (!txBody) return null;
   const paragraphs = children(txBody, "p");
@@ -85,6 +85,8 @@ function parseTextBody(sp: Element): { text: string; fontSize: number; color: st
   let fontSize = 0;
   let color = "";
   let bold = false;
+  let italic = false;
+  let underline = false;
   let align: "left" | "center" | "right" = "left";
   for (const p of paragraphs) {
     const runs = children(p, "r");
@@ -97,6 +99,8 @@ function parseTextBody(sp: Element): { text: string; fontSize: number; color: st
         const sz = Number(rPr.getAttribute("sz") ?? 0) / 100;
         if (sz > fontSize) fontSize = sz;
         if (rPr.getAttribute("b") === "1") bold = true;
+        if (rPr.getAttribute("i") === "1") italic = true;
+        if (rPr.getAttribute("u") === "sng") underline = true;
         const c = attrColor(rPr);
         if (c) color = c;
       }
@@ -114,6 +118,8 @@ function parseTextBody(sp: Element): { text: string; fontSize: number; color: st
     fontSize: fontSize > 0 ? ptToPx(fontSize) : 28,
     color: color || "#0f172a",
     bold,
+    italic,
+    underline,
     align,
   };
 }
@@ -547,6 +553,8 @@ export async function importPPTXFile(file: File): Promise<void> {
               fontSize: body.fontSize,
               color: body.color,
               fontWeight: body.bold ? 800 : 500,
+              ...(body.italic ? { italic: true } : {}),
+              ...(body.underline ? { underline: true } : {}),
               align: body.align,
             }),
           );
@@ -603,7 +611,29 @@ export async function importPPTXFile(file: File): Promise<void> {
         if (!rid || !box) continue;
         const src = await mediaToDataUrl(zip, rid, rels);
         if (src) {
-          push(newImage(src, { ...box, fit: "contain" }));
+          // PowerPoint crop window (a:srcRect): source edges cut away,
+          // stored in 1/1000 % -> convert to the cropRect fractions.
+          const srcRect = Array.from(node.getElementsByTagName("*")).find(
+            (el) => el.localName === "srcRect",
+          );
+          const frac = (v: string | null) =>
+            v ? Math.min(0.9, Math.max(0, Number(v) / 100000)) : 0;
+          const crop = srcRect
+            ? {
+                l: frac(srcRect.getAttribute("l")),
+                t: frac(srcRect.getAttribute("t")),
+                r: frac(srcRect.getAttribute("r")),
+                b: frac(srcRect.getAttribute("b")),
+              }
+            : undefined;
+          const cropped = crop && (crop.l || crop.t || crop.r || crop.b) ? crop : undefined;
+          push(
+            newImage(src, {
+              ...box,
+              fit: cropped ? "cover" : "contain",
+              ...(cropped ? { cropRect: cropped } : {}),
+            }),
+          );
         }
       }
       if (node.localName === "graphicFrame") {

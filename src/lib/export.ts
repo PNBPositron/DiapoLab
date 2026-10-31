@@ -359,6 +359,19 @@ function entranceTimingXml(effects: Array<{ spid: string; delay: number }>): str
   );
 }
 
+/** DiapoLab shape kind -> PowerPoint preset geometry (prst). Kinds with
+ *  no real OOXML equivalent fall back to a plain rect so nothing is lost. */
+const PPTX_SHAPES: Record<string, string> = {
+  rect: "rect", circle: "ellipse", capsule: "roundRect", ring: "donut",
+  triangle: "triangle", star: "star5", starburst: "star12", gear: "gear9",
+  heart: "heart", diamond: "diamond", hexagon: "hexagon", pentagon: "pentagon",
+  parallelogram: "parallelogram", trapezoid: "trapezoid", cross: "plus",
+  lightning: "lightningBolt", cloud: "cloud", speech: "wedgeEllipseCallout",
+  octagon: "octagon", semicircle: "chord", quarter_circle: "pie",
+  chevron: "chevron", arrow: "rightArrow", moon: "moon", drop: "teardrop",
+  wave: "wave",
+};
+
 export async function exportPPTX(name: string) {
   const { pages, canvasW, canvasH } = useEditor.getState();
   if (pages.length === 0) return;
@@ -367,8 +380,7 @@ export async function exportPPTX(name: string) {
   const pptx = new PptxGenJS();
   // The browser bundle exposes shape types on the presentation instance.
   // Falling back to the documented string keeps exports compatible across versions.
-  const rectangleShape =
-    (pptx as { ShapeType?: { rect?: string } }).ShapeType?.rect ?? "rect";
+  const pptxShapeFor = (kind: string): string => PPTX_SHAPES[kind] ?? "rect";
   const wIn = canvasW / 96;
   const hIn = canvasH / 96;
   const px = (value: number) => value / 96;
@@ -406,20 +418,48 @@ export async function exportPPTX(name: string) {
           fit: "shrink",
           valign: "middle",
           rotate: element.rotation,
+          underline: element.underline ? { style: "sng" } : undefined,
+          charSpacing: element.letterSpacing
+            ? Math.round(element.letterSpacing * element.fontSize * 0.75 * 100) / 100
+            : 0,
+          lineSpacingMultiple: element.lineHeight ?? undefined,
+          transparency: element.opacity != null ? Math.round((1 - element.opacity) * 100) : 0,
         });
       } else if (element.type === "shape") {
-        slide.addShape(rectangleShape as never, {
+        const noFill = element.fill === "transparent";
+        slide.addShape(pptxShapeFor(element.shape) as never, {
           ...box,
-          fill: { color: element.fill.replace("#", "") },
+          fill: noFill
+            ? { type: "none" }
+            : {
+                color: cssColorToHex(element.fill) || "E2E8F0",
+                ...(element.opacity != null
+                  ? { transparency: Math.round((1 - element.opacity) * 100) }
+                  : {}),
+              },
           line: {
-            color: element.stroke.replace("#", ""),
+            color: cssColorToHex(element.stroke) || "94A3B8",
             width: Math.max(0.5, element.strokeWidth / 2),
+            ...(element.strokeStyle === "dashed" ? { dash: "dash" } : {}),
+            ...(element.strokeStyle === "dotted" ? { dash: "sysDot" } : {}),
+            ...(element.stroke === "transparent" ? { transparency: 100 } : {}),
           },
           rotate: element.rotation,
+          ...(element.shape === "rect" && element.cornerRadius
+            ? { rectRadius: element.cornerRadius / 96 }
+            : {}),
         });
       } else if ((element.type === "image" || element.type === "video") && element.src) {
         // PPTX supports still images natively; videos are retained as a poster/frame when possible.
-        slide.addImage({ data: element.src, ...box, transparency: 0, rotate: element.rotation });
+        slide.addImage({
+          data: element.src,
+          ...box,
+          transparency:
+            "opacity" in element && element.opacity != null
+              ? Math.round((1 - element.opacity) * 100)
+              : 0,
+          rotate: element.rotation,
+        });
       } else if (element.type === "embed" && element.src) {
         // iframes can't live inside PPTX — keep a clickable placeholder card.
         slide.addText(element.title || "Web embed", {
@@ -436,6 +476,7 @@ export async function exportPPTX(name: string) {
         });
       }
     }
+    if (page.notes) slide.addNotes(page.notes);
     motion.push({ transition: page.transition ?? "none", anims });
   }
 
