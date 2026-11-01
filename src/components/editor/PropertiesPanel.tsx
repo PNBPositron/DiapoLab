@@ -440,6 +440,9 @@ export function PropertiesPanel() {
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [jsonDirty, setJsonDirty] = useState(false);
   const [ratioLock, setRatioLock] = useState(true);
+  const [selectedKf, setSelectedKf] = useState<string | null>(null);
+  const [kfDrag, setKfDrag] = useState<string | null>(null);
+  const kfTrackRef = React.useRef<HTMLDivElement | null>(null);
   const croppingId = useEditor((s) => s.croppingId);
 
   const el = elements.find((e) => e.id === selectedId);
@@ -512,6 +515,13 @@ export function PropertiesPanel() {
     opacity: (el as { opacity?: number }).opacity ?? 1,
   });
   const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
+  const kfTotal = el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
+  const kfTimeAt = (clientX: number) => {
+    const rect = kfTrackRef.current?.getBoundingClientRect();
+    if (!rect) return 0;
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    return Math.round((pct * kfTotal) / 50) * 50;
+  };
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
     <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
@@ -1621,48 +1631,107 @@ export function PropertiesPanel() {
               {sortedKfs.length > 0 && sortedKfs.length < 2 && (
                 <p className="text-[10px] font-medium text-amber-600">Add at least 2 keyframes to animate.</p>
               )}
-              <div className="space-y-2">
-                {sortedKfs.map((k, i) => (
-                  <div key={k.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500">#{i + 1}</span>
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="number"
-                          min={0}
-                          step={50}
-                          value={k.t}
-                          aria-label="Keyframe time in ms"
-                          onChange={(e) => {
-                            const v = Number(e.target.value);
-                            if (Number.isFinite(v) && v >= 0)
-                              setKfs(kfs.map((x) => (x.id === k.id ? { ...x, t: v } : x)));
-                          }}
-                          className="w-16 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-right font-mono text-[10px] text-slate-700 outline-none"
-                        />
-                        <span className="text-[9px] text-slate-400">ms</span>
+                            <div className="space-y-2">
+                {/* Timeline track: click the line to add, drag diamonds to move */}
+                <div className="flex items-center justify-between px-0.5 text-[9px] font-mono text-slate-400">
+                  <span>0 ms</span>
+                  <span>{kfTotal} ms</span>
+                </div>
+                <div
+                  ref={kfTrackRef}
+                  title="Click the line to add a keyframe at that time"
+                  onClick={(e) => {
+                    const t = kfTimeAt(e.clientX);
+                    const nk = captureState(t);
+                    setKfs([...kfs, nk]);
+                    setSelectedKf(nk.id);
+                  }}
+                  className="relative h-10 cursor-copy rounded-lg border border-slate-200 bg-slate-50 transition hover:border-sky-300 hover:bg-sky-50/60"
+                >
+                  <div className="pointer-events-none absolute inset-x-1.5 top-1/2 h-0.5 -translate-y-1/2 rounded bg-gradient-to-r from-sky-300 to-indigo-300" />
+                  {sortedKfs.map((k, i) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      title={`Keyframe #${i + 1} at ${k.t} ms`}
+                      aria-label={`Keyframe ${i + 1} at ${k.t} milliseconds`}
+                      onClick={(e) => { e.stopPropagation(); setSelectedKf(k.id); }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+                        setKfDrag(k.id);
+                        setSelectedKf(k.id);
+                      }}
+                      onPointerMove={(e) => {
+                        if (kfDrag !== k.id) return;
+                        const t = kfTimeAt(e.clientX);
+                        setKfs(kfs.map((x) => (x.id === k.id ? { ...x, t } : x)));
+                      }}
+                      onPointerUp={() => setKfDrag(null)}
+                      onPointerCancel={() => setKfDrag(null)}
+                      className="absolute top-1/2 z-10 size-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 cursor-grab rounded-[3px] border shadow-sm transition-transform hover:scale-125 active:cursor-grabbing"
+                      style={{
+                        left: `${(k.t / kfTotal) * 100}%`,
+                        backgroundColor: selectedKf === k.id ? "#0284c7" : "#ffffff",
+                        borderColor: selectedKf === k.id ? "#0369a1" : "#64748b",
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="text-[9px] leading-snug text-slate-400">
+                  Click the line to add a keyframe · drag the diamonds to move them in time · click one to edit it below.
+                </p>
+
+                {/* Inline editor for the selected keyframe */}
+                {(() => {
+                  const k = sortedKfs.find((x) => x.id === selectedKf) ?? sortedKfs[0];
+                  if (!k) return null;
+                  const i = sortedKfs.indexOf(k);
+                  return (
+                    <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-sky-700">Keyframe #{i + 1}</span>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min={0}
+                            step={50}
+                            value={k.t}
+                            aria-label="Keyframe time in ms"
+                            onChange={(e) => {
+                              const v = Number(e.target.value);
+                              if (Number.isFinite(v) && v >= 0)
+                                setKfs(kfs.map((x) => (x.id === k.id ? { ...x, t: v } : x)));
+                            }}
+                            className="w-16 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-right font-mono text-[10px] text-slate-700 outline-none"
+                          />
+                          <span className="text-[9px] text-slate-400">ms</span>
+                        </div>
                       </div>
+                      <div className="mt-1.5 grid grid-cols-3 gap-1">
+                        <button type="button" onClick={() => {
+                          setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
+                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
+                        <button type="button" onClick={() => {
+                          update(el.id, {
+                            x: k.x ?? el.x,
+                            y: k.y ?? el.y,
+                            width: k.width ?? el.width,
+                            height: k.height ?? el.height,
+                            rotation: k.rotation ?? el.rotation,
+                          } as never);
+                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
+                        <button type="button" onClick={() => {
+                          setKfs(kfs.filter((x) => x.id !== k.id));
+                          setSelectedKf(null);
+                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300">Delete</button>
+                      </div>
+                      <p className="mt-1 truncate text-[9px] text-slate-400">
+                        {Math.round(k.x ?? el.x)},{Math.round(k.y ?? el.y)} · {Math.round(k.width ?? el.width)}×{Math.round(k.height ?? el.height)} · {Math.round(k.rotation ?? 0)}° · {Math.round((k.opacity ?? 1) * 100)}%
+                      </p>
                     </div>
-                    <div className="mt-1.5 grid grid-cols-3 gap-1">
-                      <button type="button" onClick={() => {
-                        setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
-                      }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
-                      <button type="button" onClick={() => {
-                        update(el.id, {
-                          x: k.x ?? el.x,
-                          y: k.y ?? el.y,
-                          width: k.width ?? el.width,
-                          height: k.height ?? el.height,
-                          rotation: k.rotation ?? el.rotation,
-                        } as never);
-                      }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
-                      <button type="button" onClick={() => setKfs(kfs.filter((x) => x.id !== k.id))} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300">Delete</button>
-                    </div>
-                    <p className="mt-1 truncate text-[9px] text-slate-400">
-                      {Math.round(k.x ?? el.x)},{Math.round(k.y ?? el.y)} · {Math.round(k.width ?? el.width)}×{Math.round(k.height ?? el.height)} · {Math.round(k.rotation ?? 0)}° · {Math.round((k.opacity ?? 1) * 100)}%
-                    </p>
-                  </div>
-                ))}
+                  );
+                })()}
               </div>
               <button
                 type="button"
