@@ -16,10 +16,10 @@ export const Route = createFileRoute("/")({
   component: Editor,
   head: () => ({
     meta: [
-      { title: "DiapoLab-NextGen Open Source Presentation Editor" },
-      { name: "description", content: "DiapoLab-NextGen Open Source Presentation Editor" },
-      { property: "og:title", content: "DiapoLab-NextGen Open Source Presentation Editor" },
-      { property: "og:description", content: "DiapoLab-NextGen Open Source Presentation Editor" },
+      { title: "DiapoLab — NextGen Open Source Presentation Editor" },
+      { name: "description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, present with speaker notes, import and export PowerPoint files, and make every slide your own." },
+      { property: "og:title", content: "DiapoLab — NextGen Open Source Presentation Editor" },
+      { property: "og:description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, present with speaker notes, import and export PowerPoint files, and make every slide your own." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
@@ -53,7 +53,7 @@ function Editor() {
 
   return (
     <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
-      <h1 className="sr-only">DiapoLab-NextGen Open Source Presentation Editor</h1>
+      <h1 className="sr-only">DiapoLab — NextGen Open Source Presentation Editor</h1>
       <Toolbar />
       {/* Sidebar spans the full workspace height (it runs alongside the
           pages bar), but the rail buttons are centered against the canvas
