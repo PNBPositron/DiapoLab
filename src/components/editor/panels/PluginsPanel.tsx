@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search } from "lucide-react";
+import { Puzzle, Plus, Trash2, Check, Code2, Wand2, PackageOpen, Layers, Brush, Clapperboard, Play, Share2, Search, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
@@ -70,6 +70,9 @@ export function PluginsPanel() {
     .filter((p) => p.enabled)
     .flatMap((p) => (p.apps ?? []).map((a, i) => ({ key: `${p.id}:app:${i}`, pluginName: p.name, app: a })));
 
+  const paintApp = enabledApps.find((x) => x.app.type === "paint")?.app ?? null;
+  const videoApp = enabledApps.find((x) => x.app.type === "video")?.app ?? null;
+
   // The command palette can request an app by name (diapolab:open-app event).
   useEffect(() => {
     const onOpenApp = (e: Event) => {
@@ -85,21 +88,52 @@ export function PluginsPanel() {
   return (
     <div className="space-y-4">
       <PanelHeader
-        kicker="Add-ons"
-        title="Apps & packs"
-        description="Interactive apps and widget packs — each pack ships its own importable code."
-        icon={Puzzle}
+        kicker="Tools"
+        title="Tools"
+        description="Paint, video & Photopea apps, app/widget code imports and widget packs."
+        icon={Wrench}
       />
 
       {/* Photopea — integrated image editor embedded via the Photopea Live
           Messaging API (iframe + postMessage). Same card style as the import buttons. */}
-      <div className="px-4">
+      {/* Direct tool apps — Paint, Video, Photopea */}
+      <div className="space-y-2 px-4">
+        <button
+          onClick={() => paintApp && setAppOpen(paintApp)}
+          disabled={!paintApp}
+          title={paintApp ? "Open the Paint app" : "Enable a paint app plugin below first"}
+          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-white to-indigo-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_14px_30px_-12px_rgba(37,99,235,0.45)] active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
+        >
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xs">
+            <Brush className="size-4" />
+          </span>
+          <span className="relative min-w-0 flex-1">
+            <span className="block truncate text-xs font-bold text-slate-800">Paint — draw & sketch</span>
+            <span className="block truncate text-[10px] font-medium text-slate-500">Doodle on a canvas and drop the result on the slide</span>
+          </span>
+          <Play className="relative size-4 shrink-0 text-blue-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-blue-600" />
+        </button>
+        <button
+          onClick={() => videoApp && setAppOpen(videoApp)}
+          disabled={!videoApp}
+          title={videoApp ? "Open the Video app" : "Enable a video app plugin below first"}
+          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-sky-200/70 bg-gradient-to-r from-sky-50 via-white to-blue-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-[0_14px_30px_-12px_rgba(14,165,233,0.45)] active:translate-y-0 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50"
+        >
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-xs">
+            <Clapperboard className="size-4" />
+          </span>
+          <span className="relative min-w-0 flex-1">
+            <span className="block truncate text-xs font-bold text-slate-800">Video — trim & convert</span>
+            <span className="block truncate text-[10px] font-medium text-slate-500">Cut clips, convert formats and place them on the slide</span>
+          </span>
+          <Play className="relative size-4 shrink-0 text-sky-500 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-sky-600" />
+        </button>
         <button
           onClick={() => setStudioOpen(true)}
           className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-blue-200/70 bg-gradient-to-r from-blue-50 via-white to-indigo-50/70 px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_14px_30px_-12px_rgba(37,99,235,0.45)] active:translate-y-0 active:scale-[0.99]"
         >
           <span className="absolute -top-8 -right-8 size-24 rounded-full bg-blue-100/40 blur-xl transition-transform duration-300 group-hover:scale-125" />
-          <PhotopeaLogo className="size-9 shrink-0 rounded-xl" />
+          <PhotopeaLogo className="relative size-9 shrink-0 rounded-xl" />
           <span className="relative min-w-0 flex-1">
             <span className="block truncate text-xs font-bold text-slate-800">Photopea — image editor</span>
             <span className="block truncate text-[10px] font-medium text-slate-500">Full Photoshop inside DiapoLab — PSD, layers, filters</span>
@@ -108,7 +142,7 @@ export function PluginsPanel() {
         </button>
       </div>
 
-      {/* Import buttons — apps and packs each have their own code format */}
+            {/* Import buttons — apps and packs each have their own code format */}
       <div className="grid grid-cols-2 gap-2 px-4">
         <button
           onClick={() => { setImportOpen("app"); setImportError(null); setImportSuccess(null); }}

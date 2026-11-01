@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
-import { Home, Type, Shapes, Layers, Palette, Puzzle, Folder, Library } from "lucide-react";
+import { Home, Type, Shapes, Layers, Palette, Wrench, Folder, Library } from "lucide-react";
 import "@/editor-ui.css";
 import { TemplatesPanel } from "./panels/TemplatesPanel";
 import { TextPanel } from "./panels/TextPanel";
@@ -20,7 +20,7 @@ const TOOLS = [
   { id: "library", label: "Library", icon: Library },
   { id: "components", label: "Presets", icon: Layers },
   { id: "design", label: "Design", icon: Palette },
-  { id: "plugins", label: "Add-ons", icon: Puzzle },
+  { id: "plugins", label: "Tools", icon: Wrench },
   { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
