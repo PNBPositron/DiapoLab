@@ -41,10 +41,6 @@ export type ElementKeyframe = {
   opacity?: number; // 0..1
   /** easing of the segment ENDING at this keyframe (motion INTO it) */
   easing?: KeyframeEasing;
-  /** captured shadow effect */
-  shadow?: ElementShadow;
-  /** captured image-filter effect */
-  filters?: ImageFilters;
 };
 
 export type ElementBase = {

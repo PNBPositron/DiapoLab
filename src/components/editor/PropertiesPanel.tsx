@@ -85,34 +85,6 @@ const MASK_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "cloud", label: "Cloud" },
 ];
 
-/** Effects Library — live visual effects for shapes, quizzes & charts. */
-const SHAPE_FX: Array<{ v: string; label: string }> = [
-  { v: "none", label: "None" },
-  { v: "liquid_glass", label: "Liquid glass" },
-  { v: "neon", label: "Neon" },
-  { v: "soft_shadow", label: "Soft shadow" },
-  { v: "inner_glow", label: "Inner glow" },
-  { v: "holographic", label: "Holographic" },
-  { v: "glitch", label: "Glitch" },
-  { v: "honeycomb", label: "Honeycomb" },
-];
-
-/** Effects Library — one-click image looks (merged into current filters). */
-const IMAGE_FX: Array<{ label: string; v: Partial<ImageFilters> }> = [
-  { label: "Original", v: DEFAULT_FILTERS },
-  { label: "B&W", v: { grayscale: 100 } },
-  { label: "Sepia", v: { sepia: 60 } },
-  { label: "Vintage", v: { sepia: 35, contrast: 112, saturate: 85, temperature: 30 } },
-  { label: "Cold", v: { temperature: -60 } },
-  { label: "Warm", v: { temperature: 60 } },
-  { label: "Noir", v: { grayscale: 100, contrast: 140, brightness: 92 } },
-  { label: "Dreamy", v: { blur: 2, brightness: 108, saturate: 112 } },
-  { label: "Invert", v: { invert: 100 } },
-  { label: "Glitch", v: { glitch: 45 } },
-  { label: "Pixel", v: { pixelate: 10 } },
-  { label: "Poster", v: { posterize: 5 } },
-];
-
 /** Visual grid picker for image/shape/text masks — real SVG previews per shape. */
 function MaskPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
@@ -288,10 +260,9 @@ function Section({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition hover:bg-slate-100/70"
+        className="flex w-full items-center justify-between px-3.5 py-2.5 text-left transition hover:bg-slate-50/80"
       >
-        <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-600 transition-colors group-hover:text-slate-900">
-          <span className="h-3.5 w-1 rounded-full bg-gradient-to-b from-sky-500 to-indigo-500" />
+        <span className="flex items-center gap-2 text-[11px] font-semibold tracking-wider text-slate-700">
           {title}
         </span>
         <div className="flex items-center gap-2">
@@ -544,11 +515,6 @@ export function PropertiesPanel() {
     rotation: el.rotation,
     opacity: (el as { opacity?: number }).opacity ?? 1,
     easing: sortedKfs[sortedKfs.length - 1]?.easing,
-    shadow: el.shadow ? { ...el.shadow } : undefined,
-    filters:
-      "filters" in el && (el as { filters?: ImageFilters }).filters
-        ? { ...(el as { filters?: ImageFilters }).filters }
-        : undefined,
   });
   const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
   const kfTotal = el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
@@ -1768,10 +1734,6 @@ export function PropertiesPanel() {
                             width: k.width ?? el.width,
                             height: k.height ?? el.height,
                             rotation: k.rotation ?? el.rotation,
-                            shadow: k.shadow ?? el.shadow,
-                            ...("filters" in el
-                              ? { filters: k.filters ?? (el as { filters?: ImageFilters }).filters }
-                              : {}),
                           } as never);
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
                         <button type="button" onClick={() => {
@@ -1808,59 +1770,6 @@ export function PropertiesPanel() {
                 />
               )}
             </Section>
-
-            {/* EFFECTS LIBRARY */}
-            {(el.type === "shape" || el.type === "quiz" || el.type === "chart" || el.type === "image") && (
-              <Section title="Effects Library" defaultOpen={false}>
-                {el.type === "image" ? (
-                  <>
-                    <p className="text-[10px] leading-snug text-slate-500">
-                      One-click looks — applied instantly, then fine-tune in the filters section.
-                    </p>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {IMAGE_FX.map((f) => (
-                        <button
-                          key={f.label}
-                          type="button"
-                          onClick={() =>
-                            update(el.id, {
-                              filters: { ...((el as { filters?: ImageFilters }).filters ?? DEFAULT_FILTERS), ...f.v },
-                            } as never)}
-                          className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 shadow-2xs transition hover:border-sky-400 hover:bg-sky-50/60 hover:text-sky-700"
-                        >
-                          {f.label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-[10px] leading-snug text-slate-500">
-                      Live visual effects for this element.
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {SHAPE_FX.map((f) => {
-                        const active = ((el as { effect?: string }).effect ?? "none") === f.v;
-                        return (
-                          <button
-                            key={f.v}
-                            type="button"
-                            onClick={() => update(el.id, { effect: f.v === "none" ? undefined : f.v } as never)}
-                            className={
-                              active
-                                ? "rounded-full border border-sky-500 bg-sky-50/70 px-2.5 py-1 text-[10px] font-semibold text-sky-700"
-                                : "rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
-                            }
-                          >
-                            {f.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-              </Section>
-            )}
 
             {/* INTERACTION — HOVER & CLICK */}
             <Section title="Interaction (Hover & Click)">
