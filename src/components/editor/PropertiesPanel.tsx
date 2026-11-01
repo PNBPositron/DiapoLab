@@ -505,23 +505,34 @@ export function PropertiesPanel() {
   const kfs = (el.keyframes ?? []) as ElementKeyframe[];
   const setKfs = (next: ElementKeyframe[]) =>
     update(el.id, { keyframes: next.length ? next : undefined } as never);
-  const captureState = (t: number): ElementKeyframe => ({
-    id: crypto.randomUUID(),
-    t,
-    x: el.x,
-    y: el.y,
-    width: el.width,
-    height: el.height,
-    rotation: el.rotation,
-    opacity: (el as { opacity?: number }).opacity ?? 1,
-    easing: sortedKfs[sortedKfs.length - 1]?.easing,
-    shadow: el.shadow ? { ...el.shadow } : undefined,
-    filters:
-      "filters" in el && (el as { filters?: ImageFilters }).filters
-        ? { ...(el as { filters?: ImageFilters }).filters }
-        : undefined,
-    effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
-  });
+  const captureState = (t: number): ElementKeyframe => {
+    // Full JSON snapshot of the element (single source of truth for
+    // "Go to"): every property is captured and restored, whatever the
+    // object type. Keyframe metadata is stripped to avoid recursion.
+    const snapshot = JSON.parse(JSON.stringify(el)) as Record<string, unknown>;
+    delete snapshot.keyframes;
+    delete snapshot.keyframeDuration;
+    // make "no shadow" explicit so Go to can also remove a shadow
+    snapshot.shadow = el.shadow ? { ...el.shadow } : undefined;
+    return {
+      id: crypto.randomUUID(),
+      t,
+      x: el.x,
+      y: el.y,
+      width: el.width,
+      height: el.height,
+      rotation: el.rotation,
+      opacity: (el as { opacity?: number }).opacity ?? 1,
+      easing: sortedKfs[sortedKfs.length - 1]?.easing,
+      shadow: el.shadow ? { ...el.shadow } : undefined,
+      filters:
+        "filters" in el && (el as { filters?: ImageFilters }).filters
+          ? { ...(el as { filters?: ImageFilters }).filters }
+          : undefined,
+      effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
+      snapshot,
+    };
+  };
   const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
   const kfTotal = el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
   const kfTimeAt = (clientX: number) => {
@@ -1734,18 +1745,36 @@ export function PropertiesPanel() {
                           setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
                         <button type="button" onClick={() => {
+                          const snap = { ...(k.snapshot ?? {}) } as Record<string, unknown>;
+                          delete snap.id;
+                          delete snap.keyframes;
+                          delete snap.keyframeDuration;
                           update(el.id, {
+                            ...snap,
                             x: k.x ?? el.x,
                             y: k.y ?? el.y,
                             width: k.width ?? el.width,
                             height: k.height ?? el.height,
                             rotation: k.rotation ?? el.rotation,
-                            shadow: k.shadow ?? el.shadow,
-                            ...("filters" in el
-                              ? { filters: k.filters ?? (el as { filters?: ImageFilters }).filters }
+                            opacity: k.opacity ?? (el as { opacity?: number }).opacity,
+                            shadow: "shadow" in snap
+                              ? (snap as { shadow?: ElementShadow }).shadow
+                              : k.shadow ?? el.shadow,
+                            ...("filters" in el || "filters" in snap
+                              ? {
+                                  filters:
+                                    (snap as { filters?: ImageFilters }).filters ??
+                                    k.filters ??
+                                    (el as { filters?: ImageFilters }).filters,
+                                }
                               : {}),
-                            ...("effect" in el
-                              ? { effect: k.effect ?? (el as { effect?: ElementKeyframe["effect"] }).effect }
+                            ...("effect" in el || "effect" in snap
+                              ? {
+                                  effect:
+                                    (snap as { effect?: ElementKeyframe["effect"] }).effect ??
+                                    k.effect ??
+                                    (el as { effect?: ElementKeyframe["effect"] }).effect,
+                                }
                               : {}),
                           } as never);
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>

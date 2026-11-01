@@ -344,6 +344,29 @@
     background: var(--teal);
     color: var(--ink);
   }
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Slim, discreet scrollbars everywhere in the app chrome */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--teal) 26%, transparent) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--teal) 24%, transparent);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--teal) 42%, transparent);
+  }
 }
 
 @layer utilities {

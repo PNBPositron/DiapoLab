@@ -47,6 +47,8 @@ export type ElementKeyframe = {
   filters?: ImageFilters;
   /** captured shape/quiz/chart visual effect */
   effect?: ShapeEffect;
+  /** full JSON snapshot of the element at capture time — drives "Go to" */
+  snapshot?: Record<string, unknown>;
 };
 
 export type ElementBase = {

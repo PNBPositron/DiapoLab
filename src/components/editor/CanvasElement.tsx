@@ -453,9 +453,18 @@ export function CanvasElement({
     if (!kfs || kfs.length < 2) return;
     const sorted = [...kfs].sort((a, b) => a.t - b.t);
     const base = sorted[0];
-    const anyShadow = sorted.some((k) => k.shadow);
-    const anyFilters = sorted.some((k) => k.filters);
-    const anyEffect = sorted.some((k) => k.effect);
+    // keyframes may carry dedicated fields or a full JSON snapshot —
+    // prefer the dedicated field, fall back to the snapshot.
+    const kfShadowOf = (k: ElementKeyframe) =>
+      k.shadow ?? (k.snapshot as { shadow?: ElementShadow } | undefined)?.shadow;
+    const kfFiltersOf = (k: ElementKeyframe) =>
+      k.filters ?? (k.snapshot as { filters?: ImageFilters } | undefined)?.filters;
+    const kfEffectOf = (k: ElementKeyframe) =>
+      k.effect ??
+      (k.snapshot as { effect?: ElementKeyframe["effect"] } | undefined)?.effect;
+    const anyShadow = sorted.some((k) => kfShadowOf(k));
+    const anyFilters = sorted.some((k) => kfFiltersOf(k));
+    const anyEffect = sorted.some((k) => kfEffectOf(k));
     if (!anyShadow && !anyFilters && !anyEffect) return;
     const duration = Math.max(
       200,
@@ -474,10 +483,19 @@ export function CanvasElement({
         Math.min(1, Math.max(0, raw)),
       );
       const patch: Record<string, unknown> = {};
-      if (anyShadow) patch.shadow = interpShadow(a.shadow ?? base.shadow, b.shadow ?? base.shadow, p);
+      if (anyShadow)
+        patch.shadow = interpShadow(
+          kfShadowOf(a) ?? kfShadowOf(base),
+          kfShadowOf(b) ?? kfShadowOf(base),
+          p,
+        );
       if (anyFilters)
-        patch.filters = interpFilters(a.filters ?? base.filters, b.filters ?? base.filters, p);
-      if (anyEffect) patch.effect = (p >= 1 ? b.effect : a.effect) ?? base.effect;
+        patch.filters = interpFilters(
+          kfFiltersOf(a) ?? kfFiltersOf(base),
+          kfFiltersOf(b) ?? kfFiltersOf(base),
+          p,
+        );
+      if (anyEffect) patch.effect = (p >= 1 ? kfEffectOf(b) : kfEffectOf(a)) ?? kfEffectOf(base);
       setKfFx(patch);
       if (t < duration) raf = requestAnimationFrame(tick);
     };
