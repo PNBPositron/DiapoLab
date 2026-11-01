@@ -17,9 +17,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "DiapoLab — NextGen Open Source Presentation Editor" },
-      { name: "description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, present with speaker notes, import and export PowerPoint files, and make every slide your own." },
+      { name: "description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, import and export PowerPoint files, and make every slide your own." },
       { property: "og:title", content: "DiapoLab — NextGen Open Source Presentation Editor" },
-      { property: "og:description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, present with speaker notes, import and export PowerPoint files, and make every slide your own." },
+      { property: "og:description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, import and export PowerPoint files, and make every slide your own." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
