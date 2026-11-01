@@ -1,6 +1,19 @@
 import { create } from "zustand";
 import { DEFAULT_PAGES } from "@/lib/default-deck";
 
+/** One custom animation keyframe: the element state at time t (ms).
+ *  Undefined fields inherit the first keyframe value at play time. */
+export type ElementKeyframe = {
+  id: string;
+  t: number; // ms from animation start
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  rotation?: number;
+  opacity?: number; // 0..1
+};
+
 export type ElementBase = {
   id: string;
   x: number;
@@ -15,6 +28,10 @@ export type ElementBase = {
   animation?: ElementAnimation;
   /** entrance-animation delay in ms while presenting (stagger objects) */
   animationDelay?: number;
+  /** custom keyframe animation, played while presenting (see ElementKeyframe) */
+  keyframes?: ElementKeyframe[];
+  /** total keyframe timeline length in ms (defaults to the last keyframe t) */
+  keyframeDuration?: number;
   interaction?: ElementInteraction;
   shadow?: ElementShadow;
   /** elements sharing a groupId are selected & moved together (plugin widgets) */

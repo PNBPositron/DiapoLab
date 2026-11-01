@@ -12,6 +12,7 @@ import {
   DEFAULT_FILTERS,
   type ImageFilters,
   type ShapeGradient,
+  type ElementKeyframe,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
@@ -308,6 +309,40 @@ export function CanvasElement({
       ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
       : undefined;
   const entryAnimRef = useRef<Animation | null>(null);
+
+  // ---- Custom keyframe animation (presenting) ----
+  // Interpolates position / size / rotation / opacity across the element
+  // keyframes with the Web Animations API. Plays once per slide entry,
+  // restarts on presenter replay (R). Keyframe transforms are offsets from
+  // the FIRST keyframe, so the canvas resting state is the start pose.
+  const kfAnimRef = useRef<Animation | null>(null);
+  const elementKfs = (element as { keyframes?: ElementKeyframe[] }).keyframes;
+  const elementKfDuration = (element as { keyframeDuration?: number }).keyframeDuration;
+  useEffect(() => {
+    kfAnimRef.current?.cancel();
+    kfAnimRef.current = null;
+    if (!presenting || preview || morph) return;
+    if (!elementKfs || elementKfs.length < 2) return;
+    const node = ref.current;
+    if (!node || typeof node.animate !== "function") return;
+    const sorted = [...elementKfs].sort((a, b) => a.t - b.t);
+    const base = sorted[0];
+    const end = sorted[sorted.length - 1];
+    const frames = sorted.map((k) => ({
+      transform: `translate(${(k.x ?? base.x ?? 0) - (base.x ?? 0)}px, ${(k.y ?? base.y ?? 0) - (base.y ?? 0)}px) rotate(${(k.rotation ?? 0) - (base.rotation ?? 0)}deg) scale(${k.width != null && base.width ? k.width / base.width : 1})`,
+      opacity: k.opacity ?? 1,
+    }));
+    const duration = Math.max(200, elementKfDuration ?? end.t);
+    kfAnimRef.current = node.animate(frames, {
+      duration,
+      easing: "linear",
+      fill: "forwards",
+    });
+    return () => {
+      kfAnimRef.current?.cancel();
+      kfAnimRef.current = null;
+    };
+  }, [presenting, preview, morph, elementKfs, elementKfDuration, replayEpoch]);
   const [useCssEntry, setUseCssEntry] = useState(
     () =>
       typeof window === "undefined" ||
