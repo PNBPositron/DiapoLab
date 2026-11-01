@@ -404,7 +404,7 @@ export function CommandPalette({
         label: "Brand Kit — colors & fonts",
         group: "Features",
         icon: <Palette className="size-4" />,
-        hint: "Left panel → Brand Kit",
+        hint: "Left panel: Brand Kit",
         keywords: "brand kit palette fonts theme identity",
       },
       {
@@ -412,7 +412,7 @@ export function CommandPalette({
         label: "Shape masks — text, shapes, images",
         group: "Features",
         icon: <Scissors className="size-4" />,
-        hint: "Inspector → Shape Mask",
+        hint: "Inspector: Shape Mask",
         keywords: "mask clip hexagon circle knockout silhouette",
       },
       {
@@ -420,7 +420,7 @@ export function CommandPalette({
         label: "Slide-background knockout fill",
         group: "Features",
         icon: <Frame className="size-4" />,
-        hint: "Inspector → Fill → Slide BG",
+        hint: "Inspector: Fill, Slide BG",
         keywords: "knockout background frosted window",
       },
       {
@@ -428,7 +428,7 @@ export function CommandPalette({
         label: "Liquid Glass effect",
         group: "Features",
         icon: <Droplets className="size-4" />,
-        hint: "Select a shape → Effect",
+        hint: "Select a shape, Effect",
         keywords: "glass blur translucent liquid effect",
       },
       {
@@ -436,7 +436,7 @@ export function CommandPalette({
         label: "3D transforms & interactive tilt",
         group: "Features",
         icon: <Box className="size-4" />,
-        hint: "Inspector → 3D Transform",
+        hint: "Inspector: 3D Transform",
         keywords: "3d perspective rotate tilt",
       },
       {
@@ -444,7 +444,7 @@ export function CommandPalette({
         label: "Morph slide transition",
         group: "Features",
         icon: <Shuffle className="size-4" />,
-        hint: "PagesBar → Transition → Morph",
+        hint: "PagesBar: Transition, Morph",
         keywords: "transition morph tween animation",
       },
       {
@@ -452,7 +452,7 @@ export function CommandPalette({
         label: "Click interactions — jump to slide",
         group: "Features",
         icon: <MousePointerClick className="size-4" />,
-        hint: "Inspector → Interaction",
+        hint: "Inspector: Interaction",
         keywords: "interactive link navigation click jump",
       },
       {

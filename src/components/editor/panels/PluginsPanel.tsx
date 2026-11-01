@@ -49,10 +49,10 @@ export function PluginsPanel() {
     try {
       if (importOpen === "app") {
         const plugin = usePlugins.getState().importAppPlugin(pluginCode);
-        setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.apps.length} app${plugin.apps.length === 1 ? "" : "s"}`);
+        setImportSuccess(`Imported "${plugin.name}" — ${plugin.apps.length} app${plugin.apps.length === 1 ? "" : "s"}`);
       } else {
         const plugin = usePlugins.getState().importPackPlugin(pluginCode);
-        setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
+        setImportSuccess(`Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
       }
       setPluginCode("");
     } catch (e) {
@@ -130,7 +130,7 @@ export function PluginsPanel() {
           <div>
             <p className="text-xs font-medium text-slate-600">No plugins installed</p>
             <p className="mt-1 max-w-[220px] text-[11px] leading-relaxed text-slate-400">
-              Plugins add widget presets to this panel and to Presets → Blocks. Find
+              Plugins add widget presets to this panel and to Presets, Blocks section. Find
               examples on GitHub or click "Load sample" in the import dialog.
             </p>
           </div>

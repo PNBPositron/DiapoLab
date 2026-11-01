@@ -194,7 +194,7 @@ export function RuntimeAppDialog({
           </p>
           {inserted > 0 && (
             <p className="mt-1 text-[11px] font-medium text-emerald-600">
-              ✓ {inserted} element{inserted > 1 ? "s" : ""} inserted on the current slide.
+              {inserted} element{inserted > 1 ? "s" : ""} inserted on the current slide.
             </p>
           )}
         </div>

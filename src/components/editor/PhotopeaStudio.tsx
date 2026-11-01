@@ -67,7 +67,7 @@ export function PhotopeaStudioDialog({
         a.download = "diapolab-image.png";
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 10_000);
-        setStatus("✓ PNG téléchargé");
+        setStatus("PNG téléchargé");
         return;
       }
       const reader = new FileReader();
@@ -82,7 +82,7 @@ export function PhotopeaStudioDialog({
               height: Math.round(img.naturalHeight * s),
             }),
           );
-          setStatus("✓ Image importée sur le canvas");
+          setStatus("Image importée sur le canvas");
         };
         img.onerror = () => setStatus("Impossible de lire l'image renvoyée par Photopea.");
         img.src = dataUrl;

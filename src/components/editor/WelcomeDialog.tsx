@@ -284,7 +284,7 @@ export function WelcomeDialog() {
                 onClick={finish}
                 className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
               >
-                Start creating →
+                Start creating
               </button>
             )}
           </div>

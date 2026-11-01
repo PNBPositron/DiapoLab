@@ -331,7 +331,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
                 className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-[11px] font-bold text-slate-600 transition hover:bg-white hover:text-slate-900 disabled:opacity-40"
               >
                 {capturing ? <LoaderCircle className="size-3.5 animate-spin" /> : <Camera className="size-3.5" />}
-                Capture → slide
+                Capture to slide
               </button>
               <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                 <FileText className="size-3" /> select text in the preview to insert it

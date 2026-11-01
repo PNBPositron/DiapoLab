@@ -515,6 +515,12 @@ export function PropertiesPanel() {
     rotation: el.rotation,
     opacity: (el as { opacity?: number }).opacity ?? 1,
     easing: sortedKfs[sortedKfs.length - 1]?.easing,
+    shadow: el.shadow ? { ...el.shadow } : undefined,
+    filters:
+      "filters" in el && (el as { filters?: ImageFilters }).filters
+        ? { ...(el as { filters?: ImageFilters }).filters }
+        : undefined,
+    effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
   });
   const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
   const kfTotal = el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
@@ -1403,8 +1409,8 @@ export function PropertiesPanel() {
 
                 <Field label="Crop">
                   <div className="space-y-2">
-                    <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`w-full rounded-lg px-2 py-2 text-[11px] font-semibold transition ${croppingId === el.id ? "bg-sky-600 text-white hover:bg-sky-500" : "bg-slate-900 text-white hover:bg-slate-700"}`}>{croppingId === el.id ? "✓ Terminer le recadrage" : "✂️ Recadrer sur le canvas"}</button>
-                    {croppingId === el.id && <p className="text-[10px] leading-snug text-slate-400">Glissez l'image dans son cadre pour la déplacer, molette pour zoomer, Échap ou ✅ pour terminer.</p>}
+                    <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`w-full rounded-lg px-2 py-2 text-[11px] font-semibold transition ${croppingId === el.id ? "bg-sky-600 text-white hover:bg-sky-500" : "bg-slate-900 text-white hover:bg-slate-700"}`}>{croppingId === el.id ? "Terminer le recadrage" : "Recadrer sur le canvas"}</button>
+                    {croppingId === el.id && <p className="text-[10px] leading-snug text-slate-400">Glissez l'image dans son cadre pour la déplacer, molette pour zoomer, Échap pour terminer.</p>}
                     <SliderWithInput label="Zoom" min={100} max={400} step={5} unit="%" value={Math.round((el.cropZoom ?? 1) * 100)} onChange={(v) => update(el.id, { cropZoom: v / 100 })} />
                     <SliderWithInput label="Horizontal" min={0} max={100} unit="%" value={el.cropX ?? 50} onChange={(v) => update(el.id, { cropX: v })} />
                     <SliderWithInput label="Vertical" min={0} max={100} unit="%" value={el.cropY ?? 50} onChange={(v) => update(el.id, { cropY: v })} />
@@ -1734,6 +1740,13 @@ export function PropertiesPanel() {
                             width: k.width ?? el.width,
                             height: k.height ?? el.height,
                             rotation: k.rotation ?? el.rotation,
+                            shadow: k.shadow ?? el.shadow,
+                            ...("filters" in el
+                              ? { filters: k.filters ?? (el as { filters?: ImageFilters }).filters }
+                              : {}),
+                            ...("effect" in el
+                              ? { effect: k.effect ?? (el as { effect?: ElementKeyframe["effect"] }).effect }
+                              : {}),
                           } as never);
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
                         <button type="button" onClick={() => {

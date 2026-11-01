@@ -41,6 +41,12 @@ export type ElementKeyframe = {
   opacity?: number; // 0..1
   /** easing of the segment ENDING at this keyframe (motion INTO it) */
   easing?: KeyframeEasing;
+  /** captured shadow (works for every object type) */
+  shadow?: ElementShadow;
+  /** captured image filters */
+  filters?: ImageFilters;
+  /** captured shape/quiz/chart visual effect */
+  effect?: ShapeEffect;
 };
 
 export type ElementBase = {
@@ -1122,12 +1128,12 @@ export function toEmbedSrc(raw: string): string {
 export function embedProvider(src: string): { label: string; emoji: string } {
   const s = (src || "").toLowerCase();
   if (s.includes("youtube.com") || s.includes("youtu.be")) return { label: "YouTube", emoji: "▶" };
-  if (s.includes("spotify.com")) return { label: "Spotify", emoji: "♪" };
-  if (s.includes("soundcloud.com")) return { label: "SoundCloud", emoji: "♫" };
+  if (s.includes("spotify.com")) return { label: "Spotify", emoji: "" };
+  if (s.includes("soundcloud.com")) return { label: "SoundCloud", emoji: "" };
   if (s.includes("vimeo.com")) return { label: "Vimeo", emoji: " Vimeo" };
-  if (s.includes("maps.google")) return { label: "Google Maps", emoji: "📍" };
-  if (s.includes("figma.com")) return { label: "Figma", emoji: "✦" };
-  return { label: "Web embed", emoji: "🌐" };
+  if (s.includes("maps.google")) return { label: "Google Maps", emoji: "" };
+  if (s.includes("figma.com")) return { label: "Figma", emoji: "" };
+  return { label: "Web embed", emoji: "" };
 }
 
 export const newEmbed = (src: string, overrides: Partial<EmbedElement> = {}): EmbedElement => ({
@@ -1224,7 +1230,7 @@ const UI_DEFAULTS: Record<
     title: "bash — 80×24",
     body: "npm run build",
     value: 0,
-    items: ["$ npm install", "added 214 packages", "$ npm run build", "✓ built in 1.24s"],
+    items: ["$ npm install", "added 214 packages", "$ npm run build", "built in 1.24s"],
   },
   phone: {
     w: 340,

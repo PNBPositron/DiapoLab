@@ -435,7 +435,7 @@ export const WIDGET_PACK_ELEMENTS: PluginWidget[] = [
       { id: "w", type: "shape", x: 216, y: 162, width: 16, height: 16, rotation: 0, shape: "circle", fill: "#28c840", stroke: "transparent", strokeWidth: 0 },
       { id: "w", type: "text", x: 260, y: 156, width: 400, height: 30, rotation: 0, text: "bash — 80×24", fontSize: 18, color: "#94a3b8", fontWeight: 500, fontFamily: "'JetBrains Mono', monospace", align: "left" },
       { id: "w", type: "text", x: 168, y: 220, width: 660, height: 36, rotation: 0, text: "$ npm run dev", fontSize: 22, color: "#4ade80", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left" },
-      { id: "w", type: "text", x: 168, y: 258, width: 660, height: 36, rotation: 0, text: "✓ ready in 412ms", fontSize: 22, color: "#e2e8f0", fontWeight: 400, fontFamily: "'JetBrains Mono', monospace", align: "left" },
+      { id: "w", type: "text", x: 168, y: 258, width: 660, height: 36, rotation: 0, text: "ready in 412ms", fontSize: 22, color: "#e2e8f0", fontWeight: 400, fontFamily: "'JetBrains Mono', monospace", align: "left" },
       { id: "w", type: "text", x: 168, y: 296, width: 660, height: 36, rotation: 0, text: "$ _", fontSize: 22, color: "#4ade80", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", align: "left" },
     ],
   },

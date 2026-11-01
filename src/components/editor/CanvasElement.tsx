@@ -77,6 +77,89 @@ const filterCss = (f?: ImageFilters, advancedUrl?: (key: string, inner: string) 
 const shadowFilter = (s?: ElementShadow) =>
   s ? `drop-shadow(${s.x}px ${s.y}px ${s.blur}px ${s.color})` : "";
 
+/** Keyframe easing curves as JS functions (rAF effects track). */
+const KF_EASE_FN: Record<string, (t: number) => number> = {
+  linear: (t) => t,
+  ease: (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
+  "ease-in": (t) => t * t,
+  "ease-out": (t) => 1 - (1 - t) * (1 - t),
+  "ease-in-out": (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
+  "cubic-in": (t) => t * t * t,
+  "cubic-out": (t) => 1 - Math.pow(1 - t, 3),
+  "cubic-in-out": (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+  "expo-out": (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+  "back-out": (t) => {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+};
+
+const kfLerp = (a: number, b: number, p: number) => a + (b - a) * p;
+
+const parseCssColor = (c: string): [number, number, number, number] | null => {
+  const s = c.trim();
+  if (s.startsWith("#")) {
+    const h = s.slice(1);
+    if (h.length === 3)
+      return [parseInt(h[0] + h[0], 16), parseInt(h[1] + h[1], 16), parseInt(h[2] + h[2], 16), 1];
+    if (h.length === 6 || h.length === 8)
+      return [
+        parseInt(h.slice(0, 2), 16),
+        parseInt(h.slice(2, 4), 16),
+        parseInt(h.slice(4, 6), 16),
+        h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1,
+      ];
+    return null;
+  }
+  const m = s.match(/rgba?\(([^)]+)\)/);
+  if (m) {
+    const parts = m[1].split(",").map((v) => parseFloat(v));
+    if (parts.length >= 3) return [parts[0], parts[1], parts[2], parts.length > 3 ? parts[3] : 1];
+  }
+  return null;
+};
+
+const mixColor = (c1: string, c2: string, p: number): string => {
+  const a = parseCssColor(c1);
+  const b = parseCssColor(c2);
+  if (!a || !b) return p < 1 ? c1 : c2;
+  const r = Math.round(kfLerp(a[0], b[0], p));
+  const g = Math.round(kfLerp(a[1], b[1], p));
+  const bl = Math.round(kfLerp(a[2], b[2], p));
+  const al = kfLerp(a[3], b[3], p);
+  return al >= 1 ? `rgb(${r}, ${g}, ${bl})` : `rgba(${r}, ${g}, ${bl}, ${Number(al.toFixed(3))})`;
+};
+
+const interpShadow = (
+  a: ElementShadow | undefined,
+  b: ElementShadow | undefined,
+  p: number,
+): ElementShadow | undefined => {
+  if (!a && !b) return undefined;
+  const s1 = a ?? b!;
+  const s2 = b ?? a!;
+  return {
+    x: kfLerp(s1.x, s2.x, p),
+    y: kfLerp(s1.y, s2.y, p),
+    blur: kfLerp(s1.blur, s2.blur, p),
+    color: mixColor(s1.color, s2.color, p),
+  };
+};
+
+const interpFilters = (
+  a: ImageFilters | undefined,
+  b: ImageFilters | undefined,
+  p: number,
+): ImageFilters => {
+  const f1 = { ...DEFAULT_FILTERS, ...(a ?? {}) } as Record<string, number>;
+  const f2 = { ...DEFAULT_FILTERS, ...(b ?? {}) } as Record<string, number>;
+  const out: Record<string, number> = {};
+  for (const key of Object.keys(f1))
+    if (typeof f1[key] === "number" && typeof f2[key] === "number") out[key] = kfLerp(f1[key], f2[key], p);
+  return out as unknown as ImageFilters;
+};
+
 const maskClipPath = (kind?: string) => {
   const clips: Record<string, string> = {
     circle: "circle(50% at 50% 50%)",
@@ -242,7 +325,7 @@ function cssKeyframes(name: string): Keyframe[] | null {
 }
 
 export function CanvasElement({
-  element,
+  element: sourceElement,
   scale,
   morph = false,
   preview = false,
@@ -262,19 +345,26 @@ export function CanvasElement({
   const page = useEditor((s) => s.pages[s.currentIndex]);
   const canvasW = useEditor((s) => s.canvasW);
   const canvasH = useEditor((s) => s.canvasH);
-  const selected = !presenting && !preview && selectedIds.includes(element.id);
+  const selected = !presenting && !preview && selectedIds.includes(sourceElement.id);
   // Interactive crop mode (double-click an image or press the Crop button).
   // The zustand hook MUST be called unconditionally — short-circuiting it with
   // && flips the hook count between renders (React error #311) as soon as
   // `presenting` or `preview` changes.
   const croppingId = useEditor((s) => s.croppingId);
-  const cropping = !presenting && !preview && croppingId === element.id;
+  const cropping = !presenting && !preview && croppingId === sourceElement.id;
   // Natural size of the rendered image — needed to lay out PPT-style crop.
   const [natSize, setNatSize] = useState<{ w: number; h: number } | null>(null);
-  const cropLayout = element.type === "image" ? cropRectLayout(element as never, natSize) : null;
+  const cropLayout = sourceElement.type === "image" ? cropRectLayout(sourceElement as never, natSize) : null;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  // Keyframe effects track (presenting): the rAF effect below merges the
+  // interpolated shadow / filters / effect into the rendered element, so
+  // every object type animates its effects: text shadows, shape & button
+  // shadows, image filters, shape effects.
+  const [kfFx, setKfFx] = useState<Record<string, unknown> | null>(null);
+  const element = (kfFx ? { ...sourceElement, ...kfFx } : sourceElement) as AnyElement;
 
   // Live 3D tilt toward the cursor (presenting + hoverTilt enabled)
   const [tilt, setTilt] = useState<{ rx: number; ry: number } | null>(null);
@@ -351,6 +441,52 @@ export function CanvasElement({
       kfAnimRef.current = null;
     };
   }, [presenting, preview, morph, elementKfs, elementKfDuration, replayEpoch]);
+
+  // ---- Keyframe effects (presenting) ----
+  // rAF track for the EFFECT part of the keyframes: shadow, image filters
+  // and shape effect, interpolated frame by frame and merged into the
+  // rendered element above. Discrete shape effects switch at each keyframe.
+  useEffect(() => {
+    setKfFx(null);
+    if (!presenting || preview || morph) return;
+    const kfs = (sourceElement as { keyframes?: ElementKeyframe[] }).keyframes;
+    if (!kfs || kfs.length < 2) return;
+    const sorted = [...kfs].sort((a, b) => a.t - b.t);
+    const base = sorted[0];
+    const anyShadow = sorted.some((k) => k.shadow);
+    const anyFilters = sorted.some((k) => k.filters);
+    const anyEffect = sorted.some((k) => k.effect);
+    if (!anyShadow && !anyFilters && !anyEffect) return;
+    const duration = Math.max(
+      200,
+      (sourceElement as { keyframeDuration?: number }).keyframeDuration ?? sorted[sorted.length - 1].t,
+    );
+    const start = performance.now();
+    let raf = 0;
+    const tick = () => {
+      const t = Math.min(duration, performance.now() - start);
+      let i = 0;
+      while (i < sorted.length - 2 && sorted[i + 1].t <= t) i++;
+      const a = sorted[i];
+      const b = sorted[Math.min(i + 1, sorted.length - 1)];
+      const raw = b.t > a.t ? (t - a.t) / (b.t - a.t) : 1;
+      const p = (KF_EASE_FN[b.easing ?? "linear"] ?? KF_EASE_FN.linear)(
+        Math.min(1, Math.max(0, raw)),
+      );
+      const patch: Record<string, unknown> = {};
+      if (anyShadow) patch.shadow = interpShadow(a.shadow ?? base.shadow, b.shadow ?? base.shadow, p);
+      if (anyFilters)
+        patch.filters = interpFilters(a.filters ?? base.filters, b.filters ?? base.filters, p);
+      if (anyEffect) patch.effect = (p >= 1 ? b.effect : a.effect) ?? base.effect;
+      setKfFx(patch);
+      if (t < duration) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      setKfFx(null);
+    };
+  }, [presenting, preview, morph, replayEpoch, sourceElement]);
   const [useCssEntry, setUseCssEntry] = useState(
     () =>
       typeof window === "undefined" ||
@@ -1347,7 +1483,7 @@ export function CanvasElement({
                     boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
                   }}
                 >
-                  ✓ Terminé
+                  Terminé
                 </button>
                 <button
                   type="button"
