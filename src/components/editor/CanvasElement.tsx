@@ -12,6 +12,7 @@ import {
   DEFAULT_FILTERS,
   type ImageFilters,
   type ShapeGradient,
+  KEYFRAME_EASINGS,
   type ElementKeyframe,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
@@ -328,11 +329,52 @@ export function CanvasElement({
     const sorted = [...elementKfs].sort((a, b) => a.t - b.t);
     const base = sorted[0];
     const end = sorted[sorted.length - 1];
-    const frames = sorted.map((k) => ({
+    const duration = Math.max(200, elementKfDuration ?? end.t);
+    // Effects in keyframes: shadow (drop-shadow) and image-filter deltas.
+    // The canvas resting state equals the FIRST keyframe, so each frame
+    // animates the DIFFERENCE vs. that base — no double-applied filters.
+    const anyShadow = sorted.some((k) => k.shadow);
+    const anyFilters = sorted.some((k) => k.filters);
+    const baseF = { ...DEFAULT_FILTERS, ...(base.filters ?? {}) };
+    const frameFilter = (k: ElementKeyframe): string | undefined => {
+      const parts: string[] = [];
+      if (anyShadow) {
+        const s = k.shadow ?? base.shadow;
+        if (s) parts.push(`drop-shadow(${s.x}px ${s.y}px ${s.blur}px ${s.color})`);
+      }
+      if (anyFilters) {
+        const f = { ...DEFAULT_FILTERS, ...(k.filters ?? base.filters ?? {}) };
+        const dB = f.blur - baseF.blur;
+        if (dB > 0.01) parts.push(`blur(${dB.toFixed(2)}px)`);
+        const dG = f.grayscale - baseF.grayscale;
+        if (Math.abs(dG) > 0.5) parts.push(`grayscale(${Math.max(0, dG).toFixed(1)}%)`);
+        const dS = f.sepia - baseF.sepia;
+        if (Math.abs(dS) > 0.5) parts.push(`sepia(${Math.max(0, dS).toFixed(1)}%)`);
+        const dI = f.invert - baseF.invert;
+        if (Math.abs(dI) > 0.5) parts.push(`invert(${Math.max(0, dI).toFixed(1)}%)`);
+        const dH = f.hueRotate - baseF.hueRotate;
+        if (Math.abs(dH) > 0.5) parts.push(`hue-rotate(${dH.toFixed(1)}deg)`);
+        if (Math.abs(f.brightness - baseF.brightness) > 0.5)
+          parts.push(`brightness(${((f.brightness / Math.max(1, baseF.brightness)) * 100).toFixed(1)}%)`);
+        if (Math.abs(f.saturate - baseF.saturate) > 0.5)
+          parts.push(`saturate(${((f.saturate / Math.max(1, baseF.saturate)) * 100).toFixed(1)}%)`);
+        if (Math.abs(f.contrast - baseF.contrast) > 0.5)
+          parts.push(`contrast(${((f.contrast / Math.max(1, baseF.contrast)) * 100).toFixed(1)}%)`);
+      }
+      return parts.length ? parts.join(" ") : undefined;
+    };
+    const easingCss = (name?: string): string =>
+      (KEYFRAME_EASINGS.find((e) => e.value === name) ?? KEYFRAME_EASINGS[0]).css;
+    const frames = sorted.map((k, i) => ({
       transform: `translate(${(k.x ?? base.x ?? 0) - (base.x ?? 0)}px, ${(k.y ?? base.y ?? 0) - (base.y ?? 0)}px) rotate(${(k.rotation ?? 0) - (base.rotation ?? 0)}deg) scale(${k.width != null && base.width ? k.width / base.width : 1})`,
       opacity: k.opacity ?? 1,
+      filter: frameFilter(k),
+      // real time offsets — keyframes no longer need even spacing
+      offset: Math.min(1, k.t / duration),
+      // WAAPI easing on a frame drives the segment STARTING at it, so the
+      // easing stored on keyframe i+1 (motion INTO it) is set on frame i.
+      ...(i < sorted.length - 1 ? { easing: easingCss(sorted[i + 1].easing) } : {}),
     }));
-    const duration = Math.max(200, elementKfDuration ?? end.t);
     kfAnimRef.current = node.animate(frames, {
       duration,
       easing: "linear",

@@ -3,6 +3,33 @@ import { DEFAULT_PAGES } from "@/lib/default-deck";
 
 /** One custom animation keyframe: the element state at time t (ms).
  *  Undefined fields inherit the first keyframe value at play time. */
+/** Easing curve used for the segment ENDING at a keyframe. */
+export type KeyframeEasing =
+  | "linear"
+  | "ease"
+  | "ease-in"
+  | "ease-out"
+  | "ease-in-out"
+  | "cubic-in"
+  | "cubic-out"
+  | "cubic-in-out"
+  | "expo-out"
+  | "back-out";
+
+/** Catalog of keyframe easings — label for the UI, css for WAAPI. */
+export const KEYFRAME_EASINGS: Array<{ value: KeyframeEasing; label: string; css: string }> = [
+  { value: "linear", label: "Normal (linear)", css: "linear" },
+  { value: "ease", label: "Ease", css: "ease" },
+  { value: "ease-in", label: "Ease in", css: "ease-in" },
+  { value: "ease-out", label: "Ease out", css: "ease-out" },
+  { value: "ease-in-out", label: "Ease in-out", css: "ease-in-out" },
+  { value: "cubic-in", label: "Cubic in", css: "cubic-bezier(0.32,0,0.67,0)" },
+  { value: "cubic-out", label: "Cubic out", css: "cubic-bezier(0.33,1,0.68,1)" },
+  { value: "cubic-in-out", label: "Cubic in-out", css: "cubic-bezier(0.65,0,0.35,1)" },
+  { value: "expo-out", label: "Expo out", css: "cubic-bezier(0.16,1,0.3,1)" },
+  { value: "back-out", label: "Back out (overshoot)", css: "cubic-bezier(0.34,1.56,0.64,1)" },
+];
+
 export type ElementKeyframe = {
   id: string;
   t: number; // ms from animation start
@@ -12,6 +39,12 @@ export type ElementKeyframe = {
   height?: number;
   rotation?: number;
   opacity?: number; // 0..1
+  /** easing of the segment ENDING at this keyframe (motion INTO it) */
+  easing?: KeyframeEasing;
+  /** captured shadow effect */
+  shadow?: ElementShadow;
+  /** captured image-filter effect */
+  filters?: ImageFilters;
 };
 
 export type ElementBase = {
