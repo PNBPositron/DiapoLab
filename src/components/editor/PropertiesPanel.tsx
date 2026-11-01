@@ -17,6 +17,7 @@ import {
   type ChartKind,
   type ButtonAction,
   type UiStyle,
+  type ElementKeyframe,
 } from "@/store/editor";
 import { prepareImage } from "@/lib/image-assets";
 import { toEmbedSrc } from "@/store/editor";
@@ -496,6 +497,21 @@ export function PropertiesPanel() {
     setJsonError(null);
   };
 
+  // ---- Keyframe animation helpers ----
+  const kfs = (el.keyframes ?? []) as ElementKeyframe[];
+  const setKfs = (next: ElementKeyframe[]) =>
+    update(el.id, { keyframes: next.length ? next : undefined } as never);
+  const captureState = (t: number): ElementKeyframe => ({
+    id: crypto.randomUUID(),
+    t,
+    x: el.x,
+    y: el.y,
+    width: el.width,
+    height: el.height,
+    rotation: el.rotation,
+    opacity: (el as { opacity?: number }).opacity ?? 1,
+  });
+  const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
     <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
@@ -1596,6 +1612,80 @@ export function PropertiesPanel() {
                 </button>
               </Section>
             )}
+
+            {/* KEYFRAME ANIMATION — custom motion path */}
+            <Section title="Keyframe Animation" defaultOpen={false}>
+              <p className="text-[10px] leading-snug text-slate-500">
+                Build a custom animation: place the object, capture a keyframe, move or restyle it, capture the next. It plays while presenting.
+              </p>
+              {sortedKfs.length > 0 && sortedKfs.length < 2 && (
+                <p className="text-[10px] font-medium text-amber-600">Add at least 2 keyframes to animate.</p>
+              )}
+              <div className="space-y-2">
+                {sortedKfs.map((k, i) => (
+                  <div key={k.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-500">#{i + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min={0}
+                          step={50}
+                          value={k.t}
+                          aria-label="Keyframe time in ms"
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            if (Number.isFinite(v) && v >= 0)
+                              setKfs(kfs.map((x) => (x.id === k.id ? { ...x, t: v } : x)));
+                          }}
+                          className="w-16 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-right font-mono text-[10px] text-slate-700 outline-none"
+                        />
+                        <span className="text-[9px] text-slate-400">ms</span>
+                      </div>
+                    </div>
+                    <div className="mt-1.5 grid grid-cols-3 gap-1">
+                      <button type="button" onClick={() => {
+                        setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
+                      }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
+                      <button type="button" onClick={() => {
+                        update(el.id, {
+                          x: k.x ?? el.x,
+                          y: k.y ?? el.y,
+                          width: k.width ?? el.width,
+                          height: k.height ?? el.height,
+                          rotation: k.rotation ?? el.rotation,
+                        } as never);
+                      }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
+                      <button type="button" onClick={() => setKfs(kfs.filter((x) => x.id !== k.id))} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300">Delete</button>
+                    </div>
+                    <p className="mt-1 truncate text-[9px] text-slate-400">
+                      {Math.round(k.x ?? el.x)},{Math.round(k.y ?? el.y)} · {Math.round(k.width ?? el.width)}×{Math.round(k.height ?? el.height)} · {Math.round(k.rotation ?? 0)}° · {Math.round((k.opacity ?? 1) * 100)}%
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const last = sortedKfs[sortedKfs.length - 1];
+                  setKfs([...kfs, captureState(last ? last.t + 500 : 500)]);
+                }}
+                className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+              >
+                + Add keyframe at current position
+              </button>
+              {sortedKfs.length >= 2 && (
+                <SliderWithInput
+                  label="Duration"
+                  min={200}
+                  max={10000}
+                  step={100}
+                  value={el.keyframeDuration ?? sortedKfs[sortedKfs.length - 1].t}
+                  unit="ms"
+                  onChange={(v) => update(el.id, { keyframeDuration: v } as never)}
+                />
+              )}
+            </Section>
 
             {/* INTERACTION — HOVER & CLICK */}
             <Section title="Interaction (Hover & Click)">
