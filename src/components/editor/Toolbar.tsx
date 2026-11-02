@@ -225,7 +225,7 @@ export function Toolbar() {
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
           <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]" />
-          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-800 transition-colors hover:text-blue-600">DiapoLab</Link>
+          <Link to="/" className="logo-wordmark text-base font-extrabold tracking-[0.06em] text-slate-900 transition-colors duration-150 hover:text-[var(--dl-accent)]">DiapoLab</Link>
         </div>
 
         {/* Decorative vertical divider */}
@@ -252,7 +252,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-1 rounded-2xl border border-slate-200/60 bg-white/70 p-1 shadow-[0_2px_12px_rgba(15,23,42,0.05)] backdrop-blur-md">
+      <div className="flex items-center gap-1 rounded-2xl border border-white/60 bg-white/85 p-1 shadow-[0_2px_12px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl p-0.5">
           <button
@@ -382,7 +382,7 @@ export function Toolbar() {
           }}
           title="Present"
           type="button"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#2F5BFF] to-[#7C5CFF] px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(47,91,255,0.28)] transition-all duration-150 hover:from-[#2447CC] hover:to-[#6E4BF5] hover:shadow-[0_10px_28px_rgba(47,91,255,0.38)] active:scale-[0.98]"
         >
           <Play className="h-3.5 w-3.5 fill-white" /> Present
         </button>
