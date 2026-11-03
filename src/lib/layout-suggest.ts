@@ -2,6 +2,9 @@ import type { AnyElement } from "@/store/editor";
 
 /* Designer: slide-aware layout suggestions. Each suggestion rearranges the
    existing elements (position + size only — content and styles are untouched).
+   Placement is content-aware: media keeps its aspect ratio (fit + center),
+   and text boxes keep their font size while their height grows when the
+   width shrinks, so nothing gets squashed or clipped.
    Undo with Ctrl+Z after applying. */
 
 export type PreviewBox = { x: number; y: number; w: number; h: number; kind: "title" | "body" | "media" };
@@ -56,6 +59,36 @@ function grid(
   return kinds.map((kind, i) =>
     box(x + (i % cols) * (cw + gap), y + Math.floor(i / cols) * (ch + gap), cw, ch, kind),
   );
+}
+
+/* Content-aware placement inside a target region:
+   - media (images/videos): contain-fit, aspect ratio preserved, centered
+   - text: keep the font size untouched — width becomes the region width
+     and the height grows proportionally when the width shrinks, so the
+     extra wrapped lines stay visible (capped by the region height)
+   - everything else: fill the region exactly */
+function place(el: AnyElement, region: PreviewBox): LayoutPatch {
+  if (el.type === "image" || el.type === "video") {
+    if (el.width <= 0 || el.height <= 0) {
+      return { id: el.id, x: region.x, y: region.y, width: region.w, height: region.h };
+    }
+    const scale = Math.min(region.w / el.width, region.h / el.height);
+    const w = Math.round(el.width * scale);
+    const h = Math.round(el.height * scale);
+    return {
+      id: el.id,
+      x: region.x + Math.round((region.w - w) / 2),
+      y: region.y + Math.round((region.h - h) / 2),
+      width: w,
+      height: h,
+    };
+  }
+  if (el.type === "text") {
+    const grow = el.width > 0 ? el.height * (el.width / region.w) : el.height;
+    const h = Math.min(Math.max(el.height, Math.round(grow)), region.h);
+    return { id: el.id, x: region.x, y: region.y, width: region.w, height: h };
+  }
+  return { id: el.id, x: region.x, y: region.y, width: region.w, height: region.h };
 }
 
 export function suggestLayouts(elements: AnyElement[]): LayoutSuggestion[] {
@@ -129,18 +162,24 @@ export function suggestLayouts(elements: AnyElement[]): LayoutSuggestion[] {
 
   return templates.map((t) => {
     const patches: LayoutPatch[] = [];
+    const preview: PreviewBox[] = [];
     if (title) {
-      patches.push({ id: title.id, x: t.title.x, y: t.title.y, width: t.title.w, height: t.title.h });
+      const p = place(title, t.title);
+      patches.push(p);
+      preview.push({ x: p.x, y: p.y, w: p.width, h: p.height, kind: "title" });
     }
     others.forEach((el, i) => {
-      const c = t.cells[i];
-      if (c) patches.push({ id: el.id, x: c.x, y: c.y, width: c.w, height: c.h });
+      const region = t.cells[i];
+      if (!region) return;
+      const p = place(el, region);
+      patches.push(p);
+      preview.push({ x: p.x, y: p.y, w: p.width, h: p.height, kind: kindOf(el) });
     });
     return {
       id: t.id,
       label: t.label,
       description: t.description,
-      preview: [t.title, ...t.cells],
+      preview,
       patches,
     };
   });
