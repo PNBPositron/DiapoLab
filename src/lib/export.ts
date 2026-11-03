@@ -372,6 +372,15 @@ const PPTX_SHAPES: Record<string, string> = {
   wave: "wave",
 };
 
+/** DiapoLab shadow (CSS-like x/y/blur/color) → PPTX outer shadow.
+ *  px → pt (×0.75); the PPTX angle is counter-clockwise from +x. */
+function pptxShadow(sh: { x: number; y: number; blur: number; color: string }) {
+  const angle = Math.round((Math.atan2(-sh.y, Math.max(1e-6, sh.x)) * 180) / Math.PI);
+  const offset = Math.round(Math.hypot(sh.x, sh.y) * 0.75 * 100) / 100;
+  const blur = Math.max(0, Math.round(sh.blur * 0.75));
+  return { type: "outer", angle, offset, blur, color: cssColorToHex(sh.color) || "000000" };
+}
+
 export async function exportPPTX(name: string) {
   const { pages, canvasW, canvasH } = useEditor.getState();
   if (pages.length === 0) return;
@@ -424,6 +433,7 @@ export async function exportPPTX(name: string) {
             : 0,
           lineSpacingMultiple: element.lineHeight ?? undefined,
           transparency: element.opacity != null ? Math.round((1 - element.opacity) * 100) : 0,
+          ...(element.shadow ? { shadow: pptxShadow(element.shadow) } : {}),
         });
       } else if (element.type === "shape") {
         const noFill = element.fill === "transparent";
@@ -448,6 +458,7 @@ export async function exportPPTX(name: string) {
           ...(element.shape === "rect" && element.cornerRadius
             ? { rectRadius: element.cornerRadius / 96 }
             : {}),
+          ...(element.shadow ? { shadow: pptxShadow(element.shadow) } : {}),
         });
       } else if ((element.type === "image" || element.type === "video") && element.src) {
         // PPTX supports still images natively; videos are retained as a poster/frame when possible.

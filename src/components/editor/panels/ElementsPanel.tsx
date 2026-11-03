@@ -10,8 +10,11 @@ import {
   Sparkles,
   Youtube,
   Music2,
+  Filter,
+  LayoutGrid,
   MapPin,
   Milestone,
+  Workflow,
   Network,
   Pyramid,
   RefreshCw,
@@ -40,6 +43,9 @@ const DIAGRAM_ICONS: Record<string, LucideIcon> = {
   cycle: RefreshCw,
   timeline: Milestone,
   orgchart: Network,
+  process: Workflow,
+  funnel: Filter,
+  matrix: LayoutGrid,
 };
 
 

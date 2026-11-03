@@ -25,7 +25,7 @@ const label = (o: Box & { text: string; size?: number; color?: string; weight?: 
   });
 
 const plate = (
-  o: Box & { fill: string; shape?: "rect" | "circle" | "trapezoid" | "ring"; radius?: number },
+  o: Box & { fill: string; shape?: "rect" | "circle" | "trapezoid" | "ring" | "chevron"; radius?: number },
 ) =>
   newShape(o.shape ?? "rect", {
     x: o.x,
@@ -107,6 +107,55 @@ function orgchart(root: string, children: string[]): AnyElement[] {
   return els;
 }
 
+function process(items: string[]): AnyElement[] {
+  const els: AnyElement[] = [];
+  const fills = ["#2b6bff", "#5b8bff", "#8fb0ff", "#b8caff"];
+  items.slice(0, 4).forEach((item, i) => {
+    const x = 200 + i * 400;
+    els.push(plate({ x, y: 470, w: 340, h: 140, fill: fills[i], shape: "chevron" }));
+    els.push(label({ x: x + 90, y: 512, w: 220, h: 56, text: item, size: 32, color: "#ffffff" }));
+  });
+  return els;
+}
+
+function funnel(items: string[]): AnyElement[] {
+  const els: AnyElement[] = [];
+  const widths = [1040, 780, 520];
+  const fills = ["#2b6bff", "#5b8bff", "#8fb0ff"];
+  items.slice(0, 3).forEach((item, i) => {
+    const w = widths[i];
+    const y = 360 + i * 150;
+    els.push(
+      newShape("trapezoid", {
+        x: 960 - w / 2,
+        y,
+        width: w,
+        height: 130,
+        rotation: 180,
+        fill: fills[i],
+        stroke: "transparent",
+        strokeWidth: 0,
+      }),
+    );
+    els.push(label({ x: 960 - w / 2, y: y + 42, w, h: 48, text: item, size: 36, color: "#ffffff" }));
+  });
+  return els;
+}
+
+function matrix(items: string[]): AnyElement[] {
+  const els: AnyElement[] = [];
+  const fills = ["#2b6bff", "#7c5cff", "#00b8a9", "#ff8a3d"];
+  items.slice(0, 4).forEach((item, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = 500 + col * 480;
+    const y = 320 + row * 320;
+    els.push(plate({ x, y, w: 440, h: 280, fill: fills[i], radius: 16 }));
+    els.push(label({ x, y: y + 106, w: 440, h: 60, text: item, size: 36, color: "#ffffff" }));
+  });
+  return els;
+}
+
 export type SmartArtPreset = {
   id: string;
   label: string;
@@ -138,5 +187,23 @@ export const SMARTART_PRESETS: SmartArtPreset[] = [
     label: "Org chart",
     hint: "Tree hierarchy",
     build: () => orgchart("CEO", ["Product", "Design", "Engineering"]),
+  },
+  {
+    id: "process",
+    label: "Process",
+    hint: "4-step chevron flow",
+    build: () => process(["Discover", "Design", "Develop", "Deliver"]),
+  },
+  {
+    id: "funnel",
+    label: "Funnel",
+    hint: "3 narrowing stages",
+    build: () => funnel(["Leads", "Qualified", "Won"]),
+  },
+  {
+    id: "matrix",
+    label: "Matrix 2x2",
+    hint: "Four quadrants",
+    build: () => matrix(["Do now", "Plan", "Delegate", "Drop"]),
   },
 ];
