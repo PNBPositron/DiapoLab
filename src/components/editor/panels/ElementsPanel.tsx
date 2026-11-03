@@ -18,6 +18,7 @@ import {
   Network,
   Pyramid,
   RefreshCw,
+  SlidersHorizontal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newEmbed, toEmbedSrc, newIcon, newImage, newVideo, useEditor, type AnyElement } from "@/store/editor";
@@ -92,6 +93,9 @@ export function ElementsPanel() {
   const [embedUrl, setEmbedUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  // SmartArt customizer: which preset is open + its editable item labels
+  const [customPreset, setCustomPreset] = useState<string | null>(null);
+  const [customItems, setCustomItems] = useState<string[]>([]);
   const filteredIcons = ICONS.filter(({ label }) =>
     label.toLowerCase().includes(iconQuery.trim().toLowerCase()),
   );
@@ -217,27 +221,112 @@ export function ElementsPanel() {
             <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">editable</span>
           </div>
           <p className="text-[10px] leading-relaxed text-slate-500">
-            Click to insert. Diagrams land as native shapes and texts — every part stays editable in one click.
+            Click a card to insert with defaults, or open the sliders to set the step count and labels first.
           </p>
           <div className="grid grid-cols-2 gap-2">
             {SMARTART_PRESETS.map((preset) => {
               const Icon = DIAGRAM_ICONS[preset.id] ?? Network;
+              const isEditing = customPreset === preset.id;
               return (
-                <button
+                <div
                   key={preset.id}
-                  type="button"
-                  onClick={() => addGroup(preset.build())}
-                  className="group flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-white/80 p-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)] active:translate-y-0 active:scale-[0.97]"
+                  className={`relative flex flex-col rounded-xl border p-3 transition-all duration-200 ${
+                    isEditing
+                      ? "border-blue-400 bg-white shadow-[0_10px_24px_-10px_rgba(37,99,235,0.35)]"
+                      : "border-slate-200/80 bg-white/80 hover:border-blue-300 hover:bg-white hover:shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)]"
+                  }`}
                 >
-                  <span className="grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
-                    <Icon className="size-4" />
-                  </span>
-                  <span className="text-[11px] font-semibold text-slate-700">{preset.label}</span>
-                  <span className="text-[9px] text-slate-400">{preset.hint}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => addGroup(preset.build(preset.defaultItems))}
+                    className="flex flex-col gap-2 text-left"
+                  >
+                    <span className="grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                      <Icon className="size-4" />
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-700">{preset.label}</span>
+                    <span className="text-[9px] text-slate-400">{preset.hint}</span>
+                  </button>
+                  <button
+                    type="button"
+                    title="Customize"
+                    onClick={() => {
+                      if (isEditing) {
+                        setCustomPreset(null);
+                        return;
+                      }
+                      setCustomPreset(preset.id);
+                      setCustomItems(preset.defaultItems.slice());
+                    }}
+                    className={`absolute right-2 top-2 grid size-6 place-items-center rounded-md transition ${
+                      isEditing
+                        ? "bg-blue-600 text-white"
+                        : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"
+                    }`}
+                  >
+                    <SlidersHorizontal className="size-3" />
+                  </button>
+                </div>
               );
             })}
           </div>
+          {customPreset &&
+            (() => {
+              const preset = SMARTART_PRESETS.find((p) => p.id === customPreset);
+              if (!preset) return null;
+              const setCount = (n: number) => {
+                const count = Math.min(preset.maxItems, Math.max(preset.minItems, n));
+                setCustomItems((items) => {
+                  const next = items.slice(0, count);
+                  while (next.length < count) next.push("Step " + (next.length + 1));
+                  return next;
+                });
+              };
+              return (
+                <div className="flex flex-col gap-2 rounded-xl border border-blue-200 bg-white p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700">{preset.label} — steps</span>
+                    <span className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCount(customItems.length - 1)}
+                        className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-600 transition hover:bg-blue-100 hover:text-blue-600"
+                      >−</button>
+                      <span className="w-4 text-center text-[11px] font-bold text-slate-700">{customItems.length}</span>
+                      <button
+                        type="button"
+                        onClick={() => setCount(customItems.length + 1)}
+                        className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-600 transition hover:bg-blue-100 hover:text-blue-600"
+                      >+</button>
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {customItems.map((item, i) => (
+                      <input
+                        key={i}
+                        value={item}
+                        onChange={(e) =>
+                          setCustomItems((items) => items.map((it, j) => (j === i ? e.target.value : it)))
+                        }
+                        onKeyDown={(e) => e.key === "Enter" && addGroup(preset.build(customItems))}
+                        placeholder={"Step " + (i + 1)}
+                        className="rounded-lg border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addGroup(preset.build(customItems));
+                      setCustomPreset(null);
+                    }}
+                    className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]"
+                  >
+                    Insert diagram
+                  </button>
+                </div>
+              );
+            })()}
         </div>
       )}
 
