@@ -1,11 +1,9 @@
-/* ── DiapoLab chrome — token-based design system ─────────────────────────
-   Every chrome color flows from the --dl-* design tokens declared in
-   styles.css: light values in :root, dark values in [data-editor-theme="dark"].
-   Manrope everywhere, one accent (#2F5BFF), glassy white bars, 160ms transitions. */
-
 @layer components {
+  /* Modern side-panel design system: opaque surface, soft layered shadows,
+     subtle borders, spring-like hover/press states, refined typography. */
+
   .editor-side-panel {
-    font-family: "Manrope", system-ui, sans-serif;
+    font-family: Manrope, system-ui, sans-serif;
   }
 
   .editor-tool-rail {
@@ -32,20 +30,19 @@
 
   .editor-tool-rail > button:hover,
   .editor-tool-rail > button:focus-visible {
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
   }
 
-  /* Side panel: frosted-glass white card, hairline border, soft lift. */
   .editor-side-panel {
     padding: 0.875rem;
-    background: var(--dl-glass-strong) !important;
-    border-color: var(--dl-border);
-    backdrop-filter: blur(20px) saturate(1.1) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(1.1) !important;
+    background: #ffffff !important;
+    border-color: #e2e8f0;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow:
-      0 1px 2px rgba(15, 17, 21, 0.04),
-      0 24px 48px -16px rgba(15, 17, 21, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 12px 32px -6px rgba(15, 23, 42, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
   }
 
   /* Thin modern scrollbar */
@@ -65,80 +62,114 @@
 
   .editor-side-panel .brutal-border,
   .editor-side-panel .brutal-border-2 {
-    border: 1px solid var(--dl-border);
-    border-radius: var(--dl-radius-md);
-    box-shadow: none;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     transition:
-      border-color var(--dl-transition) ease,
-      box-shadow var(--dl-transition) ease,
-      background-color var(--dl-transition) ease;
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .brutal-border:hover,
   .editor-side-panel .brutal-border-2:hover {
-    border-color: var(--dl-border-strong);
-    box-shadow: var(--dl-shadow-hover);
+    border-color: rgba(148, 163, 184, 0.45);
+    box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.1);
   }
 
   .editor-side-panel .brutal-press:hover {
     transform: translateY(-1px);
-    box-shadow: var(--dl-shadow-hover);
+    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.12);
   }
 
   .editor-side-panel .brutal-press:active {
     transform: translateY(0) scale(0.98);
   }
 
-  /* Inputs: soft filled style, accent focus ring */
+  .editor-side-panel .bg-ink {
+    background: #f8fafc;
+    color: #334155;
+  }
+
+  .editor-side-panel .bg-surface {
+    background: #ffffff;
+    color: #334155;
+  }
+
+  .editor-side-panel .bg-surface-2 {
+    background: #f1f5f9;
+    color: #334155;
+  }
+
+  .editor-side-panel .text-teal,
+  .editor-side-panel .text-teal\/80,
+  .editor-side-panel .text-teal\/70,
+  .editor-side-panel .text-teal\/60,
+  .editor-side-panel .text-teal\/50 {
+    color: #475569;
+  }
+
+  .editor-side-panel .text-teal {
+    color: #1e293b;
+  }
+
+  .editor-side-panel .border-teal\/20,
+  .editor-side-panel .border-teal\/25,
+  .editor-side-panel .border-teal\/30,
+  .editor-side-panel .border-teal\/40 {
+    border-color: rgba(148, 163, 184, 0.25);
+  }
+
+  /* Inputs: soft filled style, modern focus ring */
   .editor-side-panel input:not([type="color"]),
   .editor-side-panel textarea,
   .editor-side-panel select {
-    border-color: var(--dl-border-strong);
-    border-radius: var(--dl-radius-sm);
-    background: var(--dl-input);
-    color: var(--dl-ink-2);
+    border-color: rgba(148, 163, 184, 0.28);
+    border-radius: 0.625rem;
+    background: rgba(248, 250, 252, 0.8);
+    color: #334155;
     transition:
-      border-color var(--dl-transition) ease,
-      box-shadow var(--dl-transition) ease,
-      background-color var(--dl-transition) ease;
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel input:not([type="color"]):hover,
   .editor-side-panel textarea:hover,
   .editor-side-panel select:hover {
-    border-color: var(--dl-accent-ring);
+    border-color: rgba(148, 163, 184, 0.5);
   }
 
   .editor-side-panel input:not([type="color"])::placeholder,
   .editor-side-panel textarea::placeholder {
-    color: var(--dl-faint);
+    color: #94a3b8;
   }
 
   .editor-side-panel input:not([type="color"]):focus,
   .editor-side-panel textarea:focus,
   .editor-side-panel select:focus {
-    border-color: var(--dl-accent);
-    background: var(--dl-surface);
+    border-color: rgba(59, 130, 246, 0.55);
+    background: #ffffff;
     outline: none;
-    box-shadow: 0 0 0 3px var(--dl-accent-ring);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
   }
 
   .editor-side-panel button {
-    border-radius: var(--dl-radius-sm);
+    border-radius: 0.625rem;
     transition:
-      transform var(--dl-transition) cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow var(--dl-transition) ease,
-      border-color var(--dl-transition) ease,
-      background-color var(--dl-transition) ease;
+      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button,
   .editor-side-panel .grid > label {
     transition:
-      transform var(--dl-transition) cubic-bezier(0.22, 1, 0.36, 1),
-      border-color var(--dl-transition) ease,
-      box-shadow var(--dl-transition) ease,
-      background-color var(--dl-transition) ease;
+      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
   }
 
   .editor-side-panel .grid > button:hover,
@@ -151,7 +182,7 @@
   }
 
   .editor-side-panel .font-display {
-    font-family: "Manrope", system-ui, sans-serif;
+    font-family: "Manrope", Inter, system-ui, sans-serif;
   }
 
   .editor-side-panel .panel-content {
@@ -159,30 +190,30 @@
     flex-direction: column;
     gap: 1rem;
     min-width: 0;
-    color: var(--dl-ink);
+    color: #1e293b;
   }
 
+  /* Give every panel a consistent visual rhythm, regardless of its internal controls. */
   .editor-side-panel .panel-content > :is(section, [class*="rounded"], [class*="border"]),
   .editor-side-panel > :is(section, [class*="rounded"], [class*="border"]) {
-    border-color: var(--dl-border);
-    border-radius: var(--dl-radius-md);
+    border-color: rgba(148, 163, 184, 0.24);
+    border-radius: 0.875rem;
   }
 
   .editor-side-panel h2,
   .editor-side-panel h3 {
     letter-spacing: -0.01em;
-    font-weight: 700;
   }
 
   .editor-side-panel label {
-    color: var(--dl-ink-2);
-    font-weight: 500;
+    color: #475569;
   }
 
   .editor-side-panel button:not(:disabled):focus-visible {
-    outline: 2px solid var(--dl-accent-ring);
+    outline: 2px solid rgba(59, 130, 246, 0.45);
     outline-offset: 2px;
   }
+  /* Inputs keep their soft :focus border + shadow instead of a rectangle. */
   .editor-side-panel input:focus-visible,
   .editor-side-panel textarea:focus-visible,
   .editor-side-panel select:focus-visible {
@@ -190,7 +221,7 @@
   }
 
   .editor-side-panel .panel-intro {
-    color: var(--dl-muted);
+    color: #64748b;
     font-size: 0.6875rem;
     line-height: 1.5;
     padding: 0 0.125rem;
@@ -210,43 +241,44 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  /* Cards: clean surface, hairline border, accent selected state */
+  /* Cards: clean white surface, hairline border, lift on hover */
   .editor-side-panel .panel-choice-grid > button,
   .editor-side-panel .panel-action-grid > button,
   .editor-side-panel .panel-action-grid > label {
-    border-color: var(--dl-border);
-    background: var(--dl-surface);
-    box-shadow: none;
+    border-color: rgba(148, 163, 184, 0.22);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     transition:
-      transform var(--dl-transition) cubic-bezier(0.22, 1, 0.36, 1),
-      border-color var(--dl-transition) ease,
-      box-shadow var(--dl-transition) ease,
-      background-color var(--dl-transition) ease;
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      background-color 200ms ease;
   }
 
   .editor-side-panel .panel-choice-grid > button:hover,
   .editor-side-panel .panel-action-grid > button:hover,
   .editor-side-panel .panel-action-grid > label:hover {
-    border-color: var(--dl-border-strong);
-    background: var(--dl-surface);
-    box-shadow: var(--dl-shadow-hover);
-    transform: translateY(-1px);
+    border-color: rgba(148, 163, 184, 0.45);
+    background: #ffffff;
+    box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.14);
+    transform: translateY(-2px);
   }
 
   .editor-side-panel .panel-choice-grid > button:active,
   .editor-side-panel .panel-action-grid > button:active,
   .editor-side-panel .panel-action-grid > label:active {
     transform: translateY(0) scale(0.98);
-    box-shadow: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
     transition-duration: 80ms;
   }
 
+  /* Selected state: accent ring instead of heavy grey inset */
   .editor-side-panel .panel-choice-grid > button[aria-pressed="true"],
   .editor-side-panel .panel-action-grid > button[aria-pressed="true"] {
-    border-color: var(--dl-accent-ring);
+    border-color: rgba(59, 130, 246, 0.5);
     box-shadow:
-      inset 0 0 0 1px var(--dl-accent-ring),
-      0 4px 12px -4px var(--dl-accent-ring);
+      inset 0 0 0 1px rgba(59, 130, 246, 0.5),
+      0 4px 12px -4px rgba(59, 130, 246, 0.25);
   }
 
   .editor-side-panel .panel-section-label {
@@ -254,7 +286,7 @@
     align-items: center;
     gap: 0.5rem;
     margin: 0.375rem 0 0.125rem;
-    color: var(--dl-faint);
+    color: #94a3b8;
     font-size: 0.625rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -264,13 +296,13 @@
     content: "";
     height: 1px;
     flex: 1;
-    background: linear-gradient(90deg, var(--dl-border-strong), transparent);
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0.08));
   }
 }
 
-/* Manrope across the whole editor chrome. */
+/* Keep editor chrome readable without overriding slide element font families. */
 .editor-ui {
-  font-family: "Manrope", system-ui, sans-serif;
+  font-family: Manrope, system-ui, sans-serif;
 }
 .editor-ui > header,
 .editor-ui > nav,
@@ -280,17 +312,18 @@
 .editor-ui input,
 .editor-ui textarea,
 .editor-ui select {
-  font-family: "Manrope", system-ui, sans-serif;
+  font-family: Manrope, system-ui, sans-serif;
 }
 
-/* The selector kit owns its color and interaction states. */
+/* The selector kit owns its color and interaction states, rather than the
+   legacy broad side-panel button/input rules above. */
 .editor-side-panel {
   width: 280px;
   padding: 12px;
-  background: var(--dl-glass-strong);
-  color: var(--dl-ink);
-  border-color: var(--dl-border);
-  box-shadow: var(--dl-shadow-panel);
+  background: var(--selector-surface);
+  color: var(--selector-ink);
+  border-color: color-mix(in srgb, var(--selector-border) 55%, transparent);
+  box-shadow: var(--selector-panel-shadow);
   overflow-x: hidden;
   scrollbar-gutter: stable;
 }
@@ -312,22 +345,22 @@
   height: 36px;
 }
 .editor-inspector {
-  color: var(--dl-ink);
-  background: var(--dl-glass-strong);
-  border-color: var(--dl-border);
-  box-shadow: var(--dl-shadow-panel);
+  color: var(--selector-ink);
+  background: var(--selector-surface);
+  border-color: var(--selector-border);
+  box-shadow: var(--selector-panel-shadow);
 }
 .editor-inspector input:not([type="color"]):not([type="radio"]):not([type="range"]),
 .editor-inspector textarea,
 .editor-inspector select {
   min-width: 0;
   max-width: 100%;
-  background: var(--dl-input);
-  border-color: var(--dl-border-strong);
-  color: var(--dl-ink-2);
+  background: var(--selector-muted);
+  border-color: var(--selector-border);
+  color: var(--selector-ink);
 }
 .editor-inspector .inspector-section {
-  border-color: var(--dl-border);
+  border-color: var(--selector-border);
 }
 .editor-inspector .inspector-section > button {
   padding: 10px 2px;
@@ -341,26 +374,35 @@
   box-shadow: none;
 }
 
-/* ── Workspace ─────────────────────────────────────────────────────────────
-   Near-white workspace (#F4F5F7) so the white canvas pops with a large,
-   soft shadow. Bars stay glassy-white with 14–20px radii. */
-.editor-ui {
-  background-color: var(--dl-workspace) !important;
+/* Modern floating canvas zoom dock. */
+.zoom-dock button {
+  border-radius: 0.75rem;
+  color: #64748b;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
-.editor-ui main {
-  background-color: var(--dl-workspace) !important;
-  border-color: transparent !important;
+.zoom-dock button:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #2563eb;
+  transform: translateY(-1px);
 }
-.editor-ui main > .pointer-events-none.absolute.inset-0 {
-  opacity: 0.12;
+.zoom-dock button:active:not(:disabled) {
+  transform: scale(0.94);
 }
-
-/* The canvas itself: crisp hairline edge + large soft drop shadow. */
-.editor-ui .brutal-shadow-lg {
-  box-shadow: var(--dl-shadow-canvas) !important;
+.zoom-dock output {
+  border-radius: 0.625rem;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding: 0.35rem 0.55rem;
 }
-#canvas-export {
-  border: 1px solid var(--dl-border-strong) !important;
+.zoom-dock span {
+  border-left: 1px solid #e2e8f0;
+  margin-left: 0.15rem;
+  padding-left: 0.65rem;
 }
 
 /* Shared editor chrome: quiet surfaces, consistent rhythm, clear focus. */
@@ -384,16 +426,16 @@
 }
 .editor-ui .brutal-border,
 .editor-ui .brutal-border-2 {
-  border-color: var(--dl-border);
-  border-radius: var(--dl-radius-md);
-  box-shadow: none;
+  border-color: var(--border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 .editor-ui .brutal-press:hover {
-  border-color: var(--dl-accent-ring);
-  box-shadow: 0 8px 20px -10px var(--dl-accent-ring);
+  border-color: color-mix(in srgb, var(--blue) 42%, var(--border));
+  box-shadow: 0 8px 20px -10px rgba(79, 70, 229, 0.35);
 }
 .editor-ui button:focus-visible {
-  outline: 1.5px solid var(--dl-accent-ring);
+  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
   outline-offset: 2px;
 }
 .editor-ui input:focus-visible,
@@ -401,38 +443,89 @@
 .editor-ui select:focus-visible {
   outline: none;
 }
+.editor-ui .bg-paper {
+  background: var(--paper);
+}
+.editor-ui .bg-ink {
+  background: var(--surface);
+  color: var(--teal);
+}
+.editor-ui .bg-surface {
+  background: var(--surface);
+  color: var(--teal);
+}
+.editor-ui .bg-surface-2 {
+  background: var(--surface-2);
+  color: var(--teal);
+}
+.editor-ui .text-teal {
+  color: var(--teal);
+}
+.editor-ui .text-teal\/70 {
+  color: color-mix(in srgb, var(--teal) 70%, transparent);
+}
+.editor-ui .text-teal\/60 {
+  color: color-mix(in srgb, var(--teal) 60%, transparent);
+}
+.editor-ui .border-teal\/20,
+.editor-ui .border-teal\/25,
+.editor-ui .border-teal\/30 {
+  border-color: color-mix(in srgb, var(--teal) 16%, transparent);
+}
+.editor-ui .bg-blue {
+  background: var(--blue);
+  color: var(--primary-foreground);
+}
+.editor-ui .bg-teal {
+  background: var(--teal);
+  color: var(--ink);
+}
 .editor-ui .font-mono {
   font-family: var(--font-mono);
 }
 
-/* Sidebar tool rail: 24px icons, generous touch targets, light-blue active. */
+/* The editor shell is a light-white workspace; controls float above it as individual surfaces. */
+.editor-ui {
+  background-color: #fbfcfe !important;
+}
+
+.editor-ui main {
+  background-color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.editor-ui main > .pointer-events-none.absolute.inset-0 {
+  opacity: 0.12;
+}
+
+/* Keep the chrome transparent while giving each actionable control its own lift. */
 .editor-tool-rail {
   gap: 0.625rem;
   padding: 0.625rem;
 }
+
 .editor-tool-rail > button {
   border: 0;
   background: transparent;
   box-shadow: none;
-  color: var(--dl-muted);
-  border-radius: var(--dl-radius-md);
+  color: #64748b;
 }
-.editor-tool-rail > button svg {
-  width: 1.5rem;
-  height: 1.5rem;
-}
+
 .editor-tool-rail > button:hover,
 .editor-tool-rail > button:focus-visible {
   border-color: transparent;
   background: transparent;
-  color: var(--dl-accent);
+  color: #2563eb;
   box-shadow: none;
 }
+
 .editor-ui .pages-bar {
   gap: 1rem;
 }
 
-/* Slide thumbnails: quiet by default, accent halo when active. */
+/* Slide thumbnail bar: transparent on the white app background.
+   Scoped to the thumbnail buttons only — the small control buttons
+   (move, duplicate, delete, search, present) keep their own styling. */
 .editor-ui .pages-bar .group > button {
   background: transparent;
   box-shadow: none;
@@ -441,16 +534,21 @@
   box-shadow: none;
 }
 
+
 .editor-ui .toolbar button,
 .editor-ui > header button,
 .editor-ui > nav button {
-  box-shadow: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 18px -14px rgba(15, 23, 42, 0.35);
 }
+
 .editor-ui .toolbar button:hover,
 .editor-ui > header button:hover,
 .editor-ui > nav button:hover {
-  box-shadow: var(--dl-shadow-hover);
+  box-shadow: 0 10px 22px -14px rgba(37, 99, 235, 0.32);
 }
+
+/* Toolbar flyout menus (hamburger, export, user): no per-button shadow,
+   it renders as a white line under each menu item. */
 .editor-ui .toolbar-flyout > button,
 .editor-ui .toolbar-flyout button {
   box-shadow: none;
@@ -458,6 +556,8 @@
 .editor-ui .toolbar-flyout button:hover {
   box-shadow: none;
 }
+
+/* Sidebar tool rail: fully transparent buttons, no white card, no shadow. */
 .editor-ui nav.editor-tool-rail > button,
 .editor-ui nav.editor-tool-rail > button:hover,
 .editor-ui nav.editor-tool-rail > button:focus-visible,
@@ -469,77 +569,93 @@
   -webkit-backdrop-filter: none;
 }
 
-/* Floating panels: 20px radius, hairline border, glassy shadow. */
+
+/* ── Minimal floating chrome pass ─────────────────────────────────────────
+   One consistent elevation scale, hairline borders, generous radii.
+   Panels float over the white workspace instead of sitting on it. */
 .editor-side-panel,
 .editor-inspector {
-  border-radius: var(--dl-radius-lg);
-  border-color: var(--dl-border);
-  box-shadow: var(--dl-shadow-panel);
+  border-radius: 1.25rem;
+  border-color: rgba(226, 232, 240, 0.7);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 24px 48px -20px rgba(15, 23, 42, 0.16);
 }
 
-/* Zoom dock: frosted glass pill with accent hovers. */
+/* Calmer cards inside panels: hairline border, no double shadow. */
+.editor-ui .brutal-border,
+.editor-ui .brutal-border-2 {
+  box-shadow: none;
+}
+.editor-side-panel .brutal-border,
+.editor-side-panel .brutal-border-2 {
+  box-shadow: none;
+}
+
+/* Discreet focus: thin ring instead of a heavy outline. */
+.editor-ui button:focus-visible {
+  outline: 1.5px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+.editor-ui input:focus-visible,
+.editor-ui textarea:focus-visible,
+.editor-ui select:focus-visible {
+  outline: none;
+}
+
+/* Hover lift kept minimal everywhere in the chrome. */
+.editor-side-panel .panel-choice-grid > button:hover,
+.editor-side-panel .panel-action-grid > button:hover,
+.editor-side-panel .panel-action-grid > label:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.12);
+}
+
+/* Floating zoom dock. */
 .zoom-dock {
   border-radius: 1rem;
-  background: var(--dl-glass);
-  border-color: var(--dl-border);
-  box-shadow: var(--dl-shadow-panel);
-}
-.zoom-dock button {
-  border-radius: 0.75rem;
-  color: var(--dl-muted);
-  transition:
-    background-color var(--dl-transition) ease,
-    color var(--dl-transition) ease,
-    transform var(--dl-transition) ease;
-}
-.zoom-dock button:hover:not(:disabled) {
-  background: var(--dl-accent-soft);
-  color: var(--dl-accent);
-  transform: translateY(-1px);
-}
-.zoom-dock button:active:not(:disabled) {
-  transform: scale(0.94);
-}
-.zoom-dock output {
-  border-radius: var(--dl-radius-sm);
-  background: var(--dl-input);
-  color: var(--dl-ink);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  padding: 0.35rem 0.55rem;
-}
-.zoom-dock span {
-  border-left: 1px solid var(--dl-border);
-  margin-left: 0.15rem;
-  padding-left: 0.65rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 16px 32px -18px rgba(15, 23, 42, 0.2);
 }
 
-/* macOS dock bubble hover for the sidebar tool rail. */
+
+/* ── macOS dock bubble hover for the sidebar tool rail ──────────────────────
+   The hovered tool grows and lifts, its direct neighbors grow a little. */
 .editor-tool-rail > button {
   transform-origin: center;
   transition:
-    transform var(--dl-transition) cubic-bezier(0.22, 1, 0.36, 1),
-    color var(--dl-transition) ease;
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 160ms ease;
 }
+
 .editor-tool-rail > button:hover,
 .editor-tool-rail > button:focus-visible {
   transform: translateY(-3px) scale(1.18);
   z-index: 10;
 }
+
+/* Neighbor above the hovered button */
 .editor-tool-rail > button:has(+ button:hover) {
   transform: translateY(-1px) scale(1.07);
   z-index: 5;
 }
+
+/* Neighbor below the hovered button */
 .editor-tool-rail > button:hover + button {
   transform: translateY(-1px) scale(1.07);
   z-index: 5;
 }
+
 .editor-tool-rail > button:active {
   transform: translateY(-1px) scale(1.03);
   transition-duration: 90ms;
 }
 
-/* Chrome text casing: sentence case across the chrome only. */
+/* ── Chrome text casing ─────────────────────────────────────────────────────
+   Labels in the editor chrome (sidebar, toolbar, bottom bars) are authored
+   in sentence case; assorted Tailwind `uppercase` utilities and the
+   .panel-section-label rule forced full caps. Normalize to sentence case
+   across the chrome only — slide content is untouched (scoped selectors,
+   unlayered so they win over the utilities layer). */
 .editor-ui header,
 .editor-ui nav,
 .editor-ui footer,
@@ -555,23 +671,10 @@
   text-transform: none;
 }
 
-/* Dark chrome: the tokens do the work; a few safety nets for legacy
-   hardcoded light utilities inside the panels. */
-[data-editor-theme="dark"] .editor-side-panel [class*="bg-white"],
-[data-editor-theme="dark"] .editor-inspector [class*="bg-white"] {
-  background-color: var(--dl-surface);
-}
-[data-editor-theme="dark"] .editor-side-panel [class*="bg-slate-50"],
-[data-editor-theme="dark"] .editor-inspector [class*="bg-slate-50"] {
-  background-color: var(--dl-input);
-}
-[data-editor-theme="dark"] .editor-side-panel [class*="border-slate-200"],
-[data-editor-theme="dark"] .editor-inspector [class*="border-slate-200"] {
-  border-color: var(--dl-border);
-}
-
-/* Web embeds: export fallback (html-to-image cannot rasterize cross-origin
-   iframes — swap the live iframe for the static fallback card). */
+/* ── Web embeds: export fallback ──────────────────────────────────────────
+   While capturing the canvas (PNG / JPG / PDF / GIF), html-to-image cannot
+   rasterize cross-origin iframes — swap the live iframe for the static
+   fallback card rendered inside every embed element. */
 #canvas-export[data-exporting] iframe.embed-live {
   display: none !important;
 }

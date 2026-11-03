@@ -31,12 +31,12 @@ export function PagesBar() {
 
   // Slightly larger previews by default; they shrink to fit the row instead
   // of overflowing once there are too many slides.
-  const BASE_THUMB = 140;
+  const BASE_THUMB = 126;
   // Portrait formats (A4, Story…) would make the bar grow very tall if sized
   // from width alone — cap the thumbnail height so the bar stays slim. The
   // sidebar rail now runs alongside the pages bar (full workspace height),
   // so it can no longer cover the bottom Projects button.
-  const MAX_THUMB_H = 92;
+  const MAX_THUMB_H = 84;
   const fit = Math.floor((rowWidth - 96 - 12) / Math.max(1, pages.length)) - 12;
   const size = rowWidth > 0 ? Math.max(48, Math.min(BASE_THUMB, fit)) : BASE_THUMB;
   const ratio = canvasW / canvasH;
@@ -51,7 +51,7 @@ export function PagesBar() {
   }
 
   return (
-    <div className="pages-bar flex shrink-0 items-center border-t border-[var(--dl-border)] bg-white/80 py-2 pl-3 pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-xl">
+    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 py-2 pl-3 pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
       <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
@@ -61,8 +61,8 @@ export function PagesBar() {
                 onClick={() => setCurrentPage(i)}
                 className={`relative overflow-hidden rounded-xl border bg-white/60 backdrop-blur-[1px] transition-all duration-200 ${
                   active
-                    ? "border-[var(--dl-accent)] ring-2 ring-[var(--dl-accent-ring)] shadow-[0_2px_12px_rgba(47,91,255,0.25),0_0_24px_rgba(47,91,255,0.14)]"
-                    : "border-[var(--dl-border)] hover:border-[color-mix(in_srgb,var(--dl-accent)_55%,transparent)] hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
+                    ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_2px_10px_rgba(37,99,235,0.22)]"
+                    : "border-slate-200/80 hover:border-blue-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
                 }`}
                 style={{ width: thumbW + 4, height: thumbH + 4 }}
               >
