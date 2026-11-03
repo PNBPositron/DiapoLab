@@ -9,6 +9,8 @@ import {
   type ElementAnimation,
   type SlideTransition,
 } from "@/store/editor";
+import { useSettings } from "@/store/settings";
+import type { ThemeTokens } from "@/lib/themes";
 
 /* PPTX import: unzip the deck, read slide XML + embedded media, and map
    them onto DiapoLab pages. Handles text boxes, pictures, basic shapes, groups (flattened), tables and speaker notes.
@@ -478,8 +480,81 @@ function parseEntranceTimings(
   return out;
 }
 
+/* ── PowerPoint native theme (ppt/theme/theme1.xml) → DiapoLab theme tokens ──
+   Reads the deck clrScheme (colors) and fontScheme (major/minor fonts) and
+   converts them to a DiapoLab editor theme + brand kit fonts. */
+
+type PptxTheme = { tokens: ThemeTokens; majorFont?: string; minorFont?: string };
+
+function shade(hex: string, amount: number): string {
+  const raw = hex.replace("#", "");
+  const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw.slice(0, 6);
+  const num = parseInt(full, 16);
+  if (Number.isNaN(num)) return hex;
+  const mix = (channel: number) => {
+    const target = amount < 0 ? 0 : 255;
+    return Math.round(channel + (target - channel) * Math.abs(amount));
+  };
+  const r = mix((num >> 16) & 255);
+  const g = mix((num >> 8) & 255);
+  const b = mix(num & 255);
+  return "#" + [r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("");
+}
+
+async function parseTheme(zip: JSZip): Promise<PptxTheme | null> {
+  const doc = await parseXml(zip, "ppt/theme/theme1.xml");
+  if (!doc) return null;
+  const all = Array.from(doc.getElementsByTagName("*"));
+  const schemeEl = all.find((el) => el.localName === "clrScheme");
+  if (!schemeEl) return null;
+  const scheme: Record<string, string> = { ...SCHEME_COLORS };
+  const slots = [
+    "dk1", "lt1", "dk2", "lt2",
+    "accent1", "accent2", "accent3", "accent4", "accent5", "accent6",
+    "hlink", "folHlink",
+  ];
+  for (const slot of slots) {
+    const node = Array.from(schemeEl.getElementsByTagName("*")).find((el) => el.localName === slot);
+    if (!node) continue;
+    const srgb = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "srgbClr");
+    const sys = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "sysClr");
+    const hex =
+      srgb?.getAttribute("val") ??
+      sys?.getAttribute("lastClr") ??
+      (sys?.getAttribute("val") === "window" ? "ffffff" : sys?.getAttribute("val") === "windowText" ? "000000" : undefined);
+    if (hex) scheme[slot] = "#" + hex.replace("#", "");
+  }
+  const fontScheme = all.find((el) => el.localName === "fontScheme");
+  const latinTypeface = (scope: "majorFont" | "minorFont"): string | undefined => {
+    if (!fontScheme) return undefined;
+    const part = Array.from(fontScheme.getElementsByTagName("*")).find((el) => el.localName === scope);
+    if (!part) return undefined;
+    const latin = Array.from(part.getElementsByTagName("*")).find((el) => el.localName === "latin");
+    const tf = latin?.getAttribute("typeface");
+    return tf && tf.trim() ? tf : undefined;
+  };
+  const majorFont = latinTypeface("majorFont");
+  const minorFont = latinTypeface("minorFont");
+  const tokens: ThemeTokens = {
+    ink: scheme.dk2,
+    paper: scheme.lt2,
+    surface: shade(scheme.lt2, -0.05),
+    surface2: shade(scheme.lt2, -0.1),
+    grid: shade(scheme.lt2, -0.18),
+    teal: scheme.dk1,
+    tealDeep: scheme.dk2,
+    blue: scheme.accent1,
+    blueDeep: shade(scheme.accent1, -0.25),
+  };
+  return {
+    tokens,
+    ...(majorFont ? { majorFont } : {}),
+    ...(minorFont ? { minorFont } : {}),
+  };
+}
 export async function importPPTXFile(file: File): Promise<void> {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const pptxTheme = await parseTheme(zip);
 
   // Slide size
   const presDoc = await parseXml(zip, "ppt/presentation.xml");
@@ -671,4 +746,19 @@ export async function importPPTXFile(file: File): Promise<void> {
   s.setCanvasSize(canvasW, canvasH);
   s.loadPages(pages);
   s.setDesignName(file.name.replace(/\.pptx$/i, ""));
+
+  // Convert the deck native theme (colors + fonts) into a DiapoLab theme and
+  // apply it right away, so the imported deck keeps its PowerPoint identity.
+  if (pptxTheme) {
+    const settings = useSettings.getState();
+    const themeId = "pptx-" + Date.now().toString(36);
+    settings.addCustomTheme({
+      id: themeId,
+      name: file.name.replace(/\.pptx$/i, "") + " theme",
+      tokens: pptxTheme.tokens,
+    });
+    settings.setEditorTheme("custom:" + themeId);
+    if (pptxTheme.majorFont) settings.setBrandKit({ headingFont: pptxTheme.majorFont });
+    if (pptxTheme.minorFont) settings.setBrandKit({ bodyFont: pptxTheme.minorFont });
+  }
 }

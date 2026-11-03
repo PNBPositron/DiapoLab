@@ -11,14 +11,19 @@ import {
   Youtube,
   Music2,
   MapPin,
+  Milestone,
+  Network,
+  Pyramid,
+  RefreshCw,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { newEmbed, toEmbedSrc, newIcon, newImage, newVideo, useEditor, type AnyElement } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
+import { SMARTART_PRESETS } from "@/lib/smartart";
 import { prepareImage } from "@/lib/image-assets";
 import { PanelHeader } from "../ui/selectors";
 
-type ElementSection = "shapes" | "icons" | "embeds" | null;
+type ElementSection = "shapes" | "icons" | "embeds" | "diagrams" | null;
 
 const POPULAR_ICON_NAMES = [
   "Accessibility", "Activity", "Airplay", "AlignCenterHorizontal", "AlignStartHorizontal", "AlignEndHorizontal", "Anchor", "Apple", "Archive", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowUp", "Asterisk", "Atom", "AtSign", "Award", "BadgeAlert", "BadgeCheck", "Ban", "Battery", "Bell", "Bike", "Bird", "Blocks", "Bluetooth", "Bookmark", "BookMarked", "BookOpen", "Box", "Brain", "Briefcase", "Bug", "Building2", "Bus", "Cake", "Calendar", "CalendarCheck", "Camera", "Car", "Check", "CheckCheck", "Cherry", "ChevronDown", "ChevronLeft", "ChevronRight", "ChevronUp", "Circle", "CircleDashed", "CircleQuestionMark", "CircleUserRound", "CircleAlert", "TriangleAlert", "CircleCheck", "CircleX", "Clapperboard", "Clipboard", "Clock", "Clock3", "Cloud", "CloudCog", "CloudSun", "CloudDownload", "Code", "CodeXml", "Coffee", "Cog", "Columns3", "Combine", "Command", "Compass", "Contact", "Cookie", "Copy", "Cpu", "CreditCard", "Croissant", "Crown", "Database", "Diamond", "Disc3", "DollarSign", "Download", "Dumbbell", "Pencil", "Ellipsis", "ExternalLink", "Eye", "EyeOff", "Feather", "File", "FileChartColumn", "FileCheck", "FilePlus", "FileText", "Funnel", "Fish", "Flag", "Flame", "Flower2", "Folder", "FolderGit2", "FolderOpen", "Gauge", "Ghost", "Gift", "Globe", "Earth", "Grid2x2", "Guitar", "Hammer", "Hand", "Hash", "Headphones", "Heart", "Highlighter", "History", "House", "Hourglass", "Image", "Inbox", "Infinity", "Info", "Kanban", "Key", "Keyboard", "Laptop", "Layers", "LayoutPanelLeft", "LayoutDashboard", "Leaf", "Lightbulb", "Link", "Link2", "List", "ListChecks", "ListTree", "Locate", "Lock", "LockOpen", "LogIn", "LogOut", "Magnet", "Mail", "Map", "MapPin", "Medal", "Megaphone", "Menu", "MessageCircle", "MessageCircleMore", "MessageSquare", "MessagesSquare", "Mic", "Microscope", "Milestone", "Minus", "Monitor", "MonitorPlay", "Moon", "Mouse", "Music", "Navigation", "Orbit", "Package", "PackageCheck", "Paintbrush", "Palette", "PanelLeft", "PanelLeftOpen", "PanelsTopLeft", "Paperclip", "Pause", "PawPrint", "Pen", "PenTool", "Phone", "PiggyBank", "Pin", "Plane", "Sprout", "Play", "Plus", "Podcast", "Pointer", "Popcorn", "Printer", "Puzzle", "QrCode", "Quote", "Radar", "Receipt", "Recycle", "RefreshCw", "Rocket", "Route", "Sailboat", "Save", "Scale", "ScanLine", "ScanSearch", "Search", "Send", "SendHorizontal", "Server", "Settings", "Share2", "Shield", "ShieldCheck", "Shirt", "ShoppingCart", "Sigma", "SlidersHorizontal", "Snowflake", "Sparkles", "SquareDashedKanban", "SquareStack", "Stamp", "Star", "Store", "Sun", "SunMoon", "Table2", "Tablet", "Tag", "Telescope", "Tent", "Terminal", "ThumbsUp", "Ticket", "Timer", "ToggleLeft", "ToolCase", "TrainFront", "Trash2", "Trees", "Truck", "Tv", "Twitter", "Umbrella", "Upload", "User", "UserCheck", "UserPlus", "Users", "Video", "Volleyball", "WalletCards", "Wand", "Watch", "Waves", "Waypoints", "Wifi", "Wind", "Workflow", "Wrench", "X", "Zap", "ZoomIn", "ZoomOut", "ChartLine", "ChartPie", "ChartNoAxesCombined", "ChartColumnBig",
@@ -29,6 +34,13 @@ const ICONS: Array<{ name: string; label: string; Icon: LucideIcon }> = POPULAR_
   if (!Icon) return [];
   return [{ name, label: name.replace(/([a-z])([A-Z])/g, "$1 $2"), Icon }];
 });
+
+const DIAGRAM_ICONS: Record<string, LucideIcon> = {
+  pyramid: Pyramid,
+  cycle: RefreshCw,
+  timeline: Milestone,
+  orgchart: Network,
+};
 
 
 /* Refined tile: frosted card, gradient chip, subtle lift + blue glow on hover. */
@@ -179,9 +191,49 @@ export function ElementsPanel() {
           active={section === "embeds"}
           onClick={() => setSection(section === "embeds" ? null : "embeds")}
         />
+        <ActionTile
+          Icon={Network}
+          label="Diagrams"
+          active={section === "diagrams"}
+          onClick={() => setSection(section === "diagrams" ? null : "diagrams")}
+        />
       </div>
 
       {section === "shapes" && <ShapesPanel embedded />}
+
+      {/* SmartArt-like diagrams — inserted as native editable shapes + texts */}
+      {section === "diagrams" && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <Network className="size-4 text-blue-600" /> Diagrams
+            </div>
+            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">editable</span>
+          </div>
+          <p className="text-[10px] leading-relaxed text-slate-500">
+            Click to insert. Diagrams land as native shapes and texts — every part stays editable in one click.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {SMARTART_PRESETS.map((preset) => {
+              const Icon = DIAGRAM_ICONS[preset.id] ?? Network;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => addGroup(preset.build())}
+                  className="group flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-white/80 p-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)] active:translate-y-0 active:scale-[0.97]"
+                >
+                  <span className="grid size-9 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
+                    <Icon className="size-4" />
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-700">{preset.label}</span>
+                  <span className="text-[9px] text-slate-400">{preset.hint}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Web embeds — YouTube, Spotify, Maps, Figma… as live iframes on the slide */}
       {section === "embeds" && (
