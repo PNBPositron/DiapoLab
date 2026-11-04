@@ -769,7 +769,7 @@ export function ComponentsPanel() {
           {/* Widget packs — imported via Add-ons, inserted from My blocks */}
           {pluginWidgets.length > 0 && (
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-blue-600">
                 <Puzzle className="size-3" /> Widget packs ({pluginWidgets.length})
               </span>
               <OptionGrid
@@ -797,7 +797,7 @@ export function ComponentsPanel() {
       {/* Charts & quiz — dedicated Charts tab */}
       {section === "charts" && (
         <div className="flex flex-col gap-2 pb-6">
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-indigo-500">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-blue-600">
             <ChartColumn className="size-3" /> Charts &amp; quiz ({filteredElements.length})
           </span>
           <div className="grid grid-cols-2 gap-2">
@@ -806,9 +806,9 @@ export function ComponentsPanel() {
                 key={e.label}
                 type="button"
                 onClick={() => add(e.create())}
-                className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(99,102,241,0.30)]"
+                className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.30)]"
               >
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
                   <e.Icon className="size-4" />
                 </span>
                 <span className="min-w-0">
