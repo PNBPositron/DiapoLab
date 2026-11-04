@@ -21,6 +21,7 @@ import {
   Plus,
   Puzzle,
   Quote,
+  Radio,
   Rows3,
   Save,
   Search,
@@ -40,6 +41,7 @@ import {
 } from "lucide-react";
 import {
   newChart,
+  newPoll,
   newQuiz,
   newUi,
   UI_STYLE_THEMES,
@@ -599,6 +601,12 @@ export function ComponentsPanel() {
       description: "Engagement widget",
       Icon: ListChecks,
       create: () => newQuiz(quizStylePatch(style)),
+    },
+    {
+      label: "Live Poll",
+      description: "Audience votes via QR",
+      Icon: Radio,
+      create: () => newPoll(quizStylePatch(style)),
     },
   ];
 
