@@ -435,7 +435,7 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
                 whiteSpace: "nowrap",
               }}
             >
-              <span>⌕</span> Search
+              <span>⌕</span> {element.files?.[0] || "Search"}
             </div>
           )}
           {element.items.map((it, i) => (
@@ -535,7 +535,7 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
               {it}
             </div>
           ))}
-          <div style={{ marginTop: "auto", fontSize: 14 * s, color: t.muted }}>+ New tab</div>
+          <div style={{ marginTop: "auto", fontSize: 14 * s, color: t.muted }}>{element.files?.[0] || "+ New tab"}</div>
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 * s, padding: `${10 * s}px ${14 * s}px`, borderBottom: `1px solid ${line}` }}>
@@ -731,7 +731,7 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
             borderRadius: t.radius ? t.radius / 2 : 0,
           }}
         >
-          Continue
+          {element.files?.[0] || "Continue"}
         </div>
       </div>
     );
@@ -823,7 +823,7 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
   }
 
   if (K === "kdeFiles") {
-    const files = ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"];
+    const files = element.files?.length ? element.files : ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"];
     return (
       <div style={{ ...shell, padding: 0, gap: 0 }}>
         <div
@@ -965,7 +965,7 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
   }
 
   if (K === "kdeSettings") {
-    const rows = ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"];
+    const rows = element.files?.length ? element.files : ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"];
     return (
       <div style={{ ...shell, padding: 0, gap: 0, flexDirection: "row" }}>
         <div

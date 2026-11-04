@@ -83,6 +83,10 @@ type UiDraft = {
   showBody: boolean;
   showItems: boolean;
   showValue: boolean;
+  files: string[];
+  showFiles: boolean;
+  filesLabel: string;
+  filesList: boolean;
 };
 type ElementDraft = {
   id: string;
@@ -94,6 +98,15 @@ type ElementDraft = {
 };
 const DRAFT_FIELD =
   "rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-blue-400";
+
+/** Extra editable text slots per UI kind (file names, setting rows, chrome captions). */
+const EXTRA_LABELS: Partial<Record<UiKind, { label: string; list: boolean; defaults: string[] }>> = {
+  kdeFiles: { label: "Files", list: true, defaults: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"] },
+  kdeSettings: { label: "Setting rows", list: true, defaults: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"] },
+  taskbar: { label: "Search label", list: false, defaults: ["Search"] },
+  vtabs: { label: "New tab label", list: false, defaults: ["+ New tab"] },
+  login: { label: "Button label", list: false, defaults: ["Continue"] },
+};
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -719,6 +732,7 @@ export function ComponentsPanel() {
 
   const openUiDraft = (kind: UiKind, label: string, ov?: Partial<ReturnType<typeof newUi>>) => {
     const sample = { ...newUi(kind, style), ...(ov ?? {}) };
+    const extra = EXTRA_LABELS[kind];
     setUiDraft({
       kind,
       label,
@@ -726,10 +740,14 @@ export function ComponentsPanel() {
       body: sample.body ?? "",
       items: Array.isArray(sample.items) ? sample.items.slice() : [],
       value: typeof sample.value === "number" ? sample.value : 50,
+      files: Array.isArray(sample.files) && sample.files.length > 0 ? sample.files.slice() : (extra?.defaults.slice() ?? []),
       showTitle: !!sample.title,
       showBody: !!sample.body,
       showItems: Array.isArray(sample.items) && sample.items.length > 0,
       showValue: kind === "stat" || kind === "progress",
+      showFiles: !!extra,
+      filesLabel: extra?.label ?? "",
+      filesList: extra?.list ?? false,
     });
   };
 
@@ -740,6 +758,7 @@ export function ComponentsPanel() {
         ...(uiDraft.showTitle ? { title: uiDraft.title } : {}),
         ...(uiDraft.showBody ? { body: uiDraft.body } : {}),
         ...(uiDraft.showItems ? { items: uiDraft.items.filter((s) => s.trim() !== "") } : {}),
+        ...(uiDraft.showFiles ? { files: uiDraft.files.filter((s) => s.trim() !== "") } : {}),
         ...(uiDraft.showValue ? { value: uiDraft.value } : {}),
       }),
     );
@@ -1215,6 +1234,34 @@ export function ComponentsPanel() {
                   ))}
                   <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, items: [...d.items, "New item"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
                     <Plus className="size-3" /> Add item
+                  </button>
+                </div>
+              )}
+              {uiDraft.showFiles && !uiDraft.filesList && (
+                <input
+                  value={uiDraft.files[0] ?? ""}
+                  onChange={(e) => setUiDraft((d) => (d ? { ...d, files: [e.target.value] } : d))}
+                  placeholder={uiDraft.filesLabel}
+                  className={DRAFT_FIELD}
+                />
+              )}
+              {uiDraft.showFiles && uiDraft.filesList && (
+                <div className="flex flex-col gap-1.5">
+                  {uiDraft.files.map((f, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <input
+                        value={f}
+                        onChange={(e) => setUiDraft((d) => (d ? { ...d, files: d.files.map((x, j) => (j === i ? e.target.value : x)) } : d))}
+                        placeholder={uiDraft.filesLabel + " " + (i + 1)}
+                        className={DRAFT_FIELD + " min-w-0 flex-1"}
+                      />
+                      <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, files: d.files.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, files: [...d.files, "New"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                    <Plus className="size-3" /> Add {uiDraft.filesLabel.toLowerCase().replace(/s$/, "")}
                   </button>
                 </div>
               )}

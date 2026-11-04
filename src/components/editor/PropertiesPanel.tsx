@@ -17,6 +17,7 @@ import {
   type ChartKind,
   type ButtonAction,
   type UiStyle,
+  type UiKind,
   KEYFRAME_EASINGS,
   type ElementKeyframe,
 } from "@/store/editor";
@@ -65,6 +66,24 @@ import { pathFor } from "./ShapeRender";
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
 ).sort();
+
+/** UI kinds whose "items" list carries editable text (tabs, sidebar entries, lines…). */
+const UI_ITEMS_KINDS = new Set([
+  "list", "pricing", "window", "browser", "terminal", "phone", "modal",
+  "tabs", "toggle", "login", "taskbar", "vtabs", "kdePanel", "kdeFiles",
+  "kdeRunner", "kdeSettings", "timeline",
+]);
+/** Secondary editable label lists per UI kind (file names, setting rows). */
+const UI_FILES_DEFAULTS: Partial<Record<UiKind, string[]>> = {
+  kdeFiles: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"],
+  kdeSettings: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"],
+};
+/** Single chrome captions per UI kind (search pill, new-tab button, submit button). */
+const UI_CAPTION_DEFAULTS: Partial<Record<UiKind, string>> = {
+  taskbar: "Search",
+  vtabs: "+ New tab",
+  login: "Continue",
+};
 
 const MASK_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "", label: "None" },
@@ -907,6 +926,86 @@ export function PropertiesPanel() {
                     className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
                   />
                 </Field>
+                {(el.items.length > 0 || UI_ITEMS_KINDS.has(el.kind)) && (
+                  <Field label="Items (list entries, tabs, lines…)">
+                    <div className="space-y-1.5">
+                      {el.items.map((it, index) => (
+                        <div key={index} className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            aria-label={`Item ${index + 1}`}
+                            value={it}
+                            onChange={(e) => update(el.id, { items: el.items.map((x, j) => (j === index ? e.target.value : x)) } as never)}
+                            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            aria-label="Remove item"
+                            onClick={() => update(el.id, { items: el.items.filter((_, j) => j !== index) } as never)}
+                            className="rounded p-1 text-slate-400 hover:text-rose-600"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { items: [...el.items, `Item ${el.items.length + 1}`] } as never)}
+                        className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                      >
+                        + Add item
+                      </button>
+                    </div>
+                  </Field>
+                )}
+                {(el.kind === "kdeFiles" || el.kind === "kdeSettings") && (
+                  <Field label={el.kind === "kdeFiles" ? "File names" : "Setting rows"}>
+                    <div className="space-y-1.5">
+                      {(el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? [])).map((it, index) => {
+                        const list = el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? []);
+                        return (
+                          <div key={index} className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              aria-label={`Label ${index + 1}`}
+                              value={it}
+                              onChange={(e) => update(el.id, { files: list.map((x, j) => (j === index ? e.target.value : x)) } as never)}
+                              className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
+                            />
+                            <button
+                              type="button"
+                              aria-label="Remove label"
+                              onClick={() => update(el.id, { files: list.filter((_, j) => j !== index) } as never)}
+                              className="rounded p-1 text-slate-400 hover:text-rose-600"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const list = el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? []);
+                          update(el.id, { files: [...list, "New"] } as never);
+                        }}
+                        className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                      >
+                        {el.kind === "kdeFiles" ? "+ Add file" : "+ Add row"}
+                      </button>
+                    </div>
+                  </Field>
+                )}
+                {UI_CAPTION_DEFAULTS[el.kind] !== undefined && (
+                  <Field label={el.kind === "taskbar" ? "Search label" : el.kind === "vtabs" ? "New tab label" : "Button label"}>
+                    <input
+                      type="text"
+                      value={el.files?.[0] ?? UI_CAPTION_DEFAULTS[el.kind]}
+                      onChange={(e) => update(el.id, { files: [e.target.value] } as never)}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                    />
+                  </Field>
+                )}
                 {(el.kind === "progress" || el.kind === "stat") && (
                   <SliderWithInput
                     label={el.kind === "progress" ? "Progress Value" : "Statistic"}

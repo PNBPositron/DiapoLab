@@ -436,6 +436,8 @@ export type UiElement = ElementBase & {
   body: string;
   value: number; // 0-100 (progress) or numeric stat
   items: string[];
+  /** secondary editable labels — file names (kdeFiles), setting rows (kdeSettings), chrome captions (taskbar/vtabs/login) */
+  files?: string[];
   accentColor: string;
   /** optional per-element overrides on top of the style pack */
   bgColor?: string;
@@ -1154,7 +1156,7 @@ export const newEmbed = (src: string, overrides: Partial<EmbedElement> = {}): Em
 
 const UI_DEFAULTS: Record<
   UiKind,
-  { w: number; h: number; title: string; body: string; value: number; items: string[] }
+  { w: number; h: number; title: string; body: string; value: number; items: string[]; files?: string[] }
 > = {
   card: {
     w: 560,
@@ -1313,6 +1315,7 @@ const UI_DEFAULTS: Record<
     body: "/home/user/Documents",
     value: 0,
     items: ["Home", "Desktop", "Documents", "Downloads", "Pictures"],
+    files: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"],
   },
   kdeRunner: {
     w: 720,
@@ -1329,6 +1332,7 @@ const UI_DEFAULTS: Record<
     body: "Appearance",
     value: 0,
     items: ["Appearance", "Workspace", "Networking", "Hardware"],
+    files: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"],
   },
 };
 
@@ -1352,6 +1356,7 @@ export const newUi = (
     body: d.body,
     value: d.value,
     items: d.items,
+    files: d.files,
     accentColor: UI_STYLE_THEMES[uiStyle].accent,
     ...overrides,
   };

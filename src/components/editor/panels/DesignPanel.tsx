@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Clapperboard,
-  LayoutDashboard,
   Maximize2,
   Palette,
   Sparkles,
@@ -11,10 +10,9 @@ import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
-import { LayoutDesigner } from "./LayoutDesigner";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 
-type SectionId = "canvas" | "brand" | "background" | "master" | "designer";
+type SectionId = "canvas" | "brand" | "background" | "master";
 
 const SECTIONS: {
   id: SectionId;
@@ -51,13 +49,6 @@ const SECTIONS: {
     Icon: Clapperboard,
     children: <MasterStylePanel />,
   },
-  {
-    id: "designer",
-    title: "Designer",
-    subtitle: "Auto layout suggestions from this slide",
-    Icon: LayoutDashboard,
-    children: <LayoutDesigner />,
-  },
 ];
 
 /**
@@ -74,7 +65,6 @@ export function DesignPanel() {
     brand: "Brand",
     background: "BG",
     master: "Master",
-    designer: "Ideas",
   };
 
   return (
