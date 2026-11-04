@@ -22,6 +22,7 @@ import {
   Puzzle,
   Quote,
   Radio,
+  X,
   Rows3,
   Save,
   Search,
@@ -69,6 +70,30 @@ import {
 } from "@/lib/user-blocks";
 
 type PresetSection = "ui" | "blocks" | "charts";
+
+/* Pre-insert text customizer drafts (same pattern as the SmartArt panel). */
+type UiDraft = {
+  kind: UiKind;
+  label: string;
+  title: string;
+  body: string;
+  items: string[];
+  value: number;
+  showTitle: boolean;
+  showBody: boolean;
+  showItems: boolean;
+  showValue: boolean;
+};
+type ElementDraft = {
+  id: string;
+  label: string;
+  title: string;
+  data: Array<{ label: string; value: number }>;
+  question: string;
+  options: string[];
+};
+const DRAFT_FIELD =
+  "rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-blue-400";
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -546,6 +571,9 @@ export function ComponentsPanel() {
   const [blockName, setBlockName] = useState("");
   const [blockSaved, setBlockSaved] = useState(false);
   const [creatorOpen, setCreatorOpen] = useState(false);
+  // Pre-insert text customizers
+  const [uiDraft, setUiDraft] = useState<UiDraft | null>(null);
+  const [elDraft, setElDraft] = useState<ElementDraft | null>(null);
 
   const selected = elements.find((element) => element.id === selectedId);
 
@@ -567,48 +595,190 @@ export function ComponentsPanel() {
 
   const ELEMENT_PRESETS = [
     {
+      id: "bar",
       label: "Bar Chart",
       description: "Categorical comparison",
       Icon: ChartColumn,
-      create: () => newChart("bar", chartStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newChart("bar", { ...chartStylePatch(style), ...patch }),
     },
     {
+      id: "line",
       label: "Line Graph",
       description: "Trend over time",
       Icon: ChartLine,
-      create: () => newChart("line", chartStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newChart("line", { ...chartStylePatch(style), ...patch }),
     },
     {
+      id: "area",
       label: "Area Chart",
       description: "Cumulative trend",
       Icon: ChartArea,
-      create: () => newChart("area", chartStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newChart("area", { ...chartStylePatch(style), ...patch }),
     },
     {
+      id: "pie",
       label: "Pie Chart",
       description: "Share of a whole",
       Icon: ChartPie,
-      create: () => newChart("pie", chartStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newChart("pie", { ...chartStylePatch(style), ...patch }),
     },
     {
+      id: "donut",
       label: "Donut Chart",
       description: "Modern proportions",
       Icon: Circle,
-      create: () => newChart("donut", chartStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newChart("donut", { ...chartStylePatch(style), ...patch }),
     },
     {
+      id: "quiz",
       label: "Interactive Quiz",
       description: "Engagement widget",
       Icon: ListChecks,
-      create: () => newQuiz(quizStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newQuiz({ ...quizStylePatch(style), ...patch }),
     },
     {
+      id: "poll",
       label: "Live Poll",
       description: "Audience votes via QR",
       Icon: Radio,
-      create: () => newPoll(quizStylePatch(style)),
+      create: (patch: Record<string, unknown> = {}) => newPoll({ ...quizStylePatch(style), ...patch }),
     },
   ];
+
+  const ELEMENT_DRAFT_DEFAULTS: Record<string, Omit<ElementDraft, "id" | "label">> = {
+    bar: {
+      title: "Revenue by quarter",
+      data: [
+        { label: "Q1", value: 24 },
+        { label: "Q2", value: 38 },
+        { label: "Q3", value: 19 },
+        { label: "Q4", value: 45 },
+      ],
+      question: "",
+      options: [],
+    },
+    line: {
+      title: "Growth over time",
+      data: [
+        { label: "Jan", value: 12 },
+        { label: "Feb", value: 19 },
+        { label: "Mar", value: 16 },
+        { label: "Apr", value: 28 },
+        { label: "May", value: 34 },
+        { label: "Jun", value: 42 },
+      ],
+      question: "",
+      options: [],
+    },
+    area: {
+      title: "Cumulative reach",
+      data: [
+        { label: "Jan", value: 8 },
+        { label: "Feb", value: 18 },
+        { label: "Mar", value: 33 },
+        { label: "Apr", value: 52 },
+        { label: "May", value: 74 },
+        { label: "Jun", value: 96 },
+      ],
+      question: "",
+      options: [],
+    },
+    pie: {
+      title: "Market share",
+      data: [
+        { label: "Product A", value: 38 },
+        { label: "Product B", value: 27 },
+        { label: "Product C", value: 35 },
+      ],
+      question: "",
+      options: [],
+    },
+    donut: {
+      title: "Budget split",
+      data: [
+        { label: "Design", value: 30 },
+        { label: "Engineering", value: 45 },
+        { label: "Marketing", value: 25 },
+      ],
+      question: "",
+      options: [],
+    },
+    quiz: {
+      title: "",
+      data: [],
+      question: "What is the capital of France?",
+      options: ["Paris", "London", "Berlin", "Madrid"],
+    },
+    poll: {
+      title: "",
+      data: [],
+      question: "Which feature should we build next?",
+      options: ["Live polls", "Smart export", "Design AI"],
+    },
+  };
+
+  const openUiDraft = (kind: UiKind, label: string, ov?: Partial<ReturnType<typeof newUi>>) => {
+    const sample = { ...newUi(kind, style), ...(ov ?? {}) };
+    setUiDraft({
+      kind,
+      label,
+      title: sample.title ?? "",
+      body: sample.body ?? "",
+      items: Array.isArray(sample.items) ? sample.items.slice() : [],
+      value: typeof sample.value === "number" ? sample.value : 50,
+      showTitle: !!sample.title,
+      showBody: !!sample.body,
+      showItems: Array.isArray(sample.items) && sample.items.length > 0,
+      showValue: kind === "stat" || kind === "progress",
+    });
+  };
+
+  const insertUiDraft = () => {
+    if (!uiDraft) return;
+    add(
+      newUi(uiDraft.kind, style, {
+        ...(uiDraft.showTitle ? { title: uiDraft.title } : {}),
+        ...(uiDraft.showBody ? { body: uiDraft.body } : {}),
+        ...(uiDraft.showItems ? { items: uiDraft.items.filter((s) => s.trim() !== "") } : {}),
+        ...(uiDraft.showValue ? { value: uiDraft.value } : {}),
+      }),
+    );
+    setUiDraft(null);
+  };
+
+  const openElDraft = (id: string, label: string) => {
+    const defaults = ELEMENT_DRAFT_DEFAULTS[id];
+    if (!defaults) return;
+    setElDraft({
+      id,
+      label,
+      title: defaults.title,
+      data: defaults.data.map((row) => ({ ...row })),
+      question: defaults.question,
+      options: defaults.options.slice(),
+    });
+  };
+
+  const insertElDraft = () => {
+    if (!elDraft) return;
+    const preset = ELEMENT_PRESETS.find((p) => p.id === elDraft.id);
+    if (!preset) return;
+    let patch: Record<string, unknown> = {};
+    if (elDraft.id === "quiz" || elDraft.id === "poll") {
+      const options = elDraft.options
+        .filter((text) => text.trim() !== "")
+        .map((text) => ({ id: Math.random().toString(36).slice(2, 10), text }));
+      patch = {
+        question: elDraft.question,
+        options,
+        correctId: options.length > 0 ? options[0].id : "",
+      };
+    } else {
+      patch = { title: elDraft.title, data: elDraft.data.filter((row) => row.label.trim() !== "") };
+    }
+    add(preset.create(patch));
+    setElDraft(null);
+  };
 
   const pickStyle = (nextStyle: UiStyle) => {
     setStyle(nextStyle);
@@ -810,22 +980,113 @@ export function ComponentsPanel() {
           </span>
           <div className="grid grid-cols-2 gap-2">
             {filteredElements.map((e) => (
-              <button
+              <div
                 key={e.label}
-                type="button"
-                onClick={() => add(e.create())}
-                className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.30)]"
+                className={`group relative flex items-center gap-2.5 rounded-xl border p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-white ${
+                  elDraft && elDraft.id === e.id
+                    ? "border-blue-400 bg-white shadow-[0_10px_24px_-10px_rgba(37,99,235,0.35)]"
+                    : "border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 hover:border-blue-300 hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.30)]"
+                }`}
               >
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-                  <e.Icon className="size-4" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-xs font-semibold text-slate-700">{e.label}</span>
-                  <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
-                </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => add(e.create())}
+                  className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                >
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+                    <e.Icon className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-xs font-semibold text-slate-700">{e.label}</span>
+                    <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  title="Edit texts before insert"
+                  onClick={() => openElDraft(e.id, e.label)}
+                  className={`grid size-6 shrink-0 place-items-center rounded-md transition ${
+                    elDraft && elDraft.id === e.id
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"
+                  }`}
+                >
+                  <SlidersHorizontal className="size-3" />
+                </button>
+              </div>
             ))}
           </div>
+
+          {elDraft && (
+            <div className="mt-2 flex flex-col gap-2 rounded-xl border border-blue-200 bg-white p-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-700">{elDraft.label} — texts</span>
+                <button type="button" onClick={() => setElDraft(null)} className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500">
+                  <X className="size-3" />
+                </button>
+              </div>
+              {elDraft.id === "quiz" || elDraft.id === "poll" ? (
+                <>
+                  <input
+                    value={elDraft.question}
+                    onChange={(e) => setElDraft((d) => (d ? { ...d, question: e.target.value } : d))}
+                    placeholder="Question"
+                    className={DRAFT_FIELD}
+                  />
+                  {elDraft.options.map((opt, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <input
+                        value={opt}
+                        onChange={(e) => setElDraft((d) => (d ? { ...d, options: d.options.map((o, j) => (j === i ? e.target.value : o)) } : d))}
+                        placeholder={"Option " + (i + 1)}
+                        className={DRAFT_FIELD + " min-w-0 flex-1"}
+                      />
+                      <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, options: d.options.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, options: [...d.options, "New option"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                    <Plus className="size-3" /> Add option
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input
+                    value={elDraft.title}
+                    onChange={(e) => setElDraft((d) => (d ? { ...d, title: e.target.value } : d))}
+                    placeholder="Chart title"
+                    className={DRAFT_FIELD}
+                  />
+                  {elDraft.data.map((row, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <input
+                        value={row.label}
+                        onChange={(e) => setElDraft((d) => (d ? { ...d, data: d.data.map((r, j) => (j === i ? { ...r, label: e.target.value } : r)) } : d))}
+                        placeholder="Label"
+                        className={DRAFT_FIELD + " min-w-0 flex-1"}
+                      />
+                      <input
+                        type="number"
+                        value={row.value}
+                        onChange={(e) => setElDraft((d) => (d ? { ...d, data: d.data.map((r, j) => (j === i ? { ...r, value: Number(e.target.value) } : r)) } : d))}
+                        className={DRAFT_FIELD + " w-16 shrink-0"}
+                      />
+                      <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, data: d.data.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, data: [...d.data, { label: "New", value: 10 }] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                    <Plus className="size-3" /> Add data point
+                  </button>
+                </>
+              )}
+              <button type="button" onClick={insertElDraft} className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]">
+                Insert {elDraft.label}
+              </button>
+            </div>
+          )}
           {filteredElements.length === 0 && (
             <div className="py-6 text-center text-xs text-slate-400">No chart matches your search.</div>
           )}
@@ -845,16 +1106,27 @@ export function ComponentsPanel() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 pb-6">
-            {filteredPresets.map(({ kind, label, Icon }, index) => {
+            {filteredPresets.map((p, index) => {
+              const { kind, label, Icon } = p;
+              const ov = (p as { overrides?: Partial<ReturnType<typeof newUi>> }).overrides;
               const previewElement = newUi(kind, style, {
+                ...(ov ?? {}),
                 id: `preview-${kind}-${index}`,
               });
 
               return (
-                <button
+                <div
                   key={`${kind}-${label}-${index}`}
-                  onClick={() => add(newUi(kind, style))}
-                  className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.28)]"
+                  className={`group relative flex flex-col overflow-hidden rounded-xl border p-2 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-white ${
+                    uiDraft && uiDraft.kind === kind && uiDraft.label === label
+                      ? "border-blue-400 bg-white shadow-[0_10px_24px_-10px_rgba(37,99,235,0.35)]"
+                      : "border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 hover:border-blue-300 hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.28)]"
+                  }`}
+                >
+                <button
+                  type="button"
+                  onClick={() => add(newUi(kind, style, ov))}
+                  className="flex w-full flex-col text-left"
                 >
                   {/* Miniature live canvas render preview */}
                   <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-lg border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 p-1 shadow-inner shadow-slate-100">
@@ -877,10 +1149,80 @@ export function ComponentsPanel() {
                       {label}
                     </span>
                   </div>
-                </button>
+                  </button>
+                  <button
+                    type="button"
+                    title="Edit texts before insert"
+                    onClick={() => openUiDraft(kind, label, ov)}
+                    className={`absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-md transition ${
+                      uiDraft && uiDraft.kind === kind && uiDraft.label === label
+                        ? "bg-blue-600 text-white"
+                        : "bg-slate-100 text-slate-400 opacity-0 hover:bg-blue-100 hover:text-blue-600 group-hover:opacity-100"
+                    }`}
+                  >
+                    <SlidersHorizontal className="size-3" />
+                  </button>
+                </div>
               );
             })}
           </div>
+
+          {uiDraft && (
+            <div className="mt-2 flex flex-col gap-2 rounded-xl border border-blue-200 bg-white p-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-700">{uiDraft.label} — texts</span>
+                <button type="button" onClick={() => setUiDraft(null)} className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500">
+                  <X className="size-3" />
+                </button>
+              </div>
+              {uiDraft.showTitle && (
+                <input
+                  value={uiDraft.title}
+                  onChange={(e) => setUiDraft((d) => (d ? { ...d, title: e.target.value } : d))}
+                  placeholder="Title"
+                  className={DRAFT_FIELD}
+                />
+              )}
+              {uiDraft.showBody && (
+                <textarea
+                  value={uiDraft.body}
+                  onChange={(e) => setUiDraft((d) => (d ? { ...d, body: e.target.value } : d))}
+                  placeholder="Body"
+                  rows={2}
+                  className={DRAFT_FIELD + " resize-none"}
+                />
+              )}
+              {uiDraft.showValue && (
+                <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                  <input type="range" min={0} max={100} value={uiDraft.value} onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) } : d))} className="h-1.5 flex-1 accent-blue-600" />
+                  <span className="w-9 text-right font-mono text-[10px] text-slate-500">{uiDraft.value}%</span>
+                </div>
+              )}
+              {uiDraft.showItems && (
+                <div className="flex flex-col gap-1.5">
+                  {uiDraft.items.map((item, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <input
+                        value={item}
+                        onChange={(e) => setUiDraft((d) => (d ? { ...d, items: d.items.map((it, j) => (j === i ? e.target.value : it)) } : d))}
+                        placeholder={"Item " + (i + 1)}
+                        className={DRAFT_FIELD + " min-w-0 flex-1"}
+                      />
+                      <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, items: d.items.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, items: [...d.items, "New item"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                    <Plus className="size-3" /> Add item
+                  </button>
+                </div>
+              )}
+              <button type="button" onClick={insertUiDraft} className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]">
+                Insert {uiDraft.label}
+              </button>
+            </div>
+          )}
 
           {filteredPresets.length === 0 && (
             <div className="py-8 text-center text-xs text-slate-400">
