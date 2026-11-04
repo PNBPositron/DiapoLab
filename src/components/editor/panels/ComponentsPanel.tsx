@@ -692,7 +692,7 @@ export function ComponentsPanel() {
           Widget packs (imported in Add-ons) are inserted from here too. */}
       {section === "blocks" && (
         <div className="flex flex-col gap-3">
-          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+          <div className="rounded-xl border border-blue-100 bg-gradient-to-b from-blue-50/70 to-white p-3 shadow-2xs">
             <div className="panel-section-label">Save selection as block</div>
             <div className="mt-2 flex items-center gap-2">
               <input
@@ -736,9 +736,9 @@ export function ComponentsPanel() {
             {blocks.map((block) => (
               <div
                 key={block.id}
-                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-2xs"
+                className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white p-2.5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.28)]"
               >
-                <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm">
                   <Bookmark className="size-4" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -748,7 +748,7 @@ export function ComponentsPanel() {
                 <button
                   type="button"
                   onClick={() => addGroup(cloneBlockElements(block))}
-                  className="flex shrink-0 items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-slate-700"
+                  className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
                 >
                   <Plus className="size-3" /> Insert
                 </button>
@@ -806,9 +806,9 @@ export function ComponentsPanel() {
                 key={e.label}
                 type="button"
                 onClick={() => add(e.create())}
-                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2.5 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-sm"
+                className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(99,102,241,0.30)]"
               >
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
                   <e.Icon className="size-4" />
                 </span>
                 <span className="min-w-0">
@@ -846,17 +846,17 @@ export function ComponentsPanel() {
                 <button
                   key={`${kind}-${label}-${index}`}
                   onClick={() => add(newUi(kind, style))}
-                  className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-2 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-sm"
+                  className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-2 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.28)]"
                 >
                   {/* Miniature live canvas render preview */}
-                  <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-md border border-slate-100 bg-slate-50/70 p-1">
+                  <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-lg border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 p-1 shadow-inner shadow-slate-100">
                     <div className="pointer-events-none scale-75 origin-top-left w-[133%] h-[133%]">
                       <UiRender element={previewElement} preview />
                     </div>
 
                     {/* Quick hover badge */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/10 opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 text-[10px] font-medium text-slate-800 shadow-sm">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-slate-900/25 to-slate-900/5 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-slate-800 shadow-md ring-1 ring-slate-200/70 transition-transform duration-200 group-hover:scale-105">
                         <Plus className="size-2.5" /> Add
                       </span>
                     </div>
@@ -864,8 +864,8 @@ export function ComponentsPanel() {
 
                   {/* Caption & Icon */}
                   <div className="flex items-center gap-1.5 px-0.5">
-                    <Icon className="size-3 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-                    <span className="truncate text-[11px] font-medium text-slate-700">
+                    <Icon className="size-3 text-slate-400 transition-colors group-hover:text-blue-600" />
+                    <span className="truncate text-[11px] font-semibold text-slate-700 transition-colors group-hover:text-blue-700">
                       {label}
                     </span>
                   </div>
