@@ -918,6 +918,59 @@ export function UiRender({ element, preview = false }: { element: UiElement; pre
     );
   }
 
+  if (K === "code") {
+    const lines = (element.body || "").split("\n");
+    const dark = !!t.dark;
+    const C = {
+      comment: dark ? "rgba(255,255,255,0.45)" : "#94a3b8",
+      string: dark ? "#a3e635" : "#a35b00",
+      number: dark ? "#fbbf24" : "#b45309",
+      keyword: dark ? accent : "#2563eb",
+    };
+    const RX = /(\/\/[^\n]*|#[^\n]*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(const|let|var|function|return|if|else|for|while|class|new|import|export|from|default|async|await|try|catch|throw|type|interface|def|fn|struct|enum|pub|mut)\b|\b(\d+(?:\.\d+)?)\b/g;
+    const tokenize = (codeLine: string) => {
+      const out: Array<{ text: string; kind: string }> = [];
+      let last = 0;
+      let m: RegExpExecArray | null;
+      RX.lastIndex = 0;
+      while ((m = RX.exec(codeLine))) {
+        if (m.index > last) out.push({ text: codeLine.slice(last, m.index), kind: "" });
+        const kind = m[1] ? "comment" : m[2] ? "string" : m[3] ? "keyword" : "number";
+        out.push({ text: m[0], kind });
+        last = m.index + m[0].length;
+      }
+      if (last < codeLine.length) out.push({ text: codeLine.slice(last), kind: "" });
+      return out;
+    };
+    return (
+      <div style={{ ...shell, padding: 0, gap: 0, fontFamily: "'JetBrains Mono', 'Fira Code', monospace", fontSize: 16 * s }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 * s, padding: `${10 * s}px ${14 * s}px`, borderBottom: `${Math.max(1, t.borderWidth - 1)}px solid ${line}`, background: softFill }}>
+          <span style={{ display: "flex", gap: 6 * s }}>
+            {[0, 1, 2].map((i) => (
+              <span key={i} style={{ width: 10 * s, height: 10 * s, borderRadius: "50%", background: i === 0 ? "#ff5f57" : i === 1 ? "#febc2e" : "#28c840" }} />
+            ))}
+          </span>
+          <span style={{ flex: 1, textAlign: "center", color: t.muted, fontSize: 13 * s, whiteSpace: "nowrap", overflow: "hidden" }}>{element.title}</span>
+          <span style={{ width: 10 * s }} />
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflow: "hidden", padding: `${12 * s}px 0`, display: "flex", flexDirection: "column", gap: 3 * s }}>
+          {lines.map((ln, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 12 * s }}>
+              <span style={{ width: 40 * s, flexShrink: 0, textAlign: "right", paddingRight: 14 * s, color: t.muted, opacity: 0.55, fontSize: 12 * s, userSelect: "none" }}>{i + 1}</span>
+              <span style={{ whiteSpace: "pre", flex: 1, overflow: "hidden", color: t.fg }}>
+                {tokenize(ln).map((tok, j) => (
+                  <span key={j} style={{ color: tok.kind === "comment" ? C.comment : tok.kind === "string" ? C.string : tok.kind === "keyword" ? C.keyword : tok.kind === "number" ? C.number : t.fg, fontStyle: tok.kind === "comment" ? "italic" : undefined }}>
+                    {tok.text}
+                  </span>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (K === "kdeRunner") {
     return (
       <div style={{ ...shell, padding: 0, gap: 0 }}>

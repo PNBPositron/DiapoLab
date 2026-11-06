@@ -31,6 +31,8 @@ import {
   Square,
   Terminal,
   TerminalSquare,
+  Table as TableIcon,
+  FileCode,
   Trash2,
   ToggleRight,
   TrendingUp,
@@ -43,6 +45,7 @@ import {
 import {
   newChart,
   newPoll,
+  newTable,
   newQuiz,
   newUi,
   UI_STYLE_THEMES,
@@ -126,6 +129,7 @@ const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "browser", label: "Browser", Icon: Chrome },
   { kind: "search", label: "Search bar", Icon: Search },
   { kind: "terminal", label: "Terminal", Icon: TerminalSquare },
+  { kind: "code", label: "Code block", Icon: FileCode },
   { kind: "phone", label: "Phone", Icon: Smartphone },
   { kind: "modal", label: "Modal", Icon: MessageSquare },
   { kind: "tabs", label: "Tabs", Icon: Rows3 },
@@ -656,6 +660,13 @@ export function ComponentsPanel() {
       Icon: Radio,
       create: (patch: Record<string, unknown> = {}) => newPoll({ ...quizStylePatch(style), ...patch }),
     },
+    {
+      id: "table",
+      label: "Table",
+      description: "Editable grid — native PPTX",
+      Icon: TableIcon,
+      create: (patch: Record<string, unknown> = {}) => newTable(patch),
+    },
   ];
 
   const ELEMENT_DRAFT_DEFAULTS: Record<string, Omit<ElementDraft, "id" | "label">> = {
@@ -1020,6 +1031,7 @@ export function ComponentsPanel() {
                     <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
                   </span>
                 </button>
+                {e.id !== "table" && (
                 <button
                   type="button"
                   title="Edit texts before insert"
@@ -1032,6 +1044,7 @@ export function ComponentsPanel() {
                 >
                   <SlidersHorizontal className="size-3" />
                 </button>
+                )}
               </div>
             ))}
           </div>

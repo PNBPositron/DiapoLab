@@ -485,6 +485,46 @@ export async function exportPPTX(name: string) {
           hyperlink: { url: element.src, tooltip: element.src },
           rotate: element.rotation,
         });
+      } else if (element.type === "table") {
+        // Tables export as REAL PowerPoint tables (editable text in PowerPoint).
+        const headerFill = cssColorToHex(element.accentColor) || "2B6BFF";
+        const bodyFill = cssColorToHex(element.bgColor) || "FFFFFF";
+        const aHex = (element.accentColor || "#2b6bff").replace("#", "");
+        const headColor =
+          aHex.length >= 6 &&
+          parseInt(aHex.slice(0, 2), 16) * 0.299 +
+            parseInt(aHex.slice(2, 4), 16) * 0.587 +
+            parseInt(aHex.slice(4, 6), 16) * 0.114 >
+            150
+            ? "1F2937"
+            : "FFFFFF";
+        const tableRows = element.rows.map((row, ri) =>
+          row.map((cell, ci) => ({
+            text: cell,
+            options: {
+              bold: (element.headerRow && ri === 0) || (element.firstColBold && ci === 0),
+              color:
+                element.headerRow && ri === 0
+                  ? headColor
+                  : cssColorToHex(element.fgColor) || "333333",
+              fill: {
+                color:
+                  element.headerRow && ri === 0
+                    ? headerFill
+                    : element.zebra && ri % 2 === 1
+                      ? "F1F5F9"
+                      : bodyFill,
+              },
+            },
+          })),
+        );
+        slide.addTable(tableRows as never, {
+          ...box,
+          fontSize: Math.max(8, Math.round(element.fontSize * 0.75)),
+          border: { type: "solid", pt: 0.5, color: "CBD5E1" },
+          valign: "middle",
+          autoPage: false,
+        });
       }
     }
     if (page.notes) slide.addNotes(page.notes);

@@ -17,7 +17,9 @@ const fieldsOf = (e: AnyElement): string[] => {
     case "button":
       return [e.text];
     case "ui":
-      return [e.title, e.body, ...e.items];
+      return [e.title, e.body, ...e.items, ...(e.files ?? [])];
+    case "table":
+      return e.rows.flat();
     case "quiz":
       return [e.question, ...e.options.map((o) => o.text)];
     case "chart":

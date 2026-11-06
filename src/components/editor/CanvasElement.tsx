@@ -8,6 +8,7 @@ import {
   type QuizElement,
   type ChartElement,
   type ButtonElement,
+  type TableElement,
   type ElementShadow,
   DEFAULT_FILTERS,
   type ImageFilters,
@@ -20,7 +21,7 @@ import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode } from "lucide-react";
+import { HelpCircle, Check, X as XIcon, QrCode, Lock } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -597,6 +598,7 @@ export function CanvasElement({
       return;
     }
     if (!useEditor.getState().selectedIds.includes(element.id)) select(element.id);
+    if (element.locked) return; // locked elements can be selected but never dragged
     const startX = e.clientX;
     const startY = e.clientY;
     const ox = element.x;
@@ -978,6 +980,11 @@ export function CanvasElement({
         if (element.type === "image" && !presenting) {
           e.stopPropagation();
           useEditor.getState().setCroppingId(element.id);
+        }
+        // Double-click any rich element: open the inspector on its content.
+        if (!presenting && ["ui", "chart", "quiz", "table", "button", "icon", "embed"].includes(element.type)) {
+          e.stopPropagation();
+          window.dispatchEvent(new CustomEvent("diapolab:open-inspector"));
         }
       }}
       className={
@@ -1615,6 +1622,7 @@ export function CanvasElement({
         })()}
 
       {element.type === "chart" && <ChartRender element={element} />}
+      {element.type === "table" && <TableRender element={element} />}
       {element.type === "ui" && <UiRender element={element} />}
       {element.type === "button" &&
         (() => {
@@ -1716,7 +1724,13 @@ export function CanvasElement({
           );
         })()}
 
-      {selected && !editing && (
+      {element.locked && !preview && !presenting && (
+        <div title="Element locked — unlock in the inspector" style={{ position: "absolute", right: -12, top: -12, zIndex: 6, display: "grid", placeItems: "center", width: 22, height: 22, borderRadius: 999, background: "#0f172a", color: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)", pointerEvents: "none" }}>
+          <Lock className="size-3" />
+        </div>
+      )}
+
+      {selected && !editing && !element.locked && (
         <>
           {(["nw", "ne", "sw", "se"] as Handle[]).map((h) => (
             <div
@@ -2380,6 +2394,68 @@ function ChartRender({ element }: { element: ChartElement }) {
         {chart === "pie" && renderPie(false)}
         {chart === "donut" && renderPie(true)}
       </svg>
+    </div>
+  );
+}
+
+function TableRender({ element }: { element: TableElement }) {
+  const cols = Math.max(1, element.rows[0]?.length ?? 1);
+  const accentHex = (element.accentColor || "#2b6bff").replace("#", "");
+  const onAccent =
+    accentHex.length >= 6 &&
+    parseInt(accentHex.slice(0, 2), 16) * 0.299 +
+      parseInt(accentHex.slice(2, 4), 16) * 0.587 +
+      parseInt(accentHex.slice(4, 6), 16) * 0.114 >
+      150
+      ? "#0f172a"
+      : "#ffffff";
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: element.bgColor,
+        color: element.fgColor,
+        fontSize: element.fontSize,
+        borderRadius: 8,
+        overflow: "hidden",
+        border: "1px solid rgba(15,23,42,0.12)",
+        display: "grid",
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridAutoRows: "minmax(0, 1fr)",
+      }}
+    >
+      {element.rows.map((row, ri) =>
+        row.map((cell, ci) => (
+          <div
+            key={ri + "-" + ci}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "0 12px",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              fontWeight:
+                element.headerRow && ri === 0
+                  ? 700
+                  : element.firstColBold && ci === 0
+                    ? 600
+                    : 400,
+              background:
+                element.headerRow && ri === 0
+                  ? element.accentColor
+                  : element.zebra && ri % 2 === 1
+                    ? "rgba(15,23,42,0.05)"
+                    : "transparent",
+              color: element.headerRow && ri === 0 ? onAccent : element.fgColor,
+              borderBottom: ri < element.rows.length - 1 ? "1px solid rgba(15,23,42,0.1)" : undefined,
+              borderRight: ci < cols - 1 ? "1px solid rgba(15,23,42,0.1)" : undefined,
+            }}
+          >
+            {cell}
+          </div>
+        )),
+      )}
     </div>
   );
 }

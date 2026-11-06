@@ -75,6 +75,8 @@ export type ElementBase = {
   groupId?: string;
   /** CSS mix-blend-mode — how the element composites onto the slide (undefined = normal) */
   blendMode?: string;
+  /** locked elements can be selected & edited but never dragged or resized */
+  locked?: boolean;
 };
 
 export type ElementAnimation =
@@ -384,6 +386,22 @@ export type EmbedElement = ElementBase & {
   allow?: string;
 };
 
+export type TableElement = ElementBase & {
+  type: "table";
+  /** row-major cell texts, every row must have the same length */
+  rows: string[][];
+  /** style the first row as a colored header */
+  headerRow: boolean;
+  /** alternate row background for readability */
+  zebra: boolean;
+  /** render the first column bold */
+  firstColBold: boolean;
+  bgColor: string;
+  fgColor: string;
+  accentColor: string;
+  fontSize: number;
+};
+
 // ---- UI components ----
 export type UiStyle =
   | "cyber"
@@ -426,7 +444,8 @@ export type UiKind =
   | "kdeFiles"
   | "kdeRunner"
   | "kdeSettings"
-  | "timeline";
+  | "timeline"
+  | "code";
 
 export type UiElement = ElementBase & {
   type: "ui";
@@ -716,7 +735,8 @@ export type AnyElement =
   | ChartElement
   | ButtonElement
   | EmbedElement
-  | UiElement;
+  | UiElement
+  | TableElement;
 
 export type Page = {
   id: string;
@@ -999,6 +1019,30 @@ export const newChart = (
   ...overrides,
 });
 
+export const newTable = (overrides: Partial<TableElement> = {}): TableElement => ({
+  id: uid(),
+  type: "table",
+  x: 160,
+  y: 160,
+  width: 760,
+  height: 320,
+  rotation: 0,
+  rows: [
+    ["Feature", "Basic", "Pro", "Enterprise"],
+    ["Slides", "10", "Unlimited", "Unlimited"],
+    ["Collaborators", "1", "5", "50"],
+    ["Support", "Community", "Email", "24/7"],
+  ],
+  headerRow: true,
+  zebra: true,
+  firstColBold: true,
+  bgColor: "#ffffff",
+  fgColor: "#0f172a",
+  accentColor: "#2b6bff",
+  fontSize: 15,
+  ...overrides,
+});
+
 /** A guaranteed-opaque background for a style pack (charts, quizzes, buttons). */
 export const solidThemeBg = (uiStyle: UiStyle): string => {
   const t = UI_STYLE_THEMES[uiStyle];
@@ -1235,6 +1279,14 @@ const UI_DEFAULTS: Record<
     body: "npm run build",
     value: 0,
     items: ["$ npm install", "added 214 packages", "$ npm run build", "built in 1.24s"],
+  },
+  code: {
+    w: 720,
+    h: 460,
+    title: "main.ts",
+    body: 'const greet = (name) => {\n  // say hello\n  const msg = "Hello, " + name + "!";\n  return msg;\n};\n\ngreet("World");',
+    value: 0,
+    items: [],
   },
   phone: {
     w: 340,
@@ -1798,7 +1850,9 @@ export const useEditor = create<State>((set, get) => {
             case "button":
               return { ...e, text: sub(e.text) };
             case "ui":
-              return { ...e, title: sub(e.title), body: sub(e.body), items: e.items.map(sub) };
+              return { ...e, title: sub(e.title), body: sub(e.body), items: e.items.map(sub), files: e.files?.map(sub) };
+            case "table":
+              return { ...e, rows: e.rows.map((r) => r.map(sub)) };
             case "quiz":
               return {
                 ...e,

@@ -13,6 +13,7 @@ import {
   type QuizElement,
   type QuizOption,
   type ChartElement,
+  type TableElement,
   type ButtonElement,
   type ChartKind,
   type ButtonAction,
@@ -57,6 +58,8 @@ import {
   EyeOff,
   X,
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash, Crop, SlidersHorizontal,
+  Lock,
+  LockOpen,
 } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
@@ -467,6 +470,13 @@ export function PropertiesPanel() {
 
   const el = elements.find((e) => e.id === selectedId);
 
+  // Double-clicking an element on the canvas opens this inspector.
+  useEffect(() => {
+    const onOpen = () => setAdvancedOpen(true);
+    window.addEventListener("diapolab:open-inspector", onOpen);
+    return () => window.removeEventListener("diapolab:open-inspector", onOpen);
+  }, []);
+
     // Reset popovers + JSON draft ONLY when the selection changes — not on
   // every property edit. Reading the element via getState() avoids putting
   // `el` in the deps (a new object reference on each update would re-run
@@ -740,6 +750,18 @@ export function PropertiesPanel() {
           title="Rotate 90°"
         >
           <RotateCcw className="size-3.5" />
+        </button>
+
+        <button
+          onClick={() => update(el.id, { locked: !el.locked } as never)}
+          className={`grid size-8 place-items-center rounded-full transition active:scale-90 ${
+            el.locked
+              ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+              : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+          title={el.locked ? "Unlock element (allow drag & resize)" : "Lock element (no drag, no resize)"}
+        >
+          {el.locked ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
         </button>
 
         <button
@@ -1023,6 +1045,100 @@ export function PropertiesPanel() {
                 />
               </Section>
             )}
+
+            {/* TABLE ELEMENT */}
+            {el.type === "table" && (() => {
+              const tb = el as TableElement;
+              return (
+                <Section title="Table">
+                  <Field label="Options">
+                    <div className="flex flex-wrap gap-3">
+                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                        <input type="checkbox" checked={tb.headerRow} onChange={(e) => update(tb.id, { headerRow: e.target.checked } as never)} className="accent-sky-600" />
+                        Header row
+                      </label>
+                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                        <input type="checkbox" checked={tb.zebra} onChange={(e) => update(tb.id, { zebra: e.target.checked } as never)} className="accent-sky-600" />
+                        Zebra rows
+                      </label>
+                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                        <input type="checkbox" checked={tb.firstColBold} onChange={(e) => update(tb.id, { firstColBold: e.target.checked } as never)} className="accent-sky-600" />
+                        Bold first column
+                      </label>
+                    </div>
+                  </Field>
+                  <Field label="Cells">
+                    <div className="space-y-1.5">
+                      {tb.rows.map((row, ri) => (
+                        <div key={ri} className="flex items-center gap-1">
+                          {row.map((cell, ci) => (
+                            <input
+                              key={ci}
+                              type="text"
+                              aria-label={`Row ${ri + 1} column ${ci + 1}`}
+                              value={cell}
+                              onChange={(e) =>
+                                update(tb.id, {
+                                  rows: tb.rows.map((r, i) =>
+                                    i === ri ? r.map((c2, j) => (j === ci ? e.target.value : c2)) : r,
+                                  ),
+                                } as never)
+                              }
+                              className="min-w-0 flex-1 rounded-lg border border-slate-200 px-1.5 py-1 text-[11px] focus:border-sky-500 focus:outline-none"
+                            />
+                          ))}
+                          <button
+                            type="button"
+                            aria-label="Remove row"
+                            disabled={tb.rows.length <= 1}
+                            onClick={() => update(tb.id, { rows: tb.rows.filter((_, i) => i !== ri) } as never)}
+                            className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => update(tb.id, { rows: [...tb.rows, tb.rows[0].map(() => "")] } as never)}
+                          className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                        >
+                          + Add row
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => update(tb.id, { rows: tb.rows.map((r) => [...r, ""]) } as never)}
+                          className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                        >
+                          + Add column
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Remove last column"
+                          disabled={tb.rows[0].length <= 1}
+                          onClick={() => update(tb.id, { rows: tb.rows.map((r) => r.slice(0, -1)) } as never)}
+                          className="rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-30"
+                        >
+                          − Col
+                        </button>
+                      </div>
+                    </div>
+                  </Field>
+                  <SliderWithInput
+                    label="Font size"
+                    min={10}
+                    max={40}
+                    value={tb.fontSize}
+                    unit="px"
+                    onChange={(val) => update(tb.id, { fontSize: val } as never)}
+                  />
+                  <ModernColorPicker label="Background" value={tb.bgColor} onChange={(c) => update(tb.id, { bgColor: c } as never)} />
+                  <ModernColorPicker label="Text" value={tb.fgColor} onChange={(c) => update(tb.id, { fgColor: c } as never)} />
+                  <ModernColorPicker label="Header" value={tb.accentColor} onChange={(c) => update(tb.id, { accentColor: c } as never)} />
+                </Section>
+              );
+            })()}
 
             {/* QUIZ ELEMENT */}
             {el.type === "quiz" && (() => {
