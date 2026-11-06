@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import {
   useEditor,
   UI_STYLE_THEMES,
+  TABLE_STYLE_RECIPES,
   embedProvider,
   type AnyElement,
   type ShapeElement,
@@ -2400,7 +2401,10 @@ function ChartRender({ element }: { element: ChartElement }) {
 
 function TableRender({ element }: { element: TableElement }) {
   const cols = Math.max(1, element.rows[0]?.length ?? 1);
-  const accentHex = (element.accentColor || "#2b6bff").replace("#", "");
+  const st = element.tableStyle ? UI_STYLE_THEMES[element.tableStyle] : null;
+  const recipe = element.tableStyle ? TABLE_STYLE_RECIPES[element.tableStyle] : null;
+  const accent = element.accentColor || "#2b6bff";
+  const accentHex = accent.replace("#", "");
   const onAccent =
     accentHex.length >= 6 &&
     parseInt(accentHex.slice(0, 2), 16) * 0.299 +
@@ -2409,6 +2413,16 @@ function TableRender({ element }: { element: TableElement }) {
       150
       ? "#0f172a"
       : "#ffffff";
+  const fgRGBA = (a: number) => {
+    const m = (element.fgColor || "#0f172a").match(/^#([0-9a-f]{6})$/i);
+    if (!m) return `rgba(15,23,42,${a})`;
+    const n = parseInt(m[1], 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+  };
+  const gridColor = recipe?.gridColor ?? fgRGBA(st?.dark ? 0.14 : 0.09);
+  const gridStyle = recipe?.dashGrid ? "dashed" : "solid";
+  const headerMode = recipe?.headerMode ?? "fill";
+  const noVGrid = !!recipe?.rowLinesOnly;
   return (
     <div
       style={{
@@ -2417,44 +2431,58 @@ function TableRender({ element }: { element: TableElement }) {
         background: element.bgColor,
         color: element.fgColor,
         fontSize: element.fontSize,
-        borderRadius: 8,
+        fontFamily: st?.font,
+        borderRadius: recipe?.radius ?? st?.radius ?? 8,
         overflow: "hidden",
-        border: "1px solid rgba(15,23,42,0.12)",
+        border: st ? `${st.borderWidth}px solid ${st.border}` : "1px solid rgba(15,23,42,0.12)",
+        boxShadow: recipe?.glow ? `0 0 22px ${accent}55` : recipe?.flat ? undefined : st?.shadow,
+        backdropFilter: st?.backdrop,
+        WebkitBackdropFilter: st?.backdrop,
         display: "grid",
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridAutoRows: "minmax(0, 1fr)",
       }}
     >
       {element.rows.map((row, ri) =>
-        row.map((cell, ci) => (
-          <div
-            key={ri + "-" + ci}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "0 12px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              fontWeight:
-                element.headerRow && ri === 0
-                  ? 700
-                  : element.firstColBold && ci === 0
-                    ? 600
-                    : 400,
-              background:
-                element.headerRow && ri === 0
-                  ? element.accentColor
-                  : element.zebra && ri % 2 === 1
-                    ? "rgba(15,23,42,0.05)"
+        row.map((cell, ci) => {
+          const isHeader = element.headerRow && ri === 0;
+          const headerFill = isHeader && headerMode === "fill";
+          const headerLine = isHeader && headerMode === "underline";
+          return (
+            <div
+              key={ri + "-" + ci}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "0 12px",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                fontWeight: isHeader ? 700 : element.firstColBold && ci === 0 ? 600 : 400,
+                background: headerFill
+                  ? accent
+                  : element.zebra && !isHeader && ri % 2 === 1
+                    ? fgRGBA(recipe?.zebraAlpha ?? 0.05)
                     : "transparent",
-              color: element.headerRow && ri === 0 ? onAccent : element.fgColor,
-              borderBottom: ri < element.rows.length - 1 ? "1px solid rgba(15,23,42,0.1)" : undefined,
-              borderRight: ci < cols - 1 ? "1px solid rgba(15,23,42,0.1)" : undefined,
-            }}
-          >
-            {cell}
-          </div>
-        )),
+                color: headerFill
+                  ? onAccent
+                  : isHeader && headerMode === "plain"
+                    ? accent
+                    : element.fgColor,
+                textTransform:
+                  isHeader && (recipe?.headerUppercase ?? st?.uppercase) ? "uppercase" : undefined,
+                letterSpacing: isHeader ? st?.letterSpacing : undefined,
+                borderBottom: headerLine
+                  ? `2px solid ${accent}`
+                  : ri < element.rows.length - 1
+                    ? `1px ${gridStyle} ${gridColor}`
+                    : undefined,
+                borderRight: !noVGrid && ci < cols - 1 ? `1px ${gridStyle} ${gridColor}` : undefined,
+              }}
+            >
+              {cell}
+            </div>
+          );
+        }),
       )}
     </div>
   );

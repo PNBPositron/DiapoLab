@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import { toJpeg, toPng } from "html-to-image";
-import { useEditor, type Page } from "@/store/editor";
+import { useEditor, UI_STYLE_THEMES, TABLE_STYLE_RECIPES, type Page } from "@/store/editor";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 
 export function exportJSON(name: string) {
@@ -498,6 +498,9 @@ export async function exportPPTX(name: string) {
             150
             ? "1F2937"
             : "FFFFFF";
+        const tableSt = element.tableStyle ? UI_STYLE_THEMES[element.tableStyle] : null;
+        const tableRecipe = element.tableStyle ? TABLE_STYLE_RECIPES[element.tableStyle] : null;
+        const tableFontFace = tableSt ? tableSt.font.split(",")[0].replace(/['"]/g, "").trim() : undefined;
         const tableRows = element.rows.map((row, ri) =>
           row.map((cell, ci) => ({
             text: cell,
@@ -505,12 +508,18 @@ export async function exportPPTX(name: string) {
               bold: (element.headerRow && ri === 0) || (element.firstColBold && ci === 0),
               color:
                 element.headerRow && ri === 0
-                  ? headColor
+                  ? tableRecipe && tableRecipe.headerMode === "plain"
+                    ? headerFill
+                    : tableRecipe && tableRecipe.headerMode === "underline"
+                      ? cssColorToHex(element.fgColor) || "333333"
+                      : headColor
                   : cssColorToHex(element.fgColor) || "333333",
               fill: {
                 color:
                   element.headerRow && ri === 0
-                    ? headerFill
+                    ? tableRecipe && tableRecipe.headerMode !== "fill"
+                      ? bodyFill
+                      : headerFill
                     : element.zebra && ri % 2 === 1
                       ? "F1F5F9"
                       : bodyFill,
@@ -521,7 +530,12 @@ export async function exportPPTX(name: string) {
         slide.addTable(tableRows as never, {
           ...box,
           fontSize: Math.max(8, Math.round(element.fontSize * 0.75)),
-          border: { type: "solid", pt: 0.5, color: "CBD5E1" },
+          ...(tableFontFace ? { fontFace: tableFontFace } : {}),
+          border: {
+            type: tableRecipe?.dashGrid ? "dash" : "solid",
+            pt: tableSt ? Math.max(0.5, tableSt.borderWidth) : 0.5,
+            color: tableSt ? cssColorToHex(tableSt.border) || "CBD5E1" : "CBD5E1",
+          },
           valign: "middle",
           autoPage: false,
         });

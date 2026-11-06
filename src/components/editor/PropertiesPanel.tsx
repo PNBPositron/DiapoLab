@@ -1056,8 +1056,7 @@ export function PropertiesPanel() {
                     <div className="grid grid-cols-3 gap-1.5">
                       {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
                         const t = UI_STYLE_THEMES[s];
-                        const patch = tableStylePatch(s);
-                        const active = tb.bgColor === patch.bgColor && tb.accentColor === patch.accentColor;
+                        const active = tb.tableStyle === s;
                         return (
                           <button
                             key={s}

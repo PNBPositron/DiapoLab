@@ -389,6 +389,8 @@ export type EmbedElement = ElementBase & {
 export type TableElement = ElementBase & {
   type: "table";
   /** row-major cell texts, every row must have the same length */
+  /** style pack driving borders, header treatment, grid lines and typography */
+  tableStyle?: UiStyle;
   rows: string[][];
   /** style the first row as a colored header */
   headerRow: boolean;
@@ -1091,10 +1093,41 @@ export const quizStylePatch = (uiStyle: UiStyle): Partial<QuizElement> => {
 export const tableStylePatch = (uiStyle: UiStyle): Partial<TableElement> => {
   const t = UI_STYLE_THEMES[uiStyle];
   return {
+    tableStyle: uiStyle,
     bgColor: solidThemeBg(uiStyle),
     fgColor: t.dark ? "#ffffff" : t.fg,
     accentColor: t.accent,
   };
+};
+
+/* How a table "sounds" like each style pack — the recipe drives the render
+ *  (header treatment, grid lines, zebra tint, glow, typography), the colors
+ *  come from the pack and stay hand-editable. */
+export type TableRecipe = {
+  headerMode: "fill" | "underline" | "plain";
+  zebraAlpha?: number;
+  radius?: number;
+  gridColor?: string;
+  dashGrid?: boolean;
+  rowLinesOnly?: boolean;
+  glow?: boolean;
+  flat?: boolean;
+  headerUppercase?: boolean;
+};
+export const TABLE_STYLE_RECIPES: Record<UiStyle, TableRecipe> = {
+  cyber: { headerMode: "fill", zebraAlpha: 0.05, glow: true },
+  glass: { headerMode: "underline", zebraAlpha: 0.06 },
+  neobrutalist: { headerMode: "fill", zebraAlpha: 0.06, gridColor: "#0f0f0f" },
+  sketch: { headerMode: "underline", zebraAlpha: 0.05, dashGrid: true },
+  xp: { headerMode: "fill", zebraAlpha: 0.08, radius: 0, gridColor: "rgba(15,23,42,0.3)" },
+  aqua: { headerMode: "fill", zebraAlpha: 0.05, radius: 10 },
+  midnight: { headerMode: "fill", zebraAlpha: 0.06 },
+  pastel: { headerMode: "fill", zebraAlpha: 0.05 },
+  vapor: { headerMode: "fill", zebraAlpha: 0.06, glow: true },
+  material: { headerMode: "fill", zebraAlpha: 0.04, rowLinesOnly: true, radius: 4 },
+  matrix: { headerMode: "plain", zebraAlpha: 0.07, glow: true },
+  swiss: { headerMode: "underline", zebraAlpha: 0.04, rowLinesOnly: true, radius: 0, flat: true, headerUppercase: true },
+  custom: { headerMode: "fill", zebraAlpha: 0.05 },
 };
 
 export const newButton = (overrides: Partial<ButtonElement> = {}): ButtonElement => ({
