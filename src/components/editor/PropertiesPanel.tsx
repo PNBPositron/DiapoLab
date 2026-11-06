@@ -5,6 +5,7 @@ import {
   UI_STYLE_THEMES,
   chartStylePatch,
   quizStylePatch,
+  tableStylePatch,
   type ImageFilters,
   type ElementShadow,
   type ShapeElement,
@@ -1051,6 +1052,28 @@ export function PropertiesPanel() {
               const tb = el as TableElement;
               return (
                 <Section title="Table">
+                  <Field label="Theme Presets">
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
+                        const t = UI_STYLE_THEMES[s];
+                        const patch = tableStylePatch(s);
+                        const active = tb.bgColor === patch.bgColor && tb.accentColor === patch.accentColor;
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => update(tb.id, tableStylePatch(s) as never)}
+                            className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${
+                              active
+                                ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                                : "border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
                   <Field label="Options">
                     <div className="flex flex-wrap gap-3">
                       <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">

@@ -1086,6 +1086,17 @@ export const quizStylePatch = (uiStyle: UiStyle): Partial<QuizElement> => {
   };
 };
 
+/** Map a UI style pack onto table colors so tables match the rest of the deck.
+ *  Header fill, zebra tint and text color all derive from the pack. */
+export const tableStylePatch = (uiStyle: UiStyle): Partial<TableElement> => {
+  const t = UI_STYLE_THEMES[uiStyle];
+  return {
+    bgColor: solidThemeBg(uiStyle),
+    fgColor: t.dark ? "#ffffff" : t.fg,
+    accentColor: t.accent,
+  };
+};
+
 export const newButton = (overrides: Partial<ButtonElement> = {}): ButtonElement => ({
   id: uid(),
   type: "button",

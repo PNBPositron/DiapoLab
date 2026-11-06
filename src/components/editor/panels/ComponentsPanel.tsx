@@ -52,6 +52,7 @@ import {
   useEditor,
   chartStylePatch,
   quizStylePatch,
+  tableStylePatch,
   saveCustomUiTheme,
   type UiTheme,
   type UiKind,
@@ -665,7 +666,7 @@ export function ComponentsPanel() {
       label: "Table",
       description: "Editable grid — native PPTX",
       Icon: TableIcon,
-      create: (patch: Record<string, unknown> = {}) => newTable(patch),
+      create: (patch: Record<string, unknown> = {}) => newTable({ ...tableStylePatch(style), ...patch }),
     },
   ];
 
@@ -823,6 +824,9 @@ export function ComponentsPanel() {
     }
     if (selected?.type === "chart") {
       update(selected.id, chartStylePatch(nextStyle));
+    }
+    if (selected?.type === "table") {
+      update(selected.id, tableStylePatch(nextStyle));
     }
   };
 
