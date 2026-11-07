@@ -1682,6 +1682,32 @@ export function PropertiesPanel() {
                   </div>
                 </Field>
 
+                <Field label="Replace image">
+                  <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">
+                    <Upload className="size-3.5" />
+                    <span>Choose a new file</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (!file) return;
+                        try {
+                          const src = await prepareImage(file);
+                          update(el.id, { src, cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined });
+                        } catch (err) {
+                          window.alert(err instanceof Error ? err.message : "Could not load this image.");
+                        }
+                      }}
+                    />
+                  </label>
+                  <p className="mt-1 text-[10px] leading-snug text-slate-400">
+                    La position, la taille et le masque sont conservés ; le recadrage est réinitialisé.
+                  </p>
+                </Field>
+
                 <Field label="Transform">
                   <ToggleGrid label="Image transforms" options={[
                     { id: "flipX", label: "Flip H", icon: FlipHorizontal, checked: !!el.flipX, onChange: () => update(el.id, { flipX: !el.flipX }) },
