@@ -805,6 +805,8 @@ type State = {
   toggleSelect: (id: string) => void;
   removeSelected: () => void;
   duplicateSelected: () => void;
+  /** arrow-key nudge on the current selection (skips locked, coalesced history) */
+  nudgeSelected: (dx: number, dy: number) => void;
   /** insert several elements as one group (one history entry, all selected) */
   addGroup: (els: AnyElement[]) => void;
   /** group the current multi-selection so it moves as one block */
@@ -1493,6 +1495,10 @@ export const useEditor = create<State>((set, get) => {
     set(syncCurrent(next, currentIndex));
   };
 
+  // Timestamp of the last arrow-key nudge: keydown auto-repeat fires
+  // ~30x/s, so history entries are coalesced into one per burst.
+  let lastNudgeAt = 0;
+
   return {
     pages: initialPages,
     currentIndex: 0,
@@ -1539,8 +1545,11 @@ export const useEditor = create<State>((set, get) => {
             x: Math.round(Math.max(0, Math.min(w - width, cx - width / 2))),
             y: Math.round(Math.max(0, Math.min(h - height, cy - height / 2))),
           } as AnyElement;
-          if (scaled.type === "text") {
-            return { ...scaled, fontSize: Math.max(8, Math.round(scaled.fontSize * s)) };
+          // Scale the font size of every element type that has one
+          // (text, table, quiz, ui shell) so the ratio survives the resize.
+          const fs = (scaled as { fontSize?: unknown }).fontSize;
+          if (typeof fs === "number") {
+            return { ...scaled, fontSize: Math.max(8, Math.round(fs * s)) } as AnyElement;
           }
           return scaled;
         }),
@@ -1623,6 +1632,8 @@ export const useEditor = create<State>((set, get) => {
         id: uid(),
         x: clipboard.x + 30,
         y: clipboard.y + 30,
+        // a pasted element never rejoins the group its source belonged to
+        groupId: undefined,
       } as AnyElement;
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
       set({ selectedId: clone.id, selectedIds: [clone.id] });
@@ -1682,6 +1693,24 @@ export const useEditor = create<State>((set, get) => {
       set({ selectedIds: clones.map((c) => c.id), selectedId: clones[clones.length - 1]?.id ?? null });
     },
 
+    nudgeSelected: (dx, dy) => {
+      const { selectedIds, selectedId } = get();
+      const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
+      if (!ids.length) return;
+      const now = Date.now();
+      if (now - lastNudgeAt > 600) pushHistory();
+      lastNudgeAt = now;
+      // Locked elements are never moved by the keyboard.
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          ids.includes(e.id) && !e.locked
+            ? ({ ...e, x: e.x + dx, y: e.y + dy } as AnyElement)
+            : e,
+        ),
+      }));
+    },
+
     addGroup: (els) => {
       if (!els.length) return;
       pushHistory();
@@ -1735,7 +1764,14 @@ export const useEditor = create<State>((set, get) => {
       const el = get().elements.find((e) => e.id === id);
       if (!el) return;
       pushHistory();
-      const clone = { ...el, id: uid(), x: el.x + 30, y: el.y + 30 } as AnyElement;
+      const clone = {
+        ...(JSON.parse(JSON.stringify(el)) as AnyElement),
+        id: uid(),
+        x: el.x + 30,
+        y: el.y + 30,
+      };
+      // the clone keeps a group identity of its own, never the source's
+      if (clone.groupId) clone.groupId = uid();
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, clone] }));
       set({ selectedId: clone.id, selectedIds: [clone.id] });
     },
