@@ -1155,6 +1155,22 @@ export function PropertiesPanel() {
                     unit="px"
                     onChange={(val) => update(tb.id, { fontSize: val } as never)}
                   />
+                  <SliderWithInput
+                    label="Cell padding"
+                    min={2}
+                    max={24}
+                    value={tb.cellPadding ?? 12}
+                    unit="px"
+                    onChange={(val) => update(tb.id, { cellPadding: val } as never)}
+                  />
+                  <SliderWithInput
+                    label="Grid width"
+                    min={0}
+                    max={3}
+                    value={tb.gridWidth ?? 1}
+                    unit="px"
+                    onChange={(val) => update(tb.id, { gridWidth: val } as never)}
+                  />
                   <ModernColorPicker label="Background" value={tb.bgColor} onChange={(c) => update(tb.id, { bgColor: c } as never)} />
                   <ModernColorPicker label="Text" value={tb.fgColor} onChange={(c) => update(tb.id, { fgColor: c } as never)} />
                   <ModernColorPicker label="Header" value={tb.accentColor} onChange={(c) => update(tb.id, { accentColor: c } as never)} />

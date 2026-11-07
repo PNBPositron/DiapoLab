@@ -99,6 +99,7 @@ type ElementDraft = {
   data: Array<{ label: string; value: number }>;
   question: string;
   options: string[];
+  rows?: string[][];
 };
 const DRAFT_FIELD =
   "rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-blue-400";
@@ -740,6 +741,18 @@ export function ComponentsPanel() {
       question: "Which feature should we build next?",
       options: ["Live polls", "Smart export", "Design AI"],
     },
+    table: {
+      title: "",
+      data: [],
+      question: "",
+      options: [],
+      rows: [
+        ["Feature", "Basic", "Pro", "Enterprise"],
+        ["Slides", "10", "Unlimited", "Unlimited"],
+        ["Collaborators", "1", "5", "50"],
+        ["Support", "Community", "Email", "24/7"],
+      ],
+    },
   };
 
   const openUiDraft = (kind: UiKind, label: string, ov?: Partial<ReturnType<typeof newUi>>) => {
@@ -787,6 +800,7 @@ export function ComponentsPanel() {
       data: defaults.data.map((row) => ({ ...row })),
       question: defaults.question,
       options: defaults.options.slice(),
+      rows: defaults.rows?.map((r) => r.slice()),
     });
   };
 
@@ -795,7 +809,10 @@ export function ComponentsPanel() {
     const preset = ELEMENT_PRESETS.find((p) => p.id === elDraft.id);
     if (!preset) return;
     let patch: Record<string, unknown> = {};
-    if (elDraft.id === "quiz" || elDraft.id === "poll") {
+    if (elDraft.id === "table") {
+      const rows = (elDraft.rows ?? []).map((r) => r.map((cell) => cell.trim()));
+      patch = { rows: rows.length > 0 ? rows : [[""]] };
+    } else if (elDraft.id === "quiz" || elDraft.id === "poll") {
       const options = elDraft.options
         .filter((text) => text.trim() !== "")
         .map((text) => ({ id: Math.random().toString(36).slice(2, 10), text }));
@@ -1035,7 +1052,7 @@ export function ComponentsPanel() {
                     <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
                   </span>
                 </button>
-                {e.id !== "table" && (
+                {(
                 <button
                   type="button"
                   title="Edit texts before insert"
@@ -1086,6 +1103,62 @@ export function ComponentsPanel() {
                     <Plus className="size-3" /> Add option
                   </button>
                 </>
+              ) : elDraft.id === "table" ? (
+                <div className="flex flex-col gap-1.5">
+                  {(elDraft.rows ?? []).map((row, ri) => (
+                    <div key={ri} className="flex items-center gap-1.5">
+                      {row.map((cell, ci) => (
+                        <input
+                          key={ci}
+                          value={cell}
+                          onChange={(e) =>
+                            setElDraft((d) =>
+                              d
+                                ? {
+                                    ...d,
+                                    rows: (d.rows ?? []).map((r, j) =>
+                                      j === ri ? r.map((c, k) => (k === ci ? e.target.value : c)) : r,
+                                    ),
+                                  }
+                                : d,
+                            )
+                          }
+                          placeholder={`R${ri + 1} C${ci + 1}`}
+                          className={DRAFT_FIELD + " min-w-0 flex-1"}
+                        />
+                      ))}
+                      <button
+                        type="button"
+                        aria-label="Remove row"
+                        disabled={(elDraft.rows ?? []).length <= 1}
+                        onClick={() => setElDraft((d) => (d ? { ...d, rows: (d.rows ?? []).filter((_, j) => j !== ri) } : d))}
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setElDraft((d) =>
+                          d ? { ...d, rows: [...(d.rows ?? []), ((d.rows ?? [])[0] ?? [""]).map(() => "")] } : d,
+                        )
+                      }
+                      className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                    >
+                      + Row
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setElDraft((d) => (d ? { ...d, rows: (d.rows ?? []).map((r) => [...r, ""]) } : d))}
+                      className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                    >
+                      + Column
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <>
                   <input

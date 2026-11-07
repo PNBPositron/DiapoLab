@@ -2454,7 +2454,7 @@ function TableRender({ element }: { element: TableElement }) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                padding: "0 12px",
+                padding: `0 ${element.cellPadding ?? 12}px`,
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 fontWeight: isHeader ? 700 : element.firstColBold && ci === 0 ? 600 : 400,
@@ -2474,9 +2474,9 @@ function TableRender({ element }: { element: TableElement }) {
                 borderBottom: headerLine
                   ? `2px solid ${accent}`
                   : ri < element.rows.length - 1
-                    ? `1px ${gridStyle} ${gridColor}`
+                    ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}`
                     : undefined,
-                borderRight: !noVGrid && ci < cols - 1 ? `1px ${gridStyle} ${gridColor}` : undefined,
+                borderRight: !noVGrid && ci < cols - 1 ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}` : undefined,
               }}
             >
               {cell}

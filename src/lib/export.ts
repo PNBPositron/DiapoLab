@@ -531,6 +531,7 @@ export async function exportPPTX(name: string) {
           ...box,
           fontSize: Math.max(8, Math.round(element.fontSize * 0.75)),
           ...(tableFontFace ? { fontFace: tableFontFace } : {}),
+          margin: Math.min(0.25, (element.cellPadding ?? 12) / 96),
           border: {
             type: tableRecipe?.dashGrid ? "dash" : "solid",
             pt: tableSt ? Math.max(0.5, tableSt.borderWidth) : 0.5,

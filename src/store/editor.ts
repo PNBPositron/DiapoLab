@@ -391,6 +391,10 @@ export type TableElement = ElementBase & {
   /** row-major cell texts, every row must have the same length */
   /** style pack driving borders, header treatment, grid lines and typography */
   tableStyle?: UiStyle;
+  /** horizontal cell padding in px (default 12) */
+  cellPadding?: number;
+  /** inner grid line thickness in px (default 1, 0 = no lines) */
+  gridWidth?: number;
   rows: string[][];
   /** style the first row as a colored header */
   headerRow: boolean;
