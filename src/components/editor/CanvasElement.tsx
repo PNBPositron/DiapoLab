@@ -10,6 +10,7 @@ import {
   type ChartElement,
   type ButtonElement,
   type TableElement,
+  type UiStyle,
   type ElementShadow,
   DEFAULT_FILTERS,
   type ImageFilters,
@@ -2153,10 +2154,23 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   );
 }
 
+/** Per-pack chart recipes — how the plot frame and grid "sound" like the pack. */
+const CHART_STYLE_RECIPES: Partial<Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>> = {
+  sketch: { dashGrid: true },
+  swiss: { flat: true, radius: 0 },
+  cyber: { glow: true },
+  matrix: { glow: true },
+  vapor: { glow: true },
+};
+
 function ChartRender({ element }: { element: ChartElement }) {
   const { chart, data, colors, bgColor, fgColor, title, showValues, showAxes } = element;
   const theme = element.uiStyle ? UI_STYLE_THEMES[element.uiStyle] : null;
   const fontFamily = theme ? theme.font : "Inter, sans-serif";
+  /* Per-pack chart treatment: dashed grid (Sketch), flat square frame (Swiss),
+   *  neon glow (Cyber/Matrix/Vapor). Colors still come from the pack. */
+  const chartRecipe = element.uiStyle ? (CHART_STYLE_RECIPES[element.uiStyle] ?? {}) : {};
+  const gridDash = chartRecipe.dashGrid ? "4 4" : undefined;
   const W = 400,
     H = 300;
   const padL = 50,
@@ -2319,7 +2333,7 @@ function ChartRender({ element }: { element: ChartElement }) {
           element.effect === "liquid_glass"
             ? "linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08))"
             : bgColor,
-        borderRadius: theme ? theme.radius : 12,
+        borderRadius: chartRecipe.radius ?? (theme ? theme.radius : 12),
         border:
           element.effect === "liquid_glass"
             ? "1px solid rgba(255,255,255,0.45)"
@@ -2329,9 +2343,13 @@ function ChartRender({ element }: { element: ChartElement }) {
         boxShadow:
           element.effect === "liquid_glass"
             ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)"
-            : theme
-              ? theme.shadow
-              : "none",
+            : chartRecipe.glow
+              ? `0 0 24px ${(element.colors?.[0] ?? "#22d3ee")}55`
+              : chartRecipe.flat
+                ? undefined
+                : theme
+                  ? theme.shadow
+                  : "none",
         backdropFilter:
           element.effect === "liquid_glass" ? "blur(14px) saturate(160%)" : theme?.backdrop,
         WebkitBackdropFilter:
@@ -2356,7 +2374,7 @@ function ChartRender({ element }: { element: ChartElement }) {
         )}
         {showAxes && chart !== "pie" && chart !== "donut" && (
           <g>
-            <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke={stroke} strokeWidth={1} />
+            <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke={stroke} strokeWidth={1} strokeDasharray={gridDash} />
             <line
               x1={padL}
               y1={padT + plotH}
@@ -2364,6 +2382,7 @@ function ChartRender({ element }: { element: ChartElement }) {
               y2={padT + plotH}
               stroke={stroke}
               strokeWidth={1}
+              strokeDasharray={gridDash}
             />
             {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
               <g key={i}>
@@ -2373,6 +2392,7 @@ function ChartRender({ element }: { element: ChartElement }) {
                   x2={padL}
                   y2={padT + plotH - t * plotH}
                   stroke={stroke}
+                  strokeDasharray={gridDash}
                 />
                 <text
                   x={padL - 6}
