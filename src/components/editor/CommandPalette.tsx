@@ -34,9 +34,6 @@ import {
   Droplets,
   Box,
   Puzzle,
-  Brush,
-  Clapperboard,
-  Image as ImageIcon,
   History as HistoryIcon,
   Shuffle,
   Zap,
@@ -456,15 +453,6 @@ export function CommandPalette({
         keywords: "interactive link navigation click jump",
       },
       {
-        id: "ft-plugins",
-        label: "Plugins — custom widget packs",
-        group: "Features",
-        icon: <Puzzle className="size-4" />,
-        hint: "Left panel → Plugins",
-        keywords: "plugins widgets importer packs code",
-        run: () => store.setTool("plugins"),
-      },
-      {
         id: "ft-publish",
         label: "Publish template to community",
         group: "Features",
@@ -523,27 +511,6 @@ export function CommandPalette({
           hint: `widget · ${p.name}`,
           keywords: `plugin widget insert ${w.name} ${p.name}`,
           run: () => store.addGroup(instantiateWidget(w)),
-        })),
-        ...(p.apps ?? []).map((a, i) => ({
-          id: `pa-${p.id}-${i}`,
-          label: `Open ${a.name}`,
-          group: "Plugins" as CommandGroup,
-          icon:
-            a.type === "video" ? (
-              <Clapperboard className="size-4" />
-            ) : a.type === "image" ? (
-              <ImageIcon className="size-4" />
-            ) : (
-              <Brush className="size-4" />
-            ),
-          hint: `app · ${p.name}`,
-          keywords: `plugin app ${a.type} ${a.name} ${p.name}`,
-          run: () => {
-            store.setTool("plugins");
-            window.dispatchEvent(
-              new CustomEvent("diapolab:open-app", { detail: { appName: a.name } }),
-            );
-          },
         })),
       ]);
 

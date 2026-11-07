@@ -23,7 +23,6 @@ import {
   Sliders,
   Presentation,
   Play,
-  Puzzle,
   LayoutTemplate,
   BookOpen,
   Scale,
@@ -428,7 +427,6 @@ export function Toolbar() {
           onNewDesign={newDesign}
           onPublish={handlePublish}
           onClear={clear}
-          onAssistant={() => setTool("plugins")}
           publishing={publishing}
           isAuthenticated={!!user}
         />
@@ -502,14 +500,12 @@ function LargeModernHamburger({
   onNewDesign,
   onPublish,
   onClear,
-  onAssistant,
   publishing,
   isAuthenticated,
 }: {
   onNewDesign: () => void;
   onPublish: () => void;
   onClear: () => void;
-  onAssistant: () => void;
   publishing: boolean;
   isAuthenticated: boolean;
 }) {
@@ -580,15 +576,6 @@ function LargeModernHamburger({
             title="New design"
             subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
-          />
-
-          <MenuCardItem
-            icon={Puzzle}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
-            title="Plugins"
-            subtitle="Import & manage widget packs"
-            onClick={() => handleAction(onAssistant)}
           />
 
           {isAuthenticated && (

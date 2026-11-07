@@ -340,6 +340,18 @@
   select {
     font: inherit;
   }
+
+  /* Numeric fields: hide the native gray spinner arrows — the app ships its
+     own steppers, the browser ones only duplicate them and look off-theme. */
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
   ::selection {
     background: var(--teal);
     color: var(--ink);
