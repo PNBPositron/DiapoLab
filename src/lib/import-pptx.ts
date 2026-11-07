@@ -4,6 +4,8 @@ import {
   newText,
   newImage,
   newShape,
+  newTable,
+  type TableElement,
   type Page,
   type AnyElement,
   type ElementAnimation,
@@ -239,27 +241,17 @@ function collectLeafNodes(root: Element): Array<{ node: Element; xf: GroupXf }> 
   return out;
 }
 
-/** Tables (graphicFrame + a:tbl): map each non-empty cell onto a text
- *  element positioned with the frame grid geometry. */
-function tableToTexts(frame: Element, box: Partial<Xfrm>): AnyElement[] {
+/** Tables (graphicFrame + a:tbl): import as a real DiapoLab table
+ *  element, keeping the cell grid, header row and font size from PowerPoint
+ *  (round-trip with the native addTable export). */
+function tableToElement(frame: Element, box: Partial<Xfrm>): TableElement | null {
   const tbl = firstChildByLocal(frame, "tbl");
-  if (!tbl) return [];
-  const cols = children(tbl, "gridCol").map((c) => px(c.getAttribute("w")));
-  const rows = children(tbl, "tr");
-  const rowHs = rows.map((tr) => Math.max(2, px(tr.getAttribute("h"))));
-  const totalW = cols.reduce((a, b) => a + b, 0) || 1;
-  const totalH = rowHs.reduce((a, b) => a + b, 0) || 1;
-  const scaleX = (box.width ?? 0) / totalW;
-  const scaleY = (box.height ?? 0) / totalH;
-  const out: AnyElement[] = [];
-  let y = box.y ?? 0;
-  for (let ri = 0; ri < rows.length; ri++) {
-    const cells = children(rows[ri], "tc");
-    const rowH = rowHs[ri] * scaleY;
-    let x = box.x ?? 0;
-    for (let ci = 0; ci < cells.length; ci++) {
-      const colW = Math.max(2, cols[ci] ?? Math.round(totalW / Math.max(1, cells.length))) * scaleX;
-      const tc = cells[ci];
+  if (!tbl) return null;
+  const rows: string[][] = [];
+  let fontSize = 0;
+  for (const tr of children(tbl, "tr")) {
+    const row: string[] = [];
+    for (const tc of children(tr, "tc")) {
       const txBody = firstChildByLocal(tc, "txBody");
       const text = txBody
         ? children(txBody, "p")
@@ -271,27 +263,34 @@ function tableToTexts(frame: Element, box: Partial<Xfrm>): AnyElement[] {
             .join("\n")
             .trim()
         : "";
-      if (text) {
-        out.push(
-          newText({
-            x: x + 4,
-            y: y + 2,
-            width: Math.max(10, Math.round(colW - 8)),
-            height: Math.max(10, Math.round(rowH - 4)),
-            rotation: 0,
-            text,
-            fontSize: 16,
-            color: "#0f172a",
-            fontWeight: 500,
-            align: "left",
-          }),
-        );
-      }
-      x += colW;
+      const rPr = txBody ? firstChildByLocal(txBody, "rPr") : null;
+      const sz = rPr ? Number(rPr.getAttribute("sz") ?? 0) / 100 : 0;
+      if (sz > fontSize) fontSize = sz;
+      row.push(text);
     }
-    y += rowH;
+    if (row.length) rows.push(row);
   }
-  return out;
+  if (rows.length === 0) return null;
+  // Header row: explicit cell fill or bold text on the first PowerPoint row.
+  let headerRow = false;
+  const firstTr = children(tbl, "tr")[0];
+  if (firstTr) {
+    for (const tc of children(firstTr, "tc")) {
+      const tcPr = firstChildByLocal(tc, "tcPr");
+      if (tcPr && Array.from(tcPr.children).some((e) => e.localName === "solidFill")) headerRow = true;
+      const txBody = firstChildByLocal(tc, "txBody");
+      if (txBody && firstChildByLocal(txBody, "rPr")?.getAttribute("b") === "1") headerRow = true;
+    }
+  }
+  return newTable({
+    x: box.x ?? 160,
+    y: box.y ?? 160,
+    width: box.width ?? 760,
+    height: box.height ?? 320,
+    rows,
+    headerRow,
+    fontSize: fontSize > 0 ? ptToPx(fontSize) : 16,
+  });
 }
 
 /** Speaker notes attached to a slide via its notesSlide relationship. */
@@ -712,8 +711,9 @@ export async function importPPTXFile(file: File): Promise<void> {
         }
       }
       if (node.localName === "graphicFrame") {
-        // Tables become a grid of text elements at the frame position.
-        for (const t of tableToTexts(node, applyXf(parseXfrm(node), xf))) push(t);
+        // Tables import as a real DiapoLab table element.
+        const tblEl = tableToElement(node, applyXf(parseXfrm(node), xf));
+        if (tblEl) push(tblEl);
       }
     }
 
