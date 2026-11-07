@@ -4,6 +4,7 @@ import { CommandPalette } from "@/components/editor/CommandPalette";
 import { Toolbar } from "@/components/editor/Toolbar";
 import { Sidebar } from "@/components/editor/Sidebar";
 import { Canvas } from "@/components/editor/Canvas";
+import { SelectionToolbar } from "@/components/editor/SelectionToolbar";
 import { PropertiesPanel } from "@/components/editor/PropertiesPanel";
 import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
@@ -63,6 +64,7 @@ function Editor() {
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
             <Canvas />
+            <SelectionToolbar />
           </main>
           <PagesBar />
         </div>

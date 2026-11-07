@@ -28,12 +28,23 @@ export function Sidebar() {
   const { tool, setTool } = useEditor();
   const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme } = useSettings();
   const [hovering, setHovering] = useState(false);
+  // Pinned panels stay open after the cursor leaves (Doory-style).
+  const [pinned, setPinned] = useState(false);
   const [systemReduced, setSystemReduced] = useState(false);
   // Height of the bottom pages bar: the rail runs full height, but the
   // centered buttons must align with the canvas area only.
   const [pagesInset, setPagesInset] = useState(0);
-  const panelOpen = hovering;
+  const panelOpen = hovering || pinned;
   const customThemes = useSettings((s) => s.customThemes);
+
+  // Escape unpins the side panel; a click on the active rail tool toggles it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPinned(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -88,7 +99,12 @@ export function Sidebar() {
           return (
             <button
               key={t.id}
-              onClick={() => { setTool(t.id); setHovering(true); }}
+              onClick={() => {
+                  if (t.id === "my-designs") { setHovering(false); setTool(t.id); return; }
+                  setPinned(tool === t.id ? false : true);
+                  setTool(t.id);
+                  setHovering(true);
+                }}
               title={t.label}
               className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
                 active
