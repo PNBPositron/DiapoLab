@@ -1941,14 +1941,6 @@ export function PropertiesPanel() {
               </Section>
             )}
 
-          </div>
-        </aside>
-      )}
-    </>
-  );
-}
-
-
 {/* SHADOW (all elements) */}
             <Section title="Shadow" defaultOpen={!!el.shadow}>
               <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
@@ -2243,6 +2235,8 @@ export function PropertiesPanel() {
                 >
                   <Trash2 className="size-3.5" /> Delete
                 </button>
+              </div>
+            </Section>
 
 <Section title="Element JSON" defaultOpen={false}>
               <p className="text-[10px] leading-relaxed text-slate-500">
@@ -2295,3 +2289,7 @@ export function PropertiesPanel() {
             </Section>
           </div>
         </aside>
+      )}
+    </>
+  );
+}
