@@ -48,10 +48,9 @@ export function Sidebar() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const theme = editorTheme ?? DEFAULT_THEME_TOKENS;
-    for (const [k, v] of Object.entries(themeCssVars(theme.tokens))) root.style.setProperty(k, v);
     const custom = customThemes.find((t) => t.id === editorTheme);
-    if (custom) for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) root.style.setProperty(k, v);
+    const tokens = custom ? custom.tokens : DEFAULT_THEME_TOKENS;
+    for (const [k, v] of Object.entries(themeCssVars(tokens))) root.style.setProperty(k, v);
   }, [editorTheme, customThemes]);
 
   useEffect(() => {
