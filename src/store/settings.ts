@@ -10,7 +10,6 @@ export type PanelId =
   | "library"
   | "media"
   | "design"
-  | "plugins"
   | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
@@ -21,7 +20,6 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   library: "Library",
   media: "Media",
   design: "Design",
-  plugins: "Plugins",
   "my-designs": "Projects",
 };
 
@@ -102,7 +100,6 @@ const ALL_ON: Record<PanelId, boolean> = {
   library: true,
   media: true,
   design: true,
-  plugins: true,
   "my-designs": true,
 };
 
@@ -154,7 +151,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 9,
+      version: 10,
       migrate: (state) => {
         const previous = state as SettingsState;
         const previousTheme = previous?.editorTheme;
@@ -164,6 +161,7 @@ export const useSettings = create<SettingsState>()(
         const panels = { ...prevPanels } as Record<PanelId, boolean>;
         delete (panels as Record<string, boolean | undefined>).unsplash;
         delete (panels as Record<string, boolean | undefined>).illustrations;
+        delete (panels as Record<string, boolean | undefined>).plugins;
         if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         if (panels.media === undefined) panels.media = true;
         return {

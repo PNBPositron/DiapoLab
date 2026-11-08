@@ -221,6 +221,9 @@ const IMAGE_FILTER_PRESETS: Array<{
   { name: "Posterize", description: "Flat color bands", filters: { ...DEFAULT_FILTERS, posterize: 5 }, preview: "none" },
   { name: "VHS", description: "Retro tape", filters: { ...DEFAULT_FILTERS, glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 }, preview: "saturate(1.35) contrast(1.12) hue-rotate(-8deg)" },
   { name: "Gameboy", description: "Dotted handheld", filters: { ...DEFAULT_FILTERS, pixelate: 12, grayscale: 100, contrast: 145, brightness: 105 }, preview: "grayscale(1) contrast(1.45) brightness(1.05)" },
+  { name: "Golden", description: "Golden hour", filters: { ...DEFAULT_FILTERS, temperature: 60, saturate: 118, brightness: 103 }, preview: "sepia(.21) saturate(1.18) brightness(1.03)" },
+  { name: "Arctic", description: "Cool wash", filters: { ...DEFAULT_FILTERS, temperature: -60, saturate: 96, brightness: 104 }, preview: "hue-rotate(-9deg) saturate(.96) brightness(1.04)" },
+  { name: "Duotone", description: "Blue tint", filters: { ...DEFAULT_FILTERS, tintColor: "#3f5bd1", tintOpacity: 45, saturate: 80, contrast: 112 }, preview: "saturate(.8) contrast(1.12)" },
 ];
 
 const BLEND_MODES = [
@@ -1777,6 +1780,55 @@ export function PropertiesPanel() {
                     update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, hueRotate: val } })
                   }
                 />
+                <SliderWithInput
+                  label="Temperature"
+                  min={-100}
+                  max={100}
+                  value={el.filters?.temperature ?? 0}
+                  unit=""
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, temperature: val } })
+                  }
+                />
+                <Field label="Tint">
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="color"
+                      value={el.filters?.tintColor ?? "#7aa2ff"}
+                      onChange={(e) =>
+                        update(el.id, {
+                          filters: {
+                            ...DEFAULT_FILTERS,
+                            ...el.filters,
+                            tintColor: e.target.value,
+                            tintOpacity: el.filters?.tintOpacity ?? 35,
+                          },
+                        })
+                      }
+                      className="h-8 w-10 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-white p-0.5"
+                      title="Tint color"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <SliderWithInput
+                        label="Tint strength"
+                        min={0}
+                        max={100}
+                        value={el.filters?.tintOpacity ?? 0}
+                        unit="%"
+                        onChange={(val) =>
+                          update(el.id, {
+                            filters: {
+                              ...DEFAULT_FILTERS,
+                              ...el.filters,
+                              tintOpacity: val,
+                              tintColor: el.filters?.tintColor ?? "#7aa2ff",
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </Field>
                 <SliderWithInput
                   label="Blur"
                   min={0}
