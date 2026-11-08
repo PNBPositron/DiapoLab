@@ -611,7 +611,7 @@ function LargeModernHamburger({
             iconColor="text-blue-600"
             iconBg="bg-blue-50 group-hover:bg-blue-100/80"
             title="Marketplace"
-            subtitle="Community templates & plugins"
+            subtitle="Community templates & add-ons"
             onClick={() => handleAction(() => navigate({ to: "/marketplace" }))}
           />
           <MenuCardItem

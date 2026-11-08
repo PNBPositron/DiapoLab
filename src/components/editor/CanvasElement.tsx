@@ -17,13 +17,14 @@ import {
   type ShapeGradient,
   KEYFRAME_EASINGS,
   type ElementKeyframe,
+  type VideoElement,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2 } from "lucide-react";
+import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2, Play, Pause, VolumeX } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -1227,41 +1228,45 @@ export function CanvasElement({
           </defs>
         </svg>
       )}
-      {element.type === "video" && (
-        <video
-          src={element.src}
-          poster={element.poster}
-          muted={element.muted ?? true}
-          loop={element.loop ?? true}
-          autoPlay
-          playbackRate={element.rate ?? 1}
-          playsInline
-          controls={useEditor.getState().presenting}
-          onLoadedMetadata={(e) => {
-            // trim window: start playback at "start"
-            if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
-              e.currentTarget.currentTime = element.start;
-            }
-          }}
-          onTimeUpdate={(e) => {
-            // trim window: loop (or pause) when reaching "end"
-            const v = e.currentTarget;
-            const s = element.start ?? 0;
-            const t = element.end;
-            if (t !== undefined && t > s && v.currentTime >= t) {
-              if (v.loop) v.currentTime = s;
-              else v.pause();
-            }
-          }}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: element.fit ?? "cover",
-            display: "block",
-            borderRadius: 0,
-          }}
-        />
-      )}
+      {element.type === "video" &&
+        (!presenting && !preview && !morph ? (
+          <VideoEditReader element={element} />
+        ) : (
+          <video
+            src={element.src}
+            poster={element.poster}
+            muted={element.muted ?? true}
+            loop={element.loop ?? true}
+            autoPlay
+            playbackRate={element.rate ?? 1}
+            playsInline
+            controls={presenting}
+            onLoadedMetadata={(e) => {
+              // trim window: start playback at "start"
+              if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
+                e.currentTarget.currentTime = element.start;
+              }
+            }}
+            onTimeUpdate={(e) => {
+              // trim window: loop (or pause) when reaching "end"
+              const v = e.currentTarget;
+              const s = element.start ?? 0;
+              const t = element.end;
+              if (t !== undefined && t > s && v.currentTime >= t) {
+                if (v.loop) v.currentTime = s;
+                else v.pause();
+              }
+            }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: element.fit ?? "cover",
+              display: "block",
+              borderRadius: 0,
+            }}
+          />
+        ))}
+
       {element.type === "audio" && (
         <div
           style={{
@@ -2615,5 +2620,114 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
     >
       {element.text}
     </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Video edit-mode reader: custom hover controls (play/pause, scrub,   */
+/* mute, time) so videos are watchable on the canvas without native    */
+/* controls. Only the control bar swallows pointer events; the video   */
+/* surface itself stays draggable.                                     */
+/* ------------------------------------------------------------------ */
+const fmtTime = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+};
+
+function VideoEditReader({ element }: { element: VideoElement }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(element.muted ?? true);
+  const [time, setTime] = useState(0);
+  const [dur, setDur] = useState(0);
+
+  const togglePlay = () => {
+    const v = ref.current;
+    if (!v) return;
+    if (v.paused) void v.play();
+    else v.pause();
+  };
+
+  return (
+    <div className="group/video relative size-full">
+      <video
+        ref={ref}
+        src={element.src}
+        poster={element.poster}
+        muted={muted}
+        loop={element.loop ?? true}
+        autoPlay
+        playbackRate={element.rate ?? 1}
+        playsInline
+        onLoadedMetadata={(e) => {
+          setDur(e.currentTarget.duration || 0);
+          // trim window: start playback at "start"
+          if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
+            e.currentTarget.currentTime = element.start;
+          }
+        }}
+        onTimeUpdate={(e) => {
+          setTime(e.currentTarget.currentTime);
+          // trim window: loop (or pause) when reaching "end"
+          const v = e.currentTarget;
+          const s = element.start ?? 0;
+          const t = element.end;
+          if (t !== undefined && t > s && v.currentTime >= t) {
+            if (v.loop) v.currentTime = s;
+            else v.pause();
+          }
+        }}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: element.fit ?? "cover",
+          display: "block",
+          borderRadius: 0,
+        }}
+      />
+      {/* hover control bar — pointer events stop here so the canvas drag is not hijacked */}
+      <div
+        className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center gap-2 rounded-lg bg-slate-950/85 px-2 py-1.5 text-white opacity-0 shadow-lg backdrop-blur transition-opacity duration-150 group-hover/video:opacity-100"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={togglePlay}
+          className="grid size-5 shrink-0 place-items-center rounded hover:bg-white/15"
+          aria-label={playing ? "Pause" : "Play"}
+        >
+          {playing ? <Pause className="size-3" /> : <Play className="size-3" />}
+        </button>
+        <input
+          type="range"
+          min={element.start ?? 0}
+          max={dur || element.end || 0}
+          step={0.05}
+          value={time}
+          onChange={(e) => {
+            const v = ref.current;
+            const t = Number(e.target.value);
+            setTime(t);
+            if (v) v.currentTime = t;
+          }}
+          className="h-1 min-w-0 flex-1 cursor-pointer accent-white"
+          aria-label="Seek"
+        />
+        <span className="shrink-0 font-mono text-[9px] tabular-nums text-white/90">
+          {fmtTime(time)} / {fmtTime(element.end ?? dur)}
+        </span>
+        <button
+          type="button"
+          onClick={() => setMuted((m) => !m)}
+          className="grid size-5 shrink-0 place-items-center rounded hover:bg-white/15"
+          aria-label={muted ? "Unmute" : "Mute"}
+        >
+          {muted ? <VolumeX className="size-3" /> : <Volume2 className="size-3" />}
+        </button>
+      </div>
+    </div>
   );
 }

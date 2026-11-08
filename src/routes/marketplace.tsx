@@ -12,16 +12,16 @@ export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
   head: () => ({
     meta: [
-      { title: "Marketplace — Templates & Plugins" },
+      { title: "Marketplace — Templates & Add-ons" },
       {
         name: "description",
         content:
-          "Browse community presentation templates and import user-made plugins for DiapoLab, then load them straight into the editor.",
+          "Browse community presentation templates and import user-made add-ons for DiapoLab, then load them straight into the editor.",
       },
-      { property: "og:title", content: "Marketplace — Templates & Plugins" },
+      { property: "og:title", content: "Marketplace — Templates & Add-ons" },
       {
         property: "og:description",
-        content: "Browse community templates and import plugins for the DiapoLab editor.",
+        content: "Browse community templates and import add-ons for the DiapoLab editor.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -122,7 +122,7 @@ function Marketplace() {
             </div>
           </div>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
-            Community templates and user-made plugins. Everything is free — load it,
+            Community templates and user-made add-ons. Everything is free — load it,
             remix it, make it yours.
           </p>
 
@@ -145,7 +145,7 @@ function Marketplace() {
               </button>
             )}
             </div>
-            <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-slate-400"><span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">/</span><span>Search templates, plugins, authors</span><span className="ml-auto hidden sm:inline">{filteredTemplates.length + filteredPlugins.length} results</span></div>
+            <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-slate-400"><span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">/</span><span>Search templates, add-ons, authors</span><span className="ml-auto hidden sm:inline">{filteredTemplates.length + filteredPlugins.length} results</span></div>
           </div>
         </div>
       </header>
@@ -156,7 +156,7 @@ function Marketplace() {
           {(
             [
               ["templates", "Templates", LayoutTemplate],
-              ["plugins", "Plugins", Puzzle],
+              ["plugins", "Add-ons", Puzzle],
             ] as Array<[Tab, string, typeof Puzzle]>
           ).map(([id, label, Icon]) => (
             <button
@@ -183,7 +183,7 @@ function Marketplace() {
               onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
               className="ml-auto flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-all hover:brightness-110 active:scale-[0.97]"
             >
-              <Code2 className="size-3.5" /> Import plugin code
+              <Code2 className="size-3.5" /> Import add-on code
             </button>
           )}
         </div>
@@ -247,14 +247,14 @@ function Marketplace() {
         ) : filteredPlugins.length === 0 ? (
           <Empty
             icon={<PackageOpen className="size-5" />}
-            title={plugins.length === 0 ? "No plugins yet" : "No plugin matches your search"}
-            text={plugins.length === 0 ? "Import plugin code to add custom widget presets — they appear in the editor's Presets panel." : `No plugin matches “${query}”.`}
+            title={plugins.length === 0 ? "No add-ons yet" : "No add-on matches your search"}
+            text={plugins.length === 0 ? "Import add-on code to add custom widget presets — they appear in the editor's Presets panel." : `No add-on matches “${query}”.`}
             action={
               <button
                 onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
                 className="mt-1 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
               >
-                <Code2 className="size-3.5" /> Import plugin code
+                <Code2 className="size-3.5" /> Import add-on code
               </button>
             }
           />
@@ -298,12 +298,12 @@ function Marketplace() {
               <span className="grid size-7 place-items-center rounded-lg bg-blue-600 text-white">
                 <Code2 className="size-3.5" />
               </span>
-              Import plugin
+              Import add-on
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 p-5">
             <p className="text-xs leading-relaxed text-slate-500">
-              Paste plugin code below. Call <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">diapolabPlugin(&#123; name, widgets: [...] &#125;)</code>{" "}
+              Paste add-on code below. Call <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">diapolabPlugin(&#123; name, widgets: [...] &#125;)</code>{" "}
               with an array of widgets — each widget is a named set of canvas elements
               that will appear in the editor's <strong>Presets → Blocks</strong> section.
             </p>
@@ -311,7 +311,7 @@ function Marketplace() {
               value={pluginCode}
               onChange={(e) => { setPluginCode(e.target.value); setImportError(null); setImportSuccess(null); }}
               spellCheck={false}
-              placeholder="// Paste your plugin code here…"
+              placeholder="// Paste your add-on code here…"
               className="h-56 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
             />
             {importError && (
@@ -336,7 +336,7 @@ function Marketplace() {
                 disabled={!pluginCode.trim()}
                 className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
               >
-                <Check className="size-3.5" /> Import plugin
+                <Check className="size-3.5" /> Import add-on
               </button>
             </div>
           </div>
@@ -386,7 +386,7 @@ function PluginCard({
           </div>
           <button
             onClick={onRemove}
-            title="Remove plugin"
+            title="Remove add-on"
             className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
           >
             <Trash2 className="size-3.5" />

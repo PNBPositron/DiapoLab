@@ -49,7 +49,7 @@ import {
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-type CommandGroup = "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Plugins" | "Links";
+type CommandGroup = "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Add-ons" | "Links";
 
 type Command = {
   id: string;
@@ -69,7 +69,7 @@ const GROUP_ICONS: Record<CommandGroup, React.ReactNode> = {
   Insert: <Plus className="size-2.5" />,
   Shortcuts: <Command className="size-2.5" />,
   Features: <Sparkles className="size-2.5" />,
-  Plugins: <Puzzle className="size-2.5" />,
+  "Add-ons": <Puzzle className="size-2.5" />,
   Links: <Link2 className="size-2.5" />,
 };
 
@@ -506,10 +506,10 @@ export function CommandPalette({
         ...p.widgets.map((w, i) => ({
           id: `pw-${p.id}-${i}`,
           label: w.name,
-          group: "Plugins" as CommandGroup,
+          group: "Add-ons" as CommandGroup,
           icon: <Puzzle className="size-4" />,
           hint: `widget · ${p.name}`,
-          keywords: `plugin widget insert ${w.name} ${p.name}`,
+          keywords: `addon pack widget insert ${w.name} ${p.name}`,
           run: () => store.addGroup(instantiateWidget(w)),
         })),
       ]);
@@ -629,7 +629,7 @@ export function CommandPalette({
               </span>
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-300">No results for “{query}”</p>
-                <p className="mt-1 text-[11px] text-slate-500">Try “insert”, “paint”, “plugin”, “present”…</p>
+                <p className="mt-1 text-[11px] text-slate-500">Try “insert”, “paint”, “add-ons”, “present”…</p>
               </div>
             </div>
           ) : (

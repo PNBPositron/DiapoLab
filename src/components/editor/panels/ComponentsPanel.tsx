@@ -993,7 +993,7 @@ export function ComponentsPanel() {
                 <Puzzle className="size-3" /> Widget packs ({pluginWidgets.length})
               </span>
               <OptionGrid
-                label="Plugin widgets"
+                label="Add-on widgets"
                 options={pluginWidgets.map(({ key, pluginName, widget }) => ({
                   value: key,
                   label: widget.name,
