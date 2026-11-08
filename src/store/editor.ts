@@ -321,6 +321,18 @@ export type VideoElement = ElementBase & {
   rate?: number;
 };
 
+export type AudioElement = ElementBase & {
+  type: "audio";
+  src: string;
+  title?: string;
+  loop?: boolean;
+  muted?: boolean;
+  /** trim window in seconds */
+  start?: number;
+  end?: number;
+  rate?: number;
+};
+
 export type IconElement = ElementBase & {
   type: "icon";
   name: string; // lucide icon name in PascalCase
@@ -736,6 +748,7 @@ export type AnyElement =
   | ShapeElement
   | ImageElement
   | VideoElement
+  | AudioElement
   | IconElement
   | QuizElement
   | ChartElement
@@ -771,7 +784,7 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "my-designs";
+type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "media" | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };
@@ -934,6 +947,19 @@ export const newVideo = (src: string, overrides: Partial<VideoElement> = {}): Vi
   rotation: 0,
   src,
   muted: true,
+  loop: true,
+  ...overrides,
+});
+
+export const newAudio = (src: string, overrides: Partial<AudioElement> = {}): AudioElement => ({
+  id: uid(),
+  type: "audio",
+  x: 240,
+  y: 420,
+  width: 480,
+  height: 120,
+  rotation: 0,
+  src,
   loop: true,
   ...overrides,
 });

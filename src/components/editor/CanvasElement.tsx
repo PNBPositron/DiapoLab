@@ -23,7 +23,7 @@ import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode, Lock } from "lucide-react";
+import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -1242,6 +1242,45 @@ export function CanvasElement({
             borderRadius: 0,
           }}
         />
+      )}
+      {element.type === "audio" && (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            borderRadius: 16,
+            background: "linear-gradient(150deg,#0b1120 0%,#121c36 100%)",
+            color: "#d9f5ff",
+            padding: 14,
+            boxShadow: "0 24px 48px -20px rgba(0,0,0,0.6)",
+          }}
+        >
+          <Volume2 className="size-6" aria-hidden="true" />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: "0.02em",
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {element.title ?? element.src.split("/").pop()?.slice(0, 40) ?? "Audio"}
+          </span>
+          <audio
+            src={element.src}
+            loop={element.loop ?? true}
+            controls
+            style={{ width: "100%" }}
+          />
+        </div>
       )}
       {element.type === "image" && element.src.toLowerCase().startsWith("data:video/") && (
         <video
