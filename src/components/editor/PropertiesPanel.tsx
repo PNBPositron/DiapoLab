@@ -1618,6 +1618,7 @@ export function PropertiesPanel() {
 
             {/* IMAGE ELEMENT */}
             {el.type === "image" && (
+              <>
               <Section title="Image">
                 <Field label="Shape Mask">
                   <MaskPicker
@@ -1939,6 +1940,7 @@ export function PropertiesPanel() {
                 </Field>
 
               </Section>
+              </>
             )}
 
 {/* SHADOW (all elements) */}
