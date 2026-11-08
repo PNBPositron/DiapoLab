@@ -458,10 +458,6 @@ export type UiKind =
   | "notification"
   | "taskbar"
   | "vtabs"
-  | "kdePanel"
-  | "kdeFiles"
-  | "kdeRunner"
-  | "kdeSettings"
   | "timeline"
   | "code";
 
@@ -473,7 +469,7 @@ export type UiElement = ElementBase & {
   body: string;
   value: number; // 0-100 (progress) or numeric stat
   items: string[];
-  /** secondary editable labels — file names (kdeFiles), setting rows (kdeSettings), chrome captions (taskbar/vtabs/login) */
+  /** secondary editable labels — chrome captions (taskbar/vtabs/login) */
   files?: string[];
   accentColor: string;
   /** optional per-element overrides on top of the style pack */
@@ -1427,40 +1423,6 @@ const UI_DEFAULTS: Record<
     body: "https://diapolab.lovable.app",
     value: 0,
     items: ["Dashboard", "Editor", "Templates", "Settings"],
-  },
-  kdePanel: {
-    w: 900,
-    h: 88,
-    title: "Plasma",
-    body: "9:41",
-    value: 0,
-    items: ["Dolphin", "Konsole", "Firefox", "Kate", "Discover"],
-  },
-  kdeFiles: {
-    w: 840,
-    h: 520,
-    title: "Documents — Dolphin",
-    body: "/home/user/Documents",
-    value: 0,
-    items: ["Home", "Desktop", "Documents", "Downloads", "Pictures"],
-    files: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"],
-  },
-  kdeRunner: {
-    w: 720,
-    h: 320,
-    title: "konsole",
-    body: "KRunner",
-    value: 0,
-    items: ["Konsole — Terminal", "Konsolidate — App", "Console settings"],
-  },
-  kdeSettings: {
-    w: 860,
-    h: 520,
-    title: "System Settings",
-    body: "Appearance",
-    value: 0,
-    items: ["Appearance", "Workspace", "Networking", "Hardware"],
-    files: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"],
   },
 };
 

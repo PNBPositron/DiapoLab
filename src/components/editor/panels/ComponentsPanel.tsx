@@ -9,10 +9,8 @@ import {
   Chrome,
   Command,
   CreditCard,
-  FolderOpen,
   Gauge,
   Hash,
-  LayoutPanelTop,
   ListChecks,
   LogIn,
   MessageSquare,
@@ -29,7 +27,6 @@ import {
   SlidersHorizontal,
   Smartphone,
   Square,
-  Terminal,
   TerminalSquare,
   Table as TableIcon,
   FileCode,
@@ -106,8 +103,6 @@ const DRAFT_FIELD =
 
 /** Extra editable text slots per UI kind (file names, setting rows, chrome captions). */
 const EXTRA_LABELS: Partial<Record<UiKind, { label: string; list: boolean; defaults: string[] }>> = {
-  kdeFiles: { label: "Files", list: true, defaults: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"] },
-  kdeSettings: { label: "Setting rows", list: true, defaults: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"] },
   taskbar: { label: "Search label", list: false, defaults: ["Search"] },
   vtabs: { label: "New tab label", list: false, defaults: ["+ New tab"] },
   login: { label: "Button label", list: false, defaults: ["Continue"] },
@@ -140,10 +135,6 @@ const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "notification", label: "Toast", Icon: Bell },
   { kind: "taskbar", label: "Taskbar", Icon: PanelBottom },
   { kind: "vtabs", label: "Vertical tabs", Icon: PanelLeft },
-  { kind: "kdePanel", label: "Desktop panel", Icon: LayoutPanelTop },
-  { kind: "kdeFiles", label: "File manager", Icon: FolderOpen },
-  { kind: "kdeRunner", label: "Command runner", Icon: Terminal },
-  { kind: "kdeSettings", label: "System settings", Icon: SlidersHorizontal },
 ];
 
 const UI_PRESETS: Array<{

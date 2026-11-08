@@ -74,14 +74,8 @@ const FONT_FAMILIES: string[] = Array.from(
 /** UI kinds whose "items" list carries editable text (tabs, sidebar entries, lines…). */
 const UI_ITEMS_KINDS = new Set([
   "list", "pricing", "window", "browser", "terminal", "phone", "modal",
-  "tabs", "toggle", "login", "taskbar", "vtabs", "kdePanel", "kdeFiles",
-  "kdeRunner", "kdeSettings", "timeline",
+  "tabs", "toggle", "login", "taskbar", "vtabs", "timeline",
 ]);
-/** Secondary editable label lists per UI kind (file names, setting rows). */
-const UI_FILES_DEFAULTS: Partial<Record<UiKind, string[]>> = {
-  kdeFiles: ["report.pdf", "notes.md", "photo.png", "budget.ods", "draft.txt", "archive.zip"],
-  kdeSettings: ["Global Theme", "Plasma Style", "Colors", "Icons", "Cursors"],
-};
 /** Single chrome captions per UI kind (search pill, new-tab button, submit button). */
 const UI_CAPTION_DEFAULTS: Partial<Record<UiKind, string>> = {
   taskbar: "Search",
@@ -233,14 +227,7 @@ const BLEND_MODES = [
   "overlay",
   "darken",
   "lighten",
-  "color-dodge",
   "soft-light",
-  "difference",
-  "exclusion",
-  "hue",
-  "saturation",
-  "color",
-  "luminosity",
 ];
 
 const ASPECT_RATIOS: Array<{ label: string; value: number }> = [
@@ -980,44 +967,6 @@ export function PropertiesPanel() {
                         className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
                       >
                         + Add item
-                      </button>
-                    </div>
-                  </Field>
-                )}
-                {(el.kind === "kdeFiles" || el.kind === "kdeSettings") && (
-                  <Field label={el.kind === "kdeFiles" ? "File names" : "Setting rows"}>
-                    <div className="space-y-1.5">
-                      {(el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? [])).map((it, index) => {
-                        const list = el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? []);
-                        return (
-                          <div key={index} className="flex items-center gap-1.5">
-                            <input
-                              type="text"
-                              aria-label={`Label ${index + 1}`}
-                              value={it}
-                              onChange={(e) => update(el.id, { files: list.map((x, j) => (j === index ? e.target.value : x)) } as never)}
-                              className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
-                            />
-                            <button
-                              type="button"
-                              aria-label="Remove label"
-                              onClick={() => update(el.id, { files: list.filter((_, j) => j !== index) } as never)}
-                              className="rounded p-1 text-slate-400 hover:text-rose-600"
-                            >
-                              <X className="size-3.5" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const list = el.files?.length ? el.files : (UI_FILES_DEFAULTS[el.kind] ?? []);
-                          update(el.id, { files: [...list, "New"] } as never);
-                        }}
-                        className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                      >
-                        {el.kind === "kdeFiles" ? "+ Add file" : "+ Add row"}
                       </button>
                     </div>
                   </Field>
@@ -2144,23 +2093,40 @@ export function PropertiesPanel() {
               )}
             </Section>
 
-            {/* INTERACTION — HOVER & CLICK */}
-            <Section title="Interaction (Hover & Click)">
-              <Field label="Hover Effect">
+            {/* ANIMATION & INTERACTION */}
+            <Section title="Animation & Interaction" defaultOpen={false}>
+              <Field label="Entrance animation">
                 <Dropdown
-                  value={el.interaction?.hoverEffect ?? "none"}
+                  value={el.animation ?? "none"}
                   options={ELEMENT_ANIMATION_LABELS}
                   onChange={(v) => update(el.id, { animation: v as any })}
                 />
               </Field>
-              <SliderWithInput
-                label="Rotation"
-                min={-180}
-                max={180}
-                value={el.rotation}
-                unit="°"
-                onChange={(val) => update(el.id, { rotation: val })}
-              />
+              <Field label="Hover effect (while presenting)">
+                <Dropdown
+                  value={el.interaction?.hoverEffect ?? "none"}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "glitch", label: "Glitch" },
+                    { value: "color", label: "Color shift" },
+                    { value: "gradient", label: "Gradient" },
+                  ]}
+                  onChange={(v) =>
+                    update(el.id, {
+                      interaction: { ...el.interaction, hoverEffect: v as HoverEffect },
+                    } as never)
+                  }
+                />
+              </Field>
+              {el.interaction?.hoverEffect === "color" && (
+                <ModernColorPicker
+                  label="Hover color"
+                  value={el.interaction?.hoverColor ?? "#2b6bff"}
+                  onChange={(c) =>
+                    update(el.id, { interaction: { ...el.interaction, hoverColor: c } } as never)
+                  }
+                />
+              )}
             </Section>
 
             {/* SHADOW (all elements) */}
