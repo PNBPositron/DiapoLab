@@ -48,9 +48,14 @@ export function Sidebar() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const custom = customThemes.find((t) => t.id === editorTheme);
-    const tokens = custom ? custom.tokens : DEFAULT_THEME_TOKENS;
-    for (const [k, v] of Object.entries(themeCssVars(tokens))) root.style.setProperty(k, v);
+    root.style.setProperty("--font-display", "Inter, system-ui, sans-serif");
+    root.style.setProperty("--font-mono", "Inter, system-ui, sans-serif");
+    const custom = editorTheme.startsWith(CUSTOM_THEME_PREFIX)
+      ? customThemes.find((t) => `${CUSTOM_THEME_PREFIX}${t.id}` === editorTheme)
+      : undefined;
+    root.dataset.editorTheme = custom ? "custom" : editorTheme;
+    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS))) root.style.removeProperty(key);
+    if (custom) for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) root.style.setProperty(k, v);
   }, [editorTheme, customThemes]);
 
   useEffect(() => {
