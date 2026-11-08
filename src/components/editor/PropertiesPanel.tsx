@@ -40,6 +40,7 @@ import {
   Upload,
   MoreHorizontal,
   Palette,
+  Play,
   WandSparkles,
   ChevronDown,
   Minus,
@@ -1383,28 +1384,42 @@ export function PropertiesPanel() {
                       onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
                     />
                   </Field>
-                  <Field label="Replace image">
-                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50">
-                    <Upload className="size-3.5" aria-hidden="true" />
-                    Choose another image
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={async (event) => {
-                        const file = event.target.files?.[0];
-                        event.currentTarget.value = "";
-                        if (!file) return;
-                        try {
-                          const src = await prepareImage(file);
-                          update(el.id, { src, illustrationFormat: undefined });
-                        } catch (error) {
-                          window.alert(error instanceof Error ? error.message : "Could not import this image.");
-                        }
-                      }}
-                    />
-                  </label>
-                </Field>
+                  <Field label="Image fill (inside letters)">
+                    <div className="flex items-center gap-1.5">
+                      <label className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-sky-300 hover:bg-sky-50">
+                        <Upload className="size-3.5" aria-hidden="true" />
+                        {el.imageOverlay ? "Replace image" : "Choose an image"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={async (event) => {
+                            const file = event.target.files?.[0];
+                            event.currentTarget.value = "";
+                            if (!file) return;
+                            try {
+                              const src = await prepareImage(file);
+                              update(el.id, { imageOverlay: src });
+                            } catch (error) {
+                              window.alert(error instanceof Error ? error.message : "Could not import this image.");
+                            }
+                          }}
+                        />
+                      </label>
+                      {el.imageOverlay && (
+                        <button
+                          type="button"
+                          onClick={() => update(el.id, { imageOverlay: undefined })}
+                          className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[11px] font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-rose-50"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-1 text-[10px] leading-snug text-slate-400">
+                      The image fills the letters of the text.
+                    </p>
+                  </Field>
 
                 <Field label="Shape Mask">
                   <Dropdown
@@ -1603,7 +1618,7 @@ export function PropertiesPanel() {
 
             {/* IMAGE ELEMENT */}
             {el.type === "image" && (
-              <Section title="Image Filters & Adjustments">
+              <Section title="Image">
                 <Field label="Shape Mask">
                   <MaskPicker
                     value={el.maskShape ?? ""}
@@ -1667,6 +1682,25 @@ export function PropertiesPanel() {
                   ]} />
                 </Field>
 
+                <Field label="Aspect ratio">
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {ASPECT_RATIOS.map((r) => (
+                      <button
+                        key={r.label}
+                        type="button"
+                        onClick={() =>
+                          update(el.id, { height: Math.max(20, Math.round(el.width / r.value)) } as never)
+                        }
+                        className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+
+              </Section>
+              <Section title="Image Filters" defaultOpen={false}>
                 <Field label="Presets">
                   <div className="grid grid-cols-4 gap-1.5">
                     {IMAGE_FILTER_PRESETS.map((preset) => (
@@ -1849,6 +1883,15 @@ export function PropertiesPanel() {
                     update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, posterize: val } })
                   }
                 />
+                <button
+                  type="button"
+                  onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
+                  className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
+                >
+                  Reset filters
+                </button>
+              </Section>
+              <Section title="Image Style" defaultOpen={false}>
                 <SliderWithInput
                   label="Corner Radius"
                   min={0}
@@ -1887,23 +1930,6 @@ export function PropertiesPanel() {
                   </div>
                 </Field>
 
-                <Field label="Aspect ratio">
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {ASPECT_RATIOS.map((r) => (
-                      <button
-                        key={r.label}
-                        type="button"
-                        onClick={() =>
-                          update(el.id, { height: Math.max(20, Math.round(el.width / r.value)) } as never)
-                        }
-                        className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
-                      >
-                        {r.label}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-
                 <Field label="Blend mode">
                   <Dropdown
                     value={el.blendMode ?? "normal"}
@@ -1912,15 +1938,33 @@ export function PropertiesPanel() {
                   />
                 </Field>
 
-                <button
-                  type="button"
-                  onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
-                  className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
-                >
-                  Reset filters
-                </button>
               </Section>
             )}
+
+          </div>
+        </aside>
+      )}
+    </>
+  );
+}
+
+
+{/* SHADOW (all elements) */}
+            <Section title="Shadow" defaultOpen={!!el.shadow}>
+              <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
+              {el.shadow && (() => {
+                const s = el.shadow as ElementShadow;
+                const set = (p: Partial<ElementShadow>) => update(el.id, { shadow: { ...s, ...p } } as never);
+                return (
+                  <>
+                    <SliderWithInput label="Offset X" min={-60} max={60} value={s.x} unit="px" onChange={(v) => set({ x: v })} />
+                    <SliderWithInput label="Offset Y" min={-60} max={60} value={s.y} unit="px" onChange={(v) => set({ y: v })} />
+                    <SliderWithInput label="Blur" min={0} max={100} value={s.blur} unit="px" onChange={(v) => set({ blur: v })} />
+                    <ModernColorPicker label="Color" value={s.color.startsWith("#") ? s.color : "#000000"} onChange={(c) => set({ color: c })} />
+                  </>
+                );
+              })()}
+            </Section>
 
             {/* KEYFRAME ANIMATION — custom motion path */}
             <Section title="Keyframe Animation" defaultOpen={false}>
@@ -1930,7 +1974,40 @@ export function PropertiesPanel() {
               {sortedKfs.length > 0 && sortedKfs.length < 2 && (
                 <p className="text-[10px] font-medium text-amber-600">Add at least 2 keyframes to animate.</p>
               )}
-                            <div className="space-y-2">
+              <div className="space-y-2">
+                {/* Toolbar: count, total time, preview & clear */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+                    {sortedKfs.length} keyframe{sortedKfs.length === 1 ? "" : "s"} · {(kfTotal / 1000).toFixed(1)} s
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={sortedKfs.length < 2}
+                      onClick={() =>
+                        window.dispatchEvent(
+                          new CustomEvent("diapolab:preview-keyframes", { detail: { id: el.id } })
+                        )
+                      }
+                      title="Play the animation on the canvas"
+                      className="flex items-center gap-1 rounded-md bg-slate-900 px-2 py-1 text-[9px] font-bold text-white transition hover:bg-slate-700 disabled:opacity-30"
+                    >
+                      <Play className="size-3" /> Preview
+                    </button>
+                    {sortedKfs.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setKfs([]);
+                          setSelectedKf(null);
+                        }}
+                        className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
                 {/* Timeline track: click the line to add, drag diamonds to move */}
                 <div className="flex items-center justify-between px-0.5 text-[9px] font-mono text-slate-400">
                   <span>0 ms</span>
@@ -2005,6 +2082,7 @@ export function PropertiesPanel() {
                             className="w-16 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-right font-mono text-[10px] text-slate-700 outline-none"
                           />
                           <span className="text-[9px] text-slate-400">ms</span>
+                          <span className="font-mono text-[9px] text-slate-400">({(k.t / 1000).toFixed(2)} s)</span>
                         </div>
                       </div>
                       <div className="mt-1.5 flex items-center gap-1.5">
@@ -2020,7 +2098,7 @@ export function PropertiesPanel() {
                           ))}
                         </select>
                       </div>
-                      <div className="mt-1.5 grid grid-cols-3 gap-1">
+                      <div className="mt-1.5 grid grid-cols-4 gap-1">
                         <button type="button" onClick={() => {
                           setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
@@ -2059,6 +2137,11 @@ export function PropertiesPanel() {
                           } as never);
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
                         <button type="button" onClick={() => {
+                          const copy = { ...k, id: crypto.randomUUID(), t: Math.min(kfTotal, k.t + 250) };
+                          setKfs([...kfs, copy]);
+                          setSelectedKf(copy.id);
+                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Duplicate</button>
+                        <button type="button" onClick={() => {
                           setKfs(kfs.filter((x) => x.id !== k.id));
                           setSelectedKf(null);
                         }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300">Delete</button>
@@ -2093,7 +2176,7 @@ export function PropertiesPanel() {
               )}
             </Section>
 
-            {/* ANIMATION & INTERACTION */}
+{/* ANIMATION & INTERACTION */}
             <Section title="Animation & Interaction" defaultOpen={false}>
               <Field label="Entrance animation">
                 <Dropdown
@@ -2129,24 +2212,39 @@ export function PropertiesPanel() {
               )}
             </Section>
 
-            {/* SHADOW (all elements) */}
-            <Section title="Shadow" defaultOpen={!!el.shadow}>
-              <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
-              {el.shadow && (() => {
-                const s = el.shadow as ElementShadow;
-                const set = (p: Partial<ElementShadow>) => update(el.id, { shadow: { ...s, ...p } } as never);
-                return (
-                  <>
-                    <SliderWithInput label="Offset X" min={-60} max={60} value={s.x} unit="px" onChange={(v) => set({ x: v })} />
-                    <SliderWithInput label="Offset Y" min={-60} max={60} value={s.y} unit="px" onChange={(v) => set({ y: v })} />
-                    <SliderWithInput label="Blur" min={0} max={100} value={s.blur} unit="px" onChange={(v) => set({ blur: v })} />
-                    <ModernColorPicker label="Color" value={s.color.startsWith("#") ? s.color : "#000000"} onChange={(c) => set({ color: c })} />
-                  </>
-                );
-              })()}
-            </Section>
+{/* LAYER ORDER ACTIONS */}
+            <Section title="Layer Management">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => bringForward(el.id)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                >
+                  <ArrowUp className="size-3.5" /> Forward
+                </button>
+                <button
+                  type="button"
+                  onClick={() => sendBackward(el.id)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                >
+                  <ArrowDown className="size-3.5" /> Backward
+                </button>
+                <button
+                  type="button"
+                  onClick={() => duplicate(el.id)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                >
+                  <Copy className="size-3.5" /> Duplicate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(el.id)}
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 shadow-2xs hover:bg-rose-100"
+                >
+                  <Trash2 className="size-3.5" /> Delete
+                </button>
 
-            <Section title="Element JSON" defaultOpen={false}>
+<Section title="Element JSON" defaultOpen={false}>
               <p className="text-[10px] leading-relaxed text-slate-500">
                 Edit the raw properties of the selected element. The id and type are
                 locked. Apply with the button or ⌘/Ctrl + ↵.
@@ -2195,45 +2293,5 @@ export function PropertiesPanel() {
                 </button>
               </div>
             </Section>
-
-            {/* LAYER ORDER ACTIONS */}
-            <Section title="Layer Management">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => bringForward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
-                >
-                  <ArrowUp className="size-3.5" /> Forward
-                </button>
-                <button
-                  type="button"
-                  onClick={() => sendBackward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
-                >
-                  <ArrowDown className="size-3.5" /> Backward
-                </button>
-                <button
-                  type="button"
-                  onClick={() => duplicate(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
-                >
-                  <Copy className="size-3.5" /> Duplicate
-                </button>
-                <button
-                  type="button"
-                  onClick={() => remove(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 shadow-2xs hover:bg-rose-100"
-                >
-                  <Trash2 className="size-3.5" /> Delete
-                </button>
-              </div>
-            </Section>
           </div>
         </aside>
-      )}
-    </>
-  );
-}
-
-

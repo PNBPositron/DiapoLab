@@ -412,10 +412,22 @@ export function CanvasElement({
   const kfAnimRef = useRef<Animation | null>(null);
   const elementKfs = (element as { keyframes?: ElementKeyframe[] }).keyframes;
   const elementKfDuration = (element as { keyframeDuration?: number }).keyframeDuration;
+  // Edit-mode preview: the inspector "Preview" button bumps this epoch and the
+  // two keyframe effects below run outside present mode for one playback.
+  const [kfPreviewEpoch, setKfPreviewEpoch] = useState(0);
+  useEffect(() => {
+    const onPreview = (e: Event) => {
+      const id = (e as CustomEvent<{ id?: string }>).detail?.id;
+      if (id !== element.id) return;
+      setKfPreviewEpoch((n) => n + 1);
+    };
+    window.addEventListener("diapolab:preview-keyframes", onPreview);
+    return () => window.removeEventListener("diapolab:preview-keyframes", onPreview);
+  }, [element.id]);
   useEffect(() => {
     kfAnimRef.current?.cancel();
     kfAnimRef.current = null;
-    if (!presenting || preview || morph) return;
+    if ((!presenting && kfPreviewEpoch === 0) || preview || morph) return;
     if (!elementKfs || elementKfs.length < 2) return;
     const node = ref.current;
     if (!node || typeof node.animate !== "function") return;
@@ -439,11 +451,18 @@ export function CanvasElement({
       easing: "linear",
       fill: "forwards",
     });
+    // Preview outside present mode: snap back to the resting pose at the end.
+    if (!presenting) {
+      kfAnimRef.current.onfinish = () => {
+        kfAnimRef.current?.cancel();
+        kfAnimRef.current = null;
+      };
+    }
     return () => {
       kfAnimRef.current?.cancel();
       kfAnimRef.current = null;
     };
-  }, [presenting, preview, morph, elementKfs, elementKfDuration, replayEpoch]);
+  }, [presenting, preview, morph, elementKfs, elementKfDuration, replayEpoch, kfPreviewEpoch]);
 
   // ---- Keyframe effects (presenting) ----
   // rAF track for the EFFECT part of the keyframes: shadow, image filters
@@ -451,7 +470,7 @@ export function CanvasElement({
   // rendered element above. Discrete shape effects switch at each keyframe.
   useEffect(() => {
     setKfFx(null);
-    if (!presenting || preview || morph) return;
+    if ((!presenting && kfPreviewEpoch === 0) || preview || morph) return;
     const kfs = (sourceElement as { keyframes?: ElementKeyframe[] }).keyframes;
     if (!kfs || kfs.length < 2) return;
     const sorted = [...kfs].sort((a, b) => a.t - b.t);
@@ -507,7 +526,7 @@ export function CanvasElement({
       cancelAnimationFrame(raf);
       setKfFx(null);
     };
-  }, [presenting, preview, morph, replayEpoch, sourceElement]);
+  }, [presenting, preview, morph, replayEpoch, sourceElement, kfPreviewEpoch]);
   const [useCssEntry, setUseCssEntry] = useState(
     () =>
       typeof window === "undefined" ||
