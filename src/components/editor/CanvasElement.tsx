@@ -1313,7 +1313,7 @@ export function CanvasElement({
           loop
           muted
           playsInline
-          controls={useEditor.getState().presenting}
+          controls={presenting}
           style={{
             width: "100%",
             height: "100%",
