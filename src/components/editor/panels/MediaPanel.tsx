@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
-import { LayoutGrid, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { LayoutGrid, Music, Upload, X } from "lucide-react";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 import { newAudio, newImage, newVideo, useEditor } from "@/store/editor";
 import { prepareImage } from "@/lib/image-assets";
+import { listMedia, removeMedia, saveMedia, type MediaLibraryItem } from "@/lib/media-library";
 
 type MediaTab = "uploads" | "grids";
 
@@ -41,10 +42,16 @@ export function MediaPanel() {
   const [error, setError] = useState<string | null>(null);
   const { add, addGroup, canvasW, canvasH } = useEditor();
   const inputRef = useRef<HTMLInputElement>(null);
+  // Media the user imported before, saved in this browser.
+  const [library, setLibrary] = useState<MediaLibraryItem[]>([]);
+  useEffect(() => {
+    void listMedia().then(setLibrary);
+  }, []);
 
   const importFiles = async (files: FileList | File[]) => {
     setError(null);
     setBusy(true);
+    const toLibrary: Array<{ name: string; kind: "image" | "video" | "audio"; src: string }> = [];
     try {
       for (const file of Array.from(files)) {
         if (file.type.startsWith("image/")) {
@@ -52,20 +59,53 @@ export function MediaPanel() {
           const src =
             file.type === "image/gif" ? await readFileAsDataUrl(file) : await prepareImage(file);
           add(newImage(src, { x: 200, y: 200, width: 480, height: 480, fit: "cover" }));
+          toLibrary.push({ name: file.name, kind: "image", src });
         } else if (file.type.startsWith("video/")) {
           if (file.size > 25 * 1024 * 1024) throw new Error(file.name + " is too large (max 25 MB).");
           const src = await readFileAsDataUrl(file);
           add(newVideo(src, { muted: true, loop: true }));
+          toLibrary.push({ name: file.name, kind: "video", src });
         } else if (file.type.startsWith("audio/")) {
           if (file.size > 25 * 1024 * 1024) throw new Error(file.name + " is too large (max 25 MB).");
           const src = await readFileAsDataUrl(file);
           add(newAudio(src));
+          toLibrary.push({ name: file.name, kind: "audio", src });
         }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Import failed.");
     } finally {
       setBusy(false);
+    }
+    // Keep a copy of everything imported in this browser for later reuse.
+    // Heavy files (long videos) are skipped to keep the library responsive.
+    for (const item of toLibrary) {
+      if (item.src.length > 6_000_000) continue;
+      try {
+        const saved = await saveMedia(item);
+        setLibrary((l) => [saved, ...l.filter((m) => m.src !== saved.src)]);
+      } catch {
+        // Quota exceeded or private mode: the deck keeps working without the library.
+      }
+    }
+  };
+
+  const insertFromLibrary = (m: MediaLibraryItem) => {
+    if (m.kind === "image") {
+      add(newImage(m.src, { x: 200, y: 200, width: 480, height: 480, fit: "cover" }));
+    } else if (m.kind === "video") {
+      add(newVideo(m.src, { muted: true, loop: true }));
+    } else {
+      add(newAudio(m.src));
+    }
+  };
+
+  const removeFromLibrary = async (id: string) => {
+    setLibrary((l) => l.filter((m) => m.id !== id));
+    try {
+      await removeMedia(id);
+    } catch {
+      // Already gone from storage: nothing to do.
     }
   };
 
@@ -142,6 +182,46 @@ export function MediaPanel() {
           <p className="text-[10px] leading-snug text-slate-400">
             Images and GIFs land on the slide right away. Videos loop while presenting; audio shows a compact player.
           </p>
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Your library</p>
+            {library.length === 0 ? (
+              <p className="text-[10px] leading-snug text-slate-400">
+                Media you import is saved in this browser and shows up here, ready to reuse in any deck.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {library.map((m) => (
+                  <div key={m.id} className="group relative">
+                    <button
+                      type="button"
+                      onClick={() => insertFromLibrary(m)}
+                      title={"Insert " + m.name}
+                      className="block w-full overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:border-sky-400"
+                    >
+                      {m.kind === "image" ? (
+                        <img src={m.src} alt="" className="aspect-square w-full object-cover" />
+                      ) : m.kind === "video" ? (
+                        <video src={m.src} muted playsInline preload="metadata" className="aspect-square w-full object-cover" />
+                      ) : (
+                        <span className="grid aspect-square w-full place-items-center bg-slate-100">
+                          <Music className="size-4 text-slate-400" />
+                        </span>
+                      )}
+                      <span className="block truncate px-1 py-0.5 text-[8px] font-medium text-slate-500">{m.name}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void removeFromLibrary(m.id)}
+                      aria-label={"Remove " + m.name + " from library"}
+                      className="absolute right-1 top-1 hidden rounded bg-slate-900/70 p-0.5 text-white transition hover:bg-slate-900 group-hover:block"
+                    >
+                      <X className="size-2.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="space-y-3 px-4">
