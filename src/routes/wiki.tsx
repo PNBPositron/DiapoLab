@@ -393,7 +393,7 @@ function Wiki() {
               <li>
                 <strong>Image filters</strong> — brightness, contrast, saturation,
                 temperature and tint, blur, sepia and hue-rotate, plus live glitch,
-                pixelate and posterize effects.
+                pixelate, posterize and film-grain noise effects.
               </li>
               <li>
                 <strong>3D transforms</strong> — add perspective, rotate on X/Y, and

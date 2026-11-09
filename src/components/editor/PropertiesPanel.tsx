@@ -194,31 +194,14 @@ const IMAGE_FILTER_PRESETS: Array<{
     preview: "contrast(1.32) saturate(1.22) brightness(.98)",
   },
   {
-    name: "Cool",
-    description: "Blue mood",
-    filters: { ...DEFAULT_FILTERS, hueRotate: 18, saturate: 112, contrast: 108 },
-    preview: "hue-rotate(18deg) saturate(1.12) contrast(1.08)",
-  },
-  {
     name: "Sunset",
     description: "Warm glow",
     filters: { ...DEFAULT_FILTERS, sepia: 24, hueRotate: -12, saturate: 135, brightness: 106 },
     preview: "sepia(.24) hue-rotate(-12deg) saturate(1.35) brightness(1.06)",
   },
-  {
-    name: "Dream",
-    description: "Soft blur",
-    filters: { ...DEFAULT_FILTERS, blur: 0.7, contrast: 88, saturate: 118, brightness: 110 },
-    preview: "blur(.7px) contrast(.88) saturate(1.18) brightness(1.1)",
-  },
   { name: "Glitch", description: "RGB split & distort", filters: { ...DEFAULT_FILTERS, glitch: 55 }, preview: "none" },
-  { name: "Pixelate", description: "8-bit mosaic", filters: { ...DEFAULT_FILTERS, pixelate: 10 }, preview: "none" },
-  { name: "Posterize", description: "Flat color bands", filters: { ...DEFAULT_FILTERS, posterize: 5 }, preview: "none" },
   { name: "VHS", description: "Retro tape", filters: { ...DEFAULT_FILTERS, glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 }, preview: "saturate(1.35) contrast(1.12) hue-rotate(-8deg)" },
-  { name: "Gameboy", description: "Dotted handheld", filters: { ...DEFAULT_FILTERS, pixelate: 12, grayscale: 100, contrast: 145, brightness: 105 }, preview: "grayscale(1) contrast(1.45) brightness(1.05)" },
   { name: "Golden", description: "Golden hour", filters: { ...DEFAULT_FILTERS, temperature: 60, saturate: 118, brightness: 103 }, preview: "sepia(.21) saturate(1.18) brightness(1.03)" },
-  { name: "Arctic", description: "Cool wash", filters: { ...DEFAULT_FILTERS, temperature: -60, saturate: 96, brightness: 104 }, preview: "hue-rotate(-9deg) saturate(.96) brightness(1.04)" },
-  { name: "Duotone", description: "Blue tint", filters: { ...DEFAULT_FILTERS, tintColor: "#3f5bd1", tintOpacity: 45, saturate: 80, contrast: 112 }, preview: "saturate(.8) contrast(1.12)" },
 ];
 
 const BLEND_MODES = [
@@ -1776,21 +1759,18 @@ export function PropertiesPanel() {
                 />
                 <Field label="Tint">
                   <div className="flex items-center gap-2.5">
-                    <input
-                      type="color"
+                    <ColorPicker
                       value={el.filters?.tintColor ?? "#7aa2ff"}
-                      onChange={(e) =>
+                      onChange={(hex) =>
                         update(el.id, {
                           filters: {
                             ...DEFAULT_FILTERS,
                             ...el.filters,
-                            tintColor: e.target.value,
+                            tintColor: hex,
                             tintOpacity: el.filters?.tintOpacity ?? 35,
                           },
                         })
                       }
-                      className="h-8 w-10 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-white p-0.5"
-                      title="Tint color"
                     />
                     <div className="min-w-0 flex-1">
                       <SliderWithInput
@@ -1862,6 +1842,16 @@ export function PropertiesPanel() {
                   unit="%"
                   onChange={(val) =>
                     update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, glitch: val } })
+                  }
+                />
+                <SliderWithInput
+                  label="Noise"
+                  min={0}
+                  max={100}
+                  value={el.filters?.noise ?? 0}
+                  unit="%"
+                  onChange={(val) =>
+                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, noise: val } })
                   }
                 />
                 <SliderWithInput

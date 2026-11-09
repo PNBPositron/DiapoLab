@@ -46,9 +46,25 @@ const advancedEffects = (f?: ImageFilters): Array<{ key: string; inner: string }
     });
   }
   if ((v.glitch ?? 0) > 0) {
+    // Real glitch: turbulent horizontal tearing of the source, then an RGB
+    // channel split (red shifted left, blue shifted right, green kept)
+    // recombined with screen blends. The screen of the three isolated
+    // channels equals the source, so the split adds fringes without
+    // washing out or darkening the image.
+    const g = Math.min(100, Math.max(1, v.glitch!));
+    const tear = (g * 0.35).toFixed(1);
+    const split = (g * 0.12).toFixed(1);
+    const chan = (matrix: string, dx: string, res: string) =>
+      `<feOffset in="d" dx="${dx}" result="${res}x"/><feColorMatrix in="${res}x" type="matrix" values="${matrix}" result="${res}"/>`;
     list.push({
       key: "glitch",
-      inner: `<feTurbulence type="fractalNoise" baseFrequency="0.015 0.12" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${(v.glitch! * 0.9).toFixed(1)}" xChannelSelector="R" yChannelSelector="G"/>`,
+      inner:
+        `<feTurbulence type="turbulence" baseFrequency="0.02 0.28" numOctaves="3" seed="7" result="n"/>` +
+        `<feDisplacementMap in="SourceGraphic" in2="n" scale="${tear}" xChannelSelector="R" yChannelSelector="G" result="d"/>` +
+        chan("1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0", `-${split}`, "r") +
+        `<feColorMatrix in="d" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>` +
+        chan("0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0", split, "b") +
+        `<feBlend in="g" in2="r" mode="screen" result="gr"/><feBlend in="gr" in2="b" mode="screen"/>`,
     });
   }
   if ((v.pixelate ?? 0) >= 2) {
@@ -56,6 +72,16 @@ const advancedEffects = (f?: ImageFilters): Array<{ key: string; inner: string }
     list.push({
       key: "pixelate",
       inner: `<feFlood x="${p / 2}" y="${p / 2}" height="${p}" width="${p}"/><feComposite width="${p * 2}" height="${p * 2}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${p / 2}"/>`,
+    });
+  }
+  if ((v.noise ?? 0) > 0) {
+    // Film grain: fine fractal noise tinted mid-gray, alpha scaled by the
+    // intensity, constrained to the image shape and blended with overlay.
+    const n = Math.min(100, Math.max(1, v.noise!));
+    const a = ((n / 100) * 0.4).toFixed(3);
+    list.push({
+      key: "noise",
+      inner: `<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 ${a} 0" result="grain"/><feComposite in="grain" in2="SourceGraphic" operator="in" result="cg"/><feBlend in="SourceGraphic" in2="cg" mode="overlay"/>`,
     });
   }
   return list;

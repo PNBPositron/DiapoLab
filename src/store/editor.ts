@@ -261,6 +261,8 @@ export type ImageFilters = {
   pixelate?: number;
   /** posterize levels (2..16), 0 = off — SVG discrete transfer, live on the slide */
   posterize?: number;
+  /** film grain intensity 0..100 — SVG noise overlay, live on the slide */
+  noise?: number;
 };
 
 export const DEFAULT_FILTERS: ImageFilters = {
@@ -276,6 +278,7 @@ export const DEFAULT_FILTERS: ImageFilters = {
   glitch: 0,
   pixelate: 0,
   posterize: 0,
+  noise: 0,
 };
 
 export type ImageElement = ElementBase & {
