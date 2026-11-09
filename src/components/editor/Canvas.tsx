@@ -143,7 +143,11 @@ export function Canvas() {
         <div className="flex min-h-full min-w-full w-max items-center justify-center p-10">
           <div
             className="brutal-shadow-lg relative shrink-0"
-            style={{ width: canvasW * scale, height: canvasH * scale }}
+            style={{
+              width: canvasW * scale,
+              height: canvasH * scale,
+              transition: "width 120ms ease-out, height 120ms ease-out",
+            }}
             onMouseDown={(e) => {
               if (!(e.target as HTMLElement).closest("[data-canvas-element]")) select(null);
             }}
@@ -233,9 +237,15 @@ export function Canvas() {
         >
           <Minus />
         </Button>
-        <output aria-label="Preview zoom" className="min-w-12 text-center font-mono text-xs">
+        <button
+          type="button"
+          onClick={() => setZoom(null)}
+          title="Fit to screen"
+          aria-label="Fit to screen"
+          className="min-w-12 rounded-md px-1 py-0.5 text-center font-mono text-xs transition hover:bg-slate-100"
+        >
           {Math.round(scale * 100)}%
-        </output>
+        </button>
         <Button
           variant="ghost"
           size="icon"

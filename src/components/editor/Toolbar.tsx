@@ -71,6 +71,8 @@ export function Toolbar() {
     undo,
     redo,
     clear,
+    history,
+    future,
     designId,
     designName,
     setDesignName,
@@ -256,18 +258,20 @@ export function Toolbar() {
         <div className="flex items-center rounded-xl p-0.5">
           <button
             onClick={undo}
+            disabled={history.length === 0}
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90 disabled:pointer-events-none disabled:opacity-30"
           >
             <Undo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
           <div className="h-4 w-px bg-slate-200" />
           <button
             onClick={redo}
-            title="Redo (Ctrl+Y)"
+            disabled={future.length === 0}
+            title="Redo (Ctrl+Shift+Z)"
             aria-label="Redo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90 disabled:pointer-events-none disabled:opacity-30"
           >
             <Redo2 className="h-4 w-4" strokeWidth={2.2} />
           </button>
@@ -307,6 +311,7 @@ export function Toolbar() {
           <button
             onClick={handleSave}
             disabled={saving}
+            title="Save design"
             className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 transition-all hover:border-slate-200 hover:bg-slate-100 active:scale-95 disabled:opacity-60"
           >
             {saving ? (
