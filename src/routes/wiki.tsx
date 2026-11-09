@@ -77,7 +77,7 @@ const ELEMENTS: Array<[string, string]> = [
   ["Video & audio", "Trim window, playback speed and loop, straight on the slide."],
   ["Charts", "Bar, line, area, pie and donut charts with style-matched colors."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
-  ["Quizzes & polls", "Right-or-right quizzes, and live polls whose votes sync across open windows."],
+  ["Quizzes & polls", "Right-or-wrong quizzes, and live polls whose votes sync across open windows."],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
   ["UI components", "Twenty-four kinds (cards, terminals, phones...) in thirteen style packs."],
   ["Embeds", "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically."],
