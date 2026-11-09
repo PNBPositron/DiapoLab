@@ -52,14 +52,14 @@ const advancedEffects = (f?: ImageFilters): Array<{ key: string; inner: string }
     // channels equals the source, so the split adds fringes without
     // washing out or darkening the image.
     const g = Math.min(100, Math.max(1, v.glitch!));
-    const tear = (g * 0.35).toFixed(1);
+    const tear = (g * 0.4).toFixed(1);
     const split = (g * 0.12).toFixed(1);
     const chan = (matrix: string, dx: string, res: string) =>
       `<feOffset in="d" dx="${dx}" result="${res}x"/><feColorMatrix in="${res}x" type="matrix" values="${matrix}" result="${res}"/>`;
     list.push({
       key: "glitch",
       inner:
-        `<feTurbulence type="turbulence" baseFrequency="0.02 0.28" numOctaves="3" seed="7" result="n"/>` +
+        `<feTurbulence type="turbulence" baseFrequency="0 0.05" numOctaves="2" seed="7" result="n"/>` +
         `<feDisplacementMap in="SourceGraphic" in2="n" scale="${tear}" xChannelSelector="R" yChannelSelector="G" result="d"/>` +
         chan("1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0", `-${split}`, "r") +
         `<feColorMatrix in="d" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>` +
@@ -395,6 +395,28 @@ export function CanvasElement({
   // shadows, image filters, shape effects.
   const [kfFx, setKfFx] = useState<Record<string, unknown> | null>(null);
   const element = (kfFx ? { ...sourceElement, ...kfFx } : sourceElement) as AnyElement;
+
+  // Live glitch: real interference never sits still. Every few frames the
+  // SVG turbulence is re-seeded and the tear scale / RGB split offsets are
+  // re-rolled, so the bands and fringes flicker continuously on the slide.
+  useEffect(() => {
+    const g = element.filters?.glitch ?? 0;
+    if (!g || preview) return;
+    const rand = (m: number) => (Math.random() * 2 - 1) * m;
+    const timer = setInterval(() => {
+      const f = document.getElementById(`img-fx-${element.id}-glitch`);
+      if (!f) return;
+      const turb = f.querySelector("feTurbulence");
+      const disp = f.querySelector("feDisplacementMap");
+      const rOff = f.querySelector('feOffset[result="rx"]');
+      const bOff = f.querySelector('feOffset[result="bx"]');
+      if (turb) turb.setAttribute("seed", String(1 + Math.floor(Math.random() * 998)));
+      if (disp) disp.setAttribute("scale", (g * 0.25 + Math.random() * g * 0.3).toFixed(1));
+      if (rOff) rOff.setAttribute("dx", rand(g * 0.18).toFixed(1));
+      if (bOff) bOff.setAttribute("dx", rand(g * 0.18).toFixed(1));
+    }, 90);
+    return () => clearInterval(timer);
+  }, [element.id, element.filters?.glitch, preview]);
 
   // Live 3D tilt toward the cursor (presenting + hoverTilt enabled)
   const [tilt, setTilt] = useState<{ rx: number; ry: number } | null>(null);

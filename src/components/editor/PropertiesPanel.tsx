@@ -237,6 +237,41 @@ const SWATCHES = [
   "#64748b",
 ];
 
+// Compact color control for tight rows (gradients): a swatch button that
+// opens the full app ColorPicker in a popover — replaces the native
+// input[type=color] everywhere.
+function ColorSwatchPopover({
+  value,
+  onChange,
+  label,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+  label: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        aria-label={label}
+        title={label}
+        onClick={() => setOpen((o) => !o)}
+        className="size-6 shrink-0 cursor-pointer rounded-md border border-slate-200 shadow-2xs"
+        style={{ background: value }}
+      />
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-full left-0 z-50 mb-1.5 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+            <ColorPicker value={value} onChange={onChange} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // --- MODERN UI PRIMITIVES ---
 
 function Section({
@@ -1327,22 +1362,18 @@ export function PropertiesPanel() {
                         />
                         <div className="grid grid-cols-2 gap-2">
                           <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                            <input
-                              type="color"
+                            <ColorSwatchPopover
                               value={el.gradient.from}
-                              onChange={(e) => update(el.id, { gradient: { ...el.gradient!, from: e.target.value } })}
-                              className="size-6 cursor-pointer border-0 bg-transparent p-0"
-                              aria-label="Gradient start color"
+                              onChange={(from) => update(el.id, { gradient: { ...el.gradient!, from } })}
+                              label="Gradient start color"
                             />
                             Start
                           </label>
                           <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                            <input
-                              type="color"
+                            <ColorSwatchPopover
                               value={el.gradient.to}
-                              onChange={(e) => update(el.id, { gradient: { ...el.gradient!, to: e.target.value } })}
-                              className="size-6 cursor-pointer border-0 bg-transparent p-0"
-                              aria-label="Gradient end color"
+                              onChange={(to) => update(el.id, { gradient: { ...el.gradient!, to } })}
+                              label="Gradient end color"
                             />
                             End
                           </label>
@@ -1476,11 +1507,11 @@ export function PropertiesPanel() {
                           />
                           <div className="grid grid-cols-2 gap-2">
                             <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                              <input type="color" value={el.gradient.from} onChange={(e) => update(el.id, { gradient: { ...el.gradient!, from: e.target.value } })} className="size-6 cursor-pointer border-0 bg-transparent p-0" aria-label="Gradient start color" />
+                              <ColorSwatchPopover value={el.gradient.from} onChange={(from) => update(el.id, { gradient: { ...el.gradient!, from } })} label="Gradient start color" />
                               Start
                             </label>
                             <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                              <input type="color" value={el.gradient.to} onChange={(e) => update(el.id, { gradient: { ...el.gradient!, to: e.target.value } })} className="size-6 cursor-pointer border-0 bg-transparent p-0" aria-label="Gradient end color" />
+                              <ColorSwatchPopover value={el.gradient.to} onChange={(to) => update(el.id, { gradient: { ...el.gradient!, to } })} label="Gradient end color" />
                               End
                             </label>
                           </div>
