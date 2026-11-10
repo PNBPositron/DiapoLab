@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { Theme } from "@astryxdesign/core/theme";
+import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import { useAuthInit } from "@/hooks/use-auth";
 
 function NotFoundComponent() {
@@ -160,7 +162,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <Theme theme={neutralTheme} mode="system">
+        <Outlet />
+      </Theme>
     </QueryClientProvider>
   );
 }
