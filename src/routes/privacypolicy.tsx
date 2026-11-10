@@ -1,5 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, BookOpen, User, HardDrive, CloudCog, Sparkles, Globe2, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowLeft,
+  ShieldCheck,
+  BookOpen,
+  User,
+  HardDrive,
+  CloudCog,
+  Sparkles,
+  Globe2,
+  SlidersHorizontal,
+} from "lucide-react";
 
 export const Route = createFileRoute("/privacypolicy")({
   component: PrivacyPolicy,
@@ -36,7 +46,12 @@ const PP_SECTIONS = [
 
 function PrivacyPolicy() {
   return (
-    <LegalShell title="Privacy Policy" subtitle="last updated · October 2026" icon={<ShieldCheck className="size-5" />} kicker="DiapoLab documentation">
+    <LegalShell
+      title="Privacy Policy"
+      subtitle="last updated · October 2026"
+      icon={<ShieldCheck className="size-5" />}
+      kicker="DiapoLab documentation"
+    >
       <Section title="What we store" icon={<CloudCog className="size-4" />}>
         <p>
           Designs you save, templates and themes you publish, and the likes you give are stored in
@@ -123,8 +138,12 @@ export function LegalShell({
               {icon ?? <ShieldCheck className="size-5" />}
             </span>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">{kicker}</p>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">
+                {kicker}
+              </p>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                {title}
+              </h1>
             </div>
           </div>
           <p className="mt-3 text-sm text-slate-500">{subtitle}</p>

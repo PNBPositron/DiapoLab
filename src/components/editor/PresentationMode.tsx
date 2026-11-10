@@ -32,18 +32,23 @@ export function PresentationMode() {
 
   const page = pages[currentIndex];
 
-  useEffect(() => useEditor.subscribe((next, previous) => {
-    if (!next.presenting || !previous.presenting) {
-      prevGeomRef.current = new Map();
-      return;
-    }
-    if (next.currentIndex === previous.currentIndex) return;
-    const outgoing = previous.pages[previous.currentIndex];
-    const incoming = next.pages[next.currentIndex];
-    prevGeomRef.current = outgoing && incoming?.transition === "morph"
-      ? matchMorphElements(outgoing.elements, incoming.elements)
-      : new Map();
-  }), []);
+  useEffect(
+    () =>
+      useEditor.subscribe((next, previous) => {
+        if (!next.presenting || !previous.presenting) {
+          prevGeomRef.current = new Map();
+          return;
+        }
+        if (next.currentIndex === previous.currentIndex) return;
+        const outgoing = previous.pages[previous.currentIndex];
+        const incoming = next.pages[next.currentIndex];
+        prevGeomRef.current =
+          outgoing && incoming?.transition === "morph"
+            ? matchMorphElements(outgoing.elements, incoming.elements)
+            : new Map();
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (!presenting) return;
@@ -149,9 +154,8 @@ export function PresentationMode() {
   // Shared and older designs may omit background fields. Presentation must
   // still render those pages instead of throwing while the overlay mounts.
   const pageBgColor = typeof page.bgColor === "string" ? page.bgColor : "#ffffff";
-  const backdropBgColor = backdropPage && typeof backdropPage.bgColor === "string"
-    ? backdropPage.bgColor
-    : "#ffffff";
+  const backdropBgColor =
+    backdropPage && typeof backdropPage.bgColor === "string" ? backdropPage.bgColor : "#ffffff";
   const morphing = page.transition === "morph";
   const motionTransitionNames = new Set(["tv", "neon", "cube", "prism", "origami"]);
   const transition =
@@ -179,7 +183,12 @@ export function PresentationMode() {
         >
           <div
             className="absolute left-0 top-0 overflow-hidden border border-teal"
-            style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
+            style={{
+              width: canvasW,
+              height: canvasH,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+            }}
           >
             {backdropPage && (
               <div
@@ -249,7 +258,12 @@ export function PresentationMode() {
                   ) : (
                     // Elements with no morph match (new on this slide) keep
                     // their entrance animation even during a morph transition.
-                    <CanvasElement key={el.id} element={el} scale={scale} replayEpoch={replayEpoch} />
+                    <CanvasElement
+                      key={el.id}
+                      element={el}
+                      scale={scale}
+                      replayEpoch={replayEpoch}
+                    />
                   );
                 })}
                 <TransitionFx name={page.transition} />
@@ -261,22 +275,60 @@ export function PresentationMode() {
       {presenterOpen && (
         <div className="fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-md">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">Presenter · slide {currentIndex + 1}/{pages.length}</span>
-            <span className="font-mono text-sm tabular-nums text-white/90">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">
+              Presenter · slide {currentIndex + 1}/{pages.length}
+            </span>
+            <span className="font-mono text-sm tabular-nums text-white/90">
+              {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+            </span>
             <div className="flex items-center gap-2">
-              <button onClick={() => setReplayEpoch((n) => n + 1)} title="Replay object animations (R)" className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Replay</button>
-              <button onClick={() => setElapsed(0)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Reset</button>
-              <button onClick={() => setPresenterOpen(false)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Close</button>
+              <button
+                onClick={() => setReplayEpoch((n) => n + 1)}
+                title="Replay object animations (R)"
+                className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10"
+              >
+                Replay
+              </button>
+              <button
+                onClick={() => setElapsed(0)}
+                className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setPresenterOpen(false)}
+                className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10"
+              >
+                Close
+              </button>
             </div>
           </div>
           <div className="flex gap-3">
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Notes</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                Notes
+              </span>
               <div className="mt-1 max-h-44 overflow-auto whitespace-pre-wrap text-[13px] leading-relaxed text-white/85">
-                {page.notes?.trim() ? page.notes : <span className="italic text-white/35">No notes for this slide.</span>}
+                {page.notes?.trim() ? (
+                  page.notes
+                ) : (
+                  <span className="italic text-white/35">No notes for this slide.</span>
+                )}
               </div>
             </div>
-            {pages[currentIndex + 1] && <div className="w-40 shrink-0"><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Next</span><SlideThumbnail page={pages[currentIndex + 1]} canvasW={canvasW} canvasH={canvasH} className="mt-1 rounded-lg border border-white/15" /></div>}
+            {pages[currentIndex + 1] && (
+              <div className="w-40 shrink-0">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                  Next
+                </span>
+                <SlideThumbnail
+                  page={pages[currentIndex + 1]}
+                  canvasW={canvasW}
+                  canvasH={canvasH}
+                  className="mt-1 rounded-lg border border-white/15"
+                />
+              </div>
+            )}
           </div>
           <p className="text-[10px] text-white/35">Press P to hide · arrows to navigate</p>
         </div>
@@ -287,20 +339,64 @@ export function PresentationMode() {
 
 function transitionPreset(name: string | undefined) {
   const ease = [0.22, 1, 0.36, 1] as const;
-  if (name === "slide-left") return { initial: { x: "100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-right") return { initial: { x: "-100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-up") return { initial: { y: "100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.48, ease } };
-  if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
+  if (name === "slide-left")
+    return {
+      initial: { x: "100%", opacity: 0 },
+      animate: { x: 0, opacity: 1 },
+      transition: { duration: 0.62, ease },
+    };
+  if (name === "slide-right")
+    return {
+      initial: { x: "-100%", opacity: 0 },
+      animate: { x: 0, opacity: 1 },
+      transition: { duration: 0.62, ease },
+    };
+  if (name === "slide-up")
+    return {
+      initial: { y: "100%", opacity: 0 },
+      animate: { y: 0, opacity: 1 },
+      transition: { duration: 0.62, ease },
+    };
+  if (name === "slide-down")
+    return {
+      initial: { y: "-100%", opacity: 0 },
+      animate: { y: 0, opacity: 1 },
+      transition: { duration: 0.62, ease },
+    };
+  if (name === "fade")
+    return {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration: 0.48, ease },
+    };
+  if (name === "zoom")
+    return {
+      initial: { opacity: 0.2, scale: 0.86 },
+      animate: { opacity: 1, scale: 1 },
+      transition: { duration: 0.68, ease },
+    };
   if (name === "tv") {
     return {
       // A CRT powers on from a bright horizontal line without enlarging the slide.
-      initial: { opacity: 0, clipPath: "inset(49.5% 0 49.5% 0)", filter: "brightness(3) saturate(1.8) contrast(1.25)" },
+      initial: {
+        opacity: 0,
+        clipPath: "inset(49.5% 0 49.5% 0)",
+        filter: "brightness(3) saturate(1.8) contrast(1.25)",
+      },
       animate: {
         opacity: [0, 1, 1, 1],
-        clipPath: ["inset(49.5% 0 49.5% 0)", "inset(10% 0 10% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
-        filter: ["brightness(3) saturate(1.8) contrast(1.25)", "brightness(1.6) saturate(1.35) contrast(1.1)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+        clipPath: [
+          "inset(49.5% 0 49.5% 0)",
+          "inset(10% 0 10% 0)",
+          "inset(0 0 0 0)",
+          "inset(0 0 0 0)",
+        ],
+        filter: [
+          "brightness(3) saturate(1.8) contrast(1.25)",
+          "brightness(1.6) saturate(1.35) contrast(1.1)",
+          "brightness(1) saturate(1) contrast(1)",
+          "brightness(1) saturate(1) contrast(1)",
+        ],
       },
       transition: { duration: 0.82, times: [0, 0.34, 0.72, 1], ease },
     };
@@ -308,12 +404,29 @@ function transitionPreset(name: string | undefined) {
   if (name === "neon") {
     return {
       // Digital signal lock: RGB-like horizontal jitter and scanline flashes, no zoom.
-      initial: { opacity: 0, x: 0, clipPath: "inset(0 0 100% 0)", filter: "brightness(2.4) saturate(2.8) contrast(1.5)" },
+      initial: {
+        opacity: 0,
+        x: 0,
+        clipPath: "inset(0 0 100% 0)",
+        filter: "brightness(2.4) saturate(2.8) contrast(1.5)",
+      },
       animate: {
         opacity: [0, 1, 1, 1, 1],
         x: [0, -14, 11, -6, 0],
-        clipPath: ["inset(0 0 100% 0)", "inset(0 0 58% 0)", "inset(18% 0 28% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
-        filter: ["brightness(2.4) saturate(2.8) contrast(1.5)", "brightness(1.7) saturate(2.2) contrast(1.4)", "brightness(1.35) saturate(1.6) contrast(1.15)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+        clipPath: [
+          "inset(0 0 100% 0)",
+          "inset(0 0 58% 0)",
+          "inset(18% 0 28% 0)",
+          "inset(0 0 0 0)",
+          "inset(0 0 0 0)",
+        ],
+        filter: [
+          "brightness(2.4) saturate(2.8) contrast(1.5)",
+          "brightness(1.7) saturate(2.2) contrast(1.4)",
+          "brightness(1.35) saturate(1.6) contrast(1.15)",
+          "brightness(1) saturate(1) contrast(1)",
+          "brightness(1) saturate(1) contrast(1)",
+        ],
       },
       transition: { duration: 0.78, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
     };
@@ -343,7 +456,14 @@ function transitionPreset(name: string | undefined) {
   if (name === "cube") {
     return {
       initial: { opacity: 0, rotateY: -18, x: "2%", transformPerspective: 1200 },
-      animate: { opacity: [0, 1, 1], rotateY: [-18, 3, 0], x: ["2%", "-0.5%", "0%"], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
+      animate: {
+        opacity: [0, 1, 1],
+        rotateY: [-18, 3, 0],
+        x: ["2%", "-0.5%", "0%"],
+        transformPerspective: 1200,
+        originX: 0.5,
+        originY: 0.5,
+      },
       transition: { duration: 0.86, times: [0, 0.72, 1], ease },
     };
   }
@@ -357,25 +477,71 @@ function TransitionFx({ name }: { name?: string }) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-20"
         initial={{ opacity: 1, scaleY: 0.02, filter: "brightness(3)" }}
-        animate={{ opacity: [1, 0.95, 0.7, 0], scaleY: [0.02, 0.18, 1, 1], filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"] }}
+        animate={{
+          opacity: [1, 0.95, 0.7, 0],
+          scaleY: [0.02, 0.18, 1, 1],
+          filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"],
+        }}
         transition={{ duration: 0.82, times: [0, 0.24, 0.68, 1], ease: "easeOut" }}
-        style={{ background: "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)", mixBlendMode: "screen", transformOrigin: "center" }}
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)",
+          mixBlendMode: "screen",
+          transformOrigin: "center",
+        }}
       />
     );
   }
   if (name === "neon") {
     return (
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.78, ease: "linear" }}>
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.78, ease: "linear" }}
+      >
         {["18%", "43%", "67%", "82%"].map((top, index) => (
-          <motion.div key={top} className="absolute left-[-8%] h-[3px] w-[116%]" style={{ top, background: index % 2 ? "#22d3ee" : "#f0abfc", boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`, mixBlendMode: "screen" }} initial={{ x: "-8%", scaleX: 0.3 }} animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }} transition={{ duration: 0.62, delay: index * 0.035, ease: "linear" }} />
+          <motion.div
+            key={top}
+            className="absolute left-[-8%] h-[3px] w-[116%]"
+            style={{
+              top,
+              background: index % 2 ? "#22d3ee" : "#f0abfc",
+              boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`,
+              mixBlendMode: "screen",
+            }}
+            initial={{ x: "-8%", scaleX: 0.3 }}
+            animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }}
+            transition={{ duration: 0.62, delay: index * 0.035, ease: "linear" }}
+          />
         ))}
-        <motion.div className="absolute inset-0" style={{ background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)" }} animate={{ opacity: [1, 0.2, 1, 0] }} transition={{ duration: 0.7, ease: "linear" }} />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)",
+          }}
+          animate={{ opacity: [1, 0.2, 1, 0] }}
+          transition={{ duration: 0.7, ease: "linear" }}
+        />
       </motion.div>
     );
   }
   if (name === "cube") {
     return (
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70" initial={{ opacity: 1, rotateY: -14, scale: 0.96 }} animate={{ opacity: 0, rotateY: 0, scale: 1 }} transition={{ duration: 0.86, ease: "easeOut" }} style={{ transformOrigin: "center", transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)" }} />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70"
+        initial={{ opacity: 1, rotateY: -14, scale: 0.96 }}
+        animate={{ opacity: 0, rotateY: 0, scale: 1 }}
+        transition={{ duration: 0.86, ease: "easeOut" }}
+        style={{
+          transformOrigin: "center",
+          transformStyle: "preserve-3d",
+          boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)",
+        }}
+      />
     );
   }
   return null;
@@ -403,10 +569,13 @@ function MorphItem({
     const from = prevGeom
       ? `translate(${prevGeom.x - el.x}px, ${prevGeom.y - el.y}px) scale(${prevGeom.w / (el.width || 1)}, ${prevGeom.h / (el.height || 1)}) rotate(${prevGeom.rotation - el.rotation}deg)`
       : "scale(0.92)";
-    const animation = node.animate([
-      { transform: from, opacity: prevGeom ? 1 : 0 },
-      { transform: "none", opacity: 1 },
-    ], { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" });
+    const animation = node.animate(
+      [
+        { transform: from, opacity: prevGeom ? 1 : 0 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" },
+    );
     return () => animation.cancel();
   }, [el.id, el.x, el.y, el.width, el.height, el.rotation, prevGeom]);
 
@@ -425,7 +594,6 @@ function MorphItem({
       }}
     >
       {children}
-
     </div>
   );
 }

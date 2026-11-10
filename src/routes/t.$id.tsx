@@ -3,7 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEditor, type Page } from "@/store/editor";
-import { PresentationMode, requestPresentationFullscreen } from "@/components/editor/PresentationMode";
+import {
+  PresentationMode,
+  requestPresentationFullscreen,
+} from "@/components/editor/PresentationMode";
 import { Loader2, Link2Off, Play, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/t/$id")({
@@ -14,7 +17,11 @@ export const Route = createFileRoute("/t/$id")({
   head: () => ({
     meta: [
       { title: "Shared deck — DiapoLab" },
-      { name: "description", content: "View a deck shared publicly from DiapoLab, a focused design and presentation workspace." },
+      {
+        name: "description",
+        content:
+          "View a deck shared publicly from DiapoLab, a focused design and presentation workspace.",
+      },
       { property: "og:title", content: "Shared deck — DiapoLab" },
       { property: "og:description", content: "View a deck shared publicly from DiapoLab." },
       { property: "og:type", content: "website" },
@@ -117,9 +124,17 @@ function SharedTemplate() {
         ) : (
           <>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">Shared deck</span>
-              <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-blue-600">View only</span>
-              {ready && <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">{pageCount} pages</span>}
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+                Shared deck
+              </span>
+              <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-blue-600">
+                View only
+              </span>
+              {ready && (
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">
+                  {pageCount} pages
+                </span>
+              )}
             </div>
             <button
               disabled={!ready}
@@ -129,7 +144,11 @@ function SharedTemplate() {
               }}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_14px_32px_-10px_rgba(37,99,235,0.55)] transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
-              {ready ? <Play className="size-4 fill-white" /> : <Loader2 className="size-4 animate-spin" />}
+              {ready ? (
+                <Play className="size-4 fill-white" />
+              ) : (
+                <Loader2 className="size-4 animate-spin" />
+              )}
               {ready ? "Present" : "Preparing…"}
             </button>
             {ready && shareUrl && (
@@ -144,7 +163,9 @@ function SharedTemplate() {
             )}
           </>
         )}
-        <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Made with DiapoLab</p>
+        <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+          Made with DiapoLab
+        </p>
       </div>
       <PresentationMode />
     </div>

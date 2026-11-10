@@ -106,6 +106,7 @@ export const ELEMENT_ANIMATION_OPTIONS: Array<{
 ];
 
 /** label/value pairs for the PropertiesPanel Dropdown. */
-export const ELEMENT_ANIMATION_LABELS = ELEMENT_ANIMATION_OPTIONS.map(
-  ({ value, label }) => ({ value, label }),
-);
+export const ELEMENT_ANIMATION_LABELS = ELEMENT_ANIMATION_OPTIONS.map(({ value, label }) => ({
+  value,
+  label,
+}));

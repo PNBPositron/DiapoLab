@@ -153,51 +153,43 @@ export function ShapeRender({
     element;
   const gradId = `g-${element.id}`;
   const imageId = `image-${element.id}`;
-  const fillRef = fillOverride ?? (imageOverlay ? `url(#${imageId})` : gradient ? `url(#${gradId})` : fill);
-  const defs =
-    fillOverride
-      ? null
-      : gradient || imageOverlay ? (
-      <defs>
-        {imageOverlay && (
-          <pattern id={imageId} patternUnits="objectBoundingBox" width="1" height="1">
-            <image
-              href={imageOverlay}
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              preserveAspectRatio="xMidYMid slice"
-            />
-          </pattern>
-        )}
-        {gradient &&
-          ((gradient.type ?? "linear") === "radial" ? (
-            <radialGradient
-              id={gradId}
-              gradientUnits="objectBoundingBox"
-              cx="0.5"
-              cy="0.5"
-              r="0.75"
-            >
-              <stop offset="0%" stopColor={gradient.from} />
-              <stop offset="100%" stopColor={gradient.to} />
-            </radialGradient>
-          ) : (
-            <linearGradient
-              id={gradId}
-              gradientUnits="objectBoundingBox"
-              x1="0"
-              y1="0"
-              x2={Math.cos((gradient.angle * Math.PI) / 180)}
-              y2={Math.sin((gradient.angle * Math.PI) / 180)}
-            >
-              <stop offset="0%" stopColor={gradient.from} />
-              <stop offset="100%" stopColor={gradient.to} />
-            </linearGradient>
-          ))}
-        </defs>
-    ) : null;
+  const fillRef =
+    fillOverride ?? (imageOverlay ? `url(#${imageId})` : gradient ? `url(#${gradId})` : fill);
+  const defs = fillOverride ? null : gradient || imageOverlay ? (
+    <defs>
+      {imageOverlay && (
+        <pattern id={imageId} patternUnits="objectBoundingBox" width="1" height="1">
+          <image
+            href={imageOverlay}
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMid slice"
+          />
+        </pattern>
+      )}
+      {gradient &&
+        ((gradient.type ?? "linear") === "radial" ? (
+          <radialGradient id={gradId} gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.75">
+            <stop offset="0%" stopColor={gradient.from} />
+            <stop offset="100%" stopColor={gradient.to} />
+          </radialGradient>
+        ) : (
+          <linearGradient
+            id={gradId}
+            gradientUnits="objectBoundingBox"
+            x1="0"
+            y1="0"
+            x2={Math.cos((gradient.angle * Math.PI) / 180)}
+            y2={Math.sin((gradient.angle * Math.PI) / 180)}
+          >
+            <stop offset="0%" stopColor={gradient.from} />
+            <stop offset="100%" stopColor={gradient.to} />
+          </linearGradient>
+        ))}
+    </defs>
+  ) : null;
   const dash =
     element.strokeStyle === "dashed"
       ? `${Math.max(6, strokeWidth * 3)} ${Math.max(4, strokeWidth * 2)}`

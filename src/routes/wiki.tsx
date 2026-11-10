@@ -59,14 +59,46 @@ const SECTIONS = [
 ];
 
 const PANELS = [
-  { icon: <LayoutGrid className="size-4" />, name: "Home", desc: "Community templates and starter decks, loaded in one click." },
-  { icon: <Type className="size-4" />, name: "Text", desc: "Titles, headings and paragraphs, with custom fonts." },
-  { icon: <Shapes className="size-4" />, name: "Elements", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
-  { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
-  { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio." },
-  { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets and layout blocks." },
-  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, brand kit, canvas size and magic resize." },
-  { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
+  {
+    icon: <LayoutGrid className="size-4" />,
+    name: "Home",
+    desc: "Community templates and starter decks, loaded in one click.",
+  },
+  {
+    icon: <Type className="size-4" />,
+    name: "Text",
+    desc: "Titles, headings and paragraphs, with custom fonts.",
+  },
+  {
+    icon: <Shapes className="size-4" />,
+    name: "Elements",
+    desc: "Shapes, icons, charts, tables, quizzes, buttons and more.",
+  },
+  {
+    icon: <Image className="size-4" />,
+    name: "Library",
+    desc: "Searchable stock photos and illustrations.",
+  },
+  {
+    icon: <Camera className="size-4" />,
+    name: "Media",
+    desc: "Upload your own photos, videos and audio.",
+  },
+  {
+    icon: <Layers className="size-4" />,
+    name: "Presets",
+    desc: "Ready-made widgets and layout blocks.",
+  },
+  {
+    icon: <Palette className="size-4" />,
+    name: "Design",
+    desc: "Colors, brand kit, canvas size and magic resize.",
+  },
+  {
+    icon: <Folder className="size-4" />,
+    name: "Projects",
+    desc: "Open and manage your saved designs.",
+  },
 ];
 
 const ELEMENTS: Array<[string, string]> = [
@@ -77,10 +109,16 @@ const ELEMENTS: Array<[string, string]> = [
   ["Video & audio", "Trim window, playback speed and loop, straight on the slide."],
   ["Charts", "Bar, line, area, pie and donut charts with style-matched colors."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
-  ["Quizzes & polls", "Right-or-wrong quizzes, and live polls whose votes sync across open windows."],
+  [
+    "Quizzes & polls",
+    "Right-or-wrong quizzes, and live polls whose votes sync across open windows.",
+  ],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
   ["UI components", "Twenty-four kinds (cards, terminals, phones...) in thirteen style packs."],
-  ["Embeds", "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically."],
+  [
+    "Embeds",
+    "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically.",
+  ],
 ];
 
 const SHORTCUTS: Array<[string, string]> = [
@@ -126,8 +164,8 @@ function Wiki() {
             </div>
           </div>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
-            Everything you need to build decks fast: formats, panels, elements,
-            shortcuts, effects, and how to share your work with the community.
+            Everything you need to build decks fast: formats, panels, elements, shortcuts, effects,
+            and how to share your work with the community.
           </p>
         </div>
       </header>
@@ -158,23 +196,20 @@ function Wiki() {
             title="Getting started"
           >
             <p>
-              The first time you open the editor, a welcome dialog walks you through
-              three quick choices: your canvas format, whether to start from a public
-              template, and which panel to open first. Prefer to explore on your own?
-              Hit <em>Skip</em>. You can always pick a template later from the{" "}
-              <strong>Home</strong> panel, a format from <strong>Design</strong>, and
-              your saved designs from <strong>Projects</strong>.
+              The first time you open the editor, a welcome dialog walks you through three quick
+              choices: your canvas format, whether to start from a public template, and which panel
+              to open first. Prefer to explore on your own? Hit <em>Skip</em>. You can always pick a
+              template later from the <strong>Home</strong> panel, a format from{" "}
+              <strong>Design</strong>, and your saved designs from <strong>Projects</strong>.
             </p>
             <p>
-              Name your deck in the toolbar, and press <strong>Save</strong> to store
-              it in your account once you are signed in. The <strong>History</strong>{" "}
-              button in the bottom dock snapshots versions of your deck so you can
-              go back to any of them.
+              Name your deck in the toolbar, and press <strong>Save</strong> to store it in your
+              account once you are signed in. The <strong>History</strong> button in the bottom dock
+              snapshots versions of your deck so you can go back to any of them.
             </p>
             <Callout icon={<Zap className="size-3.5" />}>
-              The fastest route to a finished deck: load a template from Home, restyle
-              it with the Design panel and the brand kit, then hit{" "}
-              <strong>Present</strong> in the toolbar.
+              The fastest route to a finished deck: load a template from Home, restyle it with the
+              Design panel and the brand kit, then hit <strong>Present</strong> in the toolbar.
             </Callout>
           </Section>
 
@@ -185,9 +220,9 @@ function Wiki() {
             title="Canvas formats"
           >
             <p>
-              Pick the right canvas for the job. You can change the size at any time
-              from <strong>Design</strong>: magic resize re-flows every slide to the
-              new proportions, keeping the composition and scaling type along the way.
+              Pick the right canvas for the job. You can change the size at any time from{" "}
+              <strong>Design</strong>: magic resize re-flows every slide to the new proportions,
+              keeping the composition and scaling type along the way.
             </p>
             <ul>
               <li>• Slide 16:9 — 1920×1080, the default for decks</li>
@@ -206,10 +241,9 @@ function Wiki() {
             title="Panels"
           >
             <p>
-              Hover the left rail to open the sidebar, or click a tool to pin it open.
-              Each tool is a panel with its own job. Hide or show panels in{" "}
-              <strong>Settings → Visible panels</strong>, and press{" "}
-              <Kbd>Esc</Kbd> to unpin.
+              Hover the left rail to open the sidebar, or click a tool to pin it open. Each tool is
+              a panel with its own job. Hide or show panels in{" "}
+              <strong>Settings → Visible panels</strong>, and press <Kbd>Esc</Kbd> to unpin.
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
               {PANELS.map((p) => (
@@ -236,8 +270,8 @@ function Wiki() {
             title="Elements"
           >
             <p>
-              Everything that can live on a slide. Insert them from the panels or the
-              command palette, then style each one in the inspector on the right.
+              Everything that can live on a slide. Insert them from the panels or the command
+              palette, then style each one in the inspector on the right.
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
               {ELEMENTS.map(([name, desc]) => (
@@ -262,11 +296,11 @@ function Wiki() {
             title="Command palette"
           >
             <p>
-              Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> anywhere in the editor to open the
-              command palette. It fuzzy-searches across actions, insertions, shortcuts,
-              feature guides, add-on widgets and links, and remembers your recent
-              commands. Type “insert chart”, “group”, or “undo”, navigate with the
-              arrow keys, run with <Kbd>↵</Kbd>, close with <Kbd>Esc</Kbd>.
+              Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> anywhere in the editor to open the command
+              palette. It fuzzy-searches across actions, insertions, shortcuts, feature guides,
+              add-on widgets and links, and remembers your recent commands. Type “insert chart”,
+              “group”, or “undo”, navigate with the arrow keys, run with <Kbd>↵</Kbd>, close with{" "}
+              <Kbd>Esc</Kbd>.
             </p>
           </Section>
 
@@ -277,21 +311,23 @@ function Wiki() {
             title="Generate slideshows with AI"
           >
             <p>
-              Give an LLM the editor contract below, then ask it to return only valid
-              JSON. The example shows the shape of a complete deck: canvas settings,
-              pages, and elements with position, size, styling, and content. Pages can
-              also set a background, a transition and presenter notes, and elements
-              cover the whole catalog above: shapes, images, text, charts, tables,
-              quizzes, buttons, UI components and embeds. Keep element types and
-              properties consistent with the example so the result can be imported
-              safely as a .json design.
+              Give an LLM the editor contract below, then ask it to return only valid JSON. The
+              example shows the shape of a complete deck: canvas settings, pages, and elements with
+              position, size, styling, and content. Pages can also set a background, a transition
+              and presenter notes, and elements cover the whole catalog above: shapes, images, text,
+              charts, tables, quizzes, buttons, UI components and embeds. Keep element types and
+              properties consistent with the example so the result can be imported safely as a .json
+              design.
             </p>
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-300">slideshow.json</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-300">
+                  slideshow.json
+                </span>
                 <span className="text-[10px] text-slate-500">starter contract</span>
               </div>
-              <pre className="overflow-x-auto p-4 text-[10px] leading-relaxed text-slate-300"><code>{`{
+              <pre className="overflow-x-auto p-4 text-[10px] leading-relaxed text-slate-300">
+                <code>{`{
   "title": "Product launch",
   "canvas": { "width": 1920, "height": 1080, "format": "16:9" },
   "pages": [
@@ -321,12 +357,13 @@ function Wiki() {
       ]
     }
   ]
-}`}</code></pre>
+}`}</code>
+              </pre>
             </div>
             <Callout icon={<Braces className="size-3.5" />}>
-              Prompt pattern: “Create a 5-page investor pitch about [topic]. Return only
-              JSON matching the DiapoLab slideshow contract. Use unique ids, a
-              1920×1080 canvas, and keep every element inside the page bounds.”
+              Prompt pattern: “Create a 5-page investor pitch about [topic]. Return only JSON
+              matching the DiapoLab slideshow contract. Use unique ids, a 1920×1080 canvas, and keep
+              every element inside the page bounds.”
             </Callout>
           </Section>
 
@@ -350,11 +387,10 @@ function Wiki() {
               ))}
             </div>
             <p className="mt-3">
-              <strong>While presenting:</strong> <Kbd>←</Kbd> <Kbd>→</Kbd> or{" "}
-              <Kbd>Space</Kbd> navigate slides, <Kbd>1</Kbd>–<Kbd>9</Kbd> jump to a
-              slide, <Kbd>P</Kbd> toggles the presenter view (notes, timer and next
-              slide), <Kbd>R</Kbd> replays the slide animations, and <Kbd>Esc</Kbd>{" "}
-              leaves the presentation.
+              <strong>While presenting:</strong> <Kbd>←</Kbd> <Kbd>→</Kbd> or <Kbd>Space</Kbd>{" "}
+              navigate slides, <Kbd>1</Kbd>–<Kbd>9</Kbd> jump to a slide, <Kbd>P</Kbd> toggles the
+              presenter view (notes, timer and next slide), <Kbd>R</Kbd> replays the slide
+              animations, and <Kbd>Esc</Kbd> leaves the presentation.
             </p>
           </Section>
 
@@ -366,43 +402,38 @@ function Wiki() {
           >
             <ul className="space-y-2">
               <li>
-                <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph,
-                tv, neon, cube, blur, three parallax modes, reveal, shutter, swirl,
-                warp, prism and origami. Pick one per slide from the dock under the
-                canvas, with a live preview.
+                <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph, tv, neon, cube,
+                blur, three parallax modes, reveal, shutter, swirl, warp, prism and origami. Pick
+                one per slide from the dock under the canvas, with a live preview.
               </li>
               <li>
-                <strong>Element animations</strong> — entrance animations per element
-                (pop, fade-up, glitch, bounce, spin, blur-in and more), with a delay
-                to stagger objects.
+                <strong>Element animations</strong> — entrance animations per element (pop, fade-up,
+                glitch, bounce, spin, blur-in and more), with a delay to stagger objects.
               </li>
               <li>
-                <strong>Keyframe animations</strong> — capture any element state on a
-                timeline and tween between keyframes with easing curves, from expo-out
-                to overshoot.
+                <strong>Keyframe animations</strong> — capture any element state on a timeline and
+                tween between keyframes with easing curves, from expo-out to overshoot.
               </li>
               <li>
-                <strong>Shape effects</strong> — Liquid Glass for a frosted translucent
-                look, plus neon, soft shadow, inner glow, holographic, glitch and
-                honeycomb.
+                <strong>Shape effects</strong> — Liquid Glass for a frosted translucent look, plus
+                neon, soft shadow, inner glow, holographic, glitch and honeycomb.
               </li>
               <li>
-                <strong>Shape masks</strong> — clip text, shapes and images into
-                circles, hexagons, blobs and more.
+                <strong>Shape masks</strong> — clip text, shapes and images into circles, hexagons,
+                blobs and more.
               </li>
               <li>
-                <strong>Image filters</strong> — brightness, contrast, saturation,
-                temperature and tint, blur, sepia and hue-rotate, plus live glitch,
-                pixelate, posterize and film-grain noise effects.
+                <strong>Image filters</strong> — brightness, contrast, saturation, temperature and
+                tint, blur, sepia and hue-rotate, plus live glitch, pixelate, posterize and
+                film-grain noise effects.
               </li>
               <li>
-                <strong>3D transforms</strong> — add perspective, rotate on X/Y, and
-                optional cursor-following tilt in presentation mode.
+                <strong>3D transforms</strong> — add perspective, rotate on X/Y, and optional
+                cursor-following tilt in presentation mode.
               </li>
               <li>
-                <strong>Interactions</strong> — hover effects (glitch, color, gradient)
-                and click-to-jump so any element can navigate to another slide during
-                a presentation.
+                <strong>Interactions</strong> — hover effects (glitch, color, gradient) and
+                click-to-jump so any element can navigate to another slide during a presentation.
               </li>
             </ul>
           </Section>
@@ -415,25 +446,27 @@ function Wiki() {
           >
             <p>
               <FileUp className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Publish a template</strong> — from the toolbar menu, share your
-              deck with the community. It appears in the Home panel and on the{" "}
-              <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>.
+              <strong>Publish a template</strong> — from the toolbar menu, share your deck with the
+              community. It appears in the Home panel and on the{" "}
+              <Link to="/marketplace" className="font-medium text-blue-600 underline">
+                marketplace
+              </Link>
+              .
             </p>
             <p className="mt-2">
               <Presentation className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Share a deck</strong> — the share button copies a private
-              view-only link. Anyone with the link can watch the deck in presentation
-              mode.
+              <strong>Share a deck</strong> — the share button copies a private view-only link.
+              Anyone with the link can watch the deck in presentation mode.
             </p>
             <p className="mt-2">
-              <strong>Export & import</strong> — the Export menu saves the current
-              slide as PNG or JPG, the whole deck as PDF, PPTX or Markdown, an animated
-              GIF, or the editable JSON source file. The import button brings{" "}
-              .pptx decks and .json designs back into the editor.
+              <strong>Export & import</strong> — the Export menu saves the current slide as PNG or
+              JPG, the whole deck as PDF, PPTX or Markdown, an animated GIF, or the editable JSON
+              source file. The import button brings .pptx decks and .json designs back into the
+              editor.
             </p>
             <p className="mt-2">
-              <strong>Cloud saving</strong> — sign in to save your designs online and
-              reopen them from the Projects panel on any device.
+              <strong>Cloud saving</strong> — sign in to save your designs online and reopen them
+              from the Projects panel on any device.
             </p>
           </Section>
 
@@ -447,12 +480,12 @@ function Wiki() {
               Yes. The editor, templates and themes are free to use and remix.
             </Faq>
             <Faq q="Where are my designs stored?">
-              Locally in your browser, and in your account when you sign in. Publish
-              or share to move them onto the server.
+              Locally in your browser, and in your account when you sign in. Publish or share to
+              move them onto the server.
             </Faq>
             <Faq q="Can I import and export PowerPoint files?">
-              Yes. The import button brings a .pptx into the editor, and the Export
-              menu writes .pptx, PDF and more.
+              Yes. The import button brings a .pptx into the editor, and the Export menu writes
+              .pptx, PDF and more.
             </Faq>
             <Faq q="How do I report a bug?">
               Open an issue directly on{" "}
@@ -462,8 +495,7 @@ function Wiki() {
               >
                 GitHub
               </a>
-              , or use the command palette (<Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>) and search
-              “report a bug”.
+              , or use the command palette (<Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>) and search “report a bug”.
             </Faq>
           </Section>
 

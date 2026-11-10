@@ -7,12 +7,15 @@ export const Route = createFileRoute("/api/llamaparse")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = process.env.api;
-        if (!apiKey) return Response.json({ error: "LlamaParse is not configured." }, { status: 503 });
+        if (!apiKey)
+          return Response.json({ error: "LlamaParse is not configured." }, { status: 503 });
 
         const incoming = await request.formData().catch(() => null);
         const file = incoming?.get("file");
-        if (!(file instanceof File)) return Response.json({ error: "Upload a file." }, { status: 400 });
-        if (file.size > 10 * 1024 * 1024) return Response.json({ error: "Files must be smaller than 10 MB." }, { status: 413 });
+        if (!(file instanceof File))
+          return Response.json({ error: "Upload a file." }, { status: 400 });
+        if (file.size > 10 * 1024 * 1024)
+          return Response.json({ error: "Files must be smaller than 10 MB." }, { status: 413 });
 
         const form = new FormData();
         form.append("file", file, file.name);
@@ -36,7 +39,12 @@ export const Route = createFileRoute("/api/llamaparse")({
         if (!upload.ok || !jobId) {
           const providerError = formatProviderError(uploadPayload?.error);
           return Response.json(
-            { error: providerError || uploadPayload?.detail || `LlamaParse upload failed (${upload.status}). Check the document type and API key.` },
+            {
+              error:
+                providerError ||
+                uploadPayload?.detail ||
+                `LlamaParse upload failed (${upload.status}). Check the document type and API key.`,
+            },
             { status: 502 },
           );
         }
@@ -45,26 +53,53 @@ export const Route = createFileRoute("/api/llamaparse")({
           const statusResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}`, {
             headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json" },
           });
-          const status = (await statusResponse.json().catch(() => null)) as Record<string, unknown> | null;
-          if (["ERROR", "FAILED", "CANCELLED"].includes(String(status?.status ?? "").toUpperCase())) {
-            return Response.json({ error: formatProviderError(status?.error) || formatProviderError(status?.detail) || "LlamaParse failed to process the file." }, { status: 502 });
+          const status = (await statusResponse.json().catch(() => null)) as Record<
+            string,
+            unknown
+          > | null;
+          if (
+            ["ERROR", "FAILED", "CANCELLED"].includes(String(status?.status ?? "").toUpperCase())
+          ) {
+            return Response.json(
+              {
+                error:
+                  formatProviderError(status?.error) ||
+                  formatProviderError(status?.detail) ||
+                  "LlamaParse failed to process the file.",
+              },
+              { status: 502 },
+            );
           }
           if (status?.status === "SUCCESS") {
             const resultResponse = await fetch(`${LLAMA_PARSE_URL}/job/${jobId}/result/markdown`, {
-              headers: { Authorization: `Bearer ${apiKey}`, Accept: "application/json, text/plain" },
+              headers: {
+                Authorization: `Bearer ${apiKey}`,
+                Accept: "application/json, text/plain",
+              },
             });
             const resultText = await resultResponse.text();
-            const result = parseApiPayload(resultText) as { markdown?: string; text?: string; error?: string } | string | null;
-            const markdown = typeof result === "string" ? result : result?.markdown ?? result?.text;
+            const result = parseApiPayload(resultText) as
+              { markdown?: string; text?: string; error?: string } | string | null;
+            const markdown =
+              typeof result === "string" ? result : (result?.markdown ?? result?.text);
             if (!resultResponse.ok || typeof markdown !== "string" || !markdown.trim()) {
-              const error = typeof result === "object" && result?.error ? formatProviderError(result.error) : undefined;
-              return Response.json({ error: error || "LlamaParse returned no markdown." }, { status: 502 });
+              const error =
+                typeof result === "object" && result?.error
+                  ? formatProviderError(result.error)
+                  : undefined;
+              return Response.json(
+                { error: error || "LlamaParse returned no markdown." },
+                { status: 502 },
+              );
             }
             return Response.json({ markdown, html: markdownToHtml(markdown), filename: file.name });
           }
         }
 
-        return Response.json({ error: "LlamaParse timed out. Try a smaller file." }, { status: 504 });
+        return Response.json(
+          { error: "LlamaParse timed out. Try a smaller file." },
+          { status: 504 },
+        );
       },
     },
   },
@@ -102,7 +137,12 @@ function markdownToHtml(markdown: string) {
 }
 
 function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character] ?? character);
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character] ??
+      character,
+  );
 }
 
 type _Route = typeof Route;

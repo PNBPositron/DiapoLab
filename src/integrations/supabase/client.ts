@@ -9,9 +9,16 @@ import { brokeredPreviewStorage } from "./previewAuthStorage";
 // request because another surface briefly owns the browser lock.
 let authLock = Promise.resolve();
 
-function serializeAuth<T>(_name: string, _acquireTimeout: number, fn: () => Promise<T>): Promise<T> {
+function serializeAuth<T>(
+  _name: string,
+  _acquireTimeout: number,
+  fn: () => Promise<T>,
+): Promise<T> {
   const run = authLock.then(fn, fn);
-  authLock = run.then(() => undefined, () => undefined);
+  authLock = run.then(
+    () => undefined,
+    () => undefined,
+  );
   return run;
 }
 

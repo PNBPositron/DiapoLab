@@ -140,7 +140,7 @@ export type TextElement = ElementBase & {
   gradientOpacity?: number;
   imageOverlay?: string;
   interaction?: ElementInteraction;
-    /** clip the element's silhouette by a shape (works like image masks) */
+  /** clip the element's silhouette by a shape (works like image masks) */
   maskShape?: ShapeKind;
   /** fill source: own color, or the slide's background (knockout) */
   fillSource?: "color" | "slide-bg";
@@ -206,7 +206,15 @@ export type ShapeKind =
   | "wave"
   | "leaf"
   | "ribbon";
-export type ShapeEffect = "none" | "liquid_glass" | "neon" | "soft_shadow" | "inner_glow" | "holographic" | "glitch" | "honeycomb";
+export type ShapeEffect =
+  | "none"
+  | "liquid_glass"
+  | "neon"
+  | "soft_shadow"
+  | "inner_glow"
+  | "holographic"
+  | "glitch"
+  | "honeycomb";
 export type ElementShadow = {
   x: number;
   y: number;
@@ -521,7 +529,8 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
     border: "rgba(34,211,238,0.45)",
     borderWidth: 1,
     radius: 14,
-    shadow: "0 24px 48px -16px rgba(34,211,238,0.35), inset 0 0 24px rgba(34,211,238,0.07), inset 0 1px 0 rgba(255,255,255,0.06)",
+    shadow:
+      "0 24px 48px -16px rgba(34,211,238,0.35), inset 0 0 24px rgba(34,211,238,0.07), inset 0 1px 0 rgba(255,255,255,0.06)",
     font: "'JetBrains Mono', 'Inter', monospace",
     letterSpacing: "0.05em",
     uppercase: true,
@@ -537,7 +546,8 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
     border: "rgba(255,255,255,0.85)",
     borderWidth: 1,
     radius: 20,
-    shadow: "0 20px 44px -18px rgba(15,23,42,0.35), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 -1px 1px rgba(255,255,255,0.3)",
+    shadow:
+      "0 20px 44px -18px rgba(15,23,42,0.35), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 -1px 1px rgba(255,255,255,0.3)",
     font: "'Inter', system-ui, sans-serif",
     letterSpacing: "-0.01em",
     uppercase: false,
@@ -584,7 +594,8 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
     border: "#a9bcd8",
     borderWidth: 2,
     radius: 8,
-    shadow: "inset -1px -1px 0 rgba(70,84,110,0.45), inset 1px 1px 0 #ffffff, 0 10px 24px -12px rgba(22,35,63,0.4)",
+    shadow:
+      "inset -1px -1px 0 rgba(70,84,110,0.45), inset 1px 1px 0 #ffffff, 0 10px 24px -12px rgba(22,35,63,0.4)",
     font: "'Tahoma', 'Verdana', sans-serif",
     letterSpacing: "0em",
     uppercase: false,
@@ -676,7 +687,8 @@ export const UI_STYLE_THEMES: Record<UiStyle, UiTheme> = {
     border: "rgba(74,222,128,0.35)",
     borderWidth: 1,
     radius: 10,
-    shadow: "0 0 24px rgba(74,222,128,0.25), 0 24px 48px -20px rgba(2,10,5,0.9), inset 0 0 32px rgba(74,222,128,0.06)",
+    shadow:
+      "0 0 24px rgba(74,222,128,0.25), 0 24px 48px -20px rgba(2,10,5,0.9), inset 0 0 32px rgba(74,222,128,0.06)",
     font: "'JetBrains Mono', monospace",
     letterSpacing: "0.05em",
     uppercase: false,
@@ -783,10 +795,25 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "media" | "my-designs";
+type Tool =
+  | "home"
+  | "text"
+  | "elements"
+  | "design"
+  | "plugins"
+  | "components"
+  | "library"
+  | "media"
+  | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
-export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };
+export type SlideVersion = {
+  id: string;
+  name: string;
+  createdAt: number;
+  pages: Page[];
+  currentIndex: number;
+};
 
 type State = {
   pages: Page[];
@@ -1085,8 +1112,18 @@ export const solidThemeBg = (uiStyle: UiStyle): string => {
 
 // Map a UI style pack onto chart colors so charts match UI components.
 export const EDITOR_COLOR_PALETTE = [
-  "#2b6bff", "#7df9ff", "#ff0080", "#ffd84a", "#00c853", "#b16bff",
-  "#0a0f1f", "#ffffff", "#1b2233", "#e2231a", "#f5f3ee", "#0d0d0d",
+  "#2b6bff",
+  "#7df9ff",
+  "#ff0080",
+  "#ffd84a",
+  "#00c853",
+  "#b16bff",
+  "#0a0f1f",
+  "#ffffff",
+  "#1b2233",
+  "#e2231a",
+  "#f5f3ee",
+  "#0d0d0d",
 ] as const;
 
 export const chartStylePatch = (uiStyle: UiStyle): Partial<ChartElement> => {
@@ -1157,7 +1194,14 @@ export const TABLE_STYLE_RECIPES: Record<UiStyle, TableRecipe> = {
   vapor: { headerMode: "fill", zebraAlpha: 0.06, glow: true },
   material: { headerMode: "fill", zebraAlpha: 0.04, rowLinesOnly: true, radius: 4 },
   matrix: { headerMode: "plain", zebraAlpha: 0.07, glow: true },
-  swiss: { headerMode: "underline", zebraAlpha: 0.04, rowLinesOnly: true, radius: 0, flat: true, headerUppercase: true },
+  swiss: {
+    headerMode: "underline",
+    zebraAlpha: 0.04,
+    rowLinesOnly: true,
+    radius: 0,
+    flat: true,
+    headerUppercase: true,
+  },
   custom: { headerMode: "fill", zebraAlpha: 0.05 },
 };
 
@@ -1227,12 +1271,20 @@ export function toEmbedSrc(raw: string): string {
       return `https://w.soundcloud.com/player/?url=${encodeURIComponent(s)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&visual=true`;
     }
     // Google Maps — place/search URLs → classic embed (no API key needed)
-    if (host === "maps.google.com" || ((host === "google.com" || host === "google.fr") && u.pathname.startsWith("/maps"))) {
-      const q = u.searchParams.get("q") || u.searchParams.get("query") || decodeURIComponent(u.pathname.split("/maps/search/")[1] || "") || "";
+    if (
+      host === "maps.google.com" ||
+      ((host === "google.com" || host === "google.fr") && u.pathname.startsWith("/maps"))
+    ) {
+      const q =
+        u.searchParams.get("q") ||
+        u.searchParams.get("query") ||
+        decodeURIComponent(u.pathname.split("/maps/search/")[1] || "") ||
+        "";
       if (q) return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=14&output=embed`;
       if (u.pathname.startsWith("/maps/place/")) {
         const place = decodeURIComponent(u.pathname.split("/maps/place/")[1].split("/")[0] || "");
-        if (place) return `https://maps.google.com/maps?q=${encodeURIComponent(place)}&z=14&output=embed`;
+        if (place)
+          return `https://maps.google.com/maps?q=${encodeURIComponent(place)}&z=14&output=embed`;
       }
     }
     // Figma — file/design/proto URLs → official Figma embed viewer
@@ -1275,7 +1327,15 @@ export const newEmbed = (src: string, overrides: Partial<EmbedElement> = {}): Em
 
 const UI_DEFAULTS: Record<
   UiKind,
-  { w: number; h: number; title: string; body: string; value: number; items: string[]; files?: string[] }
+  {
+    w: number;
+    h: number;
+    title: string;
+    body: string;
+    value: number;
+    items: string[];
+    files?: string[];
+  }
 > = {
   card: {
     w: 560,
@@ -1295,7 +1355,14 @@ const UI_DEFAULTS: Record<
   },
   badge: { w: 280, h: 96, title: "NEW", body: "", value: 0, items: [] },
   progress: { w: 560, h: 160, title: "Progress", body: "Loading assets", value: 68, items: [] },
-  timeline: { w: 640, h: 220, title: "Product launch", body: "Discovery → Build → Launch", value: 68, items: ["Discovery", "Prototype", "Launch"] },
+  timeline: {
+    w: 640,
+    h: 220,
+    title: "Product launch",
+    body: "Discovery → Build → Launch",
+    value: 68,
+    items: ["Discovery", "Prototype", "Launch"],
+  },
   alert: {
     w: 620,
     h: 200,
@@ -1545,7 +1612,13 @@ export const useEditor = create<State>((set, get) => {
           return scaled;
         }),
       }));
-      set({ ...syncCurrent(next, currentIndex), canvasW: w, canvasH: h, selectedId: null, selectedIds: [] });
+      set({
+        ...syncCurrent(next, currentIndex),
+        canvasW: w,
+        canvasH: h,
+        selectedId: null,
+        selectedIds: [],
+      });
     },
 
     applyBrandKit: (kit, scope) => {
@@ -1603,7 +1676,11 @@ export const useEditor = create<State>((set, get) => {
       const version = get().versions.find((item) => item.id === id);
       if (!version) return;
       pushHistory();
-      set({ ...syncCurrent(JSON.parse(JSON.stringify(version.pages)), version.currentIndex), selectedId: null, selectedIds: [] });
+      set({
+        ...syncCurrent(JSON.parse(JSON.stringify(version.pages)), version.currentIndex),
+        selectedId: null,
+        selectedIds: [],
+      });
     },
     setPresenting: (presenting) => set({ presenting }),
     setGuides: (guides) => set({ guides }),
@@ -1639,7 +1716,9 @@ export const useEditor = create<State>((set, get) => {
       const el = get().elements.find((e) => e.id === selectedId);
       const gid = el?.groupId;
       const ids = gid
-        ? get().elements.filter((e) => e.groupId === gid).map((e) => e.id)
+        ? get()
+            .elements.filter((e) => e.groupId === gid)
+            .map((e) => e.id)
         : [selectedId];
       set({ selectedId, selectedIds: ids });
     },
@@ -1681,7 +1760,10 @@ export const useEditor = create<State>((set, get) => {
           return clone;
         });
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...clones] }));
-      set({ selectedIds: clones.map((c) => c.id), selectedId: clones[clones.length - 1]?.id ?? null });
+      set({
+        selectedIds: clones.map((c) => c.id),
+        selectedId: clones[clones.length - 1]?.id ?? null,
+      });
     },
 
     nudgeSelected: (dx, dy) => {
@@ -1695,9 +1777,7 @@ export const useEditor = create<State>((set, get) => {
       updateCurrentPage((p) => ({
         ...p,
         elements: p.elements.map((e) =>
-          ids.includes(e.id) && !e.locked
-            ? ({ ...e, x: e.x + dx, y: e.y + dy } as AnyElement)
-            : e,
+          ids.includes(e.id) && !e.locked ? ({ ...e, x: e.x + dx, y: e.y + dy } as AnyElement) : e,
         ),
       }));
     },
@@ -1706,9 +1786,7 @@ export const useEditor = create<State>((set, get) => {
       if (!els.length) return;
       pushHistory();
       const gid = uid();
-      const tagged = els.map(
-        (el) => ({ ...el, id: uid(), groupId: gid }) as AnyElement,
-      );
+      const tagged = els.map((el) => ({ ...el, id: uid(), groupId: gid }) as AnyElement);
       updateCurrentPage((p) => ({ ...p, elements: [...p.elements, ...tagged] }));
       set({ selectedId: tagged[tagged.length - 1].id, selectedIds: tagged.map((e) => e.id) });
     },
@@ -1719,7 +1797,9 @@ export const useEditor = create<State>((set, get) => {
       const gid = uid();
       updateCurrentPage((p) => ({
         ...p,
-        elements: p.elements.map((e) => (selectedIds.includes(e.id) ? ({ ...e, groupId: gid } as AnyElement) : e)),
+        elements: p.elements.map((e) =>
+          selectedIds.includes(e.id) ? ({ ...e, groupId: gid } as AnyElement) : e,
+        ),
       }));
     },
     ungroupSelected: () => {
@@ -1794,7 +1874,11 @@ export const useEditor = create<State>((set, get) => {
     },
     setTransition: (t) => {
       pushHistory();
-      updateCurrentPage((p) => ({ ...p, transition: t, transitionZoom: t === "zoom" ? p.transitionZoom ?? 0.5 : p.transitionZoom }));
+      updateCurrentPage((p) => ({
+        ...p,
+        transition: t,
+        transitionZoom: t === "zoom" ? (p.transitionZoom ?? 0.5) : p.transitionZoom,
+      }));
     },
     setTransitionZoom: (zoom) => {
       if (!Number.isFinite(zoom)) return;
@@ -1843,7 +1927,24 @@ export const useEditor = create<State>((set, get) => {
         ...p,
         id: p.id ?? uid(),
         duration: p.duration ?? DEFAULT_PAGE_DURATION,
-        elements: p.elements.map((element) => element.type === "image" && element.assetKind === "icon" ? { ...element, type: "icon" as const, name: ("name" in element && typeof element.name === "string" ? element.name : element.src.split("/").pop()?.replace(/\.svg$/i, "") ?? "Icon"), color: element.tint ?? "#111827", strokeWidth: 2, src: element.src } : element),
+        elements: p.elements.map((element) =>
+          element.type === "image" && element.assetKind === "icon"
+            ? {
+                ...element,
+                type: "icon" as const,
+                name:
+                  "name" in element && typeof element.name === "string"
+                    ? element.name
+                    : (element.src
+                        .split("/")
+                        .pop()
+                        ?.replace(/\.svg$/i, "") ?? "Icon"),
+                color: element.tint ?? "#111827",
+                strokeWidth: 2,
+                src: element.src,
+              }
+            : element,
+        ),
       }));
       set({ ...syncCurrent(safe, 0), selectedId: null, selectedIds: [] });
     },
@@ -1925,7 +2026,13 @@ export const useEditor = create<State>((set, get) => {
             case "button":
               return { ...e, text: sub(e.text) };
             case "ui":
-              return { ...e, title: sub(e.title), body: sub(e.body), items: e.items.map(sub), files: e.files?.map(sub) };
+              return {
+                ...e,
+                title: sub(e.title),
+                body: sub(e.body),
+                items: e.items.map(sub),
+                files: e.files?.map(sub),
+              };
             case "table":
               return { ...e, rows: e.rows.map((r) => r.map(sub)) };
             case "quiz":

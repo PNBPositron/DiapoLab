@@ -54,9 +54,8 @@ function LicensePage() {
     >
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:border-blue-200/80 hover:shadow-[0_16px_40px_-16px_rgba(37,99,235,0.18)]">
         <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          DiapoLab is free software for creating, remixing, exporting and sharing
-          presentations. You can use the editor in personal and commercial projects
-          without asking permission.
+          DiapoLab is free software for creating, remixing, exporting and sharing presentations. You
+          can use the editor in personal and commercial projects without asking permission.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {PERMISSIONS.map((p) => (
@@ -94,7 +93,9 @@ function LicensePage() {
           <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
             <FileText className="size-4" />
           </span>
-          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">Full text</h2>
+          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">
+            Full text
+          </h2>
         </div>
         <pre className="whitespace-pre-wrap bg-slate-950 px-5 py-4 font-mono text-[11px] leading-relaxed text-slate-200">{`MIT License
 
@@ -129,10 +130,12 @@ SOFTWARE.`}</pre>
           </h2>
         </div>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          The MIT license covers the editor itself. Templates and themes published to
-          the <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>{" "}
-          stay the property of their authors, who grant everyone the right to use and
-          remix them inside DiapoLab.
+          The MIT license covers the editor itself. Templates and themes published to the{" "}
+          <Link to="/marketplace" className="font-medium text-blue-600 underline">
+            marketplace
+          </Link>{" "}
+          stay the property of their authors, who grant everyone the right to use and remix them
+          inside DiapoLab.
         </p>
       </section>
     </LegalShell>

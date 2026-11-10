@@ -40,10 +40,7 @@ export const Route = createFileRoute("/api/context-proxy")({
           // Read-only preview: strip scripts and CSP so the page renders
           // stably inside the dialog without frame-busting or XSS risk.
           html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
-          html = html.replace(
-            /<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi,
-            "",
-          );
+          html = html.replace(/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi, "");
           // Resolve relative assets against the original page.
           const base = `<base href="${target.toString()}">`;
           if (/<head[^>]*>/i.test(html)) {

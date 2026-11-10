@@ -34,13 +34,17 @@ export function SizePanel() {
         >
           <span
             className={`grid size-8 shrink-0 place-items-center rounded-lg transition ${
-              magic ? "bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.3)]" : "bg-slate-100 text-slate-400"
+              magic
+                ? "bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.3)]"
+                : "bg-slate-100 text-slate-400"
             }`}
           >
             <Wand2 className="size-4" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className={`block text-[11px] font-semibold ${magic ? "text-blue-700" : "text-slate-700"}`}>
+            <span
+              className={`block text-[11px] font-semibold ${magic ? "text-blue-700" : "text-slate-700"}`}
+            >
               Magic resize {magic ? "on" : "off"}
             </span>
             <span className="block text-[10px] text-slate-400">
@@ -93,10 +97,20 @@ export function SizePanel() {
                   style={{ width: tw, height: th }}
                 >
                   <span
-                    className={landscape ? "h-[3px] w-3/5 rounded-[1px] bg-blue-500/80" : "h-[2px] w-3/4 rounded-[1px] bg-blue-500/80"}
+                    className={
+                      landscape
+                        ? "h-[3px] w-3/5 rounded-[1px] bg-blue-500/80"
+                        : "h-[2px] w-3/4 rounded-[1px] bg-blue-500/80"
+                    }
                   />
                   <span className="flex flex-col gap-[2px]">
-                    <span className={landscape ? "h-[2px] w-full rounded-[1px] bg-slate-300" : "h-[2px] w-full rounded-[1px] bg-slate-300"} />
+                    <span
+                      className={
+                        landscape
+                          ? "h-[2px] w-full rounded-[1px] bg-slate-300"
+                          : "h-[2px] w-full rounded-[1px] bg-slate-300"
+                      }
+                    />
                     <span className="h-[2px] w-2/3 rounded-[1px] bg-slate-200" />
                   </span>
                 </span>
@@ -110,7 +124,9 @@ export function SizePanel() {
         <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom</div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
           <label className="block">
-            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">W</span>
+            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">
+              W
+            </span>
             <input
               type="number"
               value={w}
@@ -120,7 +136,9 @@ export function SizePanel() {
           </label>
           <span className="pb-2.5 font-mono text-xs text-slate-400">×</span>
           <label className="block">
-            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">H</span>
+            <span className="mb-1 block text-[10px] font-semibold tracking-wide text-slate-400">
+              H
+            </span>
             <input
               type="number"
               value={h}
@@ -139,4 +157,3 @@ export function SizePanel() {
     </div>
   );
 }
-

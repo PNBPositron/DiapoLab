@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Clapperboard,
-  Maximize2,
-  Palette,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+import { Clapperboard, Maximize2, Palette, Sparkles, type LucideIcon } from "lucide-react";
 import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";

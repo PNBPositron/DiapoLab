@@ -33,7 +33,11 @@ import {
   Trash2,
   ToggleRight,
   TrendingUp,
-  ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
+  ChartColumn,
+  ChartLine,
+  ChartArea,
+  ChartPie,
+  Circle,
   User,
   WandSparkles,
   Shuffle,
@@ -57,7 +61,14 @@ import {
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ColorPicker } from "../ColorPicker";
 import { FONTS } from "./TextPanel";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
@@ -102,11 +113,12 @@ const DRAFT_FIELD =
   "rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-blue-400";
 
 /** Extra editable text slots per UI kind (file names, setting rows, chrome captions). */
-const EXTRA_LABELS: Partial<Record<UiKind, { label: string; list: boolean; defaults: string[] }>> = {
-  taskbar: { label: "Search label", list: false, defaults: ["Search"] },
-  vtabs: { label: "New tab label", list: false, defaults: ["+ New tab"] },
-  login: { label: "Button label", list: false, defaults: ["Continue"] },
-};
+const EXTRA_LABELS: Partial<Record<UiKind, { label: string; list: boolean; defaults: string[] }>> =
+  {
+    taskbar: { label: "Search label", list: false, defaults: ["Search"] },
+    vtabs: { label: "New tab label", list: false, defaults: ["+ New tab"] },
+    login: { label: "Button label", list: false, defaults: ["Continue"] },
+  };
 
 const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
   { kind: "card", label: "Card", Icon: Square },
@@ -245,7 +257,13 @@ const SHADOW_PRESETS = [
 
 function hexToRgb(hex: string): [number, number, number] {
   const m = hex.replace("#", "");
-  const full = m.length === 3 ? m.split("").map((ch) => ch + ch).join("") : m;
+  const full =
+    m.length === 3
+      ? m
+          .split("")
+          .map((ch) => ch + ch)
+          .join("")
+      : m;
   const n = parseInt(full, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
@@ -264,9 +282,15 @@ function parseThemeColor(str: string): { hex: string; alpha: number } {
   if (rgbaMatch) {
     const [r, g, b] = rgbaMatch.slice(1, 4).map(Number);
     const a = rgbaMatch[4] !== undefined ? Number(rgbaMatch[4]) : 1;
-    const hex = "#" + [r, g, b]
-      .map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"))
-      .join("");
+    const hex =
+      "#" +
+      [r, g, b]
+        .map((v) =>
+          Math.max(0, Math.min(255, Math.round(v)))
+            .toString(16)
+            .padStart(2, "0"),
+        )
+        .join("");
     return { hex, alpha: a };
   }
   const hexMatch = /#[0-9a-fA-F]{6}/.exec(str);
@@ -313,7 +337,9 @@ const hslToHex = (h: number, s: number, l: number): string => {
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
     const v = l - a * Math.max(-1, Math.min(Math.min(k - 3, 9 - k, 1), -1));
-    return Math.round(255 * v).toString(16).padStart(2, "0");
+    return Math.round(255 * v)
+      .toString(16)
+      .padStart(2, "0");
   };
   return "#" + f(0) + f(8) + f(4);
 };
@@ -378,7 +404,9 @@ const shadowFor = (preset: string, accentHex: string): string => {
   if (preset === "depth") return "0 18px 44px rgba(0,0,0,0.45)";
   if (preset === "hard") return "10px 10px 0 0 rgba(10,10,10,0.85)";
   if (preset === "neon")
-    return "0 0 22px " + withAlpha(accentHex, 0.55) + ", inset 0 0 24px " + withAlpha(accentHex, 0.18);
+    return (
+      "0 0 22px " + withAlpha(accentHex, 0.55) + ", inset 0 0 24px " + withAlpha(accentHex, 0.18)
+    );
   return "none";
 };
 
@@ -435,7 +463,9 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
           onChange={(e) => set(key, Number(e.target.value))}
           className="h-1.5 w-24 accent-blue-600"
         />
-        <span className="w-9 text-right font-mono text-[10px] text-slate-500">{format(draft[key])}</span>
+        <span className="w-9 text-right font-mono text-[10px] text-slate-500">
+          {format(draft[key])}
+        </span>
       </span>
     </div>
   );
@@ -450,13 +480,19 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
               type="button"
               title={s.label + " color"}
               onClick={() => setActiveSwatch(s.key)}
-              className={"h-6 w-6 rounded-lg border transition " + (activeSwatch === s.key ? "border-blue-500 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-blue-300")}
+              className={
+                "h-6 w-6 rounded-lg border transition " +
+                (activeSwatch === s.key
+                  ? "border-blue-500 ring-2 ring-blue-500/25"
+                  : "border-slate-200 hover:border-blue-300")
+              }
               style={{ background: draft[s.key] }}
             />
           ))}
         </div>
         <span className="text-[10px] font-semibold tracking-wider text-slate-400">
-          {SWATCHES.find((s) => s.key === activeSwatch)?.label}{isBg ? " + transparency" : ""}
+          {SWATCHES.find((s) => s.key === activeSwatch)?.label}
+          {isBg ? " + transparency" : ""}
         </span>
       </div>
       <ColorPicker
@@ -477,7 +513,9 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
             <option value={draft.font}>{draft.font}</option>
           )}
           {FONTS.map((f) => (
-            <option key={f.family} value={CREATOR_FONT_STACK(f.family)}>{f.family}</option>
+            <option key={f.family} value={CREATOR_FONT_STACK(f.family)}>
+              {f.family}
+            </option>
           ))}
         </select>
       </label>
@@ -491,7 +529,9 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
           className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-[11px] text-slate-700 outline-none focus:border-blue-400"
         >
           {SHADOW_PRESETS.map((p) => (
-            <option key={p.value} value={p.value}>{p.label}</option>
+            <option key={p.value} value={p.value}>
+              {p.label}
+            </option>
           ))}
         </select>
       </label>
@@ -499,11 +539,21 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
       {slider("Letter spacing", "spacing", -0.02, 0.16, 0.01, (v) => v.toFixed(2))}
       <div className="flex items-center gap-4 text-[11px] text-slate-600">
         <label className="flex items-center gap-1.5">
-          <input type="checkbox" checked={draft.uppercase} onChange={(e) => set("uppercase", e.target.checked)} className="accent-blue-600" />
+          <input
+            type="checkbox"
+            checked={draft.uppercase}
+            onChange={(e) => set("uppercase", e.target.checked)}
+            className="accent-blue-600"
+          />
           UPPERCASE
         </label>
         <label className="flex items-center gap-1.5">
-          <input type="checkbox" checked={draft.dark} onChange={(e) => set("dark", e.target.checked)} className="accent-blue-600" />
+          <input
+            type="checkbox"
+            checked={draft.dark}
+            onChange={(e) => set("dark", e.target.checked)}
+            className="accent-blue-600"
+          />
           Dark surface
         </label>
       </div>
@@ -529,14 +579,20 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
               onClick={() => setDraft(themeToDraft(UI_STYLE_THEMES[value]))}
               className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
             >
-              <span className="h-2.5 w-2.5 rounded-full border border-slate-300" style={{ background: UI_STYLE_THEMES[value].bg }} />
+              <span
+                className="h-2.5 w-2.5 rounded-full border border-slate-300"
+                style={{ background: UI_STYLE_THEMES[value].bg }}
+              />
               {UI_STYLE_THEMES[value].label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rounded-xl p-3" style={{ background: "linear-gradient(140deg,#c7d2fe,#fbcfe8,#fde68a)" }}>
+      <div
+        className="rounded-xl p-3"
+        style={{ background: "linear-gradient(140deg,#c7d2fe,#fbcfe8,#fde68a)" }}
+      >
         <div
           className="flex flex-col gap-1.5"
           style={{
@@ -551,10 +607,31 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
             padding: 14,
           }}
         >
-          <div style={{ fontWeight: 800, fontSize: 14, textTransform: draft.uppercase ? "uppercase" : "none" }}>Custom card</div>
-          <div style={{ fontSize: 10, color: theme.muted }}>Your colors, font, corners &amp; effects.</div>
+          <div
+            style={{
+              fontWeight: 800,
+              fontSize: 14,
+              textTransform: draft.uppercase ? "uppercase" : "none",
+            }}
+          >
+            Custom card
+          </div>
+          <div style={{ fontSize: 10, color: theme.muted }}>
+            Your colors, font, corners &amp; effects.
+          </div>
           <div className="mt-1 flex items-center gap-1.5">
-            <span style={{ background: theme.accent, color: theme.onAccent, borderRadius: 999, fontSize: 9, fontWeight: 700, padding: "3px 8px" }}>Action</span>
+            <span
+              style={{
+                background: theme.accent,
+                color: theme.onAccent,
+                borderRadius: 999,
+                fontSize: 9,
+                fontWeight: 700,
+                padding: "3px 8px",
+              }}
+            >
+              Action
+            </span>
             <span style={{ background: theme.accent, width: 34, height: 5, borderRadius: 3 }} />
           </div>
         </div>
@@ -570,7 +647,6 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
     </div>
   );
 }
-
 
 export function ComponentsPanel() {
   const { add, addGroup, selectedId, selectedIds, elements, update } = useEditor();
@@ -601,7 +677,9 @@ export function ComponentsPanel() {
   const plugins = usePlugins((s) => s.plugins);
   const pluginWidgets = plugins
     .filter((p) => p.enabled)
-    .flatMap((p) => p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })));
+    .flatMap((p) =>
+      p.widgets.map((w, i) => ({ key: `${p.id}:${i}`, pluginName: p.name, widget: w })),
+    );
 
   const ELEMENT_PRESETS = [
     {
@@ -609,56 +687,64 @@ export function ComponentsPanel() {
       label: "Bar Chart",
       description: "Categorical comparison",
       Icon: ChartColumn,
-      create: (patch: Record<string, unknown> = {}) => newChart("bar", { ...chartStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newChart("bar", { ...chartStylePatch(style), ...patch }),
     },
     {
       id: "line",
       label: "Line Graph",
       description: "Trend over time",
       Icon: ChartLine,
-      create: (patch: Record<string, unknown> = {}) => newChart("line", { ...chartStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newChart("line", { ...chartStylePatch(style), ...patch }),
     },
     {
       id: "area",
       label: "Area Chart",
       description: "Cumulative trend",
       Icon: ChartArea,
-      create: (patch: Record<string, unknown> = {}) => newChart("area", { ...chartStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newChart("area", { ...chartStylePatch(style), ...patch }),
     },
     {
       id: "pie",
       label: "Pie Chart",
       description: "Share of a whole",
       Icon: ChartPie,
-      create: (patch: Record<string, unknown> = {}) => newChart("pie", { ...chartStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newChart("pie", { ...chartStylePatch(style), ...patch }),
     },
     {
       id: "donut",
       label: "Donut Chart",
       description: "Modern proportions",
       Icon: Circle,
-      create: (patch: Record<string, unknown> = {}) => newChart("donut", { ...chartStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newChart("donut", { ...chartStylePatch(style), ...patch }),
     },
     {
       id: "quiz",
       label: "Interactive Quiz",
       description: "Engagement widget",
       Icon: ListChecks,
-      create: (patch: Record<string, unknown> = {}) => newQuiz({ ...quizStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newQuiz({ ...quizStylePatch(style), ...patch }),
     },
     {
       id: "poll",
       label: "Live Poll",
       description: "Audience votes via QR",
       Icon: Radio,
-      create: (patch: Record<string, unknown> = {}) => newPoll({ ...quizStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newPoll({ ...quizStylePatch(style), ...patch }),
     },
     {
       id: "table",
       label: "Table",
       description: "Editable grid — native PPTX",
       Icon: TableIcon,
-      create: (patch: Record<string, unknown> = {}) => newTable({ ...tableStylePatch(style), ...patch }),
+      create: (patch: Record<string, unknown> = {}) =>
+        newTable({ ...tableStylePatch(style), ...patch }),
     },
   ];
 
@@ -756,7 +842,10 @@ export function ComponentsPanel() {
       body: sample.body ?? "",
       items: Array.isArray(sample.items) ? sample.items.slice() : [],
       value: typeof sample.value === "number" ? sample.value : 50,
-      files: Array.isArray(sample.files) && sample.files.length > 0 ? sample.files.slice() : (extra?.defaults.slice() ?? []),
+      files:
+        Array.isArray(sample.files) && sample.files.length > 0
+          ? sample.files.slice()
+          : (extra?.defaults.slice() ?? []),
       showTitle: !!sample.title,
       showBody: !!sample.body,
       showItems: Array.isArray(sample.items) && sample.items.length > 0,
@@ -848,9 +937,7 @@ export function ComponentsPanel() {
     if (!search.trim()) return rawPresets;
     const query = search.toLowerCase();
     return rawPresets.filter(
-      (p) =>
-        p.label.toLowerCase().includes(query) ||
-        p.kind.toLowerCase().includes(query)
+      (p) => p.label.toLowerCase().includes(query) || p.kind.toLowerCase().includes(query),
     );
   }, [rawPresets, search]);
 
@@ -860,13 +947,27 @@ export function ComponentsPanel() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
-      <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets and charts onto the slide." icon={Blocks} />
-      <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
-        { value: "ui", label: "UI", icon: Blocks },
-        { value: "charts", label: "Charts", icon: ChartColumn },
-        { value: "blocks", label: "My blocks", icon: Bookmark },
-      ]} />
-      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : "blocks"}...`} />
+      <PanelHeader
+        kicker="Components"
+        title="Presets & widgets"
+        description="Drop ready-made UI mockups, widgets and charts onto the slide."
+        icon={Blocks}
+      />
+      <SegmentedControl
+        value={section}
+        onChange={setSection}
+        label="Component category"
+        options={[
+          { value: "ui", label: "UI", icon: Blocks },
+          { value: "charts", label: "Charts", icon: ChartColumn },
+          { value: "blocks", label: "My blocks", icon: Bookmark },
+        ]}
+      />
+      <SearchField
+        value={search}
+        onChange={setSearch}
+        placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : "blocks"}...`}
+      />
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs text-selector-subtle">Visual theme</span>
@@ -882,9 +983,12 @@ export function ComponentsPanel() {
             </DialogTrigger>
             <DialogContent className="selector-panel max-h-[82vh] max-w-[320px] space-y-3 overflow-y-auto rounded-2xl p-4">
               <DialogHeader className="space-y-1 text-left">
-                <DialogTitle className="text-sm font-semibold tracking-tight text-slate-900">Theme creator</DialogTitle>
+                <DialogTitle className="text-sm font-semibold tracking-tight text-slate-900">
+                  Theme creator
+                </DialogTitle>
                 <DialogDescription className="text-[10px] leading-relaxed text-slate-500">
-                  Build your own visual theme pack — colors, font, corners, effects and transparency.
+                  Build your own visual theme pack — colors, font, corners, effects and
+                  transparency.
                 </DialogDescription>
               </DialogHeader>
               <ThemeCreator
@@ -895,14 +999,22 @@ export function ComponentsPanel() {
                 }}
               />
               <p className="text-[9px] leading-snug text-slate-400">
-                The saved theme becomes the “Custom” chip above — components, charts and quizzes all follow it.
+                The saved theme becomes the “Custom” chip above — components, charts and quizzes all
+                follow it.
               </p>
             </DialogContent>
           </Dialog>
         </div>
-        <ChipGroup value={style} onChange={pickStyle} label="Visual theme" options={STYLES.map(value => ({ value, label: UI_STYLE_THEMES[value].label }))} />
+        <ChipGroup
+          value={style}
+          onChange={pickStyle}
+          label="Visual theme"
+          options={STYLES.map((value) => ({ value, label: UI_STYLE_THEMES[value].label }))}
+        />
         {style === "custom" && (
-          <p className="text-[10px] leading-snug text-slate-400">Custom theme active — tweak it any time with “Create”.</p>
+          <p className="text-[10px] leading-snug text-slate-400">
+            Custom theme active — tweak it any time with “Create”.
+          </p>
         )}
       </div>
 
@@ -919,7 +1031,11 @@ export function ComponentsPanel() {
                 value={blockName}
                 onChange={(e) => setBlockName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveBlock()}
-                placeholder={selectedElements.length ? "Name (e.g. Header)" : "Select elements on the slide first"}
+                placeholder={
+                  selectedElements.length
+                    ? "Name (e.g. Header)"
+                    : "Select elements on the slide first"
+                }
                 disabled={selectedElements.length === 0}
                 className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400"
               />
@@ -1010,7 +1126,6 @@ export function ComponentsPanel() {
               </p>
             </div>
           )}
-
         </div>
       )}
 
@@ -1039,24 +1154,28 @@ export function ComponentsPanel() {
                     <e.Icon className="size-4" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-xs font-semibold text-slate-700">{e.label}</span>
-                    <span className="block truncate text-[10px] text-slate-400">{e.description}</span>
+                    <span className="block truncate text-xs font-semibold text-slate-700">
+                      {e.label}
+                    </span>
+                    <span className="block truncate text-[10px] text-slate-400">
+                      {e.description}
+                    </span>
                   </span>
                 </button>
-                {(
-                <button
-                  type="button"
-                  title="Edit texts before insert"
-                  onClick={() => openElDraft(e.id, e.label)}
-                  className={`grid size-6 shrink-0 place-items-center rounded-md transition ${
-                    elDraft && elDraft.id === e.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"
-                  }`}
-                >
-                  <SlidersHorizontal className="size-3" />
-                </button>
-                )}
+                {
+                  <button
+                    type="button"
+                    title="Edit texts before insert"
+                    onClick={() => openElDraft(e.id, e.label)}
+                    className={`grid size-6 shrink-0 place-items-center rounded-md transition ${
+                      elDraft && elDraft.id === e.id
+                        ? "bg-blue-600 text-white"
+                        : "bg-slate-100 text-slate-400 hover:bg-blue-100 hover:text-blue-600"
+                    }`}
+                  >
+                    <SlidersHorizontal className="size-3" />
+                  </button>
+                }
               </div>
             ))}
           </div>
@@ -1064,8 +1183,14 @@ export function ComponentsPanel() {
           {elDraft && (
             <div className="mt-2 flex flex-col gap-2 rounded-xl border border-blue-200 bg-white p-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-700">{elDraft.label} — texts</span>
-                <button type="button" onClick={() => setElDraft(null)} className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500">
+                <span className="text-[11px] font-bold text-slate-700">
+                  {elDraft.label} — texts
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setElDraft(null)}
+                  className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500"
+                >
                   <X className="size-3" />
                 </button>
               </div>
@@ -1073,7 +1198,9 @@ export function ComponentsPanel() {
                 <>
                   <input
                     value={elDraft.question}
-                    onChange={(e) => setElDraft((d) => (d ? { ...d, question: e.target.value } : d))}
+                    onChange={(e) =>
+                      setElDraft((d) => (d ? { ...d, question: e.target.value } : d))
+                    }
                     placeholder="Question"
                     className={DRAFT_FIELD}
                   />
@@ -1081,16 +1208,39 @@ export function ComponentsPanel() {
                     <div key={i} className="flex items-center gap-1.5">
                       <input
                         value={opt}
-                        onChange={(e) => setElDraft((d) => (d ? { ...d, options: d.options.map((o, j) => (j === i ? e.target.value : o)) } : d))}
+                        onChange={(e) =>
+                          setElDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  options: d.options.map((o, j) => (j === i ? e.target.value : o)),
+                                }
+                              : d,
+                          )
+                        }
                         placeholder={"Option " + (i + 1)}
                         className={DRAFT_FIELD + " min-w-0 flex-1"}
                       />
-                      <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, options: d.options.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setElDraft((d) =>
+                            d ? { ...d, options: d.options.filter((_, j) => j !== i) } : d,
+                          )
+                        }
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
+                      >
                         <X className="size-3" />
                       </button>
                     </div>
                   ))}
-                  <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, options: [...d.options, "New option"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setElDraft((d) => (d ? { ...d, options: [...d.options, "New option"] } : d))
+                    }
+                    className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                  >
                     <Plus className="size-3" /> Add option
                   </button>
                 </>
@@ -1108,7 +1258,9 @@ export function ComponentsPanel() {
                                 ? {
                                     ...d,
                                     rows: (d.rows ?? []).map((r, j) =>
-                                      j === ri ? r.map((c, k) => (k === ci ? e.target.value : c)) : r,
+                                      j === ri
+                                        ? r.map((c, k) => (k === ci ? e.target.value : c))
+                                        : r,
                                     ),
                                   }
                                 : d,
@@ -1122,7 +1274,11 @@ export function ComponentsPanel() {
                         type="button"
                         aria-label="Remove row"
                         disabled={(elDraft.rows ?? []).length <= 1}
-                        onClick={() => setElDraft((d) => (d ? { ...d, rows: (d.rows ?? []).filter((_, j) => j !== ri) } : d))}
+                        onClick={() =>
+                          setElDraft((d) =>
+                            d ? { ...d, rows: (d.rows ?? []).filter((_, j) => j !== ri) } : d,
+                          )
+                        }
                         className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 disabled:opacity-40"
                       >
                         <X className="size-3" />
@@ -1134,7 +1290,15 @@ export function ComponentsPanel() {
                       type="button"
                       onClick={() =>
                         setElDraft((d) =>
-                          d ? { ...d, rows: [...(d.rows ?? []), ((d.rows ?? [])[0] ?? [""]).map(() => "")] } : d,
+                          d
+                            ? {
+                                ...d,
+                                rows: [
+                                  ...(d.rows ?? []),
+                                  ((d.rows ?? [])[0] ?? [""]).map(() => ""),
+                                ],
+                              }
+                            : d,
                         )
                       }
                       className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
@@ -1143,7 +1307,11 @@ export function ComponentsPanel() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setElDraft((d) => (d ? { ...d, rows: (d.rows ?? []).map((r) => [...r, ""]) } : d))}
+                      onClick={() =>
+                        setElDraft((d) =>
+                          d ? { ...d, rows: (d.rows ?? []).map((r) => [...r, ""]) } : d,
+                        )
+                      }
                       className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
                     >
                       + Column
@@ -1162,33 +1330,77 @@ export function ComponentsPanel() {
                     <div key={i} className="flex items-center gap-1.5">
                       <input
                         value={row.label}
-                        onChange={(e) => setElDraft((d) => (d ? { ...d, data: d.data.map((r, j) => (j === i ? { ...r, label: e.target.value } : r)) } : d))}
+                        onChange={(e) =>
+                          setElDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  data: d.data.map((r, j) =>
+                                    j === i ? { ...r, label: e.target.value } : r,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
                         placeholder="Label"
                         className={DRAFT_FIELD + " min-w-0 flex-1"}
                       />
                       <input
                         type="number"
                         value={row.value}
-                        onChange={(e) => setElDraft((d) => (d ? { ...d, data: d.data.map((r, j) => (j === i ? { ...r, value: Number(e.target.value) } : r)) } : d))}
+                        onChange={(e) =>
+                          setElDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  data: d.data.map((r, j) =>
+                                    j === i ? { ...r, value: Number(e.target.value) } : r,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
                         className={DRAFT_FIELD + " w-16 shrink-0"}
                       />
-                      <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, data: d.data.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setElDraft((d) =>
+                            d ? { ...d, data: d.data.filter((_, j) => j !== i) } : d,
+                          )
+                        }
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
+                      >
                         <X className="size-3" />
                       </button>
                     </div>
                   ))}
-                  <button type="button" onClick={() => setElDraft((d) => (d ? { ...d, data: [...d.data, { label: "New", value: 10 }] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setElDraft((d) =>
+                        d ? { ...d, data: [...d.data, { label: "New", value: 10 }] } : d,
+                      )
+                    }
+                    className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                  >
                     <Plus className="size-3" /> Add data point
                   </button>
                 </>
               )}
-              <button type="button" onClick={insertElDraft} className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]">
+              <button
+                type="button"
+                onClick={insertElDraft}
+                className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]"
+              >
                 Insert {elDraft.label}
               </button>
             </div>
           )}
           {filteredElements.length === 0 && (
-            <div className="py-6 text-center text-xs text-slate-400">No chart matches your search.</div>
+            <div className="py-6 text-center text-xs text-slate-400">
+              No chart matches your search.
+            </div>
           )}
           <p className="text-[9px] leading-snug text-slate-400">
             Charts and quizzes follow the visual theme selected above.
@@ -1223,32 +1435,32 @@ export function ComponentsPanel() {
                       : "border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 hover:border-blue-300 hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.28)]"
                   }`}
                 >
-                <button
-                  type="button"
-                  onClick={() => add(newUi(kind, style, ov))}
-                  className="flex w-full flex-col text-left"
-                >
-                  {/* Miniature live canvas render preview */}
-                  <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-lg border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 p-1 shadow-inner shadow-slate-100">
-                    <div className="pointer-events-none scale-75 origin-top-left w-[133%] h-[133%]">
-                      <UiRender element={previewElement} preview />
+                  <button
+                    type="button"
+                    onClick={() => add(newUi(kind, style, ov))}
+                    className="flex w-full flex-col text-left"
+                  >
+                    {/* Miniature live canvas render preview */}
+                    <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-lg border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 p-1 shadow-inner shadow-slate-100">
+                      <div className="pointer-events-none scale-75 origin-top-left w-[133%] h-[133%]">
+                        <UiRender element={previewElement} preview />
+                      </div>
+
+                      {/* Quick hover badge */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-slate-900/25 to-slate-900/5 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-slate-800 shadow-md ring-1 ring-slate-200/70 transition-transform duration-200 group-hover:scale-105">
+                          <Plus className="size-2.5" /> Add
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Quick hover badge */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-slate-900/25 to-slate-900/5 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-slate-800 shadow-md ring-1 ring-slate-200/70 transition-transform duration-200 group-hover:scale-105">
-                        <Plus className="size-2.5" /> Add
+                    {/* Caption & Icon */}
+                    <div className="flex items-center gap-1.5 px-0.5">
+                      <Icon className="size-3 text-slate-400 transition-colors group-hover:text-blue-600" />
+                      <span className="truncate text-[11px] font-semibold text-slate-700 transition-colors group-hover:text-blue-700">
+                        {label}
                       </span>
                     </div>
-                  </div>
-
-                  {/* Caption & Icon */}
-                  <div className="flex items-center gap-1.5 px-0.5">
-                    <Icon className="size-3 text-slate-400 transition-colors group-hover:text-blue-600" />
-                    <span className="truncate text-[11px] font-semibold text-slate-700 transition-colors group-hover:text-blue-700">
-                      {label}
-                    </span>
-                  </div>
                   </button>
                   <button
                     type="button"
@@ -1270,8 +1482,14 @@ export function ComponentsPanel() {
           {uiDraft && (
             <div className="mt-2 flex flex-col gap-2 rounded-xl border border-blue-200 bg-white p-3 shadow-2xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-700">{uiDraft.label} — texts</span>
-                <button type="button" onClick={() => setUiDraft(null)} className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500">
+                <span className="text-[11px] font-bold text-slate-700">
+                  {uiDraft.label} — texts
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setUiDraft(null)}
+                  className="grid size-6 place-items-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-rose-50 hover:text-rose-500"
+                >
                   <X className="size-3" />
                 </button>
               </div>
@@ -1294,8 +1512,19 @@ export function ComponentsPanel() {
               )}
               {uiDraft.showValue && (
                 <div className="flex items-center gap-2 text-[11px] text-slate-600">
-                  <input type="range" min={0} max={100} value={uiDraft.value} onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) } : d))} className="h-1.5 flex-1 accent-blue-600" />
-                  <span className="w-9 text-right font-mono text-[10px] text-slate-500">{uiDraft.value}%</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={uiDraft.value}
+                    onChange={(e) =>
+                      setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) } : d))
+                    }
+                    className="h-1.5 flex-1 accent-blue-600"
+                  />
+                  <span className="w-9 text-right font-mono text-[10px] text-slate-500">
+                    {uiDraft.value}%
+                  </span>
                 </div>
               )}
               {uiDraft.showItems && (
@@ -1304,16 +1533,39 @@ export function ComponentsPanel() {
                     <div key={i} className="flex items-center gap-1.5">
                       <input
                         value={item}
-                        onChange={(e) => setUiDraft((d) => (d ? { ...d, items: d.items.map((it, j) => (j === i ? e.target.value : it)) } : d))}
+                        onChange={(e) =>
+                          setUiDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  items: d.items.map((it, j) => (j === i ? e.target.value : it)),
+                                }
+                              : d,
+                          )
+                        }
                         placeholder={"Item " + (i + 1)}
                         className={DRAFT_FIELD + " min-w-0 flex-1"}
                       />
-                      <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, items: d.items.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setUiDraft((d) =>
+                            d ? { ...d, items: d.items.filter((_, j) => j !== i) } : d,
+                          )
+                        }
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
+                      >
                         <X className="size-3" />
                       </button>
                     </div>
                   ))}
-                  <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, items: [...d.items, "New item"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setUiDraft((d) => (d ? { ...d, items: [...d.items, "New item"] } : d))
+                    }
+                    className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                  >
                     <Plus className="size-3" /> Add item
                   </button>
                 </div>
@@ -1332,21 +1584,49 @@ export function ComponentsPanel() {
                     <div key={i} className="flex items-center gap-1.5">
                       <input
                         value={f}
-                        onChange={(e) => setUiDraft((d) => (d ? { ...d, files: d.files.map((x, j) => (j === i ? e.target.value : x)) } : d))}
+                        onChange={(e) =>
+                          setUiDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  files: d.files.map((x, j) => (j === i ? e.target.value : x)),
+                                }
+                              : d,
+                          )
+                        }
                         placeholder={uiDraft.filesLabel + " " + (i + 1)}
                         className={DRAFT_FIELD + " min-w-0 flex-1"}
                       />
-                      <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, files: d.files.filter((_, j) => j !== i) } : d))} className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setUiDraft((d) =>
+                            d ? { ...d, files: d.files.filter((_, j) => j !== i) } : d,
+                          )
+                        }
+                        className="grid size-6 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
+                      >
                         <X className="size-3" />
                       </button>
                     </div>
                   ))}
-                  <button type="button" onClick={() => setUiDraft((d) => (d ? { ...d, files: [...d.files, "New"] } : d))} className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600">
-                    <Plus className="size-3" /> Add {uiDraft.filesLabel.toLowerCase().replace(/s$/, "")}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setUiDraft((d) => (d ? { ...d, files: [...d.files, "New"] } : d))
+                    }
+                    className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-semibold text-slate-500 transition hover:border-blue-400 hover:text-blue-600"
+                  >
+                    <Plus className="size-3" /> Add{" "}
+                    {uiDraft.filesLabel.toLowerCase().replace(/s$/, "")}
                   </button>
                 </div>
               )}
-              <button type="button" onClick={insertUiDraft} className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]">
+              <button
+                type="button"
+                onClick={insertUiDraft}
+                className="rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 active:scale-[0.98]"
+              >
                 Insert {uiDraft.label}
               </button>
             </div>
@@ -1357,10 +1637,8 @@ export function ComponentsPanel() {
               No components match &ldquo;{search}&rdquo;
             </div>
           )}
-
         </div>
       )}
     </div>
   );
 }
-

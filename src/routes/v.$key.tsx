@@ -77,7 +77,11 @@ function VotePage() {
             <Radio className="size-3.5 animate-pulse" /> Live poll
           </span>
           <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/40">
-            {connected ? <Wifi className="size-3.5 text-emerald-400" /> : <WifiOff className="size-3.5" />}
+            {connected ? (
+              <Wifi className="size-3.5 text-emerald-400" />
+            ) : (
+              <WifiOff className="size-3.5" />
+            )}
             {connected ? "Connected" : "Connecting…"}
           </span>
         </div>
@@ -111,7 +115,10 @@ function VotePage() {
                       <span
                         aria-hidden
                         className="absolute inset-y-0 left-0 bg-cyan-400/20"
-                        style={{ width: pct + "%", transition: "width 420ms cubic-bezier(0.16,1,0.3,1)" }}
+                        style={{
+                          width: pct + "%",
+                          transition: "width 420ms cubic-bezier(0.16,1,0.3,1)",
+                        }}
                       />
                     )}
                     <span className="relative flex items-center justify-between gap-3">
@@ -123,8 +130,7 @@ function VotePage() {
                       </span>
                       {picked && (
                         <span className="flex items-center gap-2 text-xs tabular-nums text-white/70">
-                          {pct}%
-                          {mine && <Check className="size-4 text-cyan-300" strokeWidth={3} />}
+                          {pct}%{mine && <Check className="size-4 text-cyan-300" strokeWidth={3} />}
                         </span>
                       )}
                     </span>

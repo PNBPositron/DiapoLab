@@ -9,7 +9,9 @@ import getPublicTemplate from "./tools/get-public-template";
 const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env ?? {};
 const projectRef =
   env.VITE_SUPABASE_PROJECT_ID ||
-  (env.SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? "").match(/^https:\/\/([^.]+)\.supabase\.co/i)?.[1] ||
+  (env.SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? "").match(
+    /^https:\/\/([^.]+)\.supabase\.co/i,
+  )?.[1] ||
   "project-ref-unset";
 
 export default defineMcp({
@@ -22,5 +24,12 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [listDesigns, getDesign, createDesign, deleteDesign, listPublicTemplates, getPublicTemplate],
+  tools: [
+    listDesigns,
+    getDesign,
+    createDesign,
+    deleteDesign,
+    listPublicTemplates,
+    getPublicTemplate,
+  ],
 });

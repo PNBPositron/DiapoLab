@@ -82,7 +82,9 @@ export function SelectionToolbar() {
           <button
             type="button"
             title="Smaller text"
-            onClick={() => update(el.id, { fontSize: clampFont((text.fontSize ?? 16) - 2) } as never)}
+            onClick={() =>
+              update(el.id, { fontSize: clampFont((text.fontSize ?? 16) - 2) } as never)
+            }
             className={btn}
           >
             <Minus className="size-3.5" />
@@ -93,7 +95,9 @@ export function SelectionToolbar() {
           <button
             type="button"
             title="Bigger text"
-            onClick={() => update(el.id, { fontSize: clampFont((text.fontSize ?? 16) + 2) } as never)}
+            onClick={() =>
+              update(el.id, { fontSize: clampFont((text.fontSize ?? 16) + 2) } as never)
+            }
             className={btn}
           >
             <Plus className="size-3.5" />
@@ -119,10 +123,20 @@ export function SelectionToolbar() {
           <span className="mx-1 h-4 w-px bg-slate-200" />
         </>
       )}
-      <button type="button" title="Bring forward" onClick={() => bringForward(el.id)} className={btn}>
+      <button
+        type="button"
+        title="Bring forward"
+        onClick={() => bringForward(el.id)}
+        className={btn}
+      >
         <ChevronUp className="size-3.5" />
       </button>
-      <button type="button" title="Send backward" onClick={() => sendBackward(el.id)} className={btn}>
+      <button
+        type="button"
+        title="Send backward"
+        onClick={() => sendBackward(el.id)}
+        className={btn}
+      >
         <ChevronDown className="size-3.5" />
       </button>
       <button type="button" title="Duplicate" onClick={duplicateSelected} className={btn}>

@@ -52,7 +52,10 @@ export function PagesBar() {
 
   return (
     <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 py-2 pl-3 pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
-      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
+      <div
+        ref={rowRef}
+        className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1"
+      >
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (
