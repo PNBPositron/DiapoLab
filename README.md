@@ -1,6 +1,8 @@
-#  DiapoLab
+# DiapoLab
 
 <div align="center">
+
+<img src="./public/favicon.svg" alt="DiapoLab logo" width="72" />
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
@@ -39,9 +41,12 @@ The app includes:
 - Text tools for creating and styling slide content
 - Shape and illustration support
 - Preset components and reusable blocks
-- Slides thumbnail and page navigation
-- Presentation mode for full-screen playback
-- Undo/redo and quick design cleanup tools
+- Slide thumbnails and page navigation
+- Presentation mode with presenter view (notes, timer, next-slide preview)
+- Undo/redo with accurate disabled states, duplicate, copy/paste, arrow-key nudging
+- Smooth zoom controls (wheel, buttons, fit-to-screen on click)
+- Slide transitions (18 presets) with per-slide configuration
+- Version history with restore
 
 ### 🎨 Design & Styling
 
@@ -49,6 +54,10 @@ The app includes:
 - Background and layout adjustments
 - Template-driven starter experiences
 - Presets in different styles
+- Image filters: 9 one-click presets (Noir, Vintage, Faded, Crisp, Sunset, Golden, Glitch, VHS...) plus fine-tune sliders for brightness, contrast, saturation, blur, grain noise and tint
+- Advanced effects: RGB-split glitch with animated jitter, film-grain noise, pixelate, posterize
+- Color pickers with swatch popovers for fills, gradients and tints
+- Local media library (images, videos, audio) stored in IndexedDB with drag-and-drop upload and one-click insert
 - Flexible visual identity for presentation output
 
 ### 🤖 AI Assistance
@@ -63,19 +72,22 @@ The app includes:
 - Sign-in flow with Supabase auth
 - Save designs to user account
 - Load and manage personal projects
+- Private share links with secure tokens
 - Public share links for published decks
 - Marketplace and template publishing workflow
 
 ### 📤 Import / Export
 
-- Import existing design JSON
+- Import existing design JSON and PowerPoint (.pptx) files
 - Export decks as:
   - PNG
+  - JPG
   - PDF
   - PPTX
   - HTML
   - JSON
   - GIF
+  - Markdown
 
 ### 🧭 App Experience
 
@@ -119,7 +131,7 @@ The app includes:
 ├── .env
 ├── .gitignore
 ├── components.json
-���── eslint.config.js
+��├── eslint.config.js
 ├── LICENSE
 ├── package.json
 ├── tsconfig.json
@@ -215,7 +227,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📌 Project Status
 
-DiapoLab is actively evolving as a presentation editor with template publishing, AI support, and export workflows. It is suitable for experimentation, local development, and open-source extension as a personal project or collaborative codebase.
+DiapoLab is actively evolving as a presentation editor with template publishing, AI support, advanced image effects, a local media library, and a wide range of export workflows. It is suitable for experimentation, local development, and open-source extension as a personal project or collaborative codebase.
 
 ## 🔗 Links
 
