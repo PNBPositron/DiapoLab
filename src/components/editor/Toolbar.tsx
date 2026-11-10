@@ -49,26 +49,30 @@ import {
 } from "@/lib/export";
 
 /**
- * DiapoLab logo mark: blue rounded square, white flask with a play button.
+ * DiapoLab logo mark (official geometry): blue gradient rounded square,
+ * white flask with a play button.
  */
 export function DiapoLabLogoMark({ className = "size-8" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={className + " drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]"} aria-hidden="true">
+    <svg viewBox="0 0 128 128" className={className + " drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]"} aria-hidden="true">
       <defs>
-        <linearGradient id="dl-logo-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#3b82f6" />
-          <stop offset="100%" stopColor="#2456e6" />
+        <linearGradient id="dl-bgwt" x1="12" y1="6" x2="116" y2="124" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#4F8BFF" />
+          <stop offset="1" stopColor="#1D4ED8" />
+        </linearGradient>
+        <linearGradient id="dl-slwt" x1="47" y1="72" x2="81" y2="92" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#3B82F6" />
+          <stop offset="1" stopColor="#1E40AF" />
         </linearGradient>
       </defs>
-      <rect width="100" height="100" rx="24" fill="url(#dl-logo-bg)" />
-      <circle cx="72" cy="21" r="4.5" fill="#93c5fd" />
-      <circle cx="81" cy="12" r="2.5" fill="#bfdbfe" />
-      <path
-        d="M42 18 h16 v14 l14 34 c4 10 -3 16 -12 16 h-20 c-9 0 -16 -6 -12 -16 l14 -34 z"
-        fill="#ffffff"
-      />
-      <rect x="37" y="52" width="26" height="19" rx="5.5" fill="#2456e6" />
-      <path d="M46 56.5 v10 l9 -5 z" fill="#ffffff" />
+      <rect width="128" height="128" rx="30" fill="url(#dl-bgwt)" />
+      <path d="M0 30a30 30 0 0 1 30-30h68a30 30 0 0 1 30 30v10C90 20 40 36 0 60z" fill="#fff" opacity=".10" />
+      <rect x="51" y="21" width="26" height="9" rx="4.5" fill="#fff" />
+      <path fill="#fff" d="M56 29V52L33 90a9 9 0 0 0 7.7 13.5H87.3A9 9 0 0 0 95 90L72 52V29z" />
+      <rect x="47" y="72" width="34" height="20" rx="4.5" fill="url(#dl-slwt)" />
+      <path d="M60.5 76.8v10.4a1 1 0 0 0 1.5.85l8.3-5.2a1 1 0 0 0 0-1.7l-8.3-5.2a1 1 0 0 0-1.5.85z" fill="#fff" />
+      <circle cx="90" cy="35" r="4.2" fill="#BAE6FD" />
+      <circle cx="100" cy="23" r="2.6" fill="#BAE6FD" opacity=".85" />
     </svg>
   );
 }
