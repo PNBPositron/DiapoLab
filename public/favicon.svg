@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bgl" x1="12" y1="6" x2="116" y2="124" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4F8BFF"/><stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="sll" x1="47" y1="72" x2="81" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E40AF"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#bgl)"/>
+  <path d="M0 30a30 30 0 0 1 30-30h68a30 30 0 0 1 30 30v10C90 20 40 36 0 60z" fill="#fff" opacity=".10"/>
+  <rect x="51" y="21" width="26" height="9" rx="4.5" fill="#fff"/>
+  <path fill="#fff" d="M56 29V52L33 90a9 9 0 0 0 7.7 13.5H87.3A9 9 0 0 0 95 90L72 52V29z"/>
+  <rect x="47" y="72" width="34" height="20" rx="4.5" fill="url(#sll)"/>
+  <path d="M60.5 76.8v10.4a1 1 0 0 0 1.5.85l8.3-5.2a1 1 0 0 0 0-1.7l-8.3-5.2a1 1 0 0 0-1.5.85z" fill="#fff"/>
+  <circle cx="90" cy="35" r="4.2" fill="#BAE6FD"/><circle cx="100" cy="23" r="2.6" fill="#BAE6FD" opacity=".85"/>
+</svg>
