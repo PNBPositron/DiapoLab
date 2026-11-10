@@ -1215,6 +1215,9 @@ export function CanvasElement({
             <div
               contentEditable={editing}
               suppressContentEditableWarning
+              aria-label={editing ? "Edit text" : undefined}
+              spellCheck={editing}
+              className={editing ? "canvas-text-editor is-editing" : "canvas-text-editor"}
               onBlur={(e) => {
                 update(element.id, { text: e.currentTarget.innerText || "" });
                 setEditing(false);

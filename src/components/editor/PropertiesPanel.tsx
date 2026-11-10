@@ -330,7 +330,7 @@ function Section({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="inspector-section border-b border-selector-border pb-2">
+    <div className="inspector-section rounded-xl border border-slate-200/80 bg-white shadow-sm transition-shadow duration-150 hover:shadow-md">
       <button
         type="button"
         onClick={() => setOpen(!open)}
