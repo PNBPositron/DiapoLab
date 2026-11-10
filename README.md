@@ -131,7 +131,7 @@ The app includes:
 ├── .env
 ├── .gitignore
 ├── components.json
-��├── eslint.config.js
+├── eslint.config.js
 ├── LICENSE
 ├── package.json
 ├── tsconfig.json
