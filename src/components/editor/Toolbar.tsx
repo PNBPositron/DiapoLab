@@ -48,6 +48,31 @@ import {
   importJSONFile,
 } from "@/lib/export";
 
+/**
+ * DiapoLab logo mark: blue rounded square, white flask with a play button.
+ */
+export function DiapoLabLogoMark({ className = "size-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className + " drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]"} aria-hidden="true">
+      <defs>
+        <linearGradient id="dl-logo-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#2456e6" />
+        </linearGradient>
+      </defs>
+      <rect width="100" height="100" rx="24" fill="url(#dl-logo-bg)" />
+      <circle cx="72" cy="21" r="4.5" fill="#93c5fd" />
+      <circle cx="81" cy="12" r="2.5" fill="#bfdbfe" />
+      <path
+        d="M42 18 h16 v14 l14 34 c4 10 -3 16 -12 16 h-20 c-9 0 -16 -6 -12 -16 l14 -34 z"
+        fill="#ffffff"
+      />
+      <rect x="37" y="52" width="26" height="19" rx="5.5" fill="#2456e6" />
+      <path d="M46 56.5 v10 l9 -5 z" fill="#ffffff" />
+    </svg>
+  );
+}
+
 // Hook to close menus on outside click
 function useClickOutside<T extends HTMLElement>(handler: () => void) {
   const ref = useRef<T>(null);
@@ -225,8 +250,12 @@ export function Toolbar() {
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
-          <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain drop-shadow-[0_2px_6px_rgba(15,23,42,0.18)]" />
-          <Link to="/" className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-800 transition-colors hover:text-blue-600">DiapoLab</Link>
+          <Link to="/" className="flex items-center gap-2.5">
+            <DiapoLabLogoMark />
+            <span className="logo-wordmark text-base font-bold tracking-[0.08em] text-slate-900 transition-colors hover:text-blue-600">
+              Diapo<span className="text-blue-600">Lab</span>
+            </span>
+          </Link>
         </div>
 
         {/* Decorative vertical divider */}
