@@ -4,14 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
-  head: () => ({ meta: [
-    { title: "Completing sign-in — DiapoLab" },
-    { name: "description", content: "Complete your DiapoLab sign-in and return to your projects." },
-    { property: "og:title", content: "Completing sign-in — DiapoLab" },
-    { property: "og:description", content: "Complete your DiapoLab sign-in and return to your projects." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Completing sign-in — DiapoLab" },
+      {
+        name: "description",
+        content: "Complete your DiapoLab sign-in and return to your projects.",
+      },
+      { property: "og:title", content: "Completing sign-in — DiapoLab" },
+      {
+        property: "og:description",
+        content: "Complete your DiapoLab sign-in and return to your projects.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
 });
 
 function AuthCallback() {
@@ -25,5 +33,9 @@ function AuthCallback() {
     void finish();
   }, []);
 
-  return <main className="grid min-h-screen place-items-center bg-ink font-mono text-sm text-teal">Completing GitHub sign-in…</main>;
+  return (
+    <main className="grid min-h-screen place-items-center bg-ink font-mono text-sm text-teal">
+      Completing GitHub sign-in…
+    </main>
+  );
 }

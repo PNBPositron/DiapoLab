@@ -14,12 +14,72 @@ type GridLayout = { id: string; label: string; cols: number; rows: number; cells
  * placeholder cells. Pick a cell, then use "Replace image" in the inspector
  * to drop a photo in. */
 const GRID_LAYOUTS: GridLayout[] = [
-  { id: "two-cols", label: "Two columns", cols: 2, rows: 2, cells: [{ x: 0, y: 0, w: 1, h: 2 }, { x: 1, y: 0, w: 1, h: 2 }] },
-  { id: "two-rows", label: "Two rows", cols: 2, rows: 2, cells: [{ x: 0, y: 0, w: 2, h: 1 }, { x: 0, y: 1, w: 2, h: 1 }] },
-  { id: "three-cols", label: "Three columns", cols: 3, rows: 2, cells: [{ x: 0, y: 0, w: 1, h: 2 }, { x: 1, y: 0, w: 1, h: 2 }, { x: 2, y: 0, w: 1, h: 2 }] },
-  { id: "feature-left", label: "Feature left", cols: 3, rows: 2, cells: [{ x: 0, y: 0, w: 1, h: 2 }, { x: 1, y: 0, w: 2, h: 1 }, { x: 1, y: 1, w: 2, h: 1 }] },
-  { id: "four-squares", label: "Four squares", cols: 2, rows: 2, cells: [{ x: 0, y: 0, w: 1, h: 1 }, { x: 1, y: 0, w: 1, h: 1 }, { x: 0, y: 1, w: 1, h: 1 }, { x: 1, y: 1, w: 1, h: 1 }] },
-  { id: "feature-top", label: "Feature top", cols: 3, rows: 2, cells: [{ x: 0, y: 0, w: 3, h: 1 }, { x: 0, y: 1, w: 1, h: 1 }, { x: 1, y: 1, w: 1, h: 1 }, { x: 2, y: 1, w: 1, h: 1 }] },
+  {
+    id: "two-cols",
+    label: "Two columns",
+    cols: 2,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 1, h: 2 },
+      { x: 1, y: 0, w: 1, h: 2 },
+    ],
+  },
+  {
+    id: "two-rows",
+    label: "Two rows",
+    cols: 2,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 2, h: 1 },
+      { x: 0, y: 1, w: 2, h: 1 },
+    ],
+  },
+  {
+    id: "three-cols",
+    label: "Three columns",
+    cols: 3,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 1, h: 2 },
+      { x: 1, y: 0, w: 1, h: 2 },
+      { x: 2, y: 0, w: 1, h: 2 },
+    ],
+  },
+  {
+    id: "feature-left",
+    label: "Feature left",
+    cols: 3,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 1, h: 2 },
+      { x: 1, y: 0, w: 2, h: 1 },
+      { x: 1, y: 1, w: 2, h: 1 },
+    ],
+  },
+  {
+    id: "four-squares",
+    label: "Four squares",
+    cols: 2,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 1, h: 1 },
+      { x: 1, y: 0, w: 1, h: 1 },
+      { x: 0, y: 1, w: 1, h: 1 },
+      { x: 1, y: 1, w: 1, h: 1 },
+    ],
+  },
+  {
+    id: "feature-top",
+    label: "Feature top",
+    cols: 3,
+    rows: 2,
+    cells: [
+      { x: 0, y: 0, w: 3, h: 1 },
+      { x: 0, y: 1, w: 1, h: 1 },
+      { x: 1, y: 1, w: 1, h: 1 },
+      { x: 2, y: 1, w: 1, h: 1 },
+    ],
+  },
 ];
 
 const PLACEHOLDER_SRC =
@@ -61,12 +121,14 @@ export function MediaPanel() {
           add(newImage(src, { x: 200, y: 200, width: 480, height: 480, fit: "cover" }));
           toLibrary.push({ name: file.name, kind: "image", src });
         } else if (file.type.startsWith("video/")) {
-          if (file.size > 25 * 1024 * 1024) throw new Error(file.name + " is too large (max 25 MB).");
+          if (file.size > 25 * 1024 * 1024)
+            throw new Error(file.name + " is too large (max 25 MB).");
           const src = await readFileAsDataUrl(file);
           add(newVideo(src, { muted: true, loop: true }));
           toLibrary.push({ name: file.name, kind: "video", src });
         } else if (file.type.startsWith("audio/")) {
-          if (file.size > 25 * 1024 * 1024) throw new Error(file.name + " is too large (max 25 MB).");
+          if (file.size > 25 * 1024 * 1024)
+            throw new Error(file.name + " is too large (max 25 MB).");
           const src = await readFileAsDataUrl(file);
           add(newAudio(src));
           toLibrary.push({ name: file.name, kind: "audio", src });
@@ -144,7 +206,12 @@ export function MediaPanel() {
           value={tab}
           onChange={setTab}
           options={[
-            { value: "uploads", label: "Uploads", icon: Upload, title: "Import images, GIFs, videos and audio" },
+            {
+              value: "uploads",
+              label: "Uploads",
+              icon: Upload,
+              title: "Import images, GIFs, videos and audio",
+            },
             { value: "grids", label: "Grids", icon: LayoutGrid, title: "Photo grid layouts" },
           ]}
         />
@@ -161,7 +228,9 @@ export function MediaPanel() {
             className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/60 px-4 py-8 text-center transition hover:border-sky-400 hover:bg-sky-50/50"
           >
             <Upload className="size-6 text-slate-400" />
-            <span className="text-xs font-semibold text-slate-700">Drop media here, or click to browse</span>
+            <span className="text-xs font-semibold text-slate-700">
+              Drop media here, or click to browse
+            </span>
             <span className="text-[10px] leading-snug text-slate-400">
               Images, GIFs, videos and audio files. Max 25 MB per file.
             </span>
@@ -177,16 +246,22 @@ export function MediaPanel() {
               }}
             />
           </label>
-          {busy && <p className="text-center text-[10px] font-semibold text-slate-500">Importing…</p>}
+          {busy && (
+            <p className="text-center text-[10px] font-semibold text-slate-500">Importing…</p>
+          )}
           {error && <p className="text-[10px] font-medium text-rose-500">{error}</p>}
           <p className="text-[10px] leading-snug text-slate-400">
-            Images and GIFs land on the slide right away. Videos loop while presenting; audio shows a compact player.
+            Images and GIFs land on the slide right away. Videos loop while presenting; audio shows
+            a compact player.
           </p>
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Your library</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+              Your library
+            </p>
             {library.length === 0 ? (
               <p className="text-[10px] leading-snug text-slate-400">
-                Media you import is saved in this browser and shows up here, ready to reuse in any deck.
+                Media you import is saved in this browser and shows up here, ready to reuse in any
+                deck.
               </p>
             ) : (
               <div className="grid grid-cols-3 gap-2">
@@ -201,13 +276,21 @@ export function MediaPanel() {
                       {m.kind === "image" ? (
                         <img src={m.src} alt="" className="aspect-square w-full object-cover" />
                       ) : m.kind === "video" ? (
-                        <video src={m.src} muted playsInline preload="metadata" className="aspect-square w-full object-cover" />
+                        <video
+                          src={m.src}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          className="aspect-square w-full object-cover"
+                        />
                       ) : (
                         <span className="grid aspect-square w-full place-items-center bg-slate-100">
                           <Music className="size-4 text-slate-400" />
                         </span>
                       )}
-                      <span className="block truncate px-1 py-0.5 text-[8px] font-medium text-slate-500">{m.name}</span>
+                      <span className="block truncate px-1 py-0.5 text-[8px] font-medium text-slate-500">
+                        {m.name}
+                      </span>
                     </button>
                     <button
                       type="button"
@@ -226,8 +309,8 @@ export function MediaPanel() {
       ) : (
         <div className="space-y-3 px-4">
           <p className="text-[10px] leading-snug text-slate-400">
-            Choose a layout: a grouped block of placeholder cells is inserted. Select a cell, then use
-            "Replace image" in the inspector to add a photo.
+            Choose a layout: a grouped block of placeholder cells is inserted. Select a cell, then
+            use "Replace image" in the inspector to add a photo.
           </p>
           <div className="grid grid-cols-2 gap-2.5">
             {GRID_LAYOUTS.map((layout) => (

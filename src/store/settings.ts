@@ -3,14 +3,7 @@ import { persist } from "zustand/middleware";
 import type { ThemeTokens } from "@/lib/themes";
 
 export type PanelId =
-  | "home"
-  | "text"
-  | "components"
-  | "elements"
-  | "library"
-  | "media"
-  | "design"
-  | "my-designs";
+  "home" | "text" | "components" | "elements" | "library" | "media" | "design" | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
   home: "Home",
@@ -162,7 +155,8 @@ export const useSettings = create<SettingsState>()(
         delete (panels as Record<string, boolean | undefined>).unsplash;
         delete (panels as Record<string, boolean | undefined>).illustrations;
         delete (panels as Record<string, boolean | undefined>).plugins;
-        if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
+        if (panels.library === undefined)
+          panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         if (panels.media === undefined) panels.media = true;
         return {
           ...previous,

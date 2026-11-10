@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Loader2, LayoutGrid, Type, Shapes, Library, Layers, Palette, Image, Check, MonitorPlay } from "lucide-react";
+import {
+  Loader2,
+  LayoutGrid,
+  Type,
+  Shapes,
+  Library,
+  Layers,
+  Palette,
+  Image,
+  Check,
+  MonitorPlay,
+} from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useEditor, CANVAS_PRESETS, type Page } from "@/store/editor";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
@@ -17,7 +28,7 @@ const PANEL_OPTIONS = [
   { id: "library", label: "Library", icon: Library, hint: "Photos & illustrations" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },
-  { id: "media", label: "Media", icon: Image, hint: "Upload photos, videos & audio" }
+  { id: "media", label: "Media", icon: Image, hint: "Upload photos, videos & audio" },
 ] as const;
 
 export function WelcomeDialog() {
@@ -25,7 +36,13 @@ export function WelcomeDialog() {
   const [step, setStep] = useState<Step>(0);
 
   // Step 1 — format
-  const [format, setFormat] = useState<{ name: string; w: number; h: number }>(CANVAS_PRESETS.find((preset) => preset.name === "Slide 16:9") as { name: string; w: number; h: number });
+  const [format, setFormat] = useState<{ name: string; w: number; h: number }>(
+    CANVAS_PRESETS.find((preset) => preset.name === "Slide 16:9") as {
+      name: string;
+      w: number;
+      h: number;
+    },
+  );
 
   // Step 2 — template
   const [useTemplate, setUseTemplate] = useState(false);
@@ -55,7 +72,9 @@ export function WelcomeDialog() {
         setTemplates(tpls);
         tpls.forEach((t) => ensureFontsForPages(t.pages as never));
       })
-      .catch(() => setTemplatesError("Couldn't load templates — you can start from a blank canvas."))
+      .catch(() =>
+        setTemplatesError("Couldn't load templates — you can start from a blank canvas."),
+      )
       .finally(() => setTemplatesLoading(false));
   }, [open, useTemplate, templates.length, templatesLoading]);
 
@@ -90,7 +109,12 @@ export function WelcomeDialog() {
     (step === 1 && useTemplate && !!templates.length && !pickedTemplate);
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) skip(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) skip();
+      }}
+    >
       <DialogContent className="max-w-xl border-slate-200 bg-white p-0">
         {/* Header */}
         <div className="flex items-center justify-between gap-3 rounded-t-2xl border-b border-slate-200 bg-gradient-to-br from-blue-50 to-white px-6 py-5">
@@ -99,15 +123,24 @@ export function WelcomeDialog() {
               <MonitorPlay className="size-5" />
             </span>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">Welcome to DiapoLab</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                Welcome to DiapoLab
+              </p>
               <h2 className="text-base font-semibold text-slate-900">
-                {step === 0 ? "What are you making today?" : step === 1 ? "Start from a template?" : "Where do you want to begin?"}
+                {step === 0
+                  ? "What are you making today?"
+                  : step === 1
+                    ? "Start from a template?"
+                    : "Where do you want to begin?"}
               </h2>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
             {[0, 1, 2].map((i) => (
-              <span key={i} className={`h-1.5 rounded-full transition-all ${i === step ? "w-5 bg-blue-600" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200"}`} />
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${i === step ? "w-5 bg-blue-600" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200"}`}
+              />
             ))}
           </div>
         </div>
@@ -116,7 +149,9 @@ export function WelcomeDialog() {
         <div className="min-h-[260px] px-6 py-5">
           {step === 0 && (
             <>
-              <p className="mb-3 text-xs text-slate-500">Pick a format for your canvas — you can resize anytime.</p>
+              <p className="mb-3 text-xs text-slate-500">
+                Pick a format for your canvas — you can resize anytime.
+              </p>
               <div className="grid grid-cols-3 gap-2.5">
                 {CANVAS_PRESETS.map((p) => {
                   const active = format.name === p.name;
@@ -137,10 +172,15 @@ export function WelcomeDialog() {
                       )}
                       <span
                         className={`block rounded-[3px] border-2 ${active ? "border-blue-400 bg-blue-100" : "border-slate-300 bg-slate-100"}`}
-                        style={{ width: p.w >= p.h ? 34 : Math.round(34 * (p.w / p.h)), height: p.w >= p.h ? Math.round(26 * (p.h / p.w)) || 16 : 26 }}
+                        style={{
+                          width: p.w >= p.h ? 34 : Math.round(34 * (p.w / p.h)),
+                          height: p.w >= p.h ? Math.round(26 * (p.h / p.w)) || 16 : 26,
+                        }}
                       />
                       <span className="text-[11px] font-semibold text-slate-800">{p.name}</span>
-                      <span className="font-mono text-[9px] text-slate-400">{p.w}×{p.h}</span>
+                      <span className="font-mono text-[9px] text-slate-400">
+                        {p.w}×{p.h}
+                      </span>
                     </button>
                   );
                 })}
@@ -152,31 +192,50 @@ export function WelcomeDialog() {
             <>
               <div className="grid grid-cols-2 gap-2.5">
                 <button
-                  onClick={() => { setUseTemplate(false); setPickedTemplate(null); }}
+                  onClick={() => {
+                    setUseTemplate(false);
+                    setPickedTemplate(null);
+                  }}
                   className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-left transition ${
-                    !useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                    !useTemplate
+                      ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
+                      : "border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span
+                    className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}
+                  >
                     <LayoutGrid className="size-3.5" />
                   </span>
                   <span>
-                    <span className="block text-xs font-semibold text-slate-800">Start from a blank canvas</span>
-                    <span className="mt-0.5 block text-[10px] text-slate-400">Build it your way, from scratch.</span>
+                    <span className="block text-xs font-semibold text-slate-800">
+                      Start from a blank canvas
+                    </span>
+                    <span className="mt-0.5 block text-[10px] text-slate-400">
+                      Build it your way, from scratch.
+                    </span>
                   </span>
                 </button>
                 <button
                   onClick={() => setUseTemplate(true)}
                   className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-left transition ${
-                    useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                    useTemplate
+                      ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
+                      : "border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span
+                    className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}
+                  >
                     <Layers className="size-3.5" />
                   </span>
                   <span>
-                    <span className="block text-xs font-semibold text-slate-800">Use a public template</span>
-                    <span className="mt-0.5 block text-[10px] text-slate-400">Community & built-in decks.</span>
+                    <span className="block text-xs font-semibold text-slate-800">
+                      Use a public template
+                    </span>
+                    <span className="mt-0.5 block text-[10px] text-slate-400">
+                      Community & built-in decks.
+                    </span>
                   </span>
                 </button>
               </div>
@@ -188,7 +247,9 @@ export function WelcomeDialog() {
                       <Loader2 className="size-3.5 animate-spin text-blue-500" /> Loading templates…
                     </div>
                   ) : templatesError ? (
-                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">{templatesError}</div>
+                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">
+                      {templatesError}
+                    </div>
                   ) : templates.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-slate-200 px-3.5 py-8 text-center text-[11px] text-slate-400">
                       No public templates yet — start blank for now.
@@ -202,15 +263,25 @@ export function WelcomeDialog() {
                             key={t.id}
                             onClick={() => setPickedTemplate(t)}
                             className={`group relative overflow-hidden rounded-xl border text-left transition-all ${
-                              active ? "border-blue-600 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-blue-300"
+                              active
+                                ? "border-blue-600 ring-2 ring-blue-500/25"
+                                : "border-slate-200 hover:border-blue-300"
                             }`}
                           >
                             {t.pages?.[0] ? (
-                              <SlideThumbnail page={t.pages[0] as Page} canvasW={t.canvas_w} canvasH={t.canvas_h} className="aspect-video w-full" />
+                              <SlideThumbnail
+                                page={t.pages[0] as Page}
+                                canvasW={t.canvas_w}
+                                canvasH={t.canvas_h}
+                                className="aspect-video w-full"
+                              />
                             ) : (
                               <div className="aspect-video w-full bg-slate-100" />
                             )}
-                            <span className="block truncate border-t border-slate-100 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700" title={t.name}>
+                            <span
+                              className="block truncate border-t border-slate-100 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700"
+                              title={t.name}
+                            >
                               {t.name}
                             </span>
                             {active && (
@@ -230,7 +301,9 @@ export function WelcomeDialog() {
 
           {step === 2 && (
             <>
-              <p className="mb-3 text-xs text-slate-500">Which panel should open first in the sidebar?</p>
+              <p className="mb-3 text-xs text-slate-500">
+                Which panel should open first in the sidebar?
+              </p>
               <div className="grid grid-cols-2 gap-2.5">
                 {PANEL_OPTIONS.map(({ id, label, icon: Icon, hint }) => {
                   const active = panel === id;
@@ -239,10 +312,14 @@ export function WelcomeDialog() {
                       key={id}
                       onClick={() => setPanel(id)}
                       className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
-                        active ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                        active
+                          ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
+                          : "border-slate-200 bg-white hover:border-blue-300"
                       }`}
                     >
-                      <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}>
+                      <span
+                        className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}
+                      >
                         <Icon className="size-4" />
                       </span>
                       <span className="min-w-0">
@@ -259,7 +336,10 @@ export function WelcomeDialog() {
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 rounded-b-2xl border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <button onClick={skip} className="text-[11px] font-medium text-slate-400 transition hover:text-slate-600">
+          <button
+            onClick={skip}
+            className="text-[11px] font-medium text-slate-400 transition hover:text-slate-600"
+          >
             Skip
           </button>
           <div className="flex items-center gap-2">

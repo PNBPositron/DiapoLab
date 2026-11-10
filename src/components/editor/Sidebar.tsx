@@ -54,8 +54,11 @@ export function Sidebar() {
       ? customThemes.find((t) => `${CUSTOM_THEME_PREFIX}${t.id}` === editorTheme)
       : undefined;
     root.dataset.editorTheme = custom ? "custom" : editorTheme;
-    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS))) root.style.removeProperty(key);
-    if (custom) for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) root.style.setProperty(k, v);
+    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS)))
+      root.style.removeProperty(key);
+    if (custom)
+      for (const [k, v] of Object.entries(themeCssVars(custom.tokens)))
+        root.style.setProperty(k, v);
   }, [editorTheme, customThemes]);
 
   useEffect(() => {
@@ -88,7 +91,11 @@ export function Sidebar() {
   }, [visibleKey, tool, setTool]);
 
   return (
-    <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
+    <aside
+      className="editor-ui relative flex h-full"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
       <nav
         style={{ paddingBottom: pagesInset || undefined }}
         className="editor-tool-rail flex h-full w-[4.5rem] min-h-0 flex-col justify-center gap-2.5 overflow-y-auto overscroll-contain p-2 pt-3 pb-6"
@@ -100,11 +107,15 @@ export function Sidebar() {
             <button
               key={t.id}
               onClick={() => {
-                  if (t.id === "my-designs") { setHovering(false); setTool(t.id); return; }
-                  setPinned(tool === t.id ? false : true);
+                if (t.id === "my-designs") {
+                  setHovering(false);
                   setTool(t.id);
-                  setHovering(true);
-                }}
+                  return;
+                }
+                setPinned(tool === t.id ? false : true);
+                setTool(t.id);
+                setHovering(true);
+              }}
               title={t.label}
               className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
                 active
@@ -118,7 +129,11 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}>
+      <div
+        aria-hidden={!panelOpen}
+        style={{ transition: panelTransition }}
+        className={`editor-side-panel absolute left-[4.5rem] top-2 z-40 h-[calc(100%-1rem)] w-[280px] origin-left overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_12px_32px_-4px_rgba(15,23,42,0.18)] will-change-[transform,opacity,filter] ${panelOpen ? `translate-x-0 opacity-100 ${noMotion ? "" : "scale-x-100 blur-0"}` : `pointer-events-none -translate-x-[106%] opacity-0 ${noMotion ? "" : "scale-x-[0.97] blur-[2px]"}`}`}
+      >
         {tool === "home" && <TemplatesPanel />}
         {tool === "text" && <TextPanel />}
         {tool === "elements" && <ElementsPanel />}

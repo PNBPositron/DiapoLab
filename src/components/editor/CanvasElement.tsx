@@ -24,7 +24,17 @@ import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2, Play, Pause, VolumeX } from "lucide-react";
+import {
+  HelpCircle,
+  Check,
+  X as XIcon,
+  QrCode,
+  Lock,
+  Volume2,
+  Play,
+  Pause,
+  VolumeX,
+} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -186,7 +196,8 @@ const interpFilters = (
   const f2 = { ...DEFAULT_FILTERS, ...(b ?? {}) } as Record<string, number>;
   const out: Record<string, number> = {};
   for (const key of Object.keys(f1))
-    if (typeof f1[key] === "number" && typeof f2[key] === "number") out[key] = kfLerp(f1[key], f2[key], p);
+    if (typeof f1[key] === "number" && typeof f2[key] === "number")
+      out[key] = kfLerp(f1[key], f2[key], p);
   return out as unknown as ImageFilters;
 };
 
@@ -384,7 +395,8 @@ export function CanvasElement({
   const cropping = !presenting && !preview && croppingId === sourceElement.id;
   // Natural size of the rendered image — needed to lay out PPT-style crop.
   const [natSize, setNatSize] = useState<{ w: number; h: number } | null>(null);
-  const cropLayout = sourceElement.type === "image" ? cropRectLayout(sourceElement as never, natSize) : null;
+  const cropLayout =
+    sourceElement.type === "image" ? cropRectLayout(sourceElement as never, natSize) : null;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -531,15 +543,15 @@ export function CanvasElement({
     const kfFiltersOf = (k: ElementKeyframe) =>
       k.filters ?? (k.snapshot as { filters?: ImageFilters } | undefined)?.filters;
     const kfEffectOf = (k: ElementKeyframe) =>
-      k.effect ??
-      (k.snapshot as { effect?: ElementKeyframe["effect"] } | undefined)?.effect;
+      k.effect ?? (k.snapshot as { effect?: ElementKeyframe["effect"] } | undefined)?.effect;
     const anyShadow = sorted.some((k) => kfShadowOf(k));
     const anyFilters = sorted.some((k) => kfFiltersOf(k));
     const anyEffect = sorted.some((k) => kfEffectOf(k));
     if (!anyShadow && !anyFilters && !anyEffect) return;
     const duration = Math.max(
       200,
-      (sourceElement as { keyframeDuration?: number }).keyframeDuration ?? sorted[sorted.length - 1].t,
+      (sourceElement as { keyframeDuration?: number }).keyframeDuration ??
+        sorted[sorted.length - 1].t,
     );
     const start = performance.now();
     let raf = 0;
@@ -1052,7 +1064,10 @@ export function CanvasElement({
           useEditor.getState().setCroppingId(element.id);
         }
         // Double-click any rich element: open the inspector on its content.
-        if (!presenting && ["ui", "chart", "quiz", "table", "button", "icon", "embed"].includes(element.type)) {
+        if (
+          !presenting &&
+          ["ui", "chart", "quiz", "table", "button", "icon", "embed"].includes(element.type)
+        ) {
           e.stopPropagation();
           window.dispatchEvent(new CustomEvent("diapolab:open-inspector"));
         }
@@ -1200,6 +1215,9 @@ export function CanvasElement({
             <div
               contentEditable={editing}
               suppressContentEditableWarning
+              aria-label={editing ? "Edit text" : undefined}
+              spellCheck={editing}
+              className={editing ? "canvas-text-editor is-editing" : "canvas-text-editor"}
               onBlur={(e) => {
                 update(element.id, { text: e.currentTarget.innerText || "" });
                 setEditing(false);
@@ -1235,13 +1253,10 @@ export function CanvasElement({
                 position: "absolute",
                 inset: 0,
                 ...fx,
-                filter: [
-                  fx.filter,
-                  sFilter,
-                  element.feather ? `blur(${element.feather}px)` : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ") || undefined,
+                filter:
+                  [fx.filter, sFilter, element.feather ? `blur(${element.feather}px)` : ""]
+                    .filter(Boolean)
+                    .join(" ") || undefined,
               }}
             >
               {/* Slide-bg knockout: an overlay clipped by the shape's own
@@ -1346,12 +1361,7 @@ export function CanvasElement({
           >
             {element.title ?? element.src.split("/").pop()?.slice(0, 40) ?? "Audio"}
           </span>
-          <audio
-            src={element.src}
-            loop={element.loop ?? true}
-            controls
-            style={{ width: "100%" }}
-          />
+          <audio src={element.src} loop={element.loop ?? true} controls style={{ width: "100%" }} />
         </div>
       )}
       {element.type === "image" && element.src.toLowerCase().startsWith("data:video/") && (
@@ -1627,14 +1637,12 @@ export function CanvasElement({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    useEditor
-                      .getState()
-                      .update(element.id, {
-                        cropZoom: 1,
-                        cropX: 50,
-                        cropY: 50,
-                        cropRect: undefined,
-                      });
+                    useEditor.getState().update(element.id, {
+                      cropZoom: 1,
+                      cropX: 50,
+                      cropY: 50,
+                      cropRect: undefined,
+                    });
                   }}
                   style={{
                     border: "2px solid #0a0f1f",
@@ -1838,7 +1846,24 @@ export function CanvasElement({
         })()}
 
       {element.locked && !preview && !presenting && (
-        <div title="Element locked — unlock in the inspector" style={{ position: "absolute", right: -12, top: -12, zIndex: 6, display: "grid", placeItems: "center", width: 22, height: 22, borderRadius: 999, background: "#0f172a", color: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)", pointerEvents: "none" }}>
+        <div
+          title="Element locked — unlock in the inspector"
+          style={{
+            position: "absolute",
+            right: -12,
+            top: -12,
+            zIndex: 6,
+            display: "grid",
+            placeItems: "center",
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            background: "#0f172a",
+            color: "#ffffff",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            pointerEvents: "none",
+          }}
+        >
           <Lock className="size-3" />
         </div>
       )}
@@ -1895,14 +1920,22 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
     const chan = supabase.channel("poll-" + (element.liveKey ?? element.id));
     chanRef.current = chan;
     chan
-      .on("broadcast", { event: "vote" }, ({ payload }: any) => {
-        const optionId = payload?.optionId;
-        if (optionId) setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
-      })
+      .on(
+        "broadcast",
+        { event: "vote" },
+        ({ payload }: { payload?: { optionId?: string; votes?: Record<string, number> } }) => {
+          const optionId = payload?.optionId;
+          if (optionId) setVotes((v) => ({ ...v, [optionId]: (v[optionId] ?? 0) + 1 }));
+        },
+      )
       .on("broadcast", { event: "reset" }, () => setVotes({}))
-      .on("broadcast", { event: "tally" }, ({ payload }: any) => {
-        if (payload?.votes) setVotes(payload.votes);
-      })
+      .on(
+        "broadcast",
+        { event: "tally" },
+        ({ payload }: { payload?: { optionId?: string; votes?: Record<string, number> } }) => {
+          if (payload?.votes) setVotes(payload.votes);
+        },
+      )
       .on("broadcast", { event: "hello" }, () => {
         if (!interactiveRef.current) return;
         const el = elRef.current;
@@ -2266,7 +2299,9 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
 }
 
 /** Per-pack chart recipes — how the plot frame and grid "sound" like the pack. */
-const CHART_STYLE_RECIPES: Partial<Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>> = {
+const CHART_STYLE_RECIPES: Partial<
+  Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>
+> = {
   sketch: { dashGrid: true },
   swiss: { flat: true, radius: 0 },
   cyber: { glow: true },
@@ -2455,7 +2490,7 @@ function ChartRender({ element }: { element: ChartElement }) {
           element.effect === "liquid_glass"
             ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)"
             : chartRecipe.glow
-              ? `0 0 24px ${(element.colors?.[0] ?? "#22d3ee")}55`
+              ? `0 0 24px ${element.colors?.[0] ?? "#22d3ee"}55`
               : chartRecipe.flat
                 ? undefined
                 : theme
@@ -2485,7 +2520,15 @@ function ChartRender({ element }: { element: ChartElement }) {
         )}
         {showAxes && chart !== "pie" && chart !== "donut" && (
           <g>
-            <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke={stroke} strokeWidth={1} strokeDasharray={gridDash} />
+            <line
+              x1={padL}
+              y1={padT}
+              x2={padL}
+              y2={padT + plotH}
+              stroke={stroke}
+              strokeWidth={1}
+              strokeDasharray={gridDash}
+            />
             <line
               x1={padL}
               y1={padT + plotH}
@@ -2607,7 +2650,10 @@ function TableRender({ element }: { element: TableElement }) {
                   : ri < element.rows.length - 1
                     ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}`
                     : undefined,
-                borderRight: !noVGrid && ci < cols - 1 ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}` : undefined,
+                borderRight:
+                  !noVGrid && ci < cols - 1
+                    ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}`
+                    : undefined,
               }}
             >
               {cell}

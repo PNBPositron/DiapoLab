@@ -1,10 +1,40 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink } from "lucide-react";
-import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId } from "@/store/settings";
+import {
+  ChevronDown,
+  Loader2,
+  Pencil,
+  Trash2,
+  X,
+  Settings as SettingsIcon,
+  Code2,
+  LayoutDashboard,
+  Sparkles,
+  Palette,
+  Globe,
+  Check,
+  Link2,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
+import {
+  useSettings,
+  PANEL_LABELS,
+  EDITOR_THEMES,
+  springEasing,
+  type PanelId,
+} from "@/store/settings";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditor } from "@/store/editor";
-import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, listMyShareLinks, deleteShareLink, type PublicTemplate, type ShareLink } from "@/lib/designs";
+import {
+  listMyPublicTemplates,
+  renamePublicTemplate,
+  deletePublicTemplate,
+  listMyShareLinks,
+  deleteShareLink,
+  type PublicTemplate,
+  type ShareLink,
+} from "@/lib/designs";
 
 const title = "text-[11px] font-semibold tracking-[0.04em] text-slate-700";
 const help = "mt-1 text-[10px] leading-relaxed text-slate-400";
@@ -32,14 +62,19 @@ function Section({
     <section className="group mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-blue-200/80 hover:shadow-[0_8px_24px_rgba(37,99,235,0.07)]">
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
         {collapsible ? (
-          <button onClick={() => setOpen((o) => !o)} className="flex min-w-0 items-center gap-3 text-left">
+          <button
+            onClick={() => setOpen((o) => !o)}
+            className="flex min-w-0 items-center gap-3 text-left"
+          >
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
               {icon}
             </span>
             <span className="min-w-0">
               <span className={`flex items-center gap-1.5 ${title}`}>
                 {label}
-                <ChevronDown className={`size-3.5 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`size-3.5 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                />
               </span>
               {desc && <span className={help + " block"}>{desc}</span>}
             </span>
@@ -80,7 +115,20 @@ function Switch({ on, onClick, label }: { on: boolean; onClick: () => void; labe
 }
 
 export function SettingsDialog({ onClose }: { onClose: () => void }) {
-  const { panels, togglePanel, resetPanels, panelDurationMs, setPanelDurationMs, panelStiffness, setPanelStiffness, reduceMotion, setReduceMotion, resetMotion, editorTheme, setEditorTheme } = useSettings();
+  const {
+    panels,
+    togglePanel,
+    resetPanels,
+    panelDurationMs,
+    setPanelDurationMs,
+    panelStiffness,
+    setPanelStiffness,
+    reduceMotion,
+    setReduceMotion,
+    resetMotion,
+    editorTheme,
+    setEditorTheme,
+  } = useSettings();
   const { user } = useAuth();
   const { pages, loadPages } = useEditor();
   const [motionOpen, setMotionOpen] = useState(false);
@@ -90,14 +138,22 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const toDraft = () => {
     const map = new Map<string, string>();
     const byValue = new Map<string, string>();
-    const text = JSON.stringify(pages, (_k, v) => {
-      if (typeof v === "string" && v.startsWith("data:")) {
-        let key = byValue.get(v);
-        if (!key) { key = `[embedded-image-${map.size + 1}]`; map.set(key, v); byValue.set(v, key); }
-        return key;
-      }
-      return v;
-    }, 2);
+    const text = JSON.stringify(
+      pages,
+      (_k, v) => {
+        if (typeof v === "string" && v.startsWith("data:")) {
+          let key = byValue.get(v);
+          if (!key) {
+            key = `[embedded-image-${map.size + 1}]`;
+            map.set(key, v);
+            byValue.set(v, key);
+          }
+          return key;
+        }
+        return v;
+      },
+      2,
+    );
     imageMap.current = map;
     return text;
   };
@@ -112,34 +168,62 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) { setTemplates([]); setShareLinks([]); return; }
-    listMyPublicTemplates().then(setTemplates).catch((e) => setError(e instanceof Error ? e.message : "Failed to load templates"));
-    listMyShareLinks().then(setShareLinks).catch((e) => setShareError(e instanceof Error ? e.message : "Failed to load share links"));
+    if (!user) {
+      setTemplates([]);
+      setShareLinks([]);
+      return;
+    }
+    listMyPublicTemplates()
+      .then(setTemplates)
+      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load templates"));
+    listMyShareLinks()
+      .then(setShareLinks)
+      .catch((e) => setShareError(e instanceof Error ? e.message : "Failed to load share links"));
   }, [user]);
 
   const applyJson = () => {
     try {
-      const parsed = JSON.parse(jsonDraft, (_k, v) => (typeof v === "string" && imageMap.current.has(v) ? imageMap.current.get(v) : v));
-      if (!Array.isArray(parsed) || parsed.some((page) => !page || !Array.isArray(page.elements))) throw new Error("Expected an array of slides with elements.");
-      loadPages(parsed); setJsonStatus("Slideshow updated");
-    } catch (e) { setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON"); }
+      const parsed = JSON.parse(jsonDraft, (_k, v) =>
+        typeof v === "string" && imageMap.current.has(v) ? imageMap.current.get(v) : v,
+      );
+      if (!Array.isArray(parsed) || parsed.some((page) => !page || !Array.isArray(page.elements)))
+        throw new Error("Expected an array of slides with elements.");
+      loadPages(parsed);
+      setJsonStatus("Slideshow updated");
+    } catch (e) {
+      setJsonStatus(e instanceof Error ? e.message : "Invalid slideshow JSON");
+    }
   };
   const rename = async (template: PublicTemplate) => {
     const name = window.prompt("Template name", template.name);
     if (!name || name === template.name) return;
     setBusy(template.id);
-    try { await renamePublicTemplate(template.id, name); setTemplates((list) => (list ?? []).map((item) => item.id === template.id ? { ...item, name } : item)); }
-    catch (e) { setError(e instanceof Error ? e.message : "Rename failed"); }
-    finally { setBusy(null); }
+    try {
+      await renamePublicTemplate(template.id, name);
+      setTemplates((list) =>
+        (list ?? []).map((item) => (item.id === template.id ? { ...item, name } : item)),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Rename failed");
+    } finally {
+      setBusy(null);
+    }
   };
   const remove = async (template: PublicTemplate) => {
-    if (!window.confirm(`Unpublish "${template.name}"? This removes it from the community.`)) return;
+    if (!window.confirm(`Unpublish "${template.name}"? This removes it from the community.`))
+      return;
     setBusy(template.id);
-    try { await deletePublicTemplate(template.id); setTemplates((list) => (list ?? []).filter((item) => item.id !== template.id)); }
-    catch (e) { setError(e instanceof Error ? e.message : "Delete failed"); }
-    finally { setBusy(null); }
+    try {
+      await deletePublicTemplate(template.id);
+      setTemplates((list) => (list ?? []).filter((item) => item.id !== template.id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setBusy(null);
+    }
   };
-  const shareUrlFor = (link: ShareLink) => `${window.location.origin}/t/${link.design_id}?share=${link.token}`;
+  const shareUrlFor = (link: ShareLink) =>
+    `${window.location.origin}/t/${link.design_id}?share=${link.token}`;
   const copyShare = async (link: ShareLink) => {
     try {
       await navigator.clipboard.writeText(shareUrlFor(link));
@@ -150,20 +234,31 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
     }
   };
   const removeShare = async (link: ShareLink) => {
-    if (!window.confirm(`Revoke this private link?
+    if (
+      !window.confirm(`Revoke this private link?
 
-"${link.design_name ?? "Deleted design"}" — anyone holding the link will lose access.`)) return;
+"${link.design_name ?? "Deleted design"}" — anyone holding the link will lose access.`)
+    )
+      return;
     setShareBusy(link.id);
-    try { await deleteShareLink(link.id); setShareLinks((list) => (list ?? []).filter((l) => l.id !== link.id)); }
-    catch (e) { setShareError(e instanceof Error ? e.message : "Revoke failed"); }
-    finally { setShareBusy(null); }
+    try {
+      await deleteShareLink(link.id);
+      setShareLinks((list) => (list ?? []).filter((l) => l.id !== link.id));
+    } catch (e) {
+      setShareError(e instanceof Error ? e.message : "Revoke failed");
+    } finally {
+      setShareBusy(null);
+    }
   };
 
   const visibleCount = (Object.keys(PANEL_LABELS) as PanelId[]).filter((id) => panels[id]).length;
   const totalPanels = Object.keys(PANEL_LABELS).length;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6"
+      onClick={onClose}
+    >
       <div
         className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-3xl border border-slate-200 bg-slate-50/95 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:my-6"
         onClick={(event) => event.stopPropagation()}
@@ -209,7 +304,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               <Switch
                 on={developerOpen}
                 label="Developer mode"
-                onClick={() => { setJsonDraft(toDraft()); setJsonStatus(null); setDeveloperOpen((open) => !open); }}
+                onClick={() => {
+                  setJsonDraft(toDraft());
+                  setJsonStatus(null);
+                  setDeveloperOpen((open) => !open);
+                }}
               />
             }
           />
@@ -218,12 +317,17 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               <div className="p-4 sm:p-5">
                 <textarea
                   value={jsonDraft}
-                  onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }}
+                  onChange={(event) => {
+                    setJsonDraft(event.target.value);
+                    setJsonStatus(null);
+                  }}
                   spellCheck={false}
                   className="h-72 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
                 />
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className={`font-mono text-[10px] ${jsonStatus?.includes("updated") ? "text-blue-400" : "text-slate-400"}`}>
+                  <span
+                    className={`font-mono text-[10px] ${jsonStatus?.includes("updated") ? "text-blue-400" : "text-slate-400"}`}
+                  >
                     {jsonStatus ?? `${pages.length} slides loaded`}
                   </span>
                   <button
@@ -243,7 +347,10 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             label="Visible panels"
             desc="Choose which tools appear in the editor sidebar."
             trailing={
-              <button onClick={resetPanels} className="shrink-0 text-[10px] font-medium text-slate-400 underline transition-colors hover:text-slate-700">
+              <button
+                onClick={resetPanels}
+                className="shrink-0 text-[10px] font-medium text-slate-400 underline transition-colors hover:text-slate-700"
+              >
                 Reset
               </button>
             }
@@ -286,7 +393,10 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             collapsible
             defaultOpen={false}
             trailing={
-              <button onClick={resetMotion} className="shrink-0 text-[10px] font-medium text-slate-400 underline transition-colors hover:text-slate-700">
+              <button
+                onClick={resetMotion}
+                className="shrink-0 text-[10px] font-medium text-slate-400 underline transition-colors hover:text-slate-700"
+              >
                 Reset
               </button>
             }
@@ -321,7 +431,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 <div
                   key={`${panelDurationMs}-${panelStiffness}-${reduceMotion}`}
                   className="h-full w-1/3 bg-blue-500"
-                  style={{ animation: reduceMotion ? undefined : `panel-motion-demo ${panelDurationMs}ms ${springEasing(panelStiffness)} both` }}
+                  style={{
+                    animation: reduceMotion
+                      ? undefined
+                      : `panel-motion-demo ${panelDurationMs}ms ${springEasing(panelStiffness)} both`,
+                  }}
                 />
               </div>
               <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
@@ -329,7 +443,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   <div className="text-[11px] font-semibold text-slate-700">Reduced motion</div>
                   <p className="mt-0.5 text-[10px] text-slate-400">Disable panel animations.</p>
                 </div>
-                <Switch on={reduceMotion} label="Reduced motion" onClick={() => setReduceMotion(!reduceMotion)} />
+                <Switch
+                  on={reduceMotion}
+                  label="Reduced motion"
+                  onClick={() => setReduceMotion(!reduceMotion)}
+                />
               </div>
             </div>
           </Section>
@@ -358,7 +476,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         <Check className="size-2.5" strokeWidth={3} />
                       </span>
                     )}
-                    <div className={`text-xs font-semibold ${on ? "text-blue-700" : "text-slate-600"}`}>{theme.label}</div>
+                    <div
+                      className={`text-xs font-semibold ${on ? "text-blue-700" : "text-slate-600"}`}
+                    >
+                      {theme.label}
+                    </div>
                     <div className="mt-1 text-[10px] text-slate-400">{theme.hint}</div>
                   </button>
                 );
@@ -370,14 +492,20 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           <Section
             icon={<Link2 className="size-4" />}
             label="Private share links"
-            desc={!user ? "Sign in to manage your private links." : "Anyone holding a link can view the deck. Revoking deletes the link instantly."}
+            desc={
+              !user
+                ? "Sign in to manage your private links."
+                : "Anyone holding a link can view the deck. Revoking deletes the link instantly."
+            }
           >
             {!user ? null : shareLinks === null ? (
               <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
                 <Loader2 className="size-3 animate-spin" /> Loading…
               </div>
             ) : shareLinks.length === 0 ? (
-              <p className={help}>No private links yet. Create one from the share menu of a saved design.</p>
+              <p className={help}>
+                No private links yet. Create one from the share menu of a saved design.
+              </p>
             ) : (
               <ul className="space-y-2">
                 {shareLinks.map((link) => {
@@ -391,9 +519,15 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         <Link2 className="size-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-xs font-medium text-slate-700">{link.design_name ?? "Deleted design"}</div>
-                        <div className="truncate font-mono text-[10px] text-slate-400" title={url}>{url}</div>
-                        <div className="text-[10px] text-slate-400">Created {new Date(link.created_at).toLocaleDateString()}</div>
+                        <div className="truncate text-xs font-medium text-slate-700">
+                          {link.design_name ?? "Deleted design"}
+                        </div>
+                        <div className="truncate font-mono text-[10px] text-slate-400" title={url}>
+                          {url}
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          Created {new Date(link.created_at).toLocaleDateString()}
+                        </div>
                       </div>
                       <button
                         onClick={() => copyShare(link)}
@@ -402,7 +536,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         aria-label={`Copy link for ${link.design_name ?? "deleted design"}`}
                         title="Copy link"
                       >
-                        {copiedLinkId === link.id ? <Check className="size-3.5 text-blue-600" /> : <Copy className="size-3.5" />}
+                        {copiedLinkId === link.id ? (
+                          <Check className="size-3.5 text-blue-600" />
+                        ) : (
+                          <Copy className="size-3.5" />
+                        )}
                       </button>
                       <a
                         href={url}
@@ -421,7 +559,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         aria-label={`Revoke link for ${link.design_name ?? "deleted design"}`}
                         title="Revoke link"
                       >
-                        {shareBusy === link.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                        {shareBusy === link.id ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3.5" />
+                        )}
                       </button>
                     </li>
                   );
@@ -451,12 +593,21 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                     className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
                   >
                     <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                      {template.thumbnail && <img src={template.thumbnail} alt="" className="h-full w-full object-cover" />}
+                      {template.thumbnail && (
+                        <img
+                          src={template.thumbnail}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-medium text-slate-700">{template.name}</div>
+                      <div className="truncate text-xs font-medium text-slate-700">
+                        {template.name}
+                      </div>
                       <div className="text-[10px] text-slate-400">
-                        {new Date(template.created_at).toLocaleDateString()} · {template.pages?.length ?? 0} slides
+                        {new Date(template.created_at).toLocaleDateString()} ·{" "}
+                        {template.pages?.length ?? 0} slides
                       </div>
                     </div>
                     <button
@@ -473,7 +624,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                       className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
                       aria-label={`Unpublish ${template.name}`}
                     >
-                      {busy === template.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                      {busy === template.id ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="size-3.5" />
+                      )}
                     </button>
                   </li>
                 ))}

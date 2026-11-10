@@ -16,6 +16,9 @@ export default defineTool({
       .order("created_at", { ascending: false })
       .limit(limit ?? 20);
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    return { content: [{ type: "text", text: JSON.stringify(data) }], structuredContent: { templates: data ?? [] } };
+    return {
+      content: [{ type: "text", text: JSON.stringify(data) }],
+      structuredContent: { templates: data ?? [] },
+    };
   },
 });

@@ -51,11 +51,7 @@ export async function saveDesign(input: {
     if (error) throw error;
     return data as unknown as SavedDesign;
   }
-  const { data, error } = await supabase
-    .from("designs")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("designs").insert(payload).select().single();
   if (error) throw error;
   return data as unknown as SavedDesign;
 }
@@ -136,7 +132,11 @@ export type PublicTemplate = {
   style?: string | null;
   creator?: string | null;
   license?: string | null;
-  creator_profile?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
+  creator_profile?: {
+    username: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {
@@ -149,7 +149,10 @@ export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const rows = (data ?? []) as unknown as PublicTemplate[];
   const ids = [...new Set(rows.map((row) => row.user_id))];
   if (!ids.length) return rows;
-  const { data: profiles } = await (supabase as any).from("profiles").select("id, username, display_name, avatar_url").in("id", ids);
+  const { data: profiles } = await (supabase as any)
+    .from("profiles")
+    .select("id, username, display_name, avatar_url")
+    .in("id", ids);
   const byId = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
   return rows.map((row) => ({ ...row, creator_profile: byId.get(row.user_id) ?? null }));
 }

@@ -296,15 +296,25 @@ export function Canvas() {
             {selectedId && (
               <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
-                  <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                  <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">
+                    Selected object motion
+                  </span>
+                  <span className="text-[9px] text-slate-400">
+                    {elements.find((element) => element.id === selectedId)?.type ?? "object"}
+                  </span>
                 </div>
                 <OptionGrid
                   columns={3}
                   label="Object animations"
                   value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
-                  onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
-                  options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({ value, label: short, icon }))}
+                  onChange={(animation) =>
+                    update(selectedId, { animation: animation as ElementAnimation })
+                  }
+                  options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({
+                    value,
+                    label: short,
+                    icon,
+                  }))}
                 />
               </div>
             )}
@@ -337,11 +347,9 @@ export function Canvas() {
             />
           </PopoverContent>
         </Popover>
-
       </div>
 
       <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );
 }
-

@@ -49,7 +49,8 @@ import {
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-type CommandGroup = "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Add-ons" | "Links";
+type CommandGroup =
+  "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Add-ons" | "Links";
 
 type Command = {
   id: string;
@@ -198,7 +199,10 @@ export function CommandPalette({
         label: "Group selection",
         group: "Actions",
         icon: <Group className="size-4" />,
-        hint: store.selectedIds.length > 1 ? store.selectedIds.length + " elements selected" : "select 2+ elements first (shift+click)",
+        hint:
+          store.selectedIds.length > 1
+            ? store.selectedIds.length + " elements selected"
+            : "select 2+ elements first (shift+click)",
         keywords: "group bind block together move",
         run: () => store.groupSelected(),
       },
@@ -556,7 +560,8 @@ export function CommandPalette({
   if (!open) return null;
 
   const runCommand = (c: Command) => {
-    if (c.href) window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
+    if (c.href)
+      window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
     else c.run?.();
     if (c.run) saveRecent(c.id);
     onOpenChange(false);
@@ -599,7 +604,10 @@ export function CommandPalette({
         <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.06] to-transparent px-5">
           <div
             className="pointer-events-none absolute inset-0 opacity-60"
-            style={{ backgroundImage: "radial-gradient(circle at 88% -10%, rgba(99,102,241,0.35) 0%, transparent 55%), radial-gradient(circle at 0% 120%, rgba(14,165,233,0.22) 0%, transparent 50%)" }}
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 88% -10%, rgba(99,102,241,0.35) 0%, transparent 55%), radial-gradient(circle at 0% 120%, rgba(14,165,233,0.22) 0%, transparent 50%)",
+            }}
           />
           <div className="relative flex items-center gap-3 py-4">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.55)]">
@@ -629,7 +637,9 @@ export function CommandPalette({
               </span>
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-300">No results for “{query}”</p>
-                <p className="mt-1 text-[11px] text-slate-500">Try “insert”, “paint”, “add-ons”, “present”…</p>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Try “insert”, “paint”, “add-ons”, “present”…
+                </p>
               </div>
             </div>
           ) : (
@@ -650,7 +660,9 @@ export function CommandPalette({
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => runCommand(c)}
                     className={`flex w-full items-center gap-3 rounded-2xl px-2.5 py-2.5 text-left transition-all duration-75 ${
-                      active ? "bg-indigo-500/15 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]" : "text-slate-300 hover:bg-white/5"
+                      active
+                        ? "bg-indigo-500/15 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.35)]"
+                        : "text-slate-300 hover:bg-white/5"
                     }`}
                   >
                     <span
@@ -667,9 +679,7 @@ export function CommandPalette({
                         {highlightLabel(c.label, query)}
                       </span>
                       {c.hint && (
-                        <span className="block truncate text-[10px] text-slate-500">
-                          {c.hint}
-                        </span>
+                        <span className="block truncate text-[10px] text-slate-500">{c.hint}</span>
                       )}
                     </span>
                     {c.href && (
@@ -693,9 +703,7 @@ export function CommandPalette({
                         ))}
                       </span>
                     )}
-                    {active && (
-                      <CornerDownLeft className="size-3.5 shrink-0 text-sky-400" />
-                    )}
+                    {active && <CornerDownLeft className="size-3.5 shrink-0 text-sky-400" />}
                   </button>
                 </div>
               );
@@ -713,9 +721,7 @@ export function CommandPalette({
             <CornerDownLeft className="size-3" /> run
           </span>
           <span className="ml-auto flex items-center gap-1">
-            <kbd className="rounded border border-white/10 bg-white/5 px-1 font-mono">
-              Ctrl K
-            </kbd>
+            <kbd className="rounded border border-white/10 bg-white/5 px-1 font-mono">Ctrl K</kbd>
             toggle
           </span>
         </div>
@@ -723,4 +729,3 @@ export function CommandPalette({
     </div>
   );
 }
-

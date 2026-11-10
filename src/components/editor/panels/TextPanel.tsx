@@ -87,7 +87,10 @@ export function TextPanel() {
   const [activeCategory, setActiveCategory] = useState("All");
   const customFonts = useSettings((s) => s.customFonts);
   const allFonts = useMemo(
-    () => [...FONTS, ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" }))],
+    () => [
+      ...FONTS,
+      ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" })),
+    ],
     [customFonts],
   );
 
@@ -101,12 +104,15 @@ export function TextPanel() {
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-3 text-slate-800">
-      <PanelHeader kicker="Text" title="Text & fonts" description="Insert styled headings or pick a font from the library." icon={Type} />
+      <PanelHeader
+        kicker="Text"
+        title="Text & fonts"
+        description="Insert styled headings or pick a font from the library."
+        icon={Type}
+      />
       {/* Quick Add Presets */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold tracking-wider text-slate-400">
-          Text Styles
-        </span>
+        <span className="text-[11px] font-semibold tracking-wider text-slate-400">Text Styles</span>
         <div className="flex flex-col gap-2">
           {PRESETS.map((p) => {
             const Icon = p.Icon;
@@ -123,7 +129,7 @@ export function TextPanel() {
                       fontFamily: p.fontFamily,
                       height: p.fontSize * 1.4,
                       color: "#0f172a",
-                    })
+                    }),
                   )
                 }
                 className="group flex items-center justify-between rounded-xl border border-slate-200/90 bg-white p-3 text-left shadow-2xs transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-xs active:translate-y-0"
@@ -166,7 +172,12 @@ export function TextPanel() {
         </div>
 
         <SearchField value={search} onChange={setSearch} placeholder="Search fonts..." />
-        <ChipGroup value={activeCategory} options={CATEGORIES} onChange={setActiveCategory} label="Font categories" />
+        <ChipGroup
+          value={activeCategory}
+          options={CATEGORIES}
+          onChange={setActiveCategory}
+          label="Font categories"
+        />
       </div>
 
       {/* Font Specimen List */}
@@ -185,7 +196,7 @@ export function TextPanel() {
                   height: 120,
                   width: 600,
                   color: "#0f172a",
-                })
+                }),
               )
             }
             title={`Insert ${f.family}`}
@@ -203,9 +214,7 @@ export function TextPanel() {
               >
                 {f.sample ?? f.family}
               </span>
-              <span className="text-[10px] text-slate-400 font-sans">
-                {f.family}
-              </span>
+              <span className="text-[10px] text-slate-400 font-sans">{f.family}</span>
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
@@ -226,4 +235,3 @@ export function TextPanel() {
     </div>
   );
 }
-

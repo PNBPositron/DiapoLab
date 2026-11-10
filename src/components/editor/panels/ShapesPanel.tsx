@@ -63,7 +63,9 @@ const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string
       { kind: "corner_bracket", label: "Corner Bracket" },
     ],
   },
-  { name: "Bubbles & Badges", shapes: [
+  {
+    name: "Bubbles & Badges",
+    shapes: [
       { kind: "speech", label: "Speech" },
       { kind: "shield", label: "Shield" },
       { kind: "ticket", label: "Ticket" },
@@ -94,10 +96,27 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
     <div className="space-y-4">
       {!embedded && <PanelHeader title="Shapes" />}
 
-      <ChipGroup value={category} options={SHAPE_CATEGORIES.map(c => ({ value: c.name, label: `${c.name} (${c.shapes.length})` }))} onChange={setCategory} label="Shape categories" />
-      <OptionGrid columns={3} label="Shapes" options={activeShapes.map(s => ({ value: s.kind, label: s.label, preview: <ShapePreview kind={s.kind} fill="#ffffff" /> }))} onChange={kind => add(newShape(kind, { fill: "#ffffff", stroke: "#2563eb", strokeWidth: 5 }))} />
-
-
+      <ChipGroup
+        value={category}
+        options={SHAPE_CATEGORIES.map((c) => ({
+          value: c.name,
+          label: `${c.name} (${c.shapes.length})`,
+        }))}
+        onChange={setCategory}
+        label="Shape categories"
+      />
+      <OptionGrid
+        columns={3}
+        label="Shapes"
+        options={activeShapes.map((s) => ({
+          value: s.kind,
+          label: s.label,
+          preview: <ShapePreview kind={s.kind} fill="#ffffff" />,
+        }))}
+        onChange={(kind) =>
+          add(newShape(kind, { fill: "#ffffff", stroke: "#2563eb", strokeWidth: 5 }))
+        }
+      />
     </div>
   );
 }
@@ -153,4 +172,3 @@ function ShapePreview({ kind, fill }: { kind: ShapeKind; fill: string }) {
     </svg>
   );
 }
-

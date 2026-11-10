@@ -1,6 +1,22 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, LayoutTemplate, Search, Sparkles, ArrowRight, ArrowUpRight, Calendar, Layers, BookOpen, Puzzle, Trash2, Check, Code2, Wand2, PackageOpen } from "lucide-react";
+import {
+  Loader2,
+  LayoutTemplate,
+  Search,
+  Sparkles,
+  ArrowRight,
+  ArrowUpRight,
+  Calendar,
+  Layers,
+  BookOpen,
+  Puzzle,
+  Trash2,
+  Check,
+  Code2,
+  Wand2,
+  PackageOpen,
+} from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
@@ -66,7 +82,9 @@ function Marketplace() {
     setImportSuccess(null);
     try {
       const plugin = usePlugins.getState().importPlugin(pluginCode);
-      setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
+      setImportSuccess(
+        `✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`,
+      );
       setPluginCode("");
     } catch (e) {
       setImportError(e instanceof Error ? e.message : "Import failed");
@@ -74,9 +92,7 @@ function Marketplace() {
   };
 
   const q = query.trim().toLowerCase();
-  const filteredTemplates = (templates ?? []).filter(
-    (t) => !q || t.name.toLowerCase().includes(q),
-  );
+  const filteredTemplates = (templates ?? []).filter((t) => !q || t.name.toLowerCase().includes(q));
   const filteredPlugins = plugins.filter(
     (p) => !q || p.name.toLowerCase().includes(q) || (p.author ?? "").toLowerCase().includes(q),
   );
@@ -122,30 +138,36 @@ function Marketplace() {
             </div>
           </div>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
-            Community templates and user-made add-ons. Everything is free — load it,
-            remix it, make it yours.
+            Community templates and user-made add-ons. Everything is free — load it, remix it, make
+            it yours.
           </p>
 
           {/* Search console */}
           <div className="mt-6 max-w-2xl rounded-2xl border border-slate-200 bg-white/90 p-2 shadow-[0_12px_32px_rgba(15,23,42,0.08)] backdrop-blur">
             <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
-            <Search className="size-4 shrink-0 text-slate-400" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the marketplace…"
-              className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
-            />
-            {query && (
-              <button
-                onClick={() => setQuery("")}
-                className="shrink-0 text-[10px] font-medium text-slate-400 transition hover:text-slate-600"
-              >
-                clear
-              </button>
-            )}
+              <Search className="size-4 shrink-0 text-slate-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search the marketplace…"
+                className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              />
+              {query && (
+                <button
+                  onClick={() => setQuery("")}
+                  className="shrink-0 text-[10px] font-medium text-slate-400 transition hover:text-slate-600"
+                >
+                  clear
+                </button>
+              )}
             </div>
-            <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-slate-400"><span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">/</span><span>Search templates, add-ons, authors</span><span className="ml-auto hidden sm:inline">{filteredTemplates.length + filteredPlugins.length} results</span></div>
+            <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-slate-400">
+              <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono">/</span>
+              <span>Search templates, add-ons, authors</span>
+              <span className="ml-auto hidden sm:inline">
+                {filteredTemplates.length + filteredPlugins.length} results
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -180,7 +202,11 @@ function Marketplace() {
           ))}
           {tab === "plugins" && (
             <button
-              onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
+              onClick={() => {
+                setImportOpen(true);
+                setImportError(null);
+                setImportSuccess(null);
+              }}
               className="ml-auto flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-all hover:brightness-110 active:scale-[0.97]"
             >
               <Code2 className="size-3.5" /> Import add-on code
@@ -201,7 +227,11 @@ function Marketplace() {
             <Empty
               icon={<LayoutTemplate className="size-5" />}
               title="No templates found"
-              text={templates.length === 0 ? "Nothing published yet — be the first to share a deck from the editor toolbar." : `No template matches “${query}”.`}
+              text={
+                templates.length === 0
+                  ? "Nothing published yet — be the first to share a deck from the editor toolbar."
+                  : `No template matches “${query}”.`
+              }
             />
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -234,10 +264,33 @@ function Marketplace() {
                       <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-400">
                         <Layers className="size-2.5" /> {t.pages?.length ?? 0} slides
                         <span className="mx-1">·</span>
-                        <Calendar className="size-2.5" /> {new Date(t.created_at).toLocaleDateString()}
+                        <Calendar className="size-2.5" />{" "}
+                        {new Date(t.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                      {t.creator_profile?.username && <Link to="/profile/$username" params={{ username: t.creator_profile.username }} onClick={(event) => event.stopPropagation()} className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-blue-600 hover:underline"><span className="grid size-5 shrink-0 place-items-center overflow-hidden rounded-full bg-blue-100 text-[8px] text-blue-600">{t.creator_profile.avatar_url ? <img src={t.creator_profile.avatar_url} alt="" className="size-full object-cover" /> : profileLabel(t.creator_profile).slice(0, 1).toUpperCase()}</span><span className="truncate">by {profileLabel(t.creator_profile as any)}</span></Link>}
+                    {t.creator_profile?.username && (
+                      <Link
+                        to="/profile/$username"
+                        params={{ username: t.creator_profile.username }}
+                        onClick={(event) => event.stopPropagation()}
+                        className="mt-2 flex min-w-0 items-center gap-1.5 text-[10px] font-semibold text-blue-600 hover:underline"
+                      >
+                        <span className="grid size-5 shrink-0 place-items-center overflow-hidden rounded-full bg-blue-100 text-[8px] text-blue-600">
+                          {t.creator_profile.avatar_url ? (
+                            <img
+                              src={t.creator_profile.avatar_url}
+                              alt=""
+                              className="size-full object-cover"
+                            />
+                          ) : (
+                            profileLabel(t.creator_profile).slice(0, 1).toUpperCase()
+                          )}
+                        </span>
+                        <span className="truncate">
+                          by {profileLabel(t.creator_profile as any)}
+                        </span>
+                      </Link>
+                    )}
                     <ArrowRight className="size-4 shrink-0 text-slate-200 transition-all group-hover:translate-x-0.5 group-hover:text-blue-500" />
                   </div>
                 </button>
@@ -248,10 +301,18 @@ function Marketplace() {
           <Empty
             icon={<PackageOpen className="size-5" />}
             title={plugins.length === 0 ? "No add-ons yet" : "No add-on matches your search"}
-            text={plugins.length === 0 ? "Import add-on code to add custom widget presets — they appear in the editor's Presets panel." : `No add-on matches “${query}”.`}
+            text={
+              plugins.length === 0
+                ? "Import add-on code to add custom widget presets — they appear in the editor's Presets panel."
+                : `No add-on matches “${query}”.`
+            }
             action={
               <button
-                onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
+                onClick={() => {
+                  setImportOpen(true);
+                  setImportError(null);
+                  setImportSuccess(null);
+                }}
                 className="mt-1 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
               >
                 <Code2 className="size-3.5" /> Import add-on code
@@ -303,13 +364,20 @@ function Marketplace() {
           </DialogHeader>
           <div className="space-y-3 p-5">
             <p className="text-xs leading-relaxed text-slate-500">
-              Paste add-on code below. Call <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">diapolabPlugin(&#123; name, widgets: [...] &#125;)</code>{" "}
-              with an array of widgets — each widget is a named set of canvas elements
-              that will appear in the editor's <strong>Presets → Blocks</strong> section.
+              Paste add-on code below. Call{" "}
+              <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">
+                diapolabPlugin(&#123; name, widgets: [...] &#125;)
+              </code>{" "}
+              with an array of widgets — each widget is a named set of canvas elements that will
+              appear in the editor's <strong>Presets → Blocks</strong> section.
             </p>
             <textarea
               value={pluginCode}
-              onChange={(e) => { setPluginCode(e.target.value); setImportError(null); setImportSuccess(null); }}
+              onChange={(e) => {
+                setPluginCode(e.target.value);
+                setImportError(null);
+                setImportSuccess(null);
+              }}
               spellCheck={false}
               placeholder="// Paste your add-on code here…"
               className="h-56 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
@@ -321,7 +389,10 @@ function Marketplace() {
             )}
             {importSuccess && (
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-medium text-emerald-600">
-                {importSuccess} <Link to="/" className="underline">Open the editor →</Link>
+                {importSuccess}{" "}
+                <Link to="/" className="underline">
+                  Open the editor →
+                </Link>
               </div>
             )}
             <div className="flex items-center justify-between gap-3">
@@ -348,7 +419,15 @@ function Marketplace() {
 
 function ArrowLeft() {
   return (
-    <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className="size-3.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M19 12H5" />
       <path d="m12 19-7-7 7-7" />
     </svg>
@@ -393,11 +472,16 @@ function PluginCard({
           </button>
         </div>
         {plugin.description && (
-          <p className="mt-2 line-clamp-2 text-[11px] leading-snug text-slate-500">{plugin.description}</p>
+          <p className="mt-2 line-clamp-2 text-[11px] leading-snug text-slate-500">
+            {plugin.description}
+          </p>
         )}
         <div className="mt-2 flex flex-wrap gap-1">
           {plugin.widgets.slice(0, 4).map((w, i) => (
-            <span key={i} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-semibold text-slate-500">
+            <span
+              key={i}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-semibold text-slate-500"
+            >
               {w.name}
             </span>
           ))}
@@ -415,11 +499,7 @@ function PluginCard({
               : "bg-slate-100 text-slate-500 hover:bg-slate-200"
           }`}
         >
-          {plugin.enabled ? (
-            <>✓ Enabled — widgets in Presets</>
-          ) : (
-            <>Disabled</>
-          )}
+          {plugin.enabled ? <>✓ Enabled — widgets in Presets</> : <>Disabled</>}
         </button>
       </div>
     </div>
@@ -445,10 +525,22 @@ function Loading() {
   );
 }
 
-function Empty({ icon, title, text, action }: { icon: React.ReactNode; title: string; text: string; action?: React.ReactNode }) {
+function Empty({
+  icon,
+  title,
+  text,
+  action,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white/60 py-16 text-center">
-      <span className="grid size-12 place-items-center rounded-2xl bg-blue-50 text-blue-400">{icon}</span>
+      <span className="grid size-12 place-items-center rounded-2xl bg-blue-50 text-blue-400">
+        {icon}
+      </span>
       <div>
         <p className="text-sm font-semibold text-slate-600">{title}</p>
         <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-400">{text}</p>

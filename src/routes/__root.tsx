@@ -76,13 +76,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "DiapoLab-The Next-Generation Open-Source Presentation Editor" },
-      { name: "description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
+      {
+        name: "description",
+        content: "DiapoLab is a focused workspace for creating polished multipage presentations.",
+      },
       { name: "author", content: "DiapoLab" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#f5f4f1" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { property: "og:title", content: "DiapoLab — Design workspace" },
-      { property: "og:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
+      {
+        property: "og:description",
+        content: "DiapoLab is a focused workspace for creating polished multipage presentations.",
+      },
       { property: "og:site_name", content: "DiapoLab" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -90,7 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
       { name: "twitter:site", content: "@diapolab" },
       { name: "twitter:title", content: "DiapoLab — Design workspace" },
-      { name: "twitter:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
+      {
+        name: "twitter:description",
+        content: "DiapoLab is a focused workspace for creating polished multipage presentations.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -128,7 +137,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               url: "https://diapolab.vercel.app",
               applicationCategory: "DesignApplication",
               operatingSystem: "Web",
-              description: "Open-source editor for creating, presenting and sharing multipage decks.",
+              description:
+                "Open-source editor for creating, presenting and sharing multipage decks.",
               offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             },
           ],

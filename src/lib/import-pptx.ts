@@ -27,11 +27,9 @@ const ptToPx = (pt: number): number => Math.round(pt * (96 / 72));
 function children(node: Element | Document, local: string): Element[] {
   const doc = node instanceof Document ? node : node.ownerDocument;
   if (!doc) return [];
-  return Array.from(
-    doc.getElementsByTagName("*"),
-  ).filter(
+  return Array.from(doc.getElementsByTagName("*")).filter(
     (el) =>
-      (el.localName === local.split(":").pop()) &&
+      el.localName === local.split(":").pop() &&
       (node instanceof Document ? true : isDescendant(node, el)),
   );
 }
@@ -81,7 +79,15 @@ function parseXfrm(sp: Element): Partial<Xfrm> {
   return { x, y, width: width || 200, height: height || 60, rotation };
 }
 
-function parseTextBody(sp: Element): { text: string; fontSize: number; color: string; bold: boolean; italic: boolean; underline: boolean; align: "left" | "center" | "right"; } | null {
+function parseTextBody(sp: Element): {
+  text: string;
+  fontSize: number;
+  color: string;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  align: "left" | "center" | "right";
+} | null {
   const txBody = firstChildByLocal(sp, "txBody");
   if (!txBody) return null;
   const paragraphs = children(txBody, "p");
@@ -131,19 +137,53 @@ function parseTextBody(sp: Element): { text: string; fontSize: number; color: st
 /* Map PowerPoint preset geometries (prstGeom) onto DiapoLab shape kinds.
    Unmapped presets fall back to a plain rect so no shape silently vanishes. */
 const PRST_TO_KIND: Record<string, string> = {
-  rect: "rect", roundRect: "rect", round1Rect: "rect", round2SameRect: "rect", round2DiagRect: "rect",
-  snip1Rect: "rect", snip2SameRect: "rect", snip2DiagRect: "rect", snipRoundRect: "rect",
-  flowChartProcess: "rect", flowChartAlternateProcess: "rect", flowChartTerminator: "rect",
-  ellipse: "circle", pie: "circle", triangle: "triangle", rtTriangle: "triangle",
-  diamond: "diamond", pentagon: "pentagon", hexagon: "hexagon", octagon: "octagon",
-  star4: "star", star5: "star", star6: "star", star8: "star", star10: "star",
-  star12: "star", star16: "star", star24: "star", star32: "star",
-  trapezoid: "trapezoid", flowChartManualInput: "trapezoid",
-  parallelogram: "parallelogram", chevron: "chevron",
-  plus: "cross", flowChartDecision: "diamond", flowChartCollate: "diamond",
-  heart: "heart", cloud: "cloud", lightningBolt: "lightning", moon: "moon",
-  donut: "ring", blockArc: "ring", chord: "semicircle",
-  rightArrow: "arrow", leftArrow: "arrow", upArrow: "arrow", downArrow: "arrow",
+  rect: "rect",
+  roundRect: "rect",
+  round1Rect: "rect",
+  round2SameRect: "rect",
+  round2DiagRect: "rect",
+  snip1Rect: "rect",
+  snip2SameRect: "rect",
+  snip2DiagRect: "rect",
+  snipRoundRect: "rect",
+  flowChartProcess: "rect",
+  flowChartAlternateProcess: "rect",
+  flowChartTerminator: "rect",
+  ellipse: "circle",
+  pie: "circle",
+  triangle: "triangle",
+  rtTriangle: "triangle",
+  diamond: "diamond",
+  pentagon: "pentagon",
+  hexagon: "hexagon",
+  octagon: "octagon",
+  star4: "star",
+  star5: "star",
+  star6: "star",
+  star8: "star",
+  star10: "star",
+  star12: "star",
+  star16: "star",
+  star24: "star",
+  star32: "star",
+  trapezoid: "trapezoid",
+  flowChartManualInput: "trapezoid",
+  parallelogram: "parallelogram",
+  chevron: "chevron",
+  plus: "cross",
+  flowChartDecision: "diamond",
+  flowChartCollate: "diamond",
+  heart: "heart",
+  cloud: "cloud",
+  lightningBolt: "lightning",
+  moon: "moon",
+  donut: "ring",
+  blockArc: "ring",
+  chord: "semicircle",
+  rightArrow: "arrow",
+  leftArrow: "arrow",
+  upArrow: "arrow",
+  downArrow: "arrow",
 };
 
 function parseShapeKind(sp: Element): string | null {
@@ -164,7 +204,11 @@ function roundRectRadius(sp: Element, box: Partial<Xfrm>): number | undefined {
   return Math.round(min * Math.min(pct, 0.5));
 }
 
-async function mediaToDataUrl(zip: JSZip, relId: string, rels: Map<string, string>): Promise<string | null> {
+async function mediaToDataUrl(
+  zip: JSZip,
+  relId: string,
+  rels: Map<string, string>,
+): Promise<string | null> {
   const target = rels.get(relId);
   if (!target) return null;
   const path = target.startsWith("/") ? target.slice(1) : `ppt/${target.replace(/^\.\.\//, "")}`;
@@ -173,11 +217,17 @@ async function mediaToDataUrl(zip: JSZip, relId: string, rels: Map<string, strin
   const base64 = await entry.async("base64");
   const ext = path.split(".").pop()?.toLowerCase() ?? "png";
   const mime =
-    ext === "png" ? "image/png" :
-    ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-    ext === "gif" ? "image/gif" :
-    ext === "svg" ? "image/svg+xml" :
-    ext === "webp" ? "image/webp" : "image/png";
+    ext === "png"
+      ? "image/png"
+      : ext === "jpg" || ext === "jpeg"
+        ? "image/jpeg"
+        : ext === "gif"
+          ? "image/gif"
+          : ext === "svg"
+            ? "image/svg+xml"
+            : ext === "webp"
+              ? "image/webp"
+              : "image/png";
   return `data:${mime};base64,${base64}`;
 }
 
@@ -232,7 +282,12 @@ function collectLeafNodes(root: Element): Array<{ node: Element; xf: GroupXf }> 
       const local = child.localName ?? "";
       if (local === "grpSp") {
         walk(child, composeXf(xf, parseGroupXf(child)));
-      } else if (local === "sp" || local === "pic" || local === "cxnSp" || local === "graphicFrame") {
+      } else if (
+        local === "sp" ||
+        local === "pic" ||
+        local === "cxnSp" ||
+        local === "graphicFrame"
+      ) {
         out.push({ node: child, xf });
       }
     }
@@ -277,7 +332,8 @@ function tableToElement(frame: Element, box: Partial<Xfrm>): TableElement | null
   if (firstTr) {
     for (const tc of children(firstTr, "tc")) {
       const tcPr = firstChildByLocal(tc, "tcPr");
-      if (tcPr && Array.from(tcPr.children).some((e) => e.localName === "solidFill")) headerRow = true;
+      if (tcPr && Array.from(tcPr.children).some((e) => e.localName === "solidFill"))
+        headerRow = true;
       const txBody = firstChildByLocal(tc, "txBody");
       if (txBody && firstChildByLocal(txBody, "rPr")?.getAttribute("b") === "1") headerRow = true;
     }
@@ -326,11 +382,22 @@ async function parseRels(zip: JSZip, partPath: string): Promise<Map<string, stri
 
 /* Office theme scheme colors → sRGB fallbacks. */
 const SCHEME_COLORS: Record<string, string> = {
-  dk1: "#000000", lt1: "#ffffff", dk2: "#44546a", lt2: "#e7e6e6",
-  tx1: "#000000", tx2: "#44546a", bg1: "#ffffff", bg2: "#e7e6e6",
-  accent1: "#4472c4", accent2: "#ed7d31", accent3: "#a5a5a5",
-  accent4: "#ffc000", accent5: "#5b9bd5", accent6: "#70ad47",
-  hlink: "#0563c1", folHlink: "#954f72",
+  dk1: "#000000",
+  lt1: "#ffffff",
+  dk2: "#44546a",
+  lt2: "#e7e6e6",
+  tx1: "#000000",
+  tx2: "#44546a",
+  bg1: "#ffffff",
+  bg2: "#e7e6e6",
+  accent1: "#4472c4",
+  accent2: "#ed7d31",
+  accent3: "#a5a5a5",
+  accent4: "#ffc000",
+  accent5: "#5b9bd5",
+  accent6: "#70ad47",
+  hlink: "#0563c1",
+  folHlink: "#954f72",
 };
 
 /** Read a color from a fill element (srgbClr or schemeClr), or undefined. */
@@ -357,7 +424,9 @@ function parseBgElement(doc: Document): { color?: string; imageRid?: string } | 
   if (!bg) return null;
   const bgPr = Array.from(bg.getElementsByTagName("*")).find((el) => el.localName === "bgPr");
   const root = bgPr ?? bg;
-  const solid = Array.from(root.getElementsByTagName("*")).find((el) => el.localName === "solidFill");
+  const solid = Array.from(root.getElementsByTagName("*")).find(
+    (el) => el.localName === "solidFill",
+  );
   const color = colorFrom(solid ?? null);
   if (color) return { color };
   const blip = Array.from(root.getElementsByTagName("*")).find((el) => el.localName === "blip");
@@ -392,7 +461,9 @@ async function resolveSlideBg(
     resolved = { color: layoutBg.color };
   } else {
     const layoutRels = await parseRels(zip, layoutPath);
-    const masterTarget = Array.from(layoutRels.values()).find((t) => /slideMasters\/[^/]+\.xml$/.test(t));
+    const masterTarget = Array.from(layoutRels.values()).find((t) =>
+      /slideMasters\/[^/]+\.xml$/.test(t),
+    );
     if (masterTarget) {
       const masterPath = "ppt/" + masterTarget.replace(/^(\.\.\/)+/, "").replace(/^\//, "");
       const masterDoc = await parseXml(zip, masterPath);
@@ -459,10 +530,15 @@ function parseEntranceTimings(
     if (preset === 2) {
       // Fly In: subtype gives the origin edge
       animation =
-        subtype === 4 ? "move-up" :
-        subtype === 1 ? "move-down" :
-        subtype === 2 ? "move-right" :
-        subtype === 8 ? "move-left" : "fade-up";
+        subtype === 4
+          ? "move-up"
+          : subtype === 1
+            ? "move-down"
+            : subtype === 2
+              ? "move-right"
+              : subtype === 8
+                ? "move-left"
+                : "fade-up";
     } else if (preset === 16) animation = "pop";
     else if (preset === 23) animation = "flip-in";
     else if (preset === 26) animation = "spin-in";
@@ -487,7 +563,13 @@ type PptxTheme = { tokens: ThemeTokens; majorFont?: string; minorFont?: string }
 
 function shade(hex: string, amount: number): string {
   const raw = hex.replace("#", "");
-  const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw.slice(0, 6);
+  const full =
+    raw.length === 3
+      ? raw
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : raw.slice(0, 6);
   const num = parseInt(full, 16);
   if (Number.isNaN(num)) return hex;
   const mix = (channel: number) => {
@@ -508,25 +590,42 @@ async function parseTheme(zip: JSZip): Promise<PptxTheme | null> {
   if (!schemeEl) return null;
   const scheme: Record<string, string> = { ...SCHEME_COLORS };
   const slots = [
-    "dk1", "lt1", "dk2", "lt2",
-    "accent1", "accent2", "accent3", "accent4", "accent5", "accent6",
-    "hlink", "folHlink",
+    "dk1",
+    "lt1",
+    "dk2",
+    "lt2",
+    "accent1",
+    "accent2",
+    "accent3",
+    "accent4",
+    "accent5",
+    "accent6",
+    "hlink",
+    "folHlink",
   ];
   for (const slot of slots) {
     const node = Array.from(schemeEl.getElementsByTagName("*")).find((el) => el.localName === slot);
     if (!node) continue;
-    const srgb = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "srgbClr");
+    const srgb = Array.from(node.getElementsByTagName("*")).find(
+      (el) => el.localName === "srgbClr",
+    );
     const sys = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "sysClr");
     const hex =
       srgb?.getAttribute("val") ??
       sys?.getAttribute("lastClr") ??
-      (sys?.getAttribute("val") === "window" ? "ffffff" : sys?.getAttribute("val") === "windowText" ? "000000" : undefined);
+      (sys?.getAttribute("val") === "window"
+        ? "ffffff"
+        : sys?.getAttribute("val") === "windowText"
+          ? "000000"
+          : undefined);
     if (hex) scheme[slot] = "#" + hex.replace("#", "");
   }
   const fontScheme = all.find((el) => el.localName === "fontScheme");
   const latinTypeface = (scope: "majorFont" | "minorFont"): string | undefined => {
     if (!fontScheme) return undefined;
-    const part = Array.from(fontScheme.getElementsByTagName("*")).find((el) => el.localName === scope);
+    const part = Array.from(fontScheme.getElementsByTagName("*")).find(
+      (el) => el.localName === scope,
+    );
     if (!part) return undefined;
     const latin = Array.from(part.getElementsByTagName("*")).find((el) => el.localName === "latin");
     const tf = latin?.getAttribute("typeface");
@@ -610,7 +709,9 @@ export async function importPPTXFile(file: File): Promise<void> {
 
     for (const { node, xf } of leaves) {
       // PPTX shape id — used to re-attach entrance animations parsed later
-      const cnvPr = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "cNvPr");
+      const cnvPr = Array.from(node.getElementsByTagName("*")).find(
+        (el) => el.localName === "cNvPr",
+      );
       const spid = cnvPr?.getAttribute("id") ?? null;
       const push = (el: AnyElement) => {
         if (spid) spidToElement.set(spid, el);
@@ -639,10 +740,20 @@ export async function importPPTXFile(file: File): Promise<void> {
           const spPr = firstChildByLocal(node, "spPr");
           // Direct children only, so a line-only solidFill is not mistaken for the fill.
           // solidFill or the first gradient stop; noFill keeps the shape hollow.
-          const fillEl = spPr ? Array.from(spPr.children).find((e) => e.localName === "solidFill" || e.localName === "gradFill") ?? null : null;
-          const noFill = spPr ? Array.from(spPr.children).some((e) => e.localName === "noFill") : false;
-          const ln = spPr ? Array.from(spPr.children).find((e) => e.localName === "ln") ?? null : null;
-          const lnSolid = ln ? Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null : null;
+          const fillEl = spPr
+            ? (Array.from(spPr.children).find(
+                (e) => e.localName === "solidFill" || e.localName === "gradFill",
+              ) ?? null)
+            : null;
+          const noFill = spPr
+            ? Array.from(spPr.children).some((e) => e.localName === "noFill")
+            : false;
+          const ln = spPr
+            ? (Array.from(spPr.children).find((e) => e.localName === "ln") ?? null)
+            : null;
+          const lnSolid = ln
+            ? (Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null)
+            : null;
           const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 0;
           const cornerRadius = roundRectRadius(node, box);
           push(
@@ -662,7 +773,9 @@ export async function importPPTXFile(file: File): Promise<void> {
         const box = applyXf(parseXfrm(node), xf);
         if (box) {
           const ln = firstChildByLocal(node, "ln");
-          const lnSolid = ln ? Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null : null;
+          const lnSolid = ln
+            ? (Array.from(ln.children).find((e) => e.localName === "solidFill") ?? null)
+            : null;
           const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 2;
           const t = Math.max(2, Math.round((lnWpt || 2) * (96 / 72)));
           const horizontal = (box.width ?? 0) >= (box.height ?? 0);
@@ -680,7 +793,9 @@ export async function importPPTXFile(file: File): Promise<void> {
       }
       if (node.localName === "pic") {
         const box = applyXf(parseXfrm(node), xf);
-        const blip = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "blip");
+        const blip = Array.from(node.getElementsByTagName("*")).find(
+          (el) => el.localName === "blip",
+        );
         const rid = blip?.getAttribute("r:embed");
         if (!rid || !box) continue;
         const src = await mediaToDataUrl(zip, rid, rels);

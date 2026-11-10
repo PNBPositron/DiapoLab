@@ -46,13 +46,9 @@ export default defineConfig(({ mode }) => {
     envPrefix: ["VITE_", "NEXT_PUBLIC_", "SUPABASE_"],
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
-      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey,
-      ),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
       "import.meta.env.SUPABASE_URL": JSON.stringify(supabaseUrl),
-      "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey,
-      ),
+      "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
     },
   };
 });

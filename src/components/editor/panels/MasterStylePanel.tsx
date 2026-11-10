@@ -15,22 +15,42 @@ export function MasterStylePanel() {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] leading-relaxed text-slate-500">
-        Use the current slide as a master: push its background and transition to every slide in the deck ({pageCount} total). Undo works as usual (⌘Z).
+        Use the current slide as a master: push its background and transition to every slide in the
+        deck ({pageCount} total). Undo works as usual (⌘Z).
       </p>
       <div className="flex flex-col gap-2">
-        <button type="button" onClick={applyBackgroundToDeck} className={btn} title={bgImage ? "Push color + background image to all slides" : "Push background color to all slides"}>
+        <button
+          type="button"
+          onClick={applyBackgroundToDeck}
+          className={btn}
+          title={
+            bgImage
+              ? "Push color + background image to all slides"
+              : "Push background color to all slides"
+          }
+        >
           <Layers className="size-3.5 shrink-0 text-blue-600" />
           <span className="min-w-0 flex-1">Use this background on all slides</span>
           <span
             aria-hidden="true"
             className="size-3.5 shrink-0 rounded-full border border-slate-300"
-            style={{ background: bg.includes("gradient(") ? bg : undefined, backgroundColor: bg.includes("gradient(") ? undefined : bg }}
+            style={{
+              background: bg.includes("gradient(") ? bg : undefined,
+              backgroundColor: bg.includes("gradient(") ? undefined : bg,
+            }}
           />
         </button>
-        <button type="button" onClick={applyTransitionToDeck} className={btn} title={`Transition: ${transition}`}>
+        <button
+          type="button"
+          onClick={applyTransitionToDeck}
+          className={btn}
+          title={`Transition: ${transition}`}
+        >
           <Clapperboard className="size-3.5 shrink-0 text-blue-600" />
           <span className="min-w-0 flex-1">Use this transition on all slides</span>
-          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] tracking-wider text-slate-500">{transition}</span>
+          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] tracking-wider text-slate-500">
+            {transition}
+          </span>
         </button>
       </div>
       <p className="flex items-center gap-1 text-[9px] text-slate-400">
@@ -41,4 +61,3 @@ export function MasterStylePanel() {
 }
 
 export default MasterStylePanel;
-

@@ -35,15 +35,17 @@ const BRIDGE = [
   '    try { parent.postMessage(Object.assign({ source: "diapolab-runtime" }, msg), "*"); } catch (e) {}',
   "  }",
   "  window.diapolab = {",
-  "    insert: function (elements) { post({ type: \"insert\", elements: elements }); },",
+  '    insert: function (elements) { post({ type: "insert", elements: elements }); },',
   "  };",
-  "  post({ type: \"ready\" });",
+  '  post({ type: "ready" });',
   "})();",
   "</scr" + "ipt>",
 ].join("\n");
 
 const num = (v: unknown, min: number, max: number, fallback: number) =>
-  typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : fallback;
+  typeof v === "number" && Number.isFinite(v)
+    ? Math.min(max, Math.max(min, Math.round(v)))
+    : fallback;
 const str = (v: unknown, max: number, fallback: string) =>
   typeof v === "string" ? v.slice(0, max) : fallback;
 
@@ -58,7 +60,11 @@ function toCanvasElement(raw: unknown): AnyElement | null {
   const rotation = num(r.rotation, -36000, 36000, 0);
   if (r.type === "text") {
     return newText({
-      x, y, width, height, rotation,
+      x,
+      y,
+      width,
+      height,
+      rotation,
       text: str(r.text, 1000, "Text"),
       fontSize: num(r.fontSize, 8, 400, 48),
       color: str(r.color, 64, "#0a0f1f"),
@@ -69,7 +75,11 @@ function toCanvasElement(raw: unknown): AnyElement | null {
   }
   if (r.type === "shape") {
     return newShape((typeof r.shape === "string" ? r.shape : "rect") as ShapeKind, {
-      x, y, width, height, rotation,
+      x,
+      y,
+      width,
+      height,
+      rotation,
       fill: str(r.fill, 64, "#ffd84a"),
       stroke: str(r.stroke, 64, "transparent"),
       strokeWidth: num(r.strokeWidth, 0, 200, 0),
@@ -87,7 +97,11 @@ function toCanvasElement(raw: unknown): AnyElement | null {
       (typeof r.kind === "string" ? r.kind : "card") as UiKind,
       (typeof r.uiStyle === "string" ? r.uiStyle : "cyber") as UiStyle,
       {
-        x, y, width, height, rotation,
+        x,
+        y,
+        width,
+        height,
+        rotation,
         title: str(r.title, 300, "Runtime card"),
         body: str(r.body, 2000, ""),
         items: Array.isArray(r.items)
@@ -133,7 +147,7 @@ export function RuntimeAppDialog({
   }, [open]);
 
   const srcDoc = [
-    "<!doctype html><html><head><meta charset=\"utf-8\" />",
+    '<!doctype html><html><head><meta charset="utf-8" />',
     "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:;\" />",
     "<style>html,body{margin:0;padding:10px;font:12px/1.4 system-ui,sans-serif;color:#0f172a;background:#fff}</style>",
     "</head><body>",
@@ -154,7 +168,9 @@ export function RuntimeAppDialog({
               : "max-w-3xl"
         }`}
       >
-        <DialogHeader className={`border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}>
+        <DialogHeader
+          className={`border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}
+        >
           <div className={`${minimized ? "mb-0" : "mb-2"} flex items-center justify-between`}>
             <TrafficLights
               minimized={minimized}
@@ -170,34 +186,34 @@ export function RuntimeAppDialog({
             </span>
             {app.name}
             {!minimized && (
-            <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
-              Runtime · sandboxed
-            </span>
+              <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-px text-[8px] font-bold uppercase tracking-wide text-slate-500">
+                Runtime · sandboxed
+              </span>
             )}
           </DialogTitle>
         </DialogHeader>
         {!minimized && (
-        <div className="p-3">
-          <iframe
-            title={app.name}
-            sandbox="allow-scripts"
-            srcDoc={srcDoc}
-            className="h-[480px] w-full rounded-xl border border-slate-200 bg-white"
-          />
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-            Runs in a sandboxed iframe — scripts only, opaque origin, network blocked by CSP.
-            The app can insert elements onto the current slide with{" "}
-            <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">
-              diapolab.insert([&#123; ... &#125;])
-            </code>
-            .
-          </p>
-          {inserted > 0 && (
-            <p className="mt-1 text-[11px] font-medium text-emerald-600">
-              {inserted} element{inserted > 1 ? "s" : ""} inserted on the current slide.
+          <div className="p-3">
+            <iframe
+              title={app.name}
+              sandbox="allow-scripts"
+              srcDoc={srcDoc}
+              className="h-[480px] w-full rounded-xl border border-slate-200 bg-white"
+            />
+            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+              Runs in a sandboxed iframe — scripts only, opaque origin, network blocked by CSP. The
+              app can insert elements onto the current slide with{" "}
+              <code className="rounded bg-slate-100 px-1 font-mono text-[10px] text-blue-600">
+                diapolab.insert([&#123; ... &#125;])
+              </code>
+              .
             </p>
-          )}
-        </div>
+            {inserted > 0 && (
+              <p className="mt-1 text-[11px] font-medium text-emerald-600">
+                {inserted} element{inserted > 1 ? "s" : ""} inserted on the current slide.
+              </p>
+            )}
+          </div>
         )}
       </DialogContent>
     </Dialog>

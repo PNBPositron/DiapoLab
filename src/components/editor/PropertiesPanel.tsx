@@ -7,6 +7,7 @@ import {
   quizStylePatch,
   tableStylePatch,
   type ImageFilters,
+  type ElementAnimation,
   type ElementShadow,
   type ShapeElement,
   type ShapeGradient,
@@ -59,7 +60,17 @@ import {
   Eye,
   EyeOff,
   X,
-  ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash, Crop, SlidersHorizontal,
+  ChartColumn,
+  ChartLine,
+  ChartArea,
+  ChartPie,
+  Circle,
+  FlipHorizontal,
+  FlipVertical,
+  MousePointer2,
+  Hash,
+  Crop,
+  SlidersHorizontal,
   Lock,
   LockOpen,
 } from "lucide-react";
@@ -69,13 +80,24 @@ import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
 const FONT_FAMILIES: string[] = Array.from(
-  new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
+  new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)]),
 ).sort();
 
 /** UI kinds whose "items" list carries editable text (tabs, sidebar entries, lines…). */
 const UI_ITEMS_KINDS = new Set([
-  "list", "pricing", "window", "browser", "terminal", "phone", "modal",
-  "tabs", "toggle", "login", "taskbar", "vtabs", "timeline",
+  "list",
+  "pricing",
+  "window",
+  "browser",
+  "terminal",
+  "phone",
+  "modal",
+  "tabs",
+  "toggle",
+  "login",
+  "taskbar",
+  "vtabs",
+  "timeline",
 ]);
 /** Single chrome captions per UI kind (search pill, new-tab button, submit button). */
 const UI_CAPTION_DEFAULTS: Partial<Record<UiKind, string>> = {
@@ -128,7 +150,17 @@ function MaskPicker({ value, onChange }: { value: string; onChange: (v: string) 
           >
             {!opt.value ? (
               <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
-                <rect x="10" y="10" width="80" height="80" rx="10" fill="none" stroke="#94a3b8" strokeWidth="7" strokeDasharray="12 10" />
+                <rect
+                  x="10"
+                  y="10"
+                  width="80"
+                  height="80"
+                  rx="10"
+                  fill="none"
+                  stroke="#94a3b8"
+                  strokeWidth="7"
+                  strokeDasharray="12 10"
+                />
               </svg>
             ) : d ? (
               <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
@@ -144,7 +176,10 @@ function MaskPicker({ value, onChange }: { value: string; onChange: (v: string) 
               </svg>
             ) : (
               <svg viewBox="0 0 100 100" className="size-5" aria-hidden="true">
-                <polygon points="50,3 61,35 98,35 68,57 79,97 50,73 21,97 32,57 2,35 39,35" fill={fill} />
+                <polygon
+                  points="50,3 61,35 98,35 68,57 79,97 50,73 21,97 32,57 2,35 39,35"
+                  fill={fill}
+                />
               </svg>
             )}
           </button>
@@ -199,20 +234,27 @@ const IMAGE_FILTER_PRESETS: Array<{
     filters: { ...DEFAULT_FILTERS, sepia: 24, hueRotate: -12, saturate: 135, brightness: 106 },
     preview: "sepia(.24) hue-rotate(-12deg) saturate(1.35) brightness(1.06)",
   },
-  { name: "Glitch", description: "RGB split & distort", filters: { ...DEFAULT_FILTERS, glitch: 55 }, preview: "none" },
-  { name: "VHS", description: "Retro tape", filters: { ...DEFAULT_FILTERS, glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 }, preview: "saturate(1.35) contrast(1.12) hue-rotate(-8deg)" },
-  { name: "Golden", description: "Golden hour", filters: { ...DEFAULT_FILTERS, temperature: 60, saturate: 118, brightness: 103 }, preview: "sepia(.21) saturate(1.18) brightness(1.03)" },
+  {
+    name: "Glitch",
+    description: "RGB split & distort",
+    filters: { ...DEFAULT_FILTERS, glitch: 55 },
+    preview: "none",
+  },
+  {
+    name: "VHS",
+    description: "Retro tape",
+    filters: { ...DEFAULT_FILTERS, glitch: 35, saturate: 135, contrast: 112, hueRotate: -8 },
+    preview: "saturate(1.35) contrast(1.12) hue-rotate(-8deg)",
+  },
+  {
+    name: "Golden",
+    description: "Golden hour",
+    filters: { ...DEFAULT_FILTERS, temperature: 60, saturate: 118, brightness: 103 },
+    preview: "sepia(.21) saturate(1.18) brightness(1.03)",
+  },
 ];
 
-const BLEND_MODES = [
-  "normal",
-  "multiply",
-  "screen",
-  "overlay",
-  "darken",
-  "lighten",
-  "soft-light",
-];
+const BLEND_MODES = ["normal", "multiply", "screen", "overlay", "darken", "lighten", "soft-light"];
 
 const ASPECT_RATIOS: Array<{ label: string; value: number }> = [
   { label: "1:1", value: 1 },
@@ -288,7 +330,7 @@ function Section({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="inspector-section border-b border-selector-border pb-2">
+    <div className="inspector-section rounded-xl border border-slate-200/80 bg-white shadow-sm transition-shadow duration-150 hover:shadow-md">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -421,8 +463,7 @@ function ModernColorPicker({
               value={Math.round((opacity ?? 1) * 100)}
               onChange={(e) => {
                 const val = Number(e.target.value);
-                if (Number.isFinite(val))
-                  onOpacityChange!(Math.min(1, Math.max(0, val / 100)));
+                if (Number.isFinite(val)) onOpacityChange!(Math.min(1, Math.max(0, val / 100)));
               }}
               className="w-9 border-0 bg-transparent text-center outline-none"
             />
@@ -487,7 +528,7 @@ export function PropertiesPanel() {
     return () => window.removeEventListener("diapolab:open-inspector", onOpen);
   }, []);
 
-    // Reset popovers + JSON draft ONLY when the selection changes — not on
+  // Reset popovers + JSON draft ONLY when the selection changes — not on
   // every property edit. Reading the element via getState() avoids putting
   // `el` in the deps (a new object reference on each update would re-run
   // this effect and collapse the inspector while editing).
@@ -507,9 +548,8 @@ export function PropertiesPanel() {
     if (jsonDirty || !el) return;
     const next = JSON.stringify(el, null, 2);
     setJsonDraft((draft) => (draft === next ? draft : next));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [el, jsonDirty]);
-  
+
   if (!el) return null;
 
   // ---- Element JSON: explicit apply instead of per-keystroke updates ----
@@ -517,7 +557,8 @@ export function PropertiesPanel() {
     try {
       const parsed = JSON.parse(jsonDraft) as Record<string, unknown>;
       if (typeof parsed !== "object" || parsed === null) throw new Error("Expected a JSON object");
-      if (parsed.id !== el.id || parsed.type !== el.type) throw new Error("id and type cannot be changed");
+      if (parsed.id !== el.id || parsed.type !== el.type)
+        throw new Error("id and type cannot be changed");
       const { id: _id, type: _type, ...patch } = parsed;
       update(el.id, patch as Partial<typeof el>);
       setJsonError(null);
@@ -573,7 +614,8 @@ export function PropertiesPanel() {
     };
   };
   const sortedKfs = [...kfs].sort((a, b) => a.t - b.t);
-  const kfTotal = el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
+  const kfTotal =
+    el.keyframeDuration ?? Math.max(2000, sortedKfs.length ? sortedKfs[sortedKfs.length - 1].t : 0);
   const kfTimeAt = (clientX: number) => {
     const rect = kfTrackRef.current?.getBoundingClientRect();
     if (!rect) return 0;
@@ -587,9 +629,7 @@ export function PropertiesPanel() {
         {/* Type badge */}
         <div className="flex items-center gap-1.5 rounded-full bg-slate-900/95 px-3 py-1.5 shadow-sm">
           <span className="size-1.5 rounded-full bg-sky-400" />
-          <span className="text-[10px] font-bold tracking-wider text-white">
-            {el.type}
-          </span>
+          <span className="text-[10px] font-bold tracking-wider text-white">{el.type}</span>
         </div>
 
         {el.type === "text" && (
@@ -625,7 +665,9 @@ export function PropertiesPanel() {
             <div className="flex h-8 items-center gap-0.5 rounded-lg bg-slate-100/80 p-0.5">
               <button
                 type="button"
-                onClick={() => update(el.id, { fontWeight: (el.fontWeight ?? 400) >= 700 ? 400 : 700 })}
+                onClick={() =>
+                  update(el.id, { fontWeight: (el.fontWeight ?? 400) >= 700 ? 400 : 700 })
+                }
                 className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
                   (el.fontWeight ?? 400) >= 700 ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
@@ -695,7 +737,8 @@ export function PropertiesPanel() {
                 value={el.fontSize}
                 onChange={(e) => {
                   const val = Number(e.target.value);
-                  if (Number.isFinite(val)) update(el.id, { fontSize: Math.min(240, Math.max(12, val)) });
+                  if (Number.isFinite(val))
+                    update(el.id, { fontSize: Math.min(240, Math.max(12, val)) });
                 }}
                 className="w-9 appearance-none border-0 bg-transparent text-center font-mono text-xs font-semibold text-slate-800 outline-none"
               />
@@ -712,19 +755,68 @@ export function PropertiesPanel() {
 
         {el.type === "shape" && (
           <div className="relative">
-            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Shape color">
-              <div className="size-4 rounded-md border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
+            <button
+              type="button"
+              onClick={() => setColorPaletteOpen(!colorPaletteOpen)}
+              className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`}
+              title="Shape color"
+            >
+              <div
+                className="size-4 rounded-md border border-slate-300 shadow-xs"
+                style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }}
+              />
             </button>
-            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
+            {colorPaletteOpen && (
+              <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+                <ModernColorPicker
+                  value={el.fill ?? "#0ea5e9"}
+                  onChange={(color) => update(el.id, { fill: color })}
+                  opacity={el.opacity ?? 1}
+                  onOpacityChange={(opacity) => update(el.id, { opacity })}
+                />
+              </div>
+            )}
           </div>
         )}
 
         {el.type === "image" && (
           <>
-            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-sky-100 text-sky-700 ring-2 ring-sky-500/30" : ""}`} title="Crop image (double-clic : mode recadrage)"><Crop className="size-3.5" /></button>
+            <button
+              type="button"
+              onClick={() =>
+                useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)
+              }
+              className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-sky-100 text-sky-700 ring-2 ring-sky-500/30" : ""}`}
+              title="Crop image (double-clic : mode recadrage)"
+            >
+              <Crop className="size-3.5" />
+            </button>
             <div className="relative">
-              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
-              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-lg border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-sky-300 hover:bg-sky-50">{preset.name}</button>)}</div>}
+              <button
+                type="button"
+                onClick={() => setImageFilterOpen(!imageFilterOpen)}
+                className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`}
+                title="Image filter"
+              >
+                <SlidersHorizontal className="size-3.5" />
+              </button>
+              {imageFilterOpen && (
+                <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                  {IMAGE_FILTER_PRESETS.map((preset) => (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => {
+                        update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } });
+                        setImageFilterOpen(false);
+                      }}
+                      className="rounded-lg border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-sky-300 hover:bg-sky-50"
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}
@@ -769,7 +861,9 @@ export function PropertiesPanel() {
               ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
               : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           }`}
-          title={el.locked ? "Unlock element (allow drag & resize)" : "Lock element (no drag, no resize)"}
+          title={
+            el.locked ? "Unlock element (allow drag & resize)" : "Lock element (no drag, no resize)"
+          }
         >
           {el.locked ? <Lock className="size-3.5" /> : <LockOpen className="size-3.5" />}
         </button>
@@ -837,7 +931,9 @@ export function PropertiesPanel() {
                     key={key}
                     className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs"
                   >
-                    <span className="w-3 text-[10px] font-bold uppercase text-slate-400">{key}</span>
+                    <span className="w-3 text-[10px] font-bold uppercase text-slate-400">
+                      {key}
+                    </span>
                     <input
                       type="number"
                       value={Math.round(el[key] as number)}
@@ -967,13 +1063,21 @@ export function PropertiesPanel() {
                             type="text"
                             aria-label={`Item ${index + 1}`}
                             value={it}
-                            onChange={(e) => update(el.id, { items: el.items.map((x, j) => (j === index ? e.target.value : x)) } as never)}
+                            onChange={(e) =>
+                              update(el.id, {
+                                items: el.items.map((x, j) => (j === index ? e.target.value : x)),
+                              } as never)
+                            }
                             className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
                           />
                           <button
                             type="button"
                             aria-label="Remove item"
-                            onClick={() => update(el.id, { items: el.items.filter((_, j) => j !== index) } as never)}
+                            onClick={() =>
+                              update(el.id, {
+                                items: el.items.filter((_, j) => j !== index),
+                              } as never)
+                            }
                             className="rounded p-1 text-slate-400 hover:text-rose-600"
                           >
                             <X className="size-3.5" />
@@ -982,7 +1086,11 @@ export function PropertiesPanel() {
                       ))}
                       <button
                         type="button"
-                        onClick={() => update(el.id, { items: [...el.items, `Item ${el.items.length + 1}`] } as never)}
+                        onClick={() =>
+                          update(el.id, {
+                            items: [...el.items, `Item ${el.items.length + 1}`],
+                          } as never)
+                        }
                         className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
                       >
                         + Add item
@@ -991,7 +1099,15 @@ export function PropertiesPanel() {
                   </Field>
                 )}
                 {UI_CAPTION_DEFAULTS[el.kind] !== undefined && (
-                  <Field label={el.kind === "taskbar" ? "Search label" : el.kind === "vtabs" ? "New tab label" : "Button label"}>
+                  <Field
+                    label={
+                      el.kind === "taskbar"
+                        ? "Search label"
+                        : el.kind === "vtabs"
+                          ? "New tab label"
+                          : "Button label"
+                    }
+                  >
                     <input
                       type="text"
                       value={el.files?.[0] ?? UI_CAPTION_DEFAULTS[el.kind]}
@@ -1019,226 +1135,310 @@ export function PropertiesPanel() {
             )}
 
             {/* TABLE ELEMENT */}
-            {el.type === "table" && (() => {
-              const tb = el as TableElement;
-              return (
-                <Section title="Table">
-                  <Field label="Theme Presets">
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
-                        const t = UI_STYLE_THEMES[s];
-                        const active = tb.tableStyle === s;
-                        return (
-                          <button
-                            key={s}
-                            onClick={() => update(tb.id, tableStylePatch(s) as never)}
-                            className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${
-                              active
-                                ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
-                                : "border-slate-200 hover:border-slate-300"
-                            }`}
-                          >
-                            {t.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </Field>
-                  <Field label="Options">
-                    <div className="flex flex-wrap gap-3">
-                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
-                        <input type="checkbox" checked={tb.headerRow} onChange={(e) => update(tb.id, { headerRow: e.target.checked } as never)} className="accent-sky-600" />
-                        Header row
-                      </label>
-                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
-                        <input type="checkbox" checked={tb.zebra} onChange={(e) => update(tb.id, { zebra: e.target.checked } as never)} className="accent-sky-600" />
-                        Zebra rows
-                      </label>
-                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
-                        <input type="checkbox" checked={tb.firstColBold} onChange={(e) => update(tb.id, { firstColBold: e.target.checked } as never)} className="accent-sky-600" />
-                        Bold first column
-                      </label>
-                    </div>
-                  </Field>
-                  <Field label="Cells">
-                    <div className="space-y-1.5">
-                      {tb.rows.map((row, ri) => (
-                        <div key={ri} className="flex items-center gap-1">
-                          {row.map((cell, ci) => (
-                            <input
-                              key={ci}
-                              type="text"
-                              aria-label={`Row ${ri + 1} column ${ci + 1}`}
-                              value={cell}
-                              onChange={(e) =>
-                                update(tb.id, {
-                                  rows: tb.rows.map((r, i) =>
-                                    i === ri ? r.map((c2, j) => (j === ci ? e.target.value : c2)) : r,
-                                  ),
-                                } as never)
+            {el.type === "table" &&
+              (() => {
+                const tb = el as TableElement;
+                return (
+                  <Section title="Table">
+                    <Field label="Theme Presets">
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
+                          const t = UI_STYLE_THEMES[s];
+                          const active = tb.tableStyle === s;
+                          return (
+                            <button
+                              key={s}
+                              onClick={() => update(tb.id, tableStylePatch(s) as never)}
+                              className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${
+                                active
+                                  ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                                  : "border-slate-200 hover:border-slate-300"
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </Field>
+                    <Field label="Options">
+                      <div className="flex flex-wrap gap-3">
+                        <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                          <input
+                            type="checkbox"
+                            checked={tb.headerRow}
+                            onChange={(e) =>
+                              update(tb.id, { headerRow: e.target.checked } as never)
+                            }
+                            className="accent-sky-600"
+                          />
+                          Header row
+                        </label>
+                        <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                          <input
+                            type="checkbox"
+                            checked={tb.zebra}
+                            onChange={(e) => update(tb.id, { zebra: e.target.checked } as never)}
+                            className="accent-sky-600"
+                          />
+                          Zebra rows
+                        </label>
+                        <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                          <input
+                            type="checkbox"
+                            checked={tb.firstColBold}
+                            onChange={(e) =>
+                              update(tb.id, { firstColBold: e.target.checked } as never)
+                            }
+                            className="accent-sky-600"
+                          />
+                          Bold first column
+                        </label>
+                      </div>
+                    </Field>
+                    <Field label="Cells">
+                      <div className="space-y-1.5">
+                        {tb.rows.map((row, ri) => (
+                          <div key={ri} className="flex items-center gap-1">
+                            {row.map((cell, ci) => (
+                              <input
+                                key={ci}
+                                type="text"
+                                aria-label={`Row ${ri + 1} column ${ci + 1}`}
+                                value={cell}
+                                onChange={(e) =>
+                                  update(tb.id, {
+                                    rows: tb.rows.map((r, i) =>
+                                      i === ri
+                                        ? r.map((c2, j) => (j === ci ? e.target.value : c2))
+                                        : r,
+                                    ),
+                                  } as never)
+                                }
+                                className="min-w-0 flex-1 rounded-lg border border-slate-200 px-1.5 py-1 text-[11px] focus:border-sky-500 focus:outline-none"
+                              />
+                            ))}
+                            <button
+                              type="button"
+                              aria-label="Remove row"
+                              disabled={tb.rows.length <= 1}
+                              onClick={() =>
+                                update(tb.id, { rows: tb.rows.filter((_, i) => i !== ri) } as never)
                               }
-                              className="min-w-0 flex-1 rounded-lg border border-slate-200 px-1.5 py-1 text-[11px] focus:border-sky-500 focus:outline-none"
-                            />
-                          ))}
+                              className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                        <div className="flex gap-1.5">
                           <button
                             type="button"
-                            aria-label="Remove row"
-                            disabled={tb.rows.length <= 1}
-                            onClick={() => update(tb.id, { rows: tb.rows.filter((_, i) => i !== ri) } as never)}
-                            className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                            onClick={() =>
+                              update(tb.id, {
+                                rows: [...tb.rows, tb.rows[0].map(() => "")],
+                              } as never)
+                            }
+                            className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
                           >
-                            <X className="size-3.5" />
+                            + Add row
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              update(tb.id, { rows: tb.rows.map((r) => [...r, ""]) } as never)
+                            }
+                            className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                          >
+                            + Add column
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Remove last column"
+                            disabled={tb.rows[0].length <= 1}
+                            onClick={() =>
+                              update(tb.id, { rows: tb.rows.map((r) => r.slice(0, -1)) } as never)
+                            }
+                            className="rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-30"
+                          >
+                            − Col
                           </button>
                         </div>
-                      ))}
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => update(tb.id, { rows: [...tb.rows, tb.rows[0].map(() => "")] } as never)}
-                          className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                        >
-                          + Add row
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => update(tb.id, { rows: tb.rows.map((r) => [...r, ""]) } as never)}
-                          className="flex-1 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                        >
-                          + Add column
-                        </button>
-                        <button
-                          type="button"
-                          aria-label="Remove last column"
-                          disabled={tb.rows[0].length <= 1}
-                          onClick={() => update(tb.id, { rows: tb.rows.map((r) => r.slice(0, -1)) } as never)}
-                          className="rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-30"
-                        >
-                          − Col
-                        </button>
                       </div>
-                    </div>
-                  </Field>
-                  <SliderWithInput
-                    label="Font size"
-                    min={10}
-                    max={40}
-                    value={tb.fontSize}
-                    unit="px"
-                    onChange={(val) => update(tb.id, { fontSize: val } as never)}
-                  />
-                  <SliderWithInput
-                    label="Cell padding"
-                    min={2}
-                    max={24}
-                    value={tb.cellPadding ?? 12}
-                    unit="px"
-                    onChange={(val) => update(tb.id, { cellPadding: val } as never)}
-                  />
-                  <SliderWithInput
-                    label="Grid width"
-                    min={0}
-                    max={3}
-                    value={tb.gridWidth ?? 1}
-                    unit="px"
-                    onChange={(val) => update(tb.id, { gridWidth: val } as never)}
-                  />
-                  <ModernColorPicker label="Background" value={tb.bgColor} onChange={(c) => update(tb.id, { bgColor: c } as never)} />
-                  <ModernColorPicker label="Text" value={tb.fgColor} onChange={(c) => update(tb.id, { fgColor: c } as never)} />
-                  <ModernColorPicker label="Header" value={tb.accentColor} onChange={(c) => update(tb.id, { accentColor: c } as never)} />
-                </Section>
-              );
-            })()}
+                    </Field>
+                    <SliderWithInput
+                      label="Font size"
+                      min={10}
+                      max={40}
+                      value={tb.fontSize}
+                      unit="px"
+                      onChange={(val) => update(tb.id, { fontSize: val } as never)}
+                    />
+                    <SliderWithInput
+                      label="Cell padding"
+                      min={2}
+                      max={24}
+                      value={tb.cellPadding ?? 12}
+                      unit="px"
+                      onChange={(val) => update(tb.id, { cellPadding: val } as never)}
+                    />
+                    <SliderWithInput
+                      label="Grid width"
+                      min={0}
+                      max={3}
+                      value={tb.gridWidth ?? 1}
+                      unit="px"
+                      onChange={(val) => update(tb.id, { gridWidth: val } as never)}
+                    />
+                    <ModernColorPicker
+                      label="Background"
+                      value={tb.bgColor}
+                      onChange={(c) => update(tb.id, { bgColor: c } as never)}
+                    />
+                    <ModernColorPicker
+                      label="Text"
+                      value={tb.fgColor}
+                      onChange={(c) => update(tb.id, { fgColor: c } as never)}
+                    />
+                    <ModernColorPicker
+                      label="Header"
+                      value={tb.accentColor}
+                      onChange={(c) => update(tb.id, { accentColor: c } as never)}
+                    />
+                  </Section>
+                );
+              })()}
 
             {/* QUIZ ELEMENT */}
-            {el.type === "quiz" && (() => {
-              const q = el as QuizElement;
-              const setOpts = (options: QuizElement["options"], correctId = q.correctId) =>
-                update(q.id, { options, correctId } as never);
-              return (
-                <Section title="Quiz">
-                  <Field label="Mode">
-                    <SegmentedControl label="Quiz mode" value={q.mode ?? "quiz"} onChange={mode => update(q.id, { mode } as never)} options={[{ value: "quiz", label: "Quiz" }, { value: "poll", label: "Live poll" }]} />
-                  </Field>
-                  <Field label="Visual style">
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((style) => (
-                        <button
-                          key={style}
-                          type="button"
-                          onClick={() => update(q.id, { ...quizStylePatch(style) } as never)}
-                          className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${q.uiStyle === style ? "border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-500/20" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
-                        >
-                          {UI_STYLE_THEMES[style].label}
-                        </button>
-                      ))}
-                    </div>
-                  </Field>
-                  <Field label="Effect">
-                    <select value={q.effect ?? "none"} onChange={(e) => update(q.id, { effect: e.target.value } as never)} className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs">
-                      {SHAPE_EFFECTS.map((effect) => <option key={effect.value} value={effect.value}>{effect.label}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="Question">
-                    <textarea
-                      rows={2}
-                      aria-label="Quiz question"
-                      value={q.question}
-                      onChange={(e) => update(q.id, { question: e.target.value } as never)}
-                      className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
-                    />
-                  </Field>
-                  <Field label={(q.mode ?? "quiz") === "quiz" ? "Answers (pick the correct one)" : "Options"}>
-                    <div className="space-y-1.5">
-                      {q.options.map((o, index) => (
-                        <div key={o.id} className="flex items-center gap-1.5">
-                          {(q.mode ?? "quiz") === "quiz" && (
-                            <input
-                              type="radio"
-                              aria-label={`Correct answer ${index + 1}`}
-                              checked={q.correctId === o.id}
-                              onChange={() => update(q.id, { correctId: o.id } as never)}
-                            />
-                          )}
-                          <input
-                            type="text"
-                            aria-label={`Answer ${index + 1}`}
-                            value={o.text}
-                            onChange={(e) =>
-                              setOpts(q.options.map((x) => (x.id === o.id ? { ...x, text: e.target.value } : x)))
-                            }
-                            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
-                          />
+            {el.type === "quiz" &&
+              (() => {
+                const q = el as QuizElement;
+                const setOpts = (options: QuizElement["options"], correctId = q.correctId) =>
+                  update(q.id, { options, correctId } as never);
+                return (
+                  <Section title="Quiz">
+                    <Field label="Mode">
+                      <SegmentedControl
+                        label="Quiz mode"
+                        value={q.mode ?? "quiz"}
+                        onChange={(mode) => update(q.id, { mode } as never)}
+                        options={[
+                          { value: "quiz", label: "Quiz" },
+                          { value: "poll", label: "Live poll" },
+                        ]}
+                      />
+                    </Field>
+                    <Field label="Visual style">
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((style) => (
                           <button
-                            aria-label="Remove option"
-                            disabled={q.options.length <= 2}
-                            onClick={() => {
-                              const rest = q.options.filter((x) => x.id !== o.id);
-                              setOpts(rest, q.correctId === o.id ? rest[0].id : q.correctId);
-                            }}
-                            className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                            key={style}
+                            type="button"
+                            onClick={() => update(q.id, { ...quizStylePatch(style) } as never)}
+                            className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${q.uiStyle === style ? "border-sky-500 bg-sky-50 text-sky-700 ring-2 ring-sky-500/20" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}
                           >
-                            <X className="size-3.5" />
+                            {UI_STYLE_THEMES[style].label}
                           </button>
-                        </div>
-                      ))}
-                      {q.options.length < 6 && (
-                        <button
-                          onClick={() =>
-                            setOpts([...q.options, { id: crypto.randomUUID(), text: `Option ${q.options.length + 1}` }])
-                          }
-                          className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                        >
-                          + Add option
-                        </button>
-                      )}
-                    </div>
-                  </Field>
-                  <ModernColorPicker label="Background" value={q.bgColor} onChange={(c) => update(q.id, { bgColor: c } as never)} />
-                  <ModernColorPicker label="Text" value={q.fgColor} onChange={(c) => update(q.id, { fgColor: c } as never)} />
-                  <ModernColorPicker label="Accent" value={q.accentColor} onChange={(c) => update(q.id, { accentColor: c } as never)} />
-                </Section>
-              );
-            })()}
+                        ))}
+                      </div>
+                    </Field>
+                    <Field label="Effect">
+                      <select
+                        value={q.effect ?? "none"}
+                        onChange={(e) => update(q.id, { effect: e.target.value } as never)}
+                        className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs"
+                      >
+                        {SHAPE_EFFECTS.map((effect) => (
+                          <option key={effect.value} value={effect.value}>
+                            {effect.label}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    <Field label="Question">
+                      <textarea
+                        rows={2}
+                        aria-label="Quiz question"
+                        value={q.question}
+                        onChange={(e) => update(q.id, { question: e.target.value } as never)}
+                        className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                      />
+                    </Field>
+                    <Field
+                      label={
+                        (q.mode ?? "quiz") === "quiz" ? "Answers (pick the correct one)" : "Options"
+                      }
+                    >
+                      <div className="space-y-1.5">
+                        {q.options.map((o, index) => (
+                          <div key={o.id} className="flex items-center gap-1.5">
+                            {(q.mode ?? "quiz") === "quiz" && (
+                              <input
+                                type="radio"
+                                aria-label={`Correct answer ${index + 1}`}
+                                checked={q.correctId === o.id}
+                                onChange={() => update(q.id, { correctId: o.id } as never)}
+                              />
+                            )}
+                            <input
+                              type="text"
+                              aria-label={`Answer ${index + 1}`}
+                              value={o.text}
+                              onChange={(e) =>
+                                setOpts(
+                                  q.options.map((x) =>
+                                    x.id === o.id ? { ...x, text: e.target.value } : x,
+                                  ),
+                                )
+                              }
+                              className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1 text-xs focus:border-sky-500 focus:outline-none"
+                            />
+                            <button
+                              aria-label="Remove option"
+                              disabled={q.options.length <= 2}
+                              onClick={() => {
+                                const rest = q.options.filter((x) => x.id !== o.id);
+                                setOpts(rest, q.correctId === o.id ? rest[0].id : q.correctId);
+                              }}
+                              className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                            >
+                              <X className="size-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                        {q.options.length < 6 && (
+                          <button
+                            onClick={() =>
+                              setOpts([
+                                ...q.options,
+                                { id: crypto.randomUUID(), text: `Option ${q.options.length + 1}` },
+                              ])
+                            }
+                            className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                          >
+                            + Add option
+                          </button>
+                        )}
+                      </div>
+                    </Field>
+                    <ModernColorPicker
+                      label="Background"
+                      value={q.bgColor}
+                      onChange={(c) => update(q.id, { bgColor: c } as never)}
+                    />
+                    <ModernColorPicker
+                      label="Text"
+                      value={q.fgColor}
+                      onChange={(c) => update(q.id, { fgColor: c } as never)}
+                    />
+                    <ModernColorPicker
+                      label="Accent"
+                      value={q.accentColor}
+                      onChange={(c) => update(q.id, { accentColor: c } as never)}
+                    />
+                  </Section>
+                );
+              })()}
 
             {/* TEXT ELEMENT */}
             {el.type === "text" && (
@@ -1306,11 +1506,33 @@ export function PropertiesPanel() {
                     />
                   </Field>
                   <Field label="Formatting">
-                    <ToggleGrid columns={3} label="Text formatting" options={[
-                      { id: "italic", label: "Italic", icon: Italic, checked: !!el.italic, onChange: () => update(el.id, { italic: !el.italic }) },
-                      { id: "underline", label: "Underline", icon: Underline, checked: !!el.underline, onChange: () => update(el.id, { underline: !el.underline }) },
-                      { id: "bullet", label: "Bullets", icon: List, checked: !!el.bullet, onChange: () => update(el.id, { bullet: !el.bullet }) },
-                    ]} />
+                    <ToggleGrid
+                      columns={3}
+                      label="Text formatting"
+                      options={[
+                        {
+                          id: "italic",
+                          label: "Italic",
+                          icon: Italic,
+                          checked: !!el.italic,
+                          onChange: () => update(el.id, { italic: !el.italic }),
+                        },
+                        {
+                          id: "underline",
+                          label: "Underline",
+                          icon: Underline,
+                          checked: !!el.underline,
+                          onChange: () => update(el.id, { underline: !el.underline }),
+                        },
+                        {
+                          id: "bullet",
+                          label: "Bullets",
+                          icon: List,
+                          checked: !!el.bullet,
+                          onChange: () => update(el.id, { bullet: !el.bullet }),
+                        },
+                      ]}
+                    />
                   </Field>
                   <Field label="Fill">
                     <SegmentedControl
@@ -1331,7 +1553,7 @@ export function PropertiesPanel() {
                       onOpacityChange={(v) => update(el.id, { opacity: v })}
                     />
                   )}
-                                  <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                  <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-medium text-slate-600">Gradient fill</span>
                       <button
@@ -1353,7 +1575,9 @@ export function PropertiesPanel() {
                         <SegmentedControl
                           value={el.gradient.type ?? "linear"}
                           onChange={(type) =>
-                            update(el.id, { gradient: { ...el.gradient!, type: type as ShapeGradient["type"] } })
+                            update(el.id, {
+                              gradient: { ...el.gradient!, type: type as ShapeGradient["type"] },
+                            })
                           }
                           options={[
                             { value: "linear", label: "Linear" },
@@ -1364,7 +1588,9 @@ export function PropertiesPanel() {
                           <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
                             <ColorSwatchPopover
                               value={el.gradient.from}
-                              onChange={(from) => update(el.id, { gradient: { ...el.gradient!, from } })}
+                              onChange={(from) =>
+                                update(el.id, { gradient: { ...el.gradient!, from } })
+                              }
                               label="Gradient start color"
                             />
                             Start
@@ -1372,7 +1598,9 @@ export function PropertiesPanel() {
                           <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
                             <ColorSwatchPopover
                               value={el.gradient.to}
-                              onChange={(to) => update(el.id, { gradient: { ...el.gradient!, to } })}
+                              onChange={(to) =>
+                                update(el.id, { gradient: { ...el.gradient!, to } })
+                              }
                               label="Gradient end color"
                             />
                             End
@@ -1385,7 +1613,9 @@ export function PropertiesPanel() {
                             max={360}
                             value={el.gradient.angle}
                             unit="°"
-                            onChange={(angle) => update(el.id, { gradient: { ...el.gradient!, angle } })}
+                            onChange={(angle) =>
+                              update(el.id, { gradient: { ...el.gradient!, angle } })
+                            }
                           />
                         )}
                       </>
@@ -1395,7 +1625,9 @@ export function PropertiesPanel() {
                     <Dropdown
                       value={el.blendMode ?? "normal"}
                       options={BLEND_MODES}
-                      onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                      onChange={(v) =>
+                        update(el.id, { blendMode: v === "normal" ? undefined : v } as never)
+                      }
                     />
                   </Field>
                   <Field label="Image fill (inside letters)">
@@ -1415,7 +1647,11 @@ export function PropertiesPanel() {
                               const src = await prepareImage(file);
                               update(el.id, { imageOverlay: src });
                             } catch (error) {
-                              window.alert(error instanceof Error ? error.message : "Could not import this image.");
+                              window.alert(
+                                error instanceof Error
+                                  ? error.message
+                                  : "Could not import this image.",
+                              );
                             }
                           }}
                         />
@@ -1435,11 +1671,13 @@ export function PropertiesPanel() {
                     </p>
                   </Field>
 
-                <Field label="Shape Mask">
-                  <Dropdown
+                  <Field label="Shape Mask">
+                    <Dropdown
                       value={el.maskShape ?? ""}
                       options={MASK_OPTIONS}
-                      onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
+                      onChange={(v) =>
+                        update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })
+                      }
                     />
                   </Field>
                   <Field label="Hyperlink URL">
@@ -1464,7 +1702,10 @@ export function PropertiesPanel() {
                 <Field label="Effect">
                   <Dropdown
                     value={el.effect ?? "none"}
-                    options={SHAPE_EFFECTS.map((option) => ({ ...option, value: option.value ?? "none" }))}
+                    options={SHAPE_EFFECTS.map((option) => ({
+                      ...option,
+                      value: option.value ?? "none",
+                    }))}
                     onChange={(v) => update(el.id, { effect: v as ShapeElement["effect"] })}
                   />
                 </Field>
@@ -1489,10 +1730,18 @@ export function PropertiesPanel() {
                     />
                     <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-medium text-slate-600">Gradient fill</span>
+                        <span className="text-[11px] font-medium text-slate-600">
+                          Gradient fill
+                        </span>
                         <button
                           type="button"
-                          onClick={() => update(el.id, { gradient: el.gradient ? undefined : { from: el.fill, to: "#6366f1", angle: 90, type: "linear" } })}
+                          onClick={() =>
+                            update(el.id, {
+                              gradient: el.gradient
+                                ? undefined
+                                : { from: el.fill, to: "#6366f1", angle: 90, type: "linear" },
+                            })
+                          }
                           className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-600 transition hover:border-sky-300 hover:text-sky-700"
                         >
                           {el.gradient ? "Remove" : "Add"}
@@ -1502,21 +1751,49 @@ export function PropertiesPanel() {
                         <>
                           <SegmentedControl
                             value={el.gradient.type ?? "linear"}
-                            onChange={(type) => update(el.id, { gradient: { ...el.gradient!, type: type as ShapeGradient["type"] } })}
-                            options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]}
+                            onChange={(type) =>
+                              update(el.id, {
+                                gradient: { ...el.gradient!, type: type as ShapeGradient["type"] },
+                              })
+                            }
+                            options={[
+                              { value: "linear", label: "Linear" },
+                              { value: "radial", label: "Radial" },
+                            ]}
                           />
                           <div className="grid grid-cols-2 gap-2">
                             <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                              <ColorSwatchPopover value={el.gradient.from} onChange={(from) => update(el.id, { gradient: { ...el.gradient!, from } })} label="Gradient start color" />
+                              <ColorSwatchPopover
+                                value={el.gradient.from}
+                                onChange={(from) =>
+                                  update(el.id, { gradient: { ...el.gradient!, from } })
+                                }
+                                label="Gradient start color"
+                              />
                               Start
                             </label>
                             <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 text-[10px] text-slate-500">
-                              <ColorSwatchPopover value={el.gradient.to} onChange={(to) => update(el.id, { gradient: { ...el.gradient!, to } })} label="Gradient end color" />
+                              <ColorSwatchPopover
+                                value={el.gradient.to}
+                                onChange={(to) =>
+                                  update(el.id, { gradient: { ...el.gradient!, to } })
+                                }
+                                label="Gradient end color"
+                              />
                               End
                             </label>
                           </div>
                           {(el.gradient.type ?? "linear") === "linear" && (
-                            <SliderWithInput label="Angle" min={0} max={360} value={el.gradient.angle} unit="°" onChange={(angle) => update(el.id, { gradient: { ...el.gradient!, angle } })} />
+                            <SliderWithInput
+                              label="Angle"
+                              min={0}
+                              max={360}
+                              value={el.gradient.angle}
+                              unit="°"
+                              onChange={(angle) =>
+                                update(el.id, { gradient: { ...el.gradient!, angle } })
+                              }
+                            />
                           )}
                         </>
                       )}
@@ -1540,7 +1817,9 @@ export function PropertiesPanel() {
                   <Dropdown
                     value={el.maskShape ?? ""}
                     options={MASK_OPTIONS}
-                    onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
+                    onChange={(v) =>
+                      update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })
+                    }
                   />
                 </Field>
                 {el.shape === "rect" && (
@@ -1565,7 +1844,9 @@ export function PropertiesPanel() {
                   <Dropdown
                     value={el.blendMode ?? "normal"}
                     options={BLEND_MODES}
-                    onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                    onChange={(v) =>
+                      update(el.id, { blendMode: v === "normal" ? undefined : v } as never)
+                    }
                   />
                 </Field>
               </Section>
@@ -1586,7 +1867,8 @@ export function PropertiesPanel() {
                     />
                   </div>
                   <p className="mt-1.5 text-[10px] leading-snug text-slate-400">
-                    Collez un lien YouTube, Spotify, SoundCloud, Google Maps, Figma ou Vimeo — il est converti en lecteur intégré.
+                    Collez un lien YouTube, Spotify, SoundCloud, Google Maps, Figma ou Vimeo — il
+                    est converti en lecteur intégré.
                   </p>
                 </Field>
                 <Field label="Titre (fallback export)">
@@ -1633,367 +1915,518 @@ export function PropertiesPanel() {
             {/* IMAGE ELEMENT */}
             {el.type === "image" && (
               <>
-              <Section title="Image">
-                <Field label="Shape Mask">
-                  <MaskPicker
-                    value={el.maskShape ?? ""}
-                    onChange={(v) => update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })}
-                  />
-                </Field>
-
-                <Field label="Fit (containance)">
-                  <SegmentedControl
-                    value={el.fit ?? "cover"}
-                    onChange={(fit) => update(el.id, { fit })}
-                    options={[
-                      { value: "cover", label: "Cover", title: "Remplit la zone, rogne l'excédent" },
-                      { value: "contain", label: "Contain", title: "Image entière visible, letterbox" },
-                      { value: "fill", label: "Fill", title: "Étirée pour remplir (peut déformer)" },
-                    ]}
-                  />
-                </Field>
-
-                <Field label="Crop">
-                  <div className="space-y-2">
-                    <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`w-full rounded-lg px-2 py-2 text-[11px] font-semibold transition ${croppingId === el.id ? "bg-sky-600 text-white hover:bg-sky-500" : "bg-slate-900 text-white hover:bg-slate-700"}`}>{croppingId === el.id ? "Terminer le recadrage" : "Recadrer sur le canvas"}</button>
-                    {croppingId === el.id && <p className="text-[10px] leading-snug text-slate-400">Glissez l'image dans son cadre pour la déplacer, molette pour zoomer, Échap pour terminer.</p>}
-                    <SliderWithInput label="Zoom" min={100} max={400} step={5} unit="%" value={Math.round((el.cropZoom ?? 1) * 100)} onChange={(v) => update(el.id, { cropZoom: v / 100 })} />
-                    <SliderWithInput label="Horizontal" min={0} max={100} unit="%" value={el.cropX ?? 50} onChange={(v) => update(el.id, { cropX: v })} />
-                    <SliderWithInput label="Vertical" min={0} max={100} unit="%" value={el.cropY ?? 50} onChange={(v) => update(el.id, { cropY: v })} />
-                    <button type="button" onClick={() => update(el.id, { cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined })} className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">Reset crop</button>
-                  </div>
-                </Field>
-
-                <Field label="Replace image">
-                  <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">
-                    <Upload className="size-3.5" />
-                    <span>Choose a new file</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        e.target.value = "";
-                        if (!file) return;
-                        try {
-                          const src = await prepareImage(file);
-                          update(el.id, { src, cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined });
-                        } catch (err) {
-                          window.alert(err instanceof Error ? err.message : "Could not load this image.");
-                        }
-                      }}
-                    />
-                  </label>
-                  <p className="mt-1 text-[10px] leading-snug text-slate-400">
-                    La position, la taille et le masque sont conservés ; le recadrage est réinitialisé.
-                  </p>
-                </Field>
-
-                <Field label="Transform">
-                  <ToggleGrid label="Image transforms" options={[
-                    { id: "flipX", label: "Flip H", icon: FlipHorizontal, checked: !!el.flipX, onChange: () => update(el.id, { flipX: !el.flipX }) },
-                    { id: "flipY", label: "Flip V", icon: FlipVertical, checked: !!el.flipY, onChange: () => update(el.id, { flipY: !el.flipY }) },
-                  ]} />
-                </Field>
-
-                <Field label="Aspect ratio">
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {ASPECT_RATIOS.map((r) => (
-                      <button
-                        key={r.label}
-                        type="button"
-                        onClick={() =>
-                          update(el.id, { height: Math.max(20, Math.round(el.width / r.value)) } as never)
-                        }
-                        className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
-                      >
-                        {r.label}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-
-              </Section>
-              <Section title="Image Filters" defaultOpen={false}>
-                <Field label="Presets">
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {IMAGE_FILTER_PRESETS.map((preset) => (
-                      <button
-                        key={preset.name}
-                        onClick={() =>
-                          update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } })
-                        }
-                        className="flex flex-col items-center rounded-lg border border-slate-200 p-1 transition hover:border-sky-500 hover:bg-slate-50"
-                      >
-                        <div
-                          className="h-7 w-full rounded-sm bg-linear-to-tr from-sky-400 to-indigo-600"
-                          style={{ filter: preset.preview }}
-                        />
-                        <span className="mt-1 text-[9px] font-medium text-slate-600">
-                          {preset.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-
-                <SliderWithInput
-                  label="Brightness"
-                  min={0}
-                  max={200}
-                  value={el.filters?.brightness ?? 100}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, brightness: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Contrast"
-                  min={0}
-                  max={200}
-                  value={el.filters?.contrast ?? 100}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, contrast: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Saturation"
-                  min={0}
-                  max={200}
-                  value={el.filters?.saturate ?? 100}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, saturate: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Hue Rotate"
-                  min={0}
-                  max={360}
-                  value={el.filters?.hueRotate ?? 0}
-                  unit="°"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, hueRotate: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Temperature"
-                  min={-100}
-                  max={100}
-                  value={el.filters?.temperature ?? 0}
-                  unit=""
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, temperature: val } })
-                  }
-                />
-                <Field label="Tint">
-                  <div className="flex items-center gap-2.5">
-                    <ColorPicker
-                      value={el.filters?.tintColor ?? "#7aa2ff"}
-                      onChange={(hex) =>
-                        update(el.id, {
-                          filters: {
-                            ...DEFAULT_FILTERS,
-                            ...el.filters,
-                            tintColor: hex,
-                            tintOpacity: el.filters?.tintOpacity ?? 35,
-                          },
-                        })
+                <Section title="Image">
+                  <Field label="Shape Mask">
+                    <MaskPicker
+                      value={el.maskShape ?? ""}
+                      onChange={(v) =>
+                        update(el.id, { maskShape: (v || undefined) as typeof el.maskShape })
                       }
                     />
-                    <div className="min-w-0 flex-1">
+                  </Field>
+
+                  <Field label="Fit (containance)">
+                    <SegmentedControl
+                      value={el.fit ?? "cover"}
+                      onChange={(fit) => update(el.id, { fit })}
+                      options={[
+                        {
+                          value: "cover",
+                          label: "Cover",
+                          title: "Remplit la zone, rogne l'excédent",
+                        },
+                        {
+                          value: "contain",
+                          label: "Contain",
+                          title: "Image entière visible, letterbox",
+                        },
+                        {
+                          value: "fill",
+                          label: "Fill",
+                          title: "Étirée pour remplir (peut déformer)",
+                        },
+                      ]}
+                    />
+                  </Field>
+
+                  <Field label="Crop">
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)
+                        }
+                        className={`w-full rounded-lg px-2 py-2 text-[11px] font-semibold transition ${croppingId === el.id ? "bg-sky-600 text-white hover:bg-sky-500" : "bg-slate-900 text-white hover:bg-slate-700"}`}
+                      >
+                        {croppingId === el.id ? "Terminer le recadrage" : "Recadrer sur le canvas"}
+                      </button>
+                      {croppingId === el.id && (
+                        <p className="text-[10px] leading-snug text-slate-400">
+                          Glissez l'image dans son cadre pour la déplacer, molette pour zoomer,
+                          Échap pour terminer.
+                        </p>
+                      )}
                       <SliderWithInput
-                        label="Tint strength"
+                        label="Zoom"
+                        min={100}
+                        max={400}
+                        step={5}
+                        unit="%"
+                        value={Math.round((el.cropZoom ?? 1) * 100)}
+                        onChange={(v) => update(el.id, { cropZoom: v / 100 })}
+                      />
+                      <SliderWithInput
+                        label="Horizontal"
                         min={0}
                         max={100}
-                        value={el.filters?.tintOpacity ?? 0}
                         unit="%"
-                        onChange={(val) =>
+                        value={el.cropX ?? 50}
+                        onChange={(v) => update(el.id, { cropX: v })}
+                      />
+                      <SliderWithInput
+                        label="Vertical"
+                        min={0}
+                        max={100}
+                        unit="%"
+                        value={el.cropY ?? 50}
+                        onChange={(v) => update(el.id, { cropY: v })}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(el.id, {
+                            cropZoom: undefined,
+                            cropX: undefined,
+                            cropY: undefined,
+                            cropRect: undefined,
+                          })
+                        }
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                      >
+                        Reset crop
+                      </button>
+                    </div>
+                  </Field>
+
+                  <Field label="Replace image">
+                    <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">
+                      <Upload className="size-3.5" />
+                      <span>Choose a new file</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = "";
+                          if (!file) return;
+                          try {
+                            const src = await prepareImage(file);
+                            update(el.id, {
+                              src,
+                              cropZoom: undefined,
+                              cropX: undefined,
+                              cropY: undefined,
+                              cropRect: undefined,
+                            });
+                          } catch (err) {
+                            window.alert(
+                              err instanceof Error ? err.message : "Could not load this image.",
+                            );
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="mt-1 text-[10px] leading-snug text-slate-400">
+                      La position, la taille et le masque sont conservés ; le recadrage est
+                      réinitialisé.
+                    </p>
+                  </Field>
+
+                  <Field label="Transform">
+                    <ToggleGrid
+                      label="Image transforms"
+                      options={[
+                        {
+                          id: "flipX",
+                          label: "Flip H",
+                          icon: FlipHorizontal,
+                          checked: !!el.flipX,
+                          onChange: () => update(el.id, { flipX: !el.flipX }),
+                        },
+                        {
+                          id: "flipY",
+                          label: "Flip V",
+                          icon: FlipVertical,
+                          checked: !!el.flipY,
+                          onChange: () => update(el.id, { flipY: !el.flipY }),
+                        },
+                      ]}
+                    />
+                  </Field>
+
+                  <Field label="Aspect ratio">
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {ASPECT_RATIOS.map((r) => (
+                        <button
+                          key={r.label}
+                          type="button"
+                          onClick={() =>
+                            update(el.id, {
+                              height: Math.max(20, Math.round(el.width / r.value)),
+                            } as never)
+                          }
+                          className="rounded-lg border border-slate-200 bg-white px-1 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                </Section>
+                <Section title="Image Filters" defaultOpen={false}>
+                  <Field label="Presets">
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {IMAGE_FILTER_PRESETS.map((preset) => (
+                        <button
+                          key={preset.name}
+                          onClick={() =>
+                            update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } })
+                          }
+                          className="flex flex-col items-center rounded-lg border border-slate-200 p-1 transition hover:border-sky-500 hover:bg-slate-50"
+                        >
+                          <div
+                            className="h-7 w-full rounded-sm bg-linear-to-tr from-sky-400 to-indigo-600"
+                            style={{ filter: preset.preview }}
+                          />
+                          <span className="mt-1 text-[9px] font-medium text-slate-600">
+                            {preset.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+
+                  <SliderWithInput
+                    label="Brightness"
+                    min={0}
+                    max={200}
+                    value={el.filters?.brightness ?? 100}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, brightness: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Contrast"
+                    min={0}
+                    max={200}
+                    value={el.filters?.contrast ?? 100}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, contrast: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Saturation"
+                    min={0}
+                    max={200}
+                    value={el.filters?.saturate ?? 100}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, saturate: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Hue Rotate"
+                    min={0}
+                    max={360}
+                    value={el.filters?.hueRotate ?? 0}
+                    unit="°"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, hueRotate: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Temperature"
+                    min={-100}
+                    max={100}
+                    value={el.filters?.temperature ?? 0}
+                    unit=""
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, temperature: val },
+                      })
+                    }
+                  />
+                  <Field label="Tint">
+                    <div className="flex items-center gap-2.5">
+                      <ColorPicker
+                        value={el.filters?.tintColor ?? "#7aa2ff"}
+                        onChange={(hex) =>
                           update(el.id, {
                             filters: {
                               ...DEFAULT_FILTERS,
                               ...el.filters,
-                              tintOpacity: val,
-                              tintColor: el.filters?.tintColor ?? "#7aa2ff",
+                              tintColor: hex,
+                              tintOpacity: el.filters?.tintOpacity ?? 35,
                             },
                           })
                         }
                       />
+                      <div className="min-w-0 flex-1">
+                        <SliderWithInput
+                          label="Tint strength"
+                          min={0}
+                          max={100}
+                          value={el.filters?.tintOpacity ?? 0}
+                          unit="%"
+                          onChange={(val) =>
+                            update(el.id, {
+                              filters: {
+                                ...DEFAULT_FILTERS,
+                                ...el.filters,
+                                tintOpacity: val,
+                                tintColor: el.filters?.tintColor ?? "#7aa2ff",
+                              },
+                            })
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-                </Field>
-                <SliderWithInput
-                  label="Blur"
-                  min={0}
-                  max={20}
-                  step={0.5}
-                  value={el.filters?.blur ?? 0}
-                  unit="px"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, blur: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Grayscale"
-                  min={0}
-                  max={100}
-                  value={el.filters?.grayscale ?? 0}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, grayscale: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Sepia"
-                  min={0}
-                  max={100}
-                  value={el.filters?.sepia ?? 0}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, sepia: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Invert"
-                  min={0}
-                  max={100}
-                  value={el.filters?.invert ?? 0}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, invert: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Glitch"
-                  min={0}
-                  max={100}
-                  value={el.filters?.glitch ?? 0}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, glitch: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Noise"
-                  min={0}
-                  max={100}
-                  value={el.filters?.noise ?? 0}
-                  unit="%"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, noise: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Pixelate"
-                  min={0}
-                  max={40}
-                  value={el.filters?.pixelate ?? 0}
-                  unit="px"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, pixelate: val } })
-                  }
-                />
-                <SliderWithInput
-                  label="Posterize"
-                  min={0}
-                  max={16}
-                  value={el.filters?.posterize ?? 0}
-                  unit=" lvl"
-                  onChange={(val) =>
-                    update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, posterize: val } })
-                  }
-                />
-                <button
-                  type="button"
-                  onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
-                  className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
-                >
-                  Reset filters
-                </button>
-              </Section>
-              <Section title="Image Style" defaultOpen={false}>
-                <SliderWithInput
-                  label="Corner Radius"
-                  min={0}
-                  max={Math.floor(Math.min(el.width, el.height) / 2)}
-                  value={el.cornerRadius ?? 0}
-                  unit="px"
-                  onChange={(val) => update(el.id, { cornerRadius: val })}
-                />
-
-                <SliderWithInput
-                  label="Opacity"
-                  min={0}
-                  max={100}
-                  value={Math.round((el.opacity ?? 1) * 100)}
-                  unit="%"
-                  onChange={(val) => update(el.id, { opacity: val / 100 })}
-                />
-
-                <Field label="Border">
-                  <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
-                    <SliderWithInput
-                      label="Border Width"
-                      min={0}
-                      max={24}
-                      value={el.borderWidth ?? 0}
-                      unit="px"
-                      onChange={(val) => update(el.id, { borderWidth: val })}
-                    />
-                    {(el.borderWidth ?? 0) > 0 && (
-                      <ModernColorPicker
-                        label="Border Color"
-                        value={el.borderColor ?? "#000000"}
-                        onChange={(c) => update(el.id, { borderColor: c })}
-                      />
-                    )}
-                  </div>
-                </Field>
-
-                <Field label="Blend mode">
-                  <Dropdown
-                    value={el.blendMode ?? "normal"}
-                    options={BLEND_MODES}
-                    onChange={(v) => update(el.id, { blendMode: v === "normal" ? undefined : v } as never)}
+                  </Field>
+                  <SliderWithInput
+                    label="Blur"
+                    min={0}
+                    max={20}
+                    step={0.5}
+                    value={el.filters?.blur ?? 0}
+                    unit="px"
+                    onChange={(val) =>
+                      update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, blur: val } })
+                    }
                   />
-                </Field>
+                  <SliderWithInput
+                    label="Grayscale"
+                    min={0}
+                    max={100}
+                    value={el.filters?.grayscale ?? 0}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, grayscale: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Sepia"
+                    min={0}
+                    max={100}
+                    value={el.filters?.sepia ?? 0}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, sepia: val } })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Invert"
+                    min={0}
+                    max={100}
+                    value={el.filters?.invert ?? 0}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, invert: val } })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Glitch"
+                    min={0}
+                    max={100}
+                    value={el.filters?.glitch ?? 0}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, glitch: val } })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Noise"
+                    min={0}
+                    max={100}
+                    value={el.filters?.noise ?? 0}
+                    unit="%"
+                    onChange={(val) =>
+                      update(el.id, { filters: { ...DEFAULT_FILTERS, ...el.filters, noise: val } })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Pixelate"
+                    min={0}
+                    max={40}
+                    value={el.filters?.pixelate ?? 0}
+                    unit="px"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, pixelate: val },
+                      })
+                    }
+                  />
+                  <SliderWithInput
+                    label="Posterize"
+                    min={0}
+                    max={16}
+                    value={el.filters?.posterize ?? 0}
+                    unit=" lvl"
+                    onChange={(val) =>
+                      update(el.id, {
+                        filters: { ...DEFAULT_FILTERS, ...el.filters, posterize: val },
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => update(el.id, { filters: { ...DEFAULT_FILTERS } })}
+                    className="w-full rounded-lg border border-dashed border-slate-300 py-1 text-[10px] font-medium text-slate-500 hover:border-rose-400 hover:text-rose-600"
+                  >
+                    Reset filters
+                  </button>
+                </Section>
+                <Section title="Image Style" defaultOpen={false}>
+                  <SliderWithInput
+                    label="Corner Radius"
+                    min={0}
+                    max={Math.floor(Math.min(el.width, el.height) / 2)}
+                    value={el.cornerRadius ?? 0}
+                    unit="px"
+                    onChange={(val) => update(el.id, { cornerRadius: val })}
+                  />
 
-              </Section>
+                  <SliderWithInput
+                    label="Opacity"
+                    min={0}
+                    max={100}
+                    value={Math.round((el.opacity ?? 1) * 100)}
+                    unit="%"
+                    onChange={(val) => update(el.id, { opacity: val / 100 })}
+                  />
+
+                  <Field label="Border">
+                    <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                      <SliderWithInput
+                        label="Border Width"
+                        min={0}
+                        max={24}
+                        value={el.borderWidth ?? 0}
+                        unit="px"
+                        onChange={(val) => update(el.id, { borderWidth: val })}
+                      />
+                      {(el.borderWidth ?? 0) > 0 && (
+                        <ModernColorPicker
+                          label="Border Color"
+                          value={el.borderColor ?? "#000000"}
+                          onChange={(c) => update(el.id, { borderColor: c })}
+                        />
+                      )}
+                    </div>
+                  </Field>
+
+                  <Field label="Blend mode">
+                    <Dropdown
+                      value={el.blendMode ?? "normal"}
+                      options={BLEND_MODES}
+                      onChange={(v) =>
+                        update(el.id, { blendMode: v === "normal" ? undefined : v } as never)
+                      }
+                    />
+                  </Field>
+                </Section>
               </>
             )}
 
-{/* SHADOW (all elements) */}
+            {/* SHADOW (all elements) */}
             <Section title="Shadow" defaultOpen={!!el.shadow}>
-              <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
-              {el.shadow && (() => {
-                const s = el.shadow as ElementShadow;
-                const set = (p: Partial<ElementShadow>) => update(el.id, { shadow: { ...s, ...p } } as never);
-                return (
-                  <>
-                    <SliderWithInput label="Offset X" min={-60} max={60} value={s.x} unit="px" onChange={(v) => set({ x: v })} />
-                    <SliderWithInput label="Offset Y" min={-60} max={60} value={s.y} unit="px" onChange={(v) => set({ y: v })} />
-                    <SliderWithInput label="Blur" min={0} max={100} value={s.blur} unit="px" onChange={(v) => set({ blur: v })} />
-                    <ModernColorPicker label="Color" value={s.color.startsWith("#") ? s.color : "#000000"} onChange={(c) => set({ color: c })} />
-                  </>
-                );
-              })()}
+              <ToggleGrid
+                label="Shadow"
+                options={[
+                  {
+                    id: "shadow",
+                    label: "Enable shadow",
+                    icon: Layers,
+                    checked: !!el.shadow,
+                    onChange: (checked) =>
+                      update(el.id, {
+                        shadow: checked
+                          ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" }
+                          : undefined,
+                      } as never),
+                  },
+                ]}
+              />
+              {el.shadow &&
+                (() => {
+                  const s = el.shadow as ElementShadow;
+                  const set = (p: Partial<ElementShadow>) =>
+                    update(el.id, { shadow: { ...s, ...p } } as never);
+                  return (
+                    <>
+                      <SliderWithInput
+                        label="Offset X"
+                        min={-60}
+                        max={60}
+                        value={s.x}
+                        unit="px"
+                        onChange={(v) => set({ x: v })}
+                      />
+                      <SliderWithInput
+                        label="Offset Y"
+                        min={-60}
+                        max={60}
+                        value={s.y}
+                        unit="px"
+                        onChange={(v) => set({ y: v })}
+                      />
+                      <SliderWithInput
+                        label="Blur"
+                        min={0}
+                        max={100}
+                        value={s.blur}
+                        unit="px"
+                        onChange={(v) => set({ blur: v })}
+                      />
+                      <ModernColorPicker
+                        label="Color"
+                        value={s.color.startsWith("#") ? s.color : "#000000"}
+                        onChange={(c) => set({ color: c })}
+                      />
+                    </>
+                  );
+                })()}
             </Section>
 
             {/* KEYFRAME ANIMATION — custom motion path */}
             <Section title="Keyframe Animation" defaultOpen={false}>
               <p className="text-[10px] leading-snug text-slate-500">
-                Build a custom animation: place the object, capture a keyframe, move or restyle it, capture the next. It plays while presenting.
+                Build a custom animation: place the object, capture a keyframe, move or restyle it,
+                capture the next. It plays while presenting.
               </p>
               {sortedKfs.length > 0 && sortedKfs.length < 2 && (
-                <p className="text-[10px] font-medium text-amber-600">Add at least 2 keyframes to animate.</p>
+                <p className="text-[10px] font-medium text-amber-600">
+                  Add at least 2 keyframes to animate.
+                </p>
               )}
               <div className="space-y-2">
                 {/* Toolbar: count, total time, preview & clear */}
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
-                    {sortedKfs.length} keyframe{sortedKfs.length === 1 ? "" : "s"} · {(kfTotal / 1000).toFixed(1)} s
+                    {sortedKfs.length} keyframe{sortedKfs.length === 1 ? "" : "s"} ·{" "}
+                    {(kfTotal / 1000).toFixed(1)} s
                   </span>
                   <div className="flex items-center gap-1">
                     <button
@@ -2001,7 +2434,7 @@ export function PropertiesPanel() {
                       disabled={sortedKfs.length < 2}
                       onClick={() =>
                         window.dispatchEvent(
-                          new CustomEvent("diapolab:preview-keyframes", { detail: { id: el.id } })
+                          new CustomEvent("diapolab:preview-keyframes", { detail: { id: el.id } }),
                         )
                       }
                       title="Play the animation on the canvas"
@@ -2046,7 +2479,10 @@ export function PropertiesPanel() {
                       type="button"
                       title={`Keyframe #${i + 1} at ${k.t} ms`}
                       aria-label={`Keyframe ${i + 1} at ${k.t} milliseconds`}
-                      onClick={(e) => { e.stopPropagation(); setSelectedKf(k.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedKf(k.id);
+                      }}
                       onPointerDown={(e) => {
                         e.stopPropagation();
                         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -2070,7 +2506,8 @@ export function PropertiesPanel() {
                   ))}
                 </div>
                 <p className="text-[9px] leading-snug text-slate-400">
-                  Click the line to add a keyframe · drag the diamonds to move them in time · click one to edit it below.
+                  Click the line to add a keyframe · drag the diamonds to move them in time · click
+                  one to edit it below.
                 </p>
 
                 {/* Inline editor for the selected keyframe */}
@@ -2081,7 +2518,9 @@ export function PropertiesPanel() {
                   return (
                     <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-sky-700">Keyframe #{i + 1}</span>
+                        <span className="text-[10px] font-bold text-sky-700">
+                          Keyframe #{i + 1}
+                        </span>
                         <div className="flex items-center gap-1">
                           <input
                             type="number"
@@ -2097,72 +2536,121 @@ export function PropertiesPanel() {
                             className="w-16 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-right font-mono text-[10px] text-slate-700 outline-none"
                           />
                           <span className="text-[9px] text-slate-400">ms</span>
-                          <span className="font-mono text-[9px] text-slate-400">({(k.t / 1000).toFixed(2)} s)</span>
+                          <span className="font-mono text-[9px] text-slate-400">
+                            ({(k.t / 1000).toFixed(2)} s)
+                          </span>
                         </div>
                       </div>
                       <div className="mt-1.5 flex items-center gap-1.5">
-                        <span className="shrink-0 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Easing in</span>
+                        <span className="shrink-0 text-[9px] font-semibold uppercase tracking-wide text-slate-500">
+                          Easing in
+                        </span>
                         <select
                           value={k.easing ?? "linear"}
                           aria-label="Easing into this keyframe"
-                          onChange={(e) => setKfs(kfs.map((x) => (x.id === k.id ? { ...x, easing: e.target.value as ElementKeyframe["easing"] } : x)))}
+                          onChange={(e) =>
+                            setKfs(
+                              kfs.map((x) =>
+                                x.id === k.id
+                                  ? { ...x, easing: e.target.value as ElementKeyframe["easing"] }
+                                  : x,
+                              ),
+                            )
+                          }
                           className="min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-1.5 py-1 text-[10px] font-medium text-slate-700 outline-none focus:border-sky-400"
                         >
                           {KEYFRAME_EASINGS.map((e) => (
-                            <option key={e.value} value={e.value}>{e.label}</option>
+                            <option key={e.value} value={e.value}>
+                              {e.label}
+                            </option>
                           ))}
                         </select>
                       </div>
                       <div className="mt-1.5 grid grid-cols-4 gap-1">
-                        <button type="button" onClick={() => {
-                          setKfs(kfs.map((x) => (x.id === k.id ? { ...captureState(k.t), id: k.id } : x)));
-                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Capture</button>
-                        <button type="button" onClick={() => {
-                          const snap = { ...(k.snapshot ?? {}) } as Record<string, unknown>;
-                          delete snap.id;
-                          delete snap.keyframes;
-                          delete snap.keyframeDuration;
-                          update(el.id, {
-                            ...snap,
-                            x: k.x ?? el.x,
-                            y: k.y ?? el.y,
-                            width: k.width ?? el.width,
-                            height: k.height ?? el.height,
-                            rotation: k.rotation ?? el.rotation,
-                            opacity: k.opacity ?? (el as { opacity?: number }).opacity,
-                            shadow: "shadow" in snap
-                              ? (snap as { shadow?: ElementShadow }).shadow
-                              : k.shadow ?? el.shadow,
-                            ...("filters" in el || "filters" in snap
-                              ? {
-                                  filters:
-                                    (snap as { filters?: ImageFilters }).filters ??
-                                    k.filters ??
-                                    (el as { filters?: ImageFilters }).filters,
-                                }
-                              : {}),
-                            ...("effect" in el || "effect" in snap
-                              ? {
-                                  effect:
-                                    (snap as { effect?: ElementKeyframe["effect"] }).effect ??
-                                    k.effect ??
-                                    (el as { effect?: ElementKeyframe["effect"] }).effect,
-                                }
-                              : {}),
-                          } as never);
-                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Go to</button>
-                        <button type="button" onClick={() => {
-                          const copy = { ...k, id: crypto.randomUUID(), t: Math.min(kfTotal, k.t + 250) };
-                          setKfs([...kfs, copy]);
-                          setSelectedKf(copy.id);
-                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700">Duplicate</button>
-                        <button type="button" onClick={() => {
-                          setKfs(kfs.filter((x) => x.id !== k.id));
-                          setSelectedKf(null);
-                        }} className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300">Delete</button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setKfs(
+                              kfs.map((x) =>
+                                x.id === k.id ? { ...captureState(k.t), id: k.id } : x,
+                              ),
+                            );
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                        >
+                          Capture
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const snap = { ...(k.snapshot ?? {}) } as Record<string, unknown>;
+                            delete snap.id;
+                            delete snap.keyframes;
+                            delete snap.keyframeDuration;
+                            update(el.id, {
+                              ...snap,
+                              x: k.x ?? el.x,
+                              y: k.y ?? el.y,
+                              width: k.width ?? el.width,
+                              height: k.height ?? el.height,
+                              rotation: k.rotation ?? el.rotation,
+                              opacity: k.opacity ?? (el as { opacity?: number }).opacity,
+                              shadow:
+                                "shadow" in snap
+                                  ? (snap as { shadow?: ElementShadow }).shadow
+                                  : (k.shadow ?? el.shadow),
+                              ...("filters" in el || "filters" in snap
+                                ? {
+                                    filters:
+                                      (snap as { filters?: ImageFilters }).filters ??
+                                      k.filters ??
+                                      (el as { filters?: ImageFilters }).filters,
+                                  }
+                                : {}),
+                              ...("effect" in el || "effect" in snap
+                                ? {
+                                    effect:
+                                      (snap as { effect?: ElementKeyframe["effect"] }).effect ??
+                                      k.effect ??
+                                      (el as { effect?: ElementKeyframe["effect"] }).effect,
+                                  }
+                                : {}),
+                            } as never);
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                        >
+                          Go to
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const copy = {
+                              ...k,
+                              id: crypto.randomUUID(),
+                              t: Math.min(kfTotal, k.t + 250),
+                            };
+                            setKfs([...kfs, copy]);
+                            setSelectedKf(copy.id);
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-sky-400 hover:text-sky-700"
+                        >
+                          Duplicate
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setKfs(kfs.filter((x) => x.id !== k.id));
+                            setSelectedKf(null);
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-1 py-1 text-[9px] font-semibold text-rose-500 transition hover:border-rose-300"
+                        >
+                          Delete
+                        </button>
                       </div>
                       <p className="mt-1 truncate text-[9px] text-slate-400">
-                        {Math.round(k.x ?? el.x)},{Math.round(k.y ?? el.y)} · {Math.round(k.width ?? el.width)}×{Math.round(k.height ?? el.height)} · {Math.round(k.rotation ?? 0)}° · {Math.round((k.opacity ?? 1) * 100)}%
+                        {Math.round(k.x ?? el.x)},{Math.round(k.y ?? el.y)} ·{" "}
+                        {Math.round(k.width ?? el.width)}×{Math.round(k.height ?? el.height)} ·{" "}
+                        {Math.round(k.rotation ?? 0)}° · {Math.round((k.opacity ?? 1) * 100)}%
                       </p>
                     </div>
                   );
@@ -2191,13 +2679,13 @@ export function PropertiesPanel() {
               )}
             </Section>
 
-{/* ANIMATION & INTERACTION */}
+            {/* ANIMATION & INTERACTION */}
             <Section title="Animation & Interaction" defaultOpen={false}>
               <Field label="Entrance animation">
                 <Dropdown
                   value={el.animation ?? "none"}
                   options={ELEMENT_ANIMATION_LABELS}
-                  onChange={(v) => update(el.id, { animation: v as any })}
+                  onChange={(v) => update(el.id, { animation: v as ElementAnimation })}
                 />
               </Field>
               <Field label="Hover effect (while presenting)">
@@ -2227,7 +2715,7 @@ export function PropertiesPanel() {
               )}
             </Section>
 
-{/* LAYER ORDER ACTIONS */}
+            {/* LAYER ORDER ACTIONS */}
             <Section title="Layer Management">
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -2261,10 +2749,10 @@ export function PropertiesPanel() {
               </div>
             </Section>
 
-<Section title="Element JSON" defaultOpen={false}>
+            <Section title="Element JSON" defaultOpen={false}>
               <p className="text-[10px] leading-relaxed text-slate-500">
-                Edit the raw properties of the selected element. The id and type are
-                locked. Apply with the button or ⌘/Ctrl + ↵.
+                Edit the raw properties of the selected element. The id and type are locked. Apply
+                with the button or ⌘/Ctrl + ↵.
               </p>
               <textarea
                 value={jsonDraft}

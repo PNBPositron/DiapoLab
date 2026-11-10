@@ -25,7 +25,10 @@ export const Route = createFileRoute("/api/context-fetch")({
             signal: AbortSignal.timeout(12000),
           });
           if (!response.ok) {
-            return Response.json({ error: `The site responded ${response.status}.` }, { status: 502 });
+            return Response.json(
+              { error: `The site responded ${response.status}.` },
+              { status: 502 },
+            );
           }
           const html = (await response.text()).slice(0, 800_000);
           const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "")

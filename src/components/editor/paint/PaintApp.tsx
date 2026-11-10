@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor, type AnyElement } from "@/store/editor";
 import type { PluginApp } from "@/lib/plugins";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TrafficLights } from "../ui/TrafficLights";
 import {
   Brush,
@@ -106,9 +101,15 @@ function paintStroke(ctx: CanvasRenderingContext2D, s: Stroke, sx: number, sy: n
       const head = Math.max(12, s.size * 2.5) * sx;
       ctx.beginPath();
       ctx.moveTo(p1.x * sx, p1.y * sy);
-      ctx.lineTo(p1.x * sx - head * Math.cos(ang - Math.PI / 6), p1.y * sy - head * Math.sin(ang - Math.PI / 6));
+      ctx.lineTo(
+        p1.x * sx - head * Math.cos(ang - Math.PI / 6),
+        p1.y * sy - head * Math.sin(ang - Math.PI / 6),
+      );
       ctx.moveTo(p1.x * sx, p1.y * sy);
-      ctx.lineTo(p1.x * sx - head * Math.cos(ang + Math.PI / 6), p1.y * sy - head * Math.sin(ang + Math.PI / 6));
+      ctx.lineTo(
+        p1.x * sx - head * Math.cos(ang + Math.PI / 6),
+        p1.y * sy - head * Math.sin(ang + Math.PI / 6),
+      );
       ctx.stroke();
     }
   } else if (s.tool === "spray") {
@@ -121,7 +122,13 @@ function paintStroke(ctx: CanvasRenderingContext2D, s: Stroke, sx: number, sy: n
         const a = Math.random() * Math.PI * 2;
         const d = Math.sqrt(Math.random()) * r;
         ctx.beginPath();
-        ctx.arc(pt.x * sx + Math.cos(a) * d, pt.y * sy + Math.sin(a) * d, Math.max(0.4, 0.8 * sx), 0, Math.PI * 2);
+        ctx.arc(
+          pt.x * sx + Math.cos(a) * d,
+          pt.y * sy + Math.sin(a) * d,
+          Math.max(0.4, 0.8 * sx),
+          0,
+          Math.PI * 2,
+        );
         ctx.fill();
       }
     }
@@ -140,7 +147,15 @@ function paintStroke(ctx: CanvasRenderingContext2D, s: Stroke, sx: number, sy: n
   } else if (s.tool === "ellipse") {
     const cx = ((p0.x + p1.x) / 2) * sx;
     const cy = ((p0.y + p1.y) / 2) * sy;
-    ctx.ellipse(cx, cy, (Math.abs(p1.x - p0.x) / 2) * sx, (Math.abs(p1.y - p0.y) / 2) * sy, 0, 0, Math.PI * 2);
+    ctx.ellipse(
+      cx,
+      cy,
+      (Math.abs(p1.x - p0.x) / 2) * sx,
+      (Math.abs(p1.y - p0.y) / 2) * sy,
+      0,
+      0,
+      Math.PI * 2,
+    );
     if (s.filled) ctx.fill();
     else ctx.stroke();
   }
@@ -221,7 +236,10 @@ export function PaintAppDialog({
   const pos = (e: React.PointerEvent) => {
     const pad = padRef.current!;
     const r = pad.getBoundingClientRect();
-    return { x: (e.clientX - r.left) * (dispW / r.width), y: (e.clientY - r.top) * (dispH / r.height) };
+    return {
+      x: (e.clientX - r.left) * (dispW / r.width),
+      y: (e.clientY - r.top) * (dispH / r.height),
+    };
   };
 
   /** Draws the newest brush segment straight on the canvas — zero React work. */
@@ -250,7 +268,13 @@ export function PaintAppDialog({
         const a = Math.random() * Math.PI * 2;
         const d = Math.sqrt(Math.random()) * r;
         ctx.beginPath();
-        ctx.arc(p.x * sx + Math.cos(a) * d, p.y * sy + Math.sin(a) * d, Math.max(0.4, 0.8 * sx), 0, Math.PI * 2);
+        ctx.arc(
+          p.x * sx + Math.cos(a) * d,
+          p.y * sy + Math.sin(a) * d,
+          Math.max(0.4, 0.8 * sx),
+          0,
+          Math.PI * 2,
+        );
         ctx.fill();
       }
       ctx.restore();
@@ -380,7 +404,6 @@ export function PaintAppDialog({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, strokes, redoStack]);
 
   const insert = () => {
@@ -426,7 +449,9 @@ export function PaintAppDialog({
               : "max-h-[88vh] max-w-xl overflow-y-auto"
         }`}
       >
-        <DialogHeader className={`border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}>
+        <DialogHeader
+          className={`border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 via-white to-slate-50 ${minimized ? "flex-row items-center gap-3 border-b-0 px-3 py-2" : "px-5 py-4"}`}
+        >
           <div className={`${minimized ? "mb-0" : "mb-2"} flex items-center justify-between`}>
             <TrafficLights
               minimized={minimized}
@@ -450,189 +475,230 @@ export function PaintAppDialog({
         </DialogHeader>
 
         {!minimized && (
-        <div className="flex flex-col gap-3 p-4">
-          {/* Tools row — floating toolbar island */}
-          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
-            {TOOLS.map(({ tool: t, label, Icon }) => (
-              <button
-                key={t}
-                title={label}
-                onClick={() => setTool(t)}
-                className={`grid size-9 place-items-center rounded-lg border transition-all ${
-                  tool === t
-                    ? "border-indigo-600 bg-indigo-600 text-white shadow-[0_4px_10px_rgba(79,70,229,0.4)]"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:bg-indigo-50"
-                }`}
-              >
-                <Icon className="size-4" />
-              </button>
-            ))}
-            <button
-              title={filled ? "Shape fill: ON" : "Shape fill: OFF"}
-              disabled={tool === "line" || tool === "arrow" || tool === "brush" || tool === "eraser" || tool === "spray" || tool === "text"}
-              onClick={() => setFilled((f) => !f)}
-              className={`grid size-9 place-items-center rounded-lg border transition-all disabled:opacity-30 ${
-                filled
-                  ? "border-indigo-600 bg-indigo-50 text-indigo-600"
-                  : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
-              }`}
-            >
-              <PaintBucket className="size-4" />
-            </button>
-            <span className="mx-1 h-6 w-px bg-slate-200" />
-            {/* Brush sizes inline */}
-            {sizes.map((s) => (
-              <button
-                key={s}
-                title={`Size ${s}px`}
-                onClick={() => setSize(s)}
-                className={`grid size-9 place-items-center rounded-lg border transition-all ${
-                  size === s ? "border-indigo-600 bg-indigo-50" : "border-slate-200 bg-white hover:border-indigo-300"
-                }`}
-              >
-                <span
-                  className="rounded-full bg-slate-800"
-                  style={{ width: Math.min(18, 3 + s * 0.38), height: Math.min(18, 3 + s * 0.38) }}
-                />
-              </button>
-            ))}
-            <span className="mx-1 h-6 w-px bg-slate-200" />
-            <button
-              title="Undo"
-              disabled={strokes.length === 0}
-              onClick={undo}
-              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
-            >
-              <Undo2 className="size-4" />
-            </button>
-            <button
-              title="Redo"
-              disabled={redoStack.length === 0}
-              onClick={redo}
-              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
-            >
-              <Redo2 className="size-4" />
-            </button>
-            <button
-              title="Clear all"
-              disabled={strokes.length === 0}
-              onClick={clearAll}
-              className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-rose-300 hover:text-rose-500 disabled:opacity-40"
-            >
-              <Trash2 className="size-4" />
-            </button>
-          </div>
-
-          {/* Pad — height capped so the dialog always fits the screen */}
-          <div className="relative mx-auto w-full rounded-2xl bg-white p-1 ring-1 ring-slate-200/70 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.1)]" style={{ maxWidth: Math.round(300 * (outW / outH)) }}>
-            <canvas
-              ref={padRef}
-              width={dispW}
-              height={dispH}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerLeave={onPointerUp}
-              className={`block w-full touch-none rounded-xl border-2 border-dashed border-slate-300 bg-white shadow-inner ${
-                tool === "eraser" ? "cursor-cell" : tool === "text" ? "cursor-text" : "cursor-crosshair"
-              }`}
-              style={{ background: transparent ? "repeating-conic-gradient(#f1f5f9 0% 25%, #ffffff 0% 50%) 50% / 24px 24px" : undefined }}
-            />
-            {textDraft && (
-              <input
-                autoFocus
-                value={textDraft.value}
-                onChange={(e) => setTextDraft((d) => (d ? { ...d, value: e.target.value } : d))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    commitText();
-                  } else if (e.key === "Escape") {
-                    e.preventDefault();
-                    setTextDraft(null);
-                  }
-                }}
-                onBlur={() => textDraft.value.trim() && commitText()}
-                placeholder="Type…"
-                className="absolute z-10 rounded-md border-2 border-indigo-500 bg-white/95 px-1.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-lg outline-none"
-                style={{
-                  left: `${(textDraft.x / dispW) * 100}%`,
-                  top: `${(textDraft.y / dispH) * 100}%`,
-                  minWidth: 120,
-                }}
-              />
-            )}
-          </div>
-
-          {/* Palette + actions — bottom island */}
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {colors.map((c) => (
+          <div className="flex flex-col gap-3 p-4">
+            {/* Tools row — floating toolbar island */}
+            <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
+              {TOOLS.map(({ tool: t, label, Icon }) => (
                 <button
-                  key={c}
-                  title={c}
-                  onClick={() => {
-                    setColor(c);
-                    if (tool === "eraser") setTool("brush");
-                  }}
-                  className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${
-                    color === c && tool !== "eraser" ? "border-indigo-600 ring-2 ring-indigo-200" : "border-white shadow"
+                  key={t}
+                  title={label}
+                  onClick={() => setTool(t)}
+                  className={`grid size-9 place-items-center rounded-lg border transition-all ${
+                    tool === t
+                      ? "border-indigo-600 bg-indigo-600 text-white shadow-[0_4px_10px_rgba(79,70,229,0.4)]"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:bg-indigo-50"
                   }`}
-                  style={{ background: c }}
-                />
+                >
+                  <Icon className="size-4" />
+                </button>
               ))}
-              <label
-                title="Custom color"
-                className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
-                style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
-              >
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => {
-                    setColor(e.target.value);
-                    if (tool === "eraser") setTool("brush");
-                  }}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                />
-              </label>
-              {/* opacity */}
-              <span className="ml-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-400" title="Opacity">
-                <Droplets className="size-3" />
-                <input
-                  type="range"
-                  min={10}
-                  max={100}
-                  value={opacity}
-                  onChange={(e) => setOpacity(Number(e.target.value))}
-                  className="h-1 w-16 cursor-pointer accent-indigo-600"
-                />
-                <span className="w-7 tabular-nums">{opacity}%</span>
-              </span>
-              {/* background toggle */}
               <button
-                title={transparent ? "Background: transparent" : "Background: " + bg + " — click for transparent"}
-                onClick={() => setBg((b) => (b === "transparent" ? defaultBg : "transparent"))}
-                className={`ml-1 grid size-6 place-items-center rounded-md border transition-all ${
-                  transparent ? "border-indigo-600 bg-indigo-50 text-indigo-600" : "border-slate-200 bg-white text-slate-400"
+                title={filled ? "Shape fill: ON" : "Shape fill: OFF"}
+                disabled={
+                  tool === "line" ||
+                  tool === "arrow" ||
+                  tool === "brush" ||
+                  tool === "eraser" ||
+                  tool === "spray" ||
+                  tool === "text"
+                }
+                onClick={() => setFilled((f) => !f)}
+                className={`grid size-9 place-items-center rounded-lg border transition-all disabled:opacity-30 ${
+                  filled
+                    ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-indigo-300"
                 }`}
               >
-                <span
-                  className="size-3 rounded"
-                  style={{ background: transparent ? "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px" : bg }}
-                />
+                <PaintBucket className="size-4" />
+              </button>
+              <span className="mx-1 h-6 w-px bg-slate-200" />
+              {/* Brush sizes inline */}
+              {sizes.map((s) => (
+                <button
+                  key={s}
+                  title={`Size ${s}px`}
+                  onClick={() => setSize(s)}
+                  className={`grid size-9 place-items-center rounded-lg border transition-all ${
+                    size === s
+                      ? "border-indigo-600 bg-indigo-50"
+                      : "border-slate-200 bg-white hover:border-indigo-300"
+                  }`}
+                >
+                  <span
+                    className="rounded-full bg-slate-800"
+                    style={{
+                      width: Math.min(18, 3 + s * 0.38),
+                      height: Math.min(18, 3 + s * 0.38),
+                    }}
+                  />
+                </button>
+              ))}
+              <span className="mx-1 h-6 w-px bg-slate-200" />
+              <button
+                title="Undo"
+                disabled={strokes.length === 0}
+                onClick={undo}
+                className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
+              >
+                <Undo2 className="size-4" />
+              </button>
+              <button
+                title="Redo"
+                disabled={redoStack.length === 0}
+                onClick={redo}
+                className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-indigo-300 disabled:opacity-40"
+              >
+                <Redo2 className="size-4" />
+              </button>
+              <button
+                title="Clear all"
+                disabled={strokes.length === 0}
+                onClick={clearAll}
+                className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all hover:border-rose-300 hover:text-rose-500 disabled:opacity-40"
+              >
+                <Trash2 className="size-4" />
               </button>
             </div>
-            <button
-              onClick={insert}
-              disabled={strokes.length === 0}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+
+            {/* Pad — height capped so the dialog always fits the screen */}
+            <div
+              className="relative mx-auto w-full rounded-2xl bg-white p-1 ring-1 ring-slate-200/70 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.1)]"
+              style={{ maxWidth: Math.round(300 * (outW / outH)) }}
             >
-              <Check className="size-3.5" />
-              Insert on slide
-            </button>
+              <canvas
+                ref={padRef}
+                width={dispW}
+                height={dispH}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerLeave={onPointerUp}
+                className={`block w-full touch-none rounded-xl border-2 border-dashed border-slate-300 bg-white shadow-inner ${
+                  tool === "eraser"
+                    ? "cursor-cell"
+                    : tool === "text"
+                      ? "cursor-text"
+                      : "cursor-crosshair"
+                }`}
+                style={{
+                  background: transparent
+                    ? "repeating-conic-gradient(#f1f5f9 0% 25%, #ffffff 0% 50%) 50% / 24px 24px"
+                    : undefined,
+                }}
+              />
+              {textDraft && (
+                <input
+                  autoFocus
+                  value={textDraft.value}
+                  onChange={(e) => setTextDraft((d) => (d ? { ...d, value: e.target.value } : d))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      commitText();
+                    } else if (e.key === "Escape") {
+                      e.preventDefault();
+                      setTextDraft(null);
+                    }
+                  }}
+                  onBlur={() => textDraft.value.trim() && commitText()}
+                  placeholder="Type…"
+                  className="absolute z-10 rounded-md border-2 border-indigo-500 bg-white/95 px-1.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-lg outline-none"
+                  style={{
+                    left: `${(textDraft.x / dispW) * 100}%`,
+                    top: `${(textDraft.y / dispH) * 100}%`,
+                    minWidth: 120,
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Palette + actions — bottom island */}
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_4px_16px_-8px_rgba(15,23,42,0.12)]">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {colors.map((c) => (
+                  <button
+                    key={c}
+                    title={c}
+                    onClick={() => {
+                      setColor(c);
+                      if (tool === "eraser") setTool("brush");
+                    }}
+                    className={`size-6 rounded-full border-2 transition-transform hover:scale-110 ${
+                      color === c && tool !== "eraser"
+                        ? "border-indigo-600 ring-2 ring-indigo-200"
+                        : "border-white shadow"
+                    }`}
+                    style={{ background: c }}
+                  />
+                ))}
+                <label
+                  title="Custom color"
+                  className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
+                  style={{
+                    background:
+                      "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)",
+                  }}
+                >
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => {
+                      setColor(e.target.value);
+                      if (tool === "eraser") setTool("brush");
+                    }}
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                  />
+                </label>
+                {/* opacity */}
+                <span
+                  className="ml-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-400"
+                  title="Opacity"
+                >
+                  <Droplets className="size-3" />
+                  <input
+                    type="range"
+                    min={10}
+                    max={100}
+                    value={opacity}
+                    onChange={(e) => setOpacity(Number(e.target.value))}
+                    className="h-1 w-16 cursor-pointer accent-indigo-600"
+                  />
+                  <span className="w-7 tabular-nums">{opacity}%</span>
+                </span>
+                {/* background toggle */}
+                <button
+                  title={
+                    transparent
+                      ? "Background: transparent"
+                      : "Background: " + bg + " — click for transparent"
+                  }
+                  onClick={() => setBg((b) => (b === "transparent" ? defaultBg : "transparent"))}
+                  className={`ml-1 grid size-6 place-items-center rounded-md border transition-all ${
+                    transparent
+                      ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                      : "border-slate-200 bg-white text-slate-400"
+                  }`}
+                >
+                  <span
+                    className="size-3 rounded"
+                    style={{
+                      background: transparent
+                        ? "repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px"
+                        : bg,
+                    }}
+                  />
+                </button>
+              </div>
+              <button
+                onClick={insert}
+                disabled={strokes.length === 0}
+                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-[0_8px_20px_rgba(37,99,235,0.35)] transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+              >
+                <Check className="size-3.5" />
+                Insert on slide
+              </button>
+            </div>
           </div>
-        </div>
         )}
       </DialogContent>
     </Dialog>

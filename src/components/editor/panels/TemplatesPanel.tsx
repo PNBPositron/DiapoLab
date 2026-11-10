@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, Rocket, Crown } from "lucide-react";
+import {
+  Loader2,
+  Heart,
+  LayoutGrid,
+  Search,
+  Users,
+  Download,
+  Layers,
+  SlidersHorizontal,
+  FilePlus2,
+  FileUp,
+  Presentation,
+  Rocket,
+  Crown,
+} from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -49,24 +63,41 @@ function inferTemplateStyle(template: PublicTemplate): TemplateStyle {
   const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
 
   if (
-    text.includes("cyber") || text.includes("neon") || text.includes("glitch") ||
-    text.includes("synthwave") || /\b(orbitron|zen dots|rampart|unbounded|major mono)\b/i.test(text)
-  ) return "cyber";
+    text.includes("cyber") ||
+    text.includes("neon") ||
+    text.includes("glitch") ||
+    text.includes("synthwave") ||
+    /\b(orbitron|zen dots|rampart|unbounded|major mono)\b/i.test(text)
+  )
+    return "cyber";
 
   if (
-    text.includes("glass") || text.includes("frosted") || text.includes("liquid") ||
-    text.includes("translucent") || text.includes("blur")
-  ) return "glass";
+    text.includes("glass") ||
+    text.includes("frosted") ||
+    text.includes("liquid") ||
+    text.includes("translucent") ||
+    text.includes("blur")
+  )
+    return "glass";
 
   if (
-    text.includes("brutal") || text.includes("loud") || text.includes("poster") ||
-    text.includes("sticker") || /\b(archivo black|anton|bungee|shrikhand|tilt prism)\b/i.test(text)
-  ) return "neobrutalist";
+    text.includes("brutal") ||
+    text.includes("loud") ||
+    text.includes("poster") ||
+    text.includes("sticker") ||
+    /\b(archivo black|anton|bungee|shrikhand|tilt prism)\b/i.test(text)
+  )
+    return "neobrutalist";
 
   if (
-    text.includes("corporate") || text.includes("business") || text.includes("report") ||
-    text.includes("pitch") || text.includes("professional") || text.includes("deck")
-  ) return "corporate";
+    text.includes("corporate") ||
+    text.includes("business") ||
+    text.includes("report") ||
+    text.includes("pitch") ||
+    text.includes("professional") ||
+    text.includes("deck")
+  )
+    return "corporate";
 
   return "minimal";
 }
@@ -116,7 +147,7 @@ export function TemplatesPanel() {
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
-    const sortedCommunity = sortTemplates(community, likeCounts, "likes");
+  const sortedCommunity = sortTemplates(community, likeCounts, "likes");
   const featured = sortedCommunity[0] ?? null;
 
   const importPptx = async (file: File) => {
@@ -136,7 +167,7 @@ export function TemplatesPanel() {
     useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
   };
 
-const filteredCommunity = filterTemplates(community, {
+  const filteredCommunity = filterTemplates(community, {
     query,
     style: styleFilter,
     creator: creatorFilter,
@@ -186,7 +217,12 @@ const filteredCommunity = filterTemplates(community, {
 
   return (
     <div className="space-y-4">
-      <PanelHeader kicker="Templates" title="Start from a deck" description="Browse community templates, then load one onto your canvas in a click." icon={LayoutGrid} />
+      <PanelHeader
+        kicker="Templates"
+        title="Start from a deck"
+        description="Browse community templates, then load one onto your canvas in a click."
+        icon={LayoutGrid}
+      />
 
       {/* ── Quick start ─────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2 px-4">
@@ -200,11 +236,19 @@ const filteredCommunity = filterTemplates(community, {
           <span className="text-[10px] font-semibold text-slate-700">Blank deck</span>
         </button>
 
-        <label className={`group flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
+        <label
+          className={`group flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}
+        >
           <span className="grid size-8 place-items-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-            {importingPptx ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
+            {importingPptx ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <FileUp className="size-4" />
+            )}
           </span>
-          <span className="text-[10px] font-semibold text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
+          <span className="text-[10px] font-semibold text-slate-700">
+            {importingPptx ? "Importing…" : "Import PPTX"}
+          </span>
           <input
             type="file"
             accept=".pptx"
@@ -572,16 +616,23 @@ function TemplateCard({
 
       {c.creator_profile?.username && (
         <Link
-          to="/profile/$username" params={{ username: c.creator_profile.username }}
+          to="/profile/$username"
+          params={{ username: c.creator_profile.username }}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-2 border-t border-slate-100 px-3 py-2 text-left hover:bg-slate-50"
           title={`View ${c.creator_profile.display_name || c.creator_profile.username}'s profile`}
         >
           {c.creator_profile.avatar_url ? (
-            <img src={c.creator_profile.avatar_url} alt="" className="size-5 rounded-full object-cover" />
+            <img
+              src={c.creator_profile.avatar_url}
+              alt=""
+              className="size-5 rounded-full object-cover"
+            />
           ) : (
             <span className="flex size-5 items-center justify-center rounded-full bg-slate-200 text-[9px] font-semibold text-slate-600">
-              {(c.creator_profile.display_name || c.creator_profile.username).slice(0, 1).toUpperCase()}
+              {(c.creator_profile.display_name || c.creator_profile.username)
+                .slice(0, 1)
+                .toUpperCase()}
             </span>
           )}
           <span className="min-w-0 truncate text-[10px] font-medium text-slate-600">
@@ -737,4 +788,3 @@ function AllTemplatesDialog({
     </Dialog>
   );
 }
-
