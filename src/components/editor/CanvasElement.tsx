@@ -690,7 +690,7 @@ export function CanvasElement({
       vTargets.push(o.x, o.x + o.width / 2, o.x + o.width);
       hTargets.push(o.y, o.y + o.height / 2, o.y + o.height);
     }
-    const THRESH = 6 / scale;
+    const THRESH = st.snapping && !e.altKey ? 6 / scale : 0;
     const snap = (val: number, targets: number[]): { v: number; hit: number | null } => {
       let best: { v: number; hit: number | null; d: number } = { v: val, hit: null, d: THRESH };
       for (const t of targets) {
@@ -787,7 +787,7 @@ export function CanvasElement({
       vTargets.push(o.x, o.x + o.width / 2, o.x + o.width);
       hTargets.push(o.y, o.y + o.height / 2, o.y + o.height);
     }
-    const THRESH = 6 / scale;
+    const THRESH = st.snapping && !e.altKey ? 6 / scale : 0;
     const snapTo = (val: number, targets: number[]): { v: number; hit: number | null } => {
       let best: { v: number; hit: number | null; d: number } = { v: val, hit: null, d: THRESH };
       for (const t of targets) {

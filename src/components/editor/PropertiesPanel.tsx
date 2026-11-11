@@ -62,6 +62,14 @@ import {
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle, FlipHorizontal, FlipVertical, MousePointer2, Hash, Crop, SlidersHorizontal,
   Lock,
   LockOpen,
+  AlignStartHorizontal,
+  AlignCenterHorizontal,
+  AlignEndHorizontal,
+  AlignStartVertical,
+  AlignCenterVertical,
+  AlignEndVertical,
+  AlignHorizontalDistributeCenter,
+  AlignVerticalDistributeCenter,
 } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
@@ -462,7 +470,7 @@ function ModernColorPicker({
 // --- MAIN PROPERTIES COMPONENT ---
 
 export function PropertiesPanel() {
-  const { elements, selectedId, update, remove, duplicate, bringForward, sendBackward } =
+  const { elements, selectedId, update, remove, duplicate, bringForward, sendBackward, alignSelected, distributeSelected } =
     useEditor();
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
@@ -2225,6 +2233,25 @@ export function PropertiesPanel() {
                   }
                 />
               )}
+            </Section>
+
+{/* ALIGN & DISTRIBUTE */}
+            <Section title="Align & Distribute">
+              <div className="grid grid-cols-6 gap-1.5">
+                <button type="button" title="Align left" aria-label="Align left" onClick={() => alignSelected("left")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartHorizontal className="size-4" /></button>
+                <button type="button" title="Align horizontal center" aria-label="Align horizontal center" onClick={() => alignSelected("center-h")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterHorizontal className="size-4" /></button>
+                <button type="button" title="Align right" aria-label="Align right" onClick={() => alignSelected("right")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndHorizontal className="size-4" /></button>
+                <button type="button" title="Align top" aria-label="Align top" onClick={() => alignSelected("top")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartVertical className="size-4" /></button>
+                <button type="button" title="Align vertical center" aria-label="Align vertical center" onClick={() => alignSelected("middle")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterVertical className="size-4" /></button>
+                <button type="button" title="Align bottom" aria-label="Align bottom" onClick={() => alignSelected("bottom")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndVertical className="size-4" /></button>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button type="button" title="Distribute horizontally (3+ objects)" aria-label="Distribute horizontally" onClick={() => distributeSelected("h")} className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignHorizontalDistributeCenter className="size-4" /> Horizontal</button>
+                <button type="button" title="Distribute vertically (3+ objects)" aria-label="Distribute vertically" onClick={() => distributeSelected("v")} className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignVerticalDistributeCenter className="size-4" /> Vertical</button>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                One object aligns to the slide. Select several (Shift+click) to align to the selection or distribute evenly.
+              </p>
             </Section>
 
 {/* LAYER ORDER ACTIONS */}

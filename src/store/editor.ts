@@ -810,6 +810,8 @@ type State = {
   designName: string;
   // alignment guides shown while dragging
   guides: { v: number[]; h: number[] };
+  /** smart snapping while dragging/resizing (toggle in the zoom dock) */
+  snapping: boolean;
   // copy/paste clipboard (single element)
   clipboard: AnyElement | null;
   setTool: (t: Tool) => void;
@@ -852,6 +854,11 @@ type State = {
   ) => void;
   setPresenting: (v: boolean) => void;
   setGuides: (g: { v: number[]; h: number[] }) => void;
+  toggleSnapping: () => void;
+  /** align the selection: to the slide when single, to the selection bounds when multi */
+  alignSelected: (mode: "left" | "center-h" | "right" | "top" | "middle" | "bottom") => void;
+  /** spread 3+ selected elements evenly on one axis */
+  distributeSelected: (axis: "h" | "v") => void;
   /** id of the image element currently in interactive crop mode (double-click) */
   croppingId: string | null;
   setCroppingId: (id: string | null) => void;
@@ -1507,6 +1514,7 @@ export const useEditor = create<State>((set, get) => {
     designId: null,
     designName: "untitled.design",
     guides: { v: [], h: [] },
+    snapping: true,
     croppingId: null,
     clipboard: null,
 
@@ -1607,6 +1615,62 @@ export const useEditor = create<State>((set, get) => {
     },
     setPresenting: (presenting) => set({ presenting }),
     setGuides: (guides) => set({ guides }),
+    toggleSnapping: () => set((s) => ({ snapping: !s.snapping })),
+    alignSelected: (mode) => {
+      const { selectedIds, selectedId, elements, canvasW, canvasH } = get();
+      const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
+      const sel = elements.filter((e) => ids.includes(e.id) && !e.locked);
+      if (!sel.length) return;
+      pushHistory();
+      // multi-selection aligns to the selection bounds, single aligns to the slide
+      const multi = sel.length > 1;
+      const minX = multi ? Math.min(...sel.map((e) => e.x)) : 0;
+      const maxX = multi ? Math.max(...sel.map((e) => e.x + e.width)) : canvasW;
+      const minY = multi ? Math.min(...sel.map((e) => e.y)) : 0;
+      const maxY = multi ? Math.max(...sel.map((e) => e.y + e.height)) : canvasH;
+      const patches = new Map<string, { x?: number; y?: number }>();
+      for (const e of sel) {
+        if (mode === "left") patches.set(e.id, { x: minX });
+        else if (mode === "center-h") patches.set(e.id, { x: minX + (maxX - minX - e.width) / 2 });
+        else if (mode === "right") patches.set(e.id, { x: maxX - e.width });
+        else if (mode === "top") patches.set(e.id, { y: minY });
+        else if (mode === "middle") patches.set(e.id, { y: minY + (maxY - minY - e.height) / 2 });
+        else patches.set(e.id, { y: maxY - e.height });
+      }
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          patches.has(e.id) ? ({ ...e, ...patches.get(e.id) } as AnyElement) : e,
+        ),
+      }));
+    },
+    distributeSelected: (axis) => {
+      const { selectedIds, selectedId, elements } = get();
+      const ids = selectedIds.length ? selectedIds : selectedId ? [selectedId] : [];
+      const sel = elements.filter((e) => ids.includes(e.id) && !e.locked);
+      if (sel.length < 3) return;
+      pushHistory();
+      const sorted = [...sel].sort((a, b) => (axis === "h" ? a.x - b.x : a.y - b.y));
+      const first = sorted[0];
+      const last = sorted[sorted.length - 1];
+      const span = axis === "h" ? last.x - first.x : last.y - first.y;
+      const totalSize = sorted.reduce((sum, e) => sum + (axis === "h" ? e.width : e.height), 0);
+      const gap = (span - totalSize) / (sorted.length - 1);
+      const patches = new Map<string, number>();
+      let cursor = axis === "h" ? first.x : first.y;
+      for (const e of sorted) {
+        patches.set(e.id, cursor);
+        cursor += (axis === "h" ? e.width : e.height) + gap;
+      }
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          patches.has(e.id)
+            ? ({ ...e, [axis === "h" ? "x" : "y"]: patches.get(e.id) } as AnyElement)
+            : e,
+        ),
+      }));
+    },
     setCroppingId: (croppingId) => set({ croppingId }),
     copySelected: () => {
       const { selectedId, elements } = get();

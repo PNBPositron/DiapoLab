@@ -3,7 +3,7 @@ import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/
 import { CanvasElement } from "./CanvasElement";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, History, WandSparkles, ChevronDown } from "lucide-react";
+import { Minus, Plus, History, WandSparkles, ChevronDown, Magnet } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
@@ -26,6 +26,8 @@ export function Canvas() {
     selectedId,
     update,
     setTransition,
+    snapping,
+    toggleSnapping,
   } = useEditor();
   const page = pages[currentIndex];
   const currentTransition: SlideTransition = page.transition ?? "none";
@@ -263,6 +265,17 @@ export function Canvas() {
         <span className="px-2 font-mono text-[10px] text-slate-500">
           {currentIndex + 1} / {pages.length}
         </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          title={snapping ? "Snapping on (Alt to bypass while dragging)" : "Snapping off"}
+          aria-label="Toggle snapping"
+          aria-pressed={snapping}
+          onClick={toggleSnapping}
+        >
+          <Magnet className={"size-4 " + (snapping ? "text-blue-600" : "text-slate-400")} />
+        </Button>
         <Button
           variant="ghost"
           size="icon"
