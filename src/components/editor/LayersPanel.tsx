@@ -50,7 +50,7 @@ const labelFor = (el: AnyElement): string => {
 export function LayersPanel() {
   const { elements, selectedId, selectedIds, select, toggleSelect, toggleHidden, bringForward, sendBackward, update } =
     useEditor();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   // top layer first: the elements array is bottom-to-top z-order
   const layers = [...elements].reverse();
 
