@@ -71,6 +71,8 @@ export function Canvas() {
     if (!node) return;
     const onWheel = (event: WheelEvent) => {
       if ((event.target as HTMLElement).closest('[contenteditable="true"]')) return;
+      // plain wheel scrolls the canvas; zoom only with Ctrl/Cmd + wheel
+      if (!(event.ctrlKey || event.metaKey)) return;
       event.preventDefault();
       const delta =
         event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? node.clientHeight : 1);
