@@ -7,6 +7,7 @@ import { Minus, Plus, History, WandSparkles, ChevronDown, Magnet } from "lucide-
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
+import { LayersPanel } from "./LayersPanel";
 import {
   TRANSITION_OPTIONS,
   TRANSITION_ICONS,
@@ -186,9 +187,11 @@ export function Canvas() {
                 />
               ) : null}
               <div className="relative z-10 size-full">
-                {elements.map((el) => (
-                  <CanvasElement key={el.id} element={el} scale={scale} />
-                ))}
+                {elements
+                  .filter((el) => !el.hidden)
+                  .map((el) => (
+                    <CanvasElement key={el.id} element={el} scale={scale} />
+                  ))}
               </div>
               {(guides.v.length > 0 || guides.h.length > 0) && (
                 <div className="pointer-events-none absolute inset-0 z-50">
@@ -353,6 +356,7 @@ export function Canvas() {
 
       </div>
 
+      <LayersPanel />
       <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );

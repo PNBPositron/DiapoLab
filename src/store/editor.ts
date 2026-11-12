@@ -77,6 +77,8 @@ export type ElementBase = {
   blendMode?: string;
   /** locked elements can be selected & edited but never dragged or resized */
   locked?: boolean;
+  /** hidden layers are skipped on canvas render and exports (managed in the Layers panel) */
+  hidden?: boolean;
 };
 
 export type ElementAnimation =
@@ -817,6 +819,7 @@ type State = {
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
   toggleSelect: (id: string) => void;
+  toggleHidden: (id: string) => void;
   removeSelected: () => void;
   duplicateSelected: () => void;
   /** arrow-key nudge on the current selection (skips locked, coalesced history) */
@@ -1847,6 +1850,13 @@ export const useEditor = create<State>((set, get) => {
         [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
         return { ...p, elements: arr };
       });
+    },
+    toggleHidden: (id) => {
+      pushHistory();
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) => (e.id === id ? ({ ...e, hidden: !e.hidden } as AnyElement) : e)),
+      }));
     },
     setBg: (bgColor) => {
       pushHistory();
