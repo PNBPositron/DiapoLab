@@ -283,12 +283,6 @@ export function ColorPanel() {
         </div>
       </div>
 
-      {/* ------- Mesh & patterns ------- */}
-      <div className="space-y-3 px-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Mesh & patterns</div>
-        <OptionGrid label="Mesh backgrounds" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={MESH_PRESETS.map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
-        <OptionGrid label="Pattern backgrounds" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={PATTERN_PRESETS.map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
-      </div>
 
       {/* ------- Dégradé custom ------- */}
       <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] mx-4">
