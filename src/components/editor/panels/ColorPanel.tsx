@@ -80,6 +80,26 @@ const GRADIENT_PACKS: { name: string; gradients: { name: string; value: string }
   },
 ];
 
+const MESH_PRESETS: { name: string; value: string }[] = [
+  { name: "Aurora", value: "radial-gradient(at 20% 20%,#22d3ee 0px,transparent 50%),radial-gradient(at 80% 10%,#a78bfa 0px,transparent 50%),radial-gradient(at 50% 90%,#34d399 0px,transparent 50%),#0f172a" },
+  { name: "Blush", value: "radial-gradient(at 15% 25%,#fda4af 0px,transparent 55%),radial-gradient(at 85% 20%,#fcd34d 0px,transparent 50%),radial-gradient(at 70% 85%,#c4b5fd 0px,transparent 55%),#fff1f2" },
+  { name: "Deep space", value: "radial-gradient(at 70% 30%,#4338ca 0px,transparent 55%),radial-gradient(at 20% 80%,#0ea5e9 0px,transparent 50%),radial-gradient(at 90% 90%,#db2777 0px,transparent 45%),#020617" },
+  { name: "Mint", value: "radial-gradient(at 25% 20%,#6ee7b7 0px,transparent 55%),radial-gradient(at 80% 70%,#a7f3d0 0px,transparent 55%),#ecfeff" },
+  { name: "Ember", value: "radial-gradient(at 20% 30%,#fb923c 0px,transparent 55%),radial-gradient(at 80% 60%,#ef4444 0px,transparent 50%),#1c1917" },
+  { name: "Lavender", value: "radial-gradient(at 30% 20%,#c4b5fd 0px,transparent 55%),radial-gradient(at 75% 75%,#f5d0fe 0px,transparent 55%),#faf5ff" },
+];
+
+const PATTERN_PRESETS: { name: string; value: string }[] = [
+  { name: "Dots dark", value: "radial-gradient(circle,#ffffff 2px,transparent 2.5px) 0 0 / 28px 28px #1e293b" },
+  { name: "Dots light", value: "radial-gradient(circle,#cbd5e1 2px,transparent 2.5px) 0 0 / 24px 24px #f8fafc" },
+  { name: "Grid", value: "linear-gradient(#e2e8f0 1px,transparent 1px) 0 0 / 40px 40px,linear-gradient(90deg,#e2e8f0 1px,transparent 1px) 0 0 / 40px 40px #ffffff" },
+  { name: "Blueprint", value: "repeating-linear-gradient(0deg,#dbeafe 0 2px,transparent 2px 26px),repeating-linear-gradient(90deg,#dbeafe 0 2px,transparent 2px 26px) #eff6ff" },
+  { name: "Stripes dark", value: "repeating-linear-gradient(45deg,#0f172a 0 14px,#1e293b 14px 28px)" },
+  { name: "Candy stripes", value: "repeating-linear-gradient(45deg,#f472b6 0 18px,#fbcfe8 18px 36px)" },
+  { name: "Checker", value: "repeating-conic-gradient(#e2e8f0 0% 25%,#ffffff 0% 50%) 0 0 / 48px 48px" },
+  { name: "Halftone", value: "radial-gradient(circle,#0f172a 3px,transparent 3.5px) 0 0 / 20px 20px,radial-gradient(circle,#0f172a 3px,transparent 3.5px) 10px 10px / 20px 20px #f1f5f9" },
+];
+
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
@@ -208,6 +228,13 @@ export function ColorPanel() {
         <SearchField value={search} onChange={setSearch} placeholder="Search gradients..." />
         <ChipGroup value={packCategory} options={["All", ...GRADIENT_PACKS.map(p => p.name)]} onChange={setPackCategory} label="Gradient categories" />
         <OptionGrid label="Gradient wallpapers" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={GRADIENT_PACKS.filter(p => packCategory === "All" || p.name === packCategory).flatMap(p => p.gradients).filter(g => g.name.toLowerCase().includes(search.toLowerCase())).map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
+      </div>
+
+      {/* ------- Mesh & patterns ------- */}
+      <div className="space-y-3 px-4">
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Mesh & patterns</div>
+        <OptionGrid label="Mesh backgrounds" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={MESH_PRESETS.map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
+        <OptionGrid label="Pattern backgrounds" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={PATTERN_PRESETS.map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
       </div>
 
       {/* ------- Dégradé custom ------- */}

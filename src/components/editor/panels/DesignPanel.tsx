@@ -4,17 +4,15 @@ import {
   Maximize2,
   Palette,
   Sparkles,
-  Wand2,
   type LucideIcon,
 } from "lucide-react";
 import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
-import { BackgroundsPanel } from "./BackgroundsPanel";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 
-type SectionId = "canvas" | "brand" | "background" | "bg-gen" | "master";
+type SectionId = "canvas" | "brand" | "background" | "master";
 
 const SECTIONS: {
   id: SectionId;
@@ -45,13 +43,6 @@ const SECTIONS: {
     children: <ColorPanel />,
   },
   {
-    id: "bg-gen",
-    title: "Backgrounds",
-    subtitle: "Gradients, mesh & patterns",
-    Icon: Wand2,
-    children: <BackgroundsPanel />,
-  },
-  {
     id: "master",
     title: "Master style",
     subtitle: "Push this slide's style deck-wide",
@@ -74,7 +65,6 @@ export function DesignPanel() {
     brand: "Brand",
     background: "BG",
     master: "Master",
-    "bg-gen": "Bgs",
   };
 
   return (
