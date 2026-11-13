@@ -72,6 +72,16 @@ const SHAPE_CATEGORIES: { name: string; shapes: { kind: ShapeKind; label: string
       { kind: "ribbon", label: "Ribbon" },
     ],
   },
+  { name: "Stickers", shapes: [
+      { kind: "sparkle4", label: "Sparkle" },
+      { kind: "confetti", label: "Confetti" },
+      { kind: "crown", label: "Crown" },
+      { kind: "gem", label: "Gem" },
+      { kind: "rocket", label: "Rocket" },
+      { kind: "balloon", label: "Balloon" },
+      { kind: "rainbow", label: "Rainbow" },
+    ],
+  },
   {
     name: "Decorative",
     shapes: [

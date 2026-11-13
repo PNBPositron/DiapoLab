@@ -207,7 +207,14 @@ export type ShapeKind =
   | "moon"
   | "wave"
   | "leaf"
-  | "ribbon";
+  | "ribbon"
+  | "sparkle4"
+  | "confetti"
+  | "crown"
+  | "gem"
+  | "rocket"
+  | "balloon"
+  | "rainbow";
 export type ShapeEffect = "none" | "liquid_glass" | "neon" | "soft_shadow" | "inner_glow" | "holographic" | "glitch" | "honeycomb";
 export type ElementShadow = {
   x: number;

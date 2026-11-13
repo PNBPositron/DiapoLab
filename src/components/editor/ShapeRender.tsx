@@ -132,6 +132,20 @@ export function pathFor(kind: ShapeKind): string | null {
       return "M8 92 C8 40 40 8 92 8 C92 60 60 92 8 92 Z";
     case "ribbon":
       return "M8 6 H92 L76 26 L92 46 H8 L24 26 Z";
+    case "sparkle4":
+      return "M50 2 C55 30 70 45 98 50 C70 55 55 70 50 98 C45 70 30 55 2 50 C30 45 45 30 50 2 Z";
+    case "confetti":
+      return "M18 10 H32 V18 H18 Z M58 4 A7 7 0 1 0 58.1 4 Z M76 38 H90 V46 H76 Z M28 58 A6 6 0 1 0 28.1 58 Z M60 76 H74 V84 H60 Z M10 84 H24 V92 H10 Z";
+    case "crown":
+      return "M8 80 V32 L30 52 L50 18 L70 52 L92 32 V80 Z";
+    case "gem":
+      return "M30 10 H70 L94 40 L50 94 L6 40 Z";
+    case "rocket":
+      return "M50 2 C66 18 72 44 66 66 L80 86 L60 78 L54 94 H46 L40 78 L20 86 L34 66 C28 44 34 18 50 2 Z";
+    case "balloon":
+      return "M50 2 C70 2 84 18 84 38 C84 58 66 70 55 73 L59 98 H41 L45 73 C34 70 16 58 16 38 C16 18 30 2 50 2 Z";
+    case "rainbow":
+      return "M50 16 A46 46 0 0 1 96 62 H78 A28 28 0 0 0 22 62 H4 A46 46 0 0 1 50 16 Z";
     default:
       return null;
   }
