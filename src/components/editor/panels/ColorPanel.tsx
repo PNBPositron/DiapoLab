@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
-import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
+import { PanelHeader, SegmentedControl } from "../ui/selectors";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ColorPicker } from "../ColorPicker";
 import { ImagePlus, X, Link2 } from "lucide-react";
 import { prepareImage } from "@/lib/image-assets";
@@ -100,6 +101,12 @@ const PATTERN_PRESETS: { name: string; value: string }[] = [
   { name: "Halftone", value: "radial-gradient(circle,#0f172a 3px,transparent 3.5px) 0 0 / 20px 20px,radial-gradient(circle,#0f172a 3px,transparent 3.5px) 10px 10px / 20px 20px #f1f5f9" },
 ];
 
+const ALL_PACKS: { name: string; gradients: { name: string; value: string }[] }[] = [
+  ...GRADIENT_PACKS,
+  { name: "Mesh", gradients: MESH_PRESETS },
+  { name: "Patterns", gradients: PATTERN_PRESETS },
+];
+
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
@@ -111,8 +118,6 @@ export function ColorPanel() {
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
   const [openPicker, setOpenPicker] = useState<"from" | "to" | "bg" | null>(null);
-  const [search, setSearch] = useState("");
-  const [packCategory, setPackCategory] = useState("All");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -222,12 +227,60 @@ export function ColorPanel() {
         )}
       </div>
 
-      {/* ------- Dégradés prédéfinis ------- */}
+      {/* ------- Packs de fonds : carte par pack, popup au clic ------- */}
       <div className="space-y-3 px-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Gradient packs</div>
-        <SearchField value={search} onChange={setSearch} placeholder="Search gradients..." />
-        <ChipGroup value={packCategory} options={["All", ...GRADIENT_PACKS.map(p => p.name)]} onChange={setPackCategory} label="Gradient categories" />
-        <OptionGrid label="Gradient wallpapers" value={bgColor} onChange={value => { setBgImage(undefined); setBg(value); }} options={GRADIENT_PACKS.filter(p => packCategory === "All" || p.name === packCategory).flatMap(p => p.gradients).filter(g => g.name.toLowerCase().includes(search.toLowerCase())).map(g => ({ value: g.value, label: g.name, preview: <span className="h-9 w-full rounded-md" style={{ background: g.value }} /> }))} />
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Background packs</div>
+        <div className="grid grid-cols-2 gap-2">
+          {ALL_PACKS.map((pack) => {
+            const isActive = pack.gradients.some((g) => g.value === bgColor);
+            return (
+              <Popover key={pack.name}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    title={pack.name + " — " + pack.gradients.length + " backgrounds"}
+                    aria-label={"Open pack " + pack.name}
+                    className={
+                      "rounded-xl border p-2 text-left transition " +
+                      (isActive ? "border-blue-500 ring-2 ring-blue-500/30" : "border-slate-200 hover:border-blue-300 hover:shadow-sm")
+                    }
+                  >
+                    <span className="grid grid-cols-4 gap-1">
+                      {pack.gradients.slice(0, 8).map((g) => (
+                        <span key={g.name} className="h-5 rounded" style={{ background: g.value }} />
+                      ))}
+                    </span>
+                    <span className="mt-1.5 block truncate text-[10px] font-medium text-slate-600">
+                      {pack.name}
+                      <span className="ml-1 font-mono text-[9px] text-slate-400">{pack.gradients.length}</span>
+                    </span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="left" align="start" className="w-64 rounded-xl p-3">
+                  <div className="mb-2 text-[10px] font-semibold tracking-wide text-slate-500">{pack.name}</div>
+                  <div className="grid max-h-56 grid-cols-3 gap-1.5 overflow-y-auto">
+                    {pack.gradients.map((g) => (
+                      <button
+                        key={g.name}
+                        type="button"
+                        title={g.name}
+                        aria-label={"Background: " + g.name}
+                        aria-pressed={bgColor === g.value}
+                        onClick={() => { setBgImage(undefined); setBg(g.value); }}
+                        className={
+                          "overflow-hidden rounded-md border transition " +
+                          (bgColor === g.value ? "border-blue-500 ring-2 ring-blue-500/30" : "border-slate-200 hover:border-blue-300")
+                        }
+                      >
+                        <span className="block h-10 w-full" style={{ background: g.value }} />
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            );
+          })}
+        </div>
       </div>
 
       {/* ------- Mesh & patterns ------- */}
