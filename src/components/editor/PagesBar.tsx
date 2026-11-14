@@ -59,10 +59,10 @@ export function PagesBar() {
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-xl border bg-transparent transition-all duration-200 ${
+                className={`relative overflow-hidden rounded-lg transition-all duration-200 ${
                   active
-                    ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.28)] scale-[1.04]"
-                    : "border-slate-200/80 hover:border-blue-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
+                    ? "ring-2 ring-blue-500/70 shadow-[0_4px_14px_rgba(37,99,235,0.22)] scale-[1.04]"
+                    : "ring-1 ring-slate-900/10 opacity-75 hover:opacity-100 hover:ring-slate-900/25"
                 }`}
                 style={{ width: thumbW + 4, height: thumbH + 4 }}
               >
@@ -72,7 +72,9 @@ export function PagesBar() {
                   canvasH={canvasH}
                   className="h-full w-full"
                 />
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/85 px-1.5 font-mono text-[9px] font-semibold text-white shadow-sm">
+                <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/85 px-1.5 font-mono text-[9px] font-semibold text-white shadow-sm transition-opacity ${
+                  active ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                }`}>
                   {i + 1}
                 </span>
               </button>
@@ -121,10 +123,12 @@ export function PagesBar() {
         })}
         <button
           onClick={addPage}
-          className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300/90 bg-transparent px-4 text-[10px] font-medium tracking-[0.12em] text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
-          style={{ height: thumbH + 4 }}
+          title="Add page"
+          aria-label="Add page"
+          className="grid shrink-0 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-900/5 hover:text-slate-700"
+          style={{ height: thumbH + 4, width: thumbH + 4 }}
         >
-          <Plus className="h-3.5 w-3.5" /> Add
+          <Plus className="h-4 w-4" strokeWidth={2.2} />
         </button>
       </div>
     </div>
