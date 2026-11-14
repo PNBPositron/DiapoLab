@@ -59,10 +59,10 @@ export function PagesBar() {
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-none transition-all duration-200 ${
+                className={`relative overflow-hidden rounded-none border border-slate-900 transition-all duration-200 ${
                   active
                     ? "ring-2 ring-blue-500/70 shadow-[0_4px_14px_rgba(37,99,235,0.22)] scale-[1.04]"
-                    : "ring-1 ring-slate-900/10 opacity-75 hover:opacity-100 hover:ring-slate-900/25"
+                    : "opacity-75 hover:opacity-100"
                 }`}
                 style={{ width: thumbW + 4, height: thumbH + 4 }}
               >
