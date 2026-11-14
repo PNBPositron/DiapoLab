@@ -284,7 +284,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-1 rounded-2xl border border-slate-200/60 bg-white/70 p-1 shadow-[0_2px_12px_rgba(15,23,42,0.05)] backdrop-blur-md">
+      <div className="flex items-center gap-1 rounded-[1.25rem] border border-white/70 bg-white/60 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_40px_-16px_rgba(15,23,42,0.22)] ring-1 ring-slate-900/[0.03] backdrop-blur-2xl">
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl p-0.5">
           <button
@@ -368,7 +368,7 @@ export function Toolbar() {
           <button
             onClick={() => setExportOpen((v) => !v)}
             disabled={!!exporting}
-            className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3.5 font-display text-[11px] font-semibold tracking-wider text-blue-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800 active:scale-95 disabled:opacity-60"
+            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all hover:from-blue-400 hover:to-blue-500 active:scale-95 disabled:opacity-60"
           >
             {exporting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />

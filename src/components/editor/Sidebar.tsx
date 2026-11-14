@@ -108,10 +108,13 @@ export function Sidebar() {
               title={t.label}
               className={`group relative flex w-full flex-col items-center gap-1 border-0 py-2.5 text-[9px] font-semibold tracking-[0.05em] transition-all duration-200 ${
                 active
-                  ? "bg-slate-100/90 text-slate-900"
+                  ? "bg-gradient-to-b from-blue-50 to-indigo-50/60 text-blue-700 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.16),0_10px_22px_-14px_rgba(37,99,235,0.4)]"
                   : "bg-transparent text-slate-500 hover:bg-slate-100/60 hover:text-slate-800"
               }`}
             >
+              {active && (
+                <span aria-hidden className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-blue-500 to-indigo-500" />
+              )}
               <Icon className="h-4 w-4" strokeWidth={2.2} />
               {t.label}
             </button>
