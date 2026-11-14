@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ColorPicker } from "../ColorPicker";
 import { ImagePlus, X, Link2 } from "lucide-react";
 import { prepareImage } from "@/lib/image-assets";
