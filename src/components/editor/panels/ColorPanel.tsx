@@ -3,7 +3,7 @@ import { useEditor } from "@/store/editor";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ColorPicker } from "../ColorPicker";
-import { ImagePlus, X, Link2 } from "lucide-react";
+import { ImagePlus, X, Link2, Plus } from "lucide-react";
 import { prepareImage } from "@/lib/image-assets";
 
 const GRADIENT_PACKS: { name: string; gradients: { name: string; value: string }[] }[] = [
@@ -107,23 +107,29 @@ const ALL_PACKS: { name: string; gradients: { name: string; value: string }[] }[
   { name: "Patterns", gradients: PATTERN_PRESETS },
 ];
 
+type GradientStop = { color: string; pos: number };
+
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
   const bgImage = page.bgImage;
   const bgFit = page.bgFit ?? "cover";
   const fileRef = useRef<HTMLInputElement>(null);
-  const [gradientFrom, setGradientFrom] = useState("#00d9ff");
-  const [gradientTo, setGradientTo] = useState("#ff0080");
+  const [stops, setStops] = useState<GradientStop[]>([
+    { color: "#00d9ff", pos: 0 },
+    { color: "#ff0080", pos: 100 },
+  ]);
   const [gradientAngle, setGradientAngle] = useState(135);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
-  const [openPicker, setOpenPicker] = useState<"from" | "to" | "bg" | null>(null);
+  const [openPicker, setOpenPicker] = useState<number | "bg" | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const sortedStops = [...stops].sort((a, b) => a.pos - b.pos);
+  const stopsCss = sortedStops.map((s) => `${s.color} ${s.pos}%`).join(", ");
   const customGradient = gradientType === "radial"
-    ? `radial-gradient(circle at center, ${gradientFrom}, ${gradientTo})`
-    : `linear-gradient(${gradientAngle}deg, ${gradientFrom}, ${gradientTo})`;
+    ? `radial-gradient(circle at center, ${stopsCss})`
+    : `linear-gradient(${gradientAngle}deg, ${stopsCss})`;
 
   const onPickImage = async (file: File) => {
     setUploading(true);
@@ -297,37 +303,54 @@ export function ColorPanel() {
           onClick={() => { setBgImage(undefined); setBg(customGradient); }}
           aria-label="Apply custom gradient"
         />
-        <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1.5">
+          {stops.map((stop, k) => (
+            <div key={k} className="flex items-center gap-1.5">
+              <button
+                onClick={() => setOpenPicker(openPicker === k ? null : k)}
+                title="Edit stop color"
+                className={`grid size-7 shrink-0 place-items-center rounded-lg border transition ${
+                  openPicker === k ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200 hover:border-blue-300"
+                }`}
+              >
+                <span className="size-4 rounded-full border border-slate-200" style={{ background: stop.color }} />
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={stop.pos}
+                onChange={(e) => setStops(stops.map((s, j) => (j === k ? { ...s, pos: +e.target.value } : s)))}
+                className="h-1 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-600 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:shadow"
+                aria-label={`Stop ${k + 1} position`}
+              />
+              <span className="w-7 shrink-0 text-right font-mono text-[9px] text-slate-500">{stop.pos}%</span>
+              <button
+                onClick={() => { if (stops.length > 2) setStops(stops.filter((_, j) => j !== k)); }}
+                disabled={stops.length <= 2}
+                title="Remove stop"
+                className="grid size-7 shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-rose-300 hover:text-rose-500 disabled:pointer-events-none disabled:opacity-30"
+              >
+                <X className="size-3" />
+              </button>
+            </div>
+          ))}
+          {openPicker !== null && openPicker !== "bg" && stops[openPicker] && (
+            <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+              <ColorPicker
+                value={stops[openPicker].color}
+                onChange={(hex) => setStops(stops.map((s, j) => (j === openPicker ? { ...s, color: hex } : s)))}
+              />
+            </div>
+          )}
           <button
-            onClick={() => setOpenPicker(openPicker === "from" ? null : "from")}
-            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tracking-wide transition ${
-              openPicker === "from"
-                ? "border-blue-500 bg-blue-50 text-blue-600"
-                : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
-            }`}
+            onClick={() => setStops([...stops, { color: "#94a3b8", pos: 100 }])}
+            disabled={stops.length >= 6}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-slate-300 py-1.5 text-[10px] font-medium text-slate-500 transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 disabled:pointer-events-none disabled:opacity-40"
           >
-            <span className="size-4 rounded-full border border-slate-200" style={{ background: gradientFrom }} />
-            From
-          </button>
-          <button
-            onClick={() => setOpenPicker(openPicker === "to" ? null : "to")}
-            className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[10px] font-semibold tracking-wide transition ${
-              openPicker === "to"
-                ? "border-blue-500 bg-blue-50 text-blue-600"
-                : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300"
-            }`}
-          >
-            <span className="size-4 rounded-full border border-slate-200" style={{ background: gradientTo }} />
-            To
+            <Plus className="size-3" /> Add color stop
           </button>
         </div>
-
-        {openPicker === "from" && (
-          <ColorPicker value={gradientFrom} onChange={setGradientFrom} />
-        )}
-        {openPicker === "to" && (
-          <ColorPicker value={gradientTo} onChange={setGradientTo} />
-        )}
 
         <SegmentedControl label="Gradient type" value={gradientType} onChange={setGradientType} options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]} />
         {gradientType === "linear" && (

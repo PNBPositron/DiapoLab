@@ -51,8 +51,8 @@ export function PagesBar() {
   }
 
   return (
-    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/70 py-2 pl-3 pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
-      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
+    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/70 bg-white/80 py-2 pl-3 pr-3 text-slate-700 shadow-[0_-1px_2px_rgba(15,23,42,0.03)] backdrop-blur-md">
+      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-2.5 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (
@@ -61,7 +61,7 @@ export function PagesBar() {
                 onClick={() => setCurrentPage(i)}
                 className={`relative overflow-hidden rounded-xl border bg-white/60 backdrop-blur-[1px] transition-all duration-200 ${
                   active
-                    ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_2px_10px_rgba(37,99,235,0.22)]"
+                    ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.28)] scale-[1.04]"
                     : "border-slate-200/80 hover:border-blue-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
                 }`}
                 style={{ width: thumbW + 4, height: thumbH + 4 }}
@@ -72,7 +72,7 @@ export function PagesBar() {
                   canvasH={canvasH}
                   className="h-full w-full"
                 />
-                <span className="absolute bottom-1 left-1 rounded bg-white/80 px-1 font-mono text-[9px] text-slate-700">
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/85 px-1.5 font-mono text-[9px] font-semibold text-white shadow-sm">
                   {i + 1}
                 </span>
               </button>
