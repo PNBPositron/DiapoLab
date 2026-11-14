@@ -6,6 +6,7 @@ import { SlideThumbnail } from "./SlideThumbnail";
 
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
 import type { AnyElement } from "@/store/editor";
+import { backgroundStyle } from "@/lib/bg";
 
 export async function requestPresentationFullscreen(target: Element = document.documentElement) {
   if (document.fullscreenElement) return true;
@@ -190,17 +191,7 @@ export function PresentationMode() {
                   {
                     width: canvasW,
                     height: canvasH,
-                    backgroundColor: backdropBgColor.includes("gradient(")
-                      ? "#0a0f1f"
-                      : backdropBgColor,
-                    backgroundImage: backdropPage.bgImage
-                      ? `url(${backdropPage.bgImage})`
-                      : backdropBgColor.includes("gradient(")
-                        ? backdropBgColor
-                        : undefined,
-                    backgroundSize: backdropPage.bgFit ?? "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
+                    ...backgroundStyle(backdropBgColor, backdropPage.bgImage, backdropPage.bgFit),
                   } as React.CSSProperties
                 }
               >
@@ -224,15 +215,7 @@ export function PresentationMode() {
                   {
                     width: canvasW,
                     height: canvasH,
-                    backgroundColor: pageBgColor.includes("gradient(") ? "#0a0f1f" : pageBgColor,
-                    backgroundImage: page.bgImage
-                      ? `url(${page.bgImage})`
-                      : pageBgColor.includes("gradient(")
-                        ? pageBgColor
-                        : undefined,
-                    backgroundSize: page.bgFit ?? "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
+                    ...backgroundStyle(pageBgColor, page.bgImage, page.bgFit),
                     "--fit": scale,
                     transformStyle: "preserve-3d",
                     perspective: page.transition === "cube" ? 1200 : undefined,

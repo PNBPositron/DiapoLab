@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Page } from "@/store/editor";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { CanvasElement } from "./CanvasElement";
+import { backgroundStyle } from "@/lib/bg";
 
 // Renders a single slide (page) scaled to fit a container. Read-only.
 export function SlideThumbnail({
@@ -66,15 +67,7 @@ export function SlideThumbnail({
         style={{
           width: canvasW,
           height: canvasH,
-          backgroundColor: page.bgColor,
-          backgroundImage: page.bgImage
-            ? `url(${page.bgImage})`
-            : page.bgColor.includes("gradient(")
-              ? page.bgColor
-              : undefined,
-          backgroundSize: page.bgFit ?? "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          ...backgroundStyle(page.bgColor, page.bgImage, page.bgFit),
           transform: `scale(${scale})`,
           transformOrigin: "top left",
         }}
