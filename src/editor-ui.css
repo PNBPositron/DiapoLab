@@ -692,10 +692,11 @@
     linear-gradient(180deg, #fbfcfe 0%, #f6f8fc 100%) !important;
 }
 
-/* Canvas stage: pure white, hairline separators. */
+/* Canvas stage: fully transparent so the ambient workspace shows through
+   (the slide canvas itself keeps its own white surface). */
 .editor-ui main {
-  background-color: #ffffff !important;
-  border-color: rgba(226, 232, 240, 0.6) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
 /* Panels, inspector and zoom dock share one glass elevation. */

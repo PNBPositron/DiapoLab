@@ -59,7 +59,7 @@ export function PagesBar() {
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-xl border bg-white/60 backdrop-blur-[1px] transition-all duration-200 ${
+                className={`relative overflow-hidden rounded-xl border bg-transparent transition-all duration-200 ${
                   active
                     ? "border-blue-500 ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.28)] scale-[1.04]"
                     : "border-slate-200/80 hover:border-blue-300 hover:shadow-[0_1px_4px_rgba(15,23,42,0.08)]"
@@ -121,7 +121,7 @@ export function PagesBar() {
         })}
         <button
           onClick={addPage}
-          className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300/90 bg-white/40 px-4 text-[10px] font-medium tracking-[0.12em] text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
+          className="flex shrink-0 items-center gap-2 rounded-xl border border-dashed border-slate-300/90 bg-transparent px-4 text-[10px] font-medium tracking-[0.12em] text-slate-600 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
           style={{ height: thumbH + 4 }}
         >
           <Plus className="h-3.5 w-3.5" /> Add
