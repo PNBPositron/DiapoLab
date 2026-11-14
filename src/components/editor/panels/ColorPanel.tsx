@@ -256,7 +256,11 @@ export function ColorPanel() {
                     </span>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent side="left" align="start" className="w-64 rounded-xl p-3">
+                <PopoverContent
+                  side="left"
+                  align="start"
+                  className="w-64 rounded-xl border-slate-200/90 bg-white/95 p-3 text-slate-700 shadow-[0_20px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl"
+                >
                   <div className="mb-2 text-[10px] font-semibold tracking-wide text-slate-500">{pack.name}</div>
                   <div className="grid max-h-56 grid-cols-3 gap-1.5 overflow-y-auto">
                     {pack.gradients.map((g) => (

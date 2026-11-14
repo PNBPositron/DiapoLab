@@ -159,7 +159,7 @@ export function Canvas() {
           >
             <div
               id="canvas-export"
-              className="absolute left-0 top-0 overflow-hidden border-[3px] border-ink"
+              className="absolute left-0 top-0 overflow-hidden rounded-[2px] shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
               style={{
                 width: canvasW,
                 height: canvasH,
