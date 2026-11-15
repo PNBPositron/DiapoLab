@@ -7,20 +7,20 @@
   }
 
   .editor-tool-rail {
-    background: transparent !important;
+    background: transparent;
     border: 0;
   }
 
   .editor-ui {
-    background: transparent !important;
+    background: transparent;
   }
 
   .toolbar,
   .pages-bar {
-    background: transparent !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .editor-tool-rail > button {
@@ -35,10 +35,10 @@
 
   .editor-side-panel {
     padding: 0.875rem;
-    background: #ffffff !important;
+    background: #ffffff;
     border-color: #e2e8f0;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow:
       0 1px 2px rgba(15, 23, 42, 0.05),
       0 12px 32px -6px rgba(15, 23, 42, 0.16),
