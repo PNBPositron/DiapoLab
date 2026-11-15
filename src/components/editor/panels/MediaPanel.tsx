@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LayoutGrid, Music, Upload, X } from "lucide-react";
+import { LayoutGrid, Monitor, Music, Upload, Video, X } from "lucide-react";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 import { newAudio, newImage, newVideo, useEditor } from "@/store/editor";
 import { prepareImage } from "@/lib/image-assets";
@@ -47,6 +47,79 @@ export function MediaPanel() {
   useEffect(() => {
     void listMedia().then(setLibrary);
   }, []);
+
+  // ---- Screen & webcam recording (MediaRecorder → video element) ----
+  const [rec, setRec] = useState<{
+    mode: "screen" | "cam";
+    stream: MediaStream;
+    recorder: MediaRecorder;
+    chunks: Blob[];
+    url: string;
+  } | null>(null);
+  const recRef = useRef(rec);
+  recRef.current = rec;
+  // Stop capture if the panel unmounts mid-recording.
+  useEffect(() => () => { recRef.current?.stream.getTracks().forEach((t) => t.stop()); }, []);
+
+  const finishRec = async (
+    mode: "screen" | "cam",
+    recorder: MediaRecorder,
+    chunks: Blob[],
+    stream: MediaStream,
+  ) => {
+    stream.getTracks().forEach((t) => t.stop());
+    setRec(null);
+    setError(null);
+    try {
+      const blob = new Blob(chunks, { type: recorder.mimeType || "video/webm" });
+      if (blob.size > 25 * 1024 * 1024) throw new Error("Recording too long (max 25 MB).");
+      const file = new File([blob], mode === "screen" ? "screen-recording.webm" : "webcam-recording.webm", {
+        type: blob.type || "video/webm",
+      });
+      const src = await readFileAsDataUrl(file);
+      add(newVideo(src, { muted: false, loop: false }));
+      // Keep a copy in the browser library when small enough (same rule as uploads).
+      if (src.length <= 6_000_000) {
+        try {
+          const saved = await saveMedia({ name: file.name, kind: "video", src });
+          setLibrary((l) => [saved, ...l.filter((m) => m.src !== saved.src)]);
+        } catch {
+          // Quota exceeded: the deck keeps working without the library.
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save the recording.");
+    }
+  };
+
+  const startRec = async (mode: "screen" | "cam") => {
+    setError(null);
+    try {
+      const stream =
+        mode === "screen"
+          ? await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true })
+          : await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: true });
+      const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+        ? "video/webm;codecs=vp9"
+        : "video/webm";
+      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 });
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+      recorder.onstop = () => { void finishRec(mode, recorder, chunks, stream); };
+      recorder.start(250);
+      // The user can also stop screen sharing from the browser bar.
+      stream.getVideoTracks()[0]?.addEventListener("ended", () => {
+        if (recorder.state !== "inactive") recorder.stop();
+      });
+      setRec({ mode, stream, recorder, chunks, url: URL.createObjectURL(stream) });
+    } catch {
+      setError("Recording cancelled or permission denied.");
+    }
+  };
+
+  const stopRec = () => {
+    if (rec && rec.recorder.state !== "inactive") rec.recorder.stop();
+  };
 
   const importFiles = async (files: FileList | File[]) => {
     setError(null);
@@ -177,6 +250,40 @@ export function MediaPanel() {
               }}
             />
           </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => void startRec("screen")}
+              disabled={!!rec}
+              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700 disabled:opacity-40"
+            >
+              <Monitor className="size-4 text-slate-400" /> Record screen
+            </button>
+            <button
+              type="button"
+              onClick={() => void startRec("cam")}
+              disabled={!!rec}
+              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700 disabled:opacity-40"
+            >
+              <Video className="size-4 text-slate-400" /> Record webcam
+            </button>
+          </div>
+          {rec && (
+            <div className="space-y-2 rounded-2xl border border-rose-200 bg-rose-50/60 p-3">
+              <div className="flex items-center gap-2 text-[11px] font-semibold text-rose-600">
+                <span className="size-2 animate-pulse rounded-full bg-rose-500" />
+                Recording {rec.mode === "screen" ? "screen" : "webcam"}…
+              </div>
+              <video src={rec.url} muted autoPlay playsInline className="w-full rounded-lg border border-rose-200 bg-black" />
+              <button
+                type="button"
+                onClick={stopRec}
+                className="w-full rounded-lg bg-rose-600 py-2 text-[11px] font-bold tracking-wide text-white transition hover:bg-rose-500"
+              >
+                Stop & insert on slide
+              </button>
+            </div>
+          )}
           {busy && <p className="text-center text-[10px] font-semibold text-slate-500">Importing…</p>}
           {error && <p className="text-[10px] font-medium text-rose-500">{error}</p>}
           <p className="text-[10px] leading-snug text-slate-400">

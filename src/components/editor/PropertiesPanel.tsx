@@ -1026,6 +1026,129 @@ export function PropertiesPanel() {
               </Section>
             )}
 
+            {/* CHART ELEMENT */}
+            {el.type === "chart" && (() => {
+              const ch = el as ChartElement;
+              const kinds: Array<{ value: ChartKind; label: string; icon: typeof ChartColumn }> = [
+                { value: "bar", label: "Bars", icon: ChartColumn },
+                { value: "line", label: "Line", icon: ChartLine },
+                { value: "area", label: "Area", icon: ChartArea },
+                { value: "pie", label: "Pie", icon: ChartPie },
+                { value: "donut", label: "Donut", icon: Circle },
+              ];
+              return (
+                <Section title="Chart">
+                  <Field label="Chart type">
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {kinds.map(({ value, label, icon: Icon }) => (
+                        <button
+                          key={value}
+                          title={label}
+                          onClick={() => update(ch.id, { chart: value } as never)}
+                          className={`grid place-items-center rounded-lg border py-2 transition ${
+                            ch.chart === value
+                              ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                              : "border-slate-200 text-slate-500 hover:border-slate-300"
+                          }`}
+                        >
+                          <Icon className="size-4" />
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  <Field label="Style pack">
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(Object.keys(UI_STYLE_THEMES) as UiStyle[]).map((s) => {
+                        const t = UI_STYLE_THEMES[s];
+                        const active = ch.uiStyle === s;
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => update(ch.id, chartStylePatch(s) as never)}
+                            className={`rounded-lg border px-2 py-2 text-[10px] font-semibold transition ${
+                              active
+                                ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                                : "border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                  <Field label="Title">
+                    <input
+                      type="text"
+                      value={ch.title ?? ""}
+                      onChange={(e) => update(ch.id, { title: e.target.value } as never)}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                    />
+                  </Field>
+                  <Field label="Data">
+                    <div className="space-y-1.5">
+                      {ch.data.map((d, i) => (
+                        <div key={i} className="flex items-center gap-1">
+                          <span
+                            className="size-3 shrink-0 rounded-full border border-slate-200"
+                            style={{ background: ch.colors[i % ch.colors.length] }}
+                          />
+                          <input
+                            type="text"
+                            aria-label={`Label ${i + 1}`}
+                            value={d.label}
+                            onChange={(e) =>
+                              update(ch.id, { data: ch.data.map((p, j) => (j === i ? { ...p, label: e.target.value } : p)) } as never)
+                            }
+                            className="min-w-0 flex-1 rounded-lg border border-slate-200 px-1.5 py-1 text-[11px] focus:border-sky-500 focus:outline-none"
+                          />
+                          <input
+                            type="number"
+                            aria-label={`Value ${i + 1}`}
+                            value={d.value}
+                            onChange={(e) =>
+                              update(ch.id, { data: ch.data.map((p, j) => (j === i ? { ...p, value: Number(e.target.value) } : p)) } as never)
+                            }
+                            className="w-14 shrink-0 rounded-lg border border-slate-200 px-1.5 py-1 text-right font-mono text-[11px] focus:border-sky-500 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            aria-label="Remove data point"
+                            disabled={ch.data.length <= 1}
+                            onClick={() => update(ch.id, { data: ch.data.filter((_, j) => j !== i) } as never)}
+                            className="rounded p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(ch.id, { data: [...ch.data, { label: `Item ${ch.data.length + 1}`, value: 10 }] } as never)
+                        }
+                        className="w-full rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                      >
+                        + Add data point
+                      </button>
+                    </div>
+                  </Field>
+                  <Field label="Options">
+                    <div className="flex flex-wrap gap-3">
+                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                        <input type="checkbox" checked={!!ch.showValues} onChange={(e) => update(ch.id, { showValues: e.target.checked } as never)} className="accent-sky-600" />
+                        Show values
+                      </label>
+                      <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                        <input type="checkbox" checked={!!ch.showAxes} onChange={(e) => update(ch.id, { showAxes: e.target.checked } as never)} className="accent-sky-600" />
+                        Show axes
+                      </label>
+                    </div>
+                  </Field>
+                </Section>
+              );
+            })()}
+
             {/* TABLE ELEMENT */}
             {el.type === "table" && (() => {
               const tb = el as TableElement;
