@@ -64,7 +64,7 @@ export function PagesBar() {
                     ? "ring-2 ring-blue-500/70 shadow-[0_4px_14px_rgba(37,99,235,0.22)] scale-[1.04]"
                     : "opacity-75 hover:opacity-100"
                 }`}
-                style={{ width: thumbW + 4, height: thumbH + 4 }}
+                style={{ width: thumbW + 2, height: thumbH + 2 }}
               >
                 <SlideThumbnail
                   page={p}
@@ -126,7 +126,7 @@ export function PagesBar() {
           title="Add page"
           aria-label="Add page"
           className="grid shrink-0 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-900/5 hover:text-slate-700"
-          style={{ height: thumbH + 4, width: thumbH + 4 }}
+          style={{ height: thumbH + 2, width: thumbH + 2 }}
         >
           <Plus className="h-4 w-4" strokeWidth={2.2} />
         </button>

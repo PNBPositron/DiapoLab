@@ -59,7 +59,10 @@ export function SlideThumbnail({
     <div
       ref={ref}
       className={`relative overflow-hidden ${className ?? ""}`}
-      style={{ aspectRatio: `${canvasW} / ${canvasH}` }}
+      style={{
+        aspectRatio: `${canvasW} / ${canvasH}`,
+        ...backgroundStyle(page.bgColor, page.bgImage, page.bgFit),
+      }}
     >
       <div
         key={fontTick}
