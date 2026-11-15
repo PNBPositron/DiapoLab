@@ -28,6 +28,8 @@ import {
   Scale,
   ShieldCheck,
   Search,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useAuth, signOut } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
@@ -119,7 +121,7 @@ export function Toolbar() {
 
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { appAccent } = useSettings();
+  const { appAccent, editorDark, setEditorDark } = useSettings();
 
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -335,6 +337,16 @@ export function Toolbar() {
           className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
         >
           <Search className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+
+        {/* Dark mode quick toggle */}
+        <button
+          onClick={() => setEditorDark(!editorDark)}
+          title={editorDark ? "Light mode" : "Dark mode"}
+          aria-label={editorDark ? "Switch to light mode" : "Switch to dark mode"}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        >
+          {editorDark ? <Sun className="h-4 w-4" strokeWidth={2.2} /> : <Moon className="h-4 w-4" strokeWidth={2.2} />}
         </button>
 
         {/* Save / Sign-in button */}

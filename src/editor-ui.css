@@ -813,3 +813,40 @@
 .editor-dark .editor-inspector::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.3);
 }
+
+/* ── Dark chrome: full coverage of Tailwind-styled surfaces ───────────────
+   The base dark rules above only restyle a few known surfaces; panels,
+   dialogs and cards are styled with Tailwind utilities, so map them to
+   dark equivalents. Scoped with :not(#canvas-export …) so slide content,
+   exports and the presentation canvas are never touched. */
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="bg-white"]:not([style*="background"]) {
+  background-color: #16213a !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="bg-slate-50"]:not([style*="background"]) {
+  background-color: rgba(148, 163, 184, 0.07) !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="bg-slate-100"]:not([style*="background"]),
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="bg-slate-200"]:not([style*="background"]) {
+  background-color: rgba(148, 163, 184, 0.14) !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="border-slate-1"],
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="border-slate-2"],
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="border-slate-3"] {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-4"],
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-5"] {
+  color: #94a3b8 !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-6"],
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-7"] {
+  color: #cbd5e1 !important;
+}
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-8"],
+.editor-dark :not(#canvas-export):not(#canvas-export *) [class*="text-slate-9"] {
+  color: #f1f5f9 !important;
+}
+/* Thumbnails: the black border disappears on the dark backdrop — lighten it. */
+.editor-dark .pages-bar .group > button {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+}
