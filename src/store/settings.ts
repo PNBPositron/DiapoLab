@@ -54,6 +54,8 @@ type SettingsState = {
   panelDurationMs: number;
   panelStiffness: number;
   reduceMotion: boolean;
+  editorDark: boolean;
+  a11yCheck: boolean;
   brandKit: BrandKit;
   appAccent: string;
   customFonts: CustomFont[];
@@ -70,6 +72,8 @@ type SettingsState = {
   setPanelDurationMs: (v: number) => void;
   setPanelStiffness: (v: number) => void;
   setReduceMotion: (v: boolean) => void;
+  setEditorDark: (v: boolean) => void;
+  setA11yCheck: (v: boolean) => void;
   resetMotion: () => void;
   togglePanel: (id: PanelId) => void;
   resetPanels: () => void;
@@ -112,6 +116,8 @@ export const useSettings = create<SettingsState>()(
       panelDurationMs: DEFAULT_PANEL_DURATION,
       panelStiffness: DEFAULT_PANEL_STIFFNESS,
       reduceMotion: true,
+      editorDark: false,
+      a11yCheck: false,
       brandKit: { ...DEFAULT_BRAND_KIT },
       appAccent: "#4f46e5",
       customThemes: [],
@@ -135,6 +141,8 @@ export const useSettings = create<SettingsState>()(
       setPanelDurationMs: (panelDurationMs) => set({ panelDurationMs }),
       setPanelStiffness: (panelStiffness) => set({ panelStiffness }),
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
+      setEditorDark: (editorDark) => set({ editorDark }),
+      setA11yCheck: (a11yCheck) => set({ a11yCheck }),
       resetMotion: () =>
         set({
           panelDurationMs: DEFAULT_PANEL_DURATION,
@@ -172,6 +180,8 @@ export const useSettings = create<SettingsState>()(
           // Editor chrome is intentionally light; reset removed dark and legacy values.
           editorTheme: DEFAULT_EDITOR_THEME,
           reduceMotion: true,
+          editorDark: previous?.editorDark ?? false,
+          a11yCheck: previous?.a11yCheck ?? false,
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
         };
       },

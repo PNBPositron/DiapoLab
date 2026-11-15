@@ -10,6 +10,7 @@ import { PresentationMode } from "@/components/editor/PresentationMode";
 import { PagesBar } from "@/components/editor/PagesBar";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
 import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
+import { A11yPanel } from "@/components/editor/A11yPanel";
 import { useSettings } from "@/store/settings";
 import { registerCustomFont } from "@/lib/fontLoader";
 
@@ -34,6 +35,8 @@ export const Route = createFileRoute("/")({
 function Editor() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const customFonts = useSettings((s) => s.customFonts);
+  const editorDark = useSettings((s) => s.editorDark);
+  const a11yCheck = useSettings((s) => s.a11yCheck);
 
   // Re-register user-uploaded fonts (from the Brand Kit) on every load.
   useEffect(() => {
@@ -53,7 +56,7 @@ function Editor() {
   }, []);
 
   return (
-    <div className="editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900">
+    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
       <h1 className="sr-only">DiapoLab — NextGen Open Source Presentation Editor</h1>
       <Toolbar />
       {/* Sidebar spans the full workspace height (it runs alongside the
@@ -70,6 +73,7 @@ function Editor() {
         </div>
         <PropertiesPanel />
       </div>
+      {a11yCheck && <A11yPanel />}
       <PresentationMode />
       <WelcomeDialog />
       <FindReplaceDialog />

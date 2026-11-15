@@ -80,7 +80,7 @@ function Switch({ on, onClick, label }: { on: boolean; onClick: () => void; labe
 }
 
 export function SettingsDialog({ onClose }: { onClose: () => void }) {
-  const { panels, togglePanel, resetPanels, panelDurationMs, setPanelDurationMs, panelStiffness, setPanelStiffness, reduceMotion, setReduceMotion, resetMotion, editorTheme, setEditorTheme } = useSettings();
+  const { panels, togglePanel, resetPanels, panelDurationMs, setPanelDurationMs, panelStiffness, setPanelStiffness, reduceMotion, setReduceMotion, resetMotion, editorTheme, setEditorTheme, editorDark, setEditorDark, a11yCheck, setA11yCheck } = useSettings();
   const { user } = useAuth();
   const { pages, loadPages } = useEditor();
   const [motionOpen, setMotionOpen] = useState(false);
@@ -363,6 +363,34 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   </button>
                 );
               })}
+            </div>
+          </Section>
+
+          {/* Appearance & accessibility */}
+          <Section
+            icon={<Palette className="size-4" />}
+            label="Appearance & accessibility"
+            desc="Dark editor chrome and on-slide accessibility checks."
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+                <div>
+                  <div className="text-[11px] font-semibold text-slate-700">Dark editor</div>
+                  <p className="mt-0.5 text-[10px] text-slate-400">
+                    Dark chrome around the slides. Slide content is untouched.
+                  </p>
+                </div>
+                <Switch on={editorDark} label="Dark editor" onClick={() => setEditorDark(!editorDark)} />
+              </div>
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+                <div>
+                  <div className="text-[11px] font-semibold text-slate-700">Accessibility checker</div>
+                  <p className="mt-0.5 text-[10px] text-slate-400">
+                    Flags low-contrast text, small fonts and off-canvas elements on the current slide.
+                  </p>
+                </div>
+                <Switch on={a11yCheck} label="Accessibility checker" onClick={() => setA11yCheck(!a11yCheck)} />
+              </div>
             </div>
           </Section>
 
