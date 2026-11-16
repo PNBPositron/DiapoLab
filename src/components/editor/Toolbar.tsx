@@ -253,12 +253,12 @@ export function Toolbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-4">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-4 max-[640px]:px-2">
       {/* LEFT: Logo + modern project name */}
       <div className="flex items-center gap-3">
         <div className="relative flex items-center gap-2.5">
           <Link to="/" className="flex items-center" aria-label="DiapoLab home">
-            <DiapoLabLogo className="h-7 w-auto" />
+            <DiapoLabLogo className="h-7 w-auto max-[640px]:h-6" />
           </Link>
         </div>
 
@@ -286,7 +286,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-1 rounded-[1.25rem] border border-white/70 bg-white/60 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_40px_-16px_rgba(15,23,42,0.22)] ring-1 ring-slate-900/[0.03] backdrop-blur-2xl">
+      <div className="flex min-w-0 items-center gap-1 rounded-[1.25rem] border border-white/70 bg-white/60 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_40px_-16px_rgba(15,23,42,0.22)] ring-1 ring-slate-900/[0.03] backdrop-blur-2xl max-[640px]:gap-0.5 max-[640px]:p-0.5">
         {/* Undo / Redo grouped macOS/Figma style */}
         <div className="flex items-center rounded-xl p-0.5">
           <button
@@ -314,7 +314,8 @@ export function Toolbar() {
         <button
           onClick={() => importRef.current?.click()}
           title="Import .json design or .pptx deck"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+          aria-label="Import .json design or .pptx deck"
+          className="hidden h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 min-[641px]:flex"
         >
           <Upload className="h-4 w-4" strokeWidth={2.2} />
         </button>
@@ -334,7 +335,7 @@ export function Toolbar() {
           onClick={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
           title="Find & replace (Ctrl+F)"
           aria-label="Find & replace"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+          className="hidden h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 min-[641px]:flex"
         >
           <Search className="h-4 w-4" strokeWidth={2.2} />
         </button>
@@ -344,7 +345,7 @@ export function Toolbar() {
           onClick={() => setEditorDark(!editorDark)}
           title={editorDark ? "Light mode" : "Dark mode"}
           aria-label={editorDark ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+          className="hidden h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 min-[641px]:flex"
         >
           {editorDark ? <Sun className="h-4 w-4" strokeWidth={2.2} /> : <Moon className="h-4 w-4" strokeWidth={2.2} />}
         </button>
@@ -368,10 +369,11 @@ export function Toolbar() {
           <Link
             to="/auth"
             search={{ next: undefined }}
-            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95"
+            aria-label="Sign in"
+            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95 max-[640px]:px-2.5"
           >
             <Cloud className="h-3.5 w-3.5 text-blue-500" strokeWidth={2.4} />
-            <span>Sign in</span>
+            <span className="max-[640px]:sr-only">Sign in</span>
           </Link>
         )}
 
@@ -380,14 +382,15 @@ export function Toolbar() {
           <button
             onClick={() => setExportOpen((v) => !v)}
             disabled={!!exporting}
-            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all hover:from-blue-400 hover:to-blue-500 active:scale-95 disabled:opacity-60"
+            aria-label={exporting ? `Exporting ${exporting}` : "Export"}
+            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all hover:from-blue-400 hover:to-blue-500 active:scale-95 disabled:opacity-60 max-[640px]:px-2.5"
           >
             {exporting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
             ) : (
               <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            <span>{exporting ? exporting : "Export"}</span>
+            <span className="max-[640px]:sr-only">{exporting ? exporting : "Export"}</span>
             <ChevronDown
               className={`h-3 w-3 transition-transform duration-200 ${exportOpen ? "rotate-180" : ""}`}
               strokeWidth={2.5}
@@ -428,10 +431,11 @@ export function Toolbar() {
             if (enteredFullscreen) setPresenting(true);
           }}
           title="Present"
+          aria-label="Present"
           type="button"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98] max-[640px]:px-2.5"
         >
-          <Play className="h-3.5 w-3.5 fill-white" /> Present
+          <Play className="h-3.5 w-3.5 fill-white" /> <span className="max-[640px]:sr-only">Present</span>
         </button>
 
         {/* GitHub repository */}
@@ -475,6 +479,10 @@ export function Toolbar() {
           onNewDesign={newDesign}
           onPublish={handlePublish}
           onClear={clear}
+          onImport={() => importRef.current?.click()}
+          onFindReplace={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
+          onToggleTheme={() => setEditorDark(!editorDark)}
+          isDarkMode={editorDark}
           publishing={publishing}
           isAuthenticated={!!user}
         />
@@ -548,12 +556,20 @@ function LargeModernHamburger({
   onNewDesign,
   onPublish,
   onClear,
+  onImport,
+  onFindReplace,
+  onToggleTheme,
+  isDarkMode,
   publishing,
   isAuthenticated,
 }: {
   onNewDesign: () => void;
   onPublish: () => void;
   onClear: () => void;
+  onImport: () => void;
+  onFindReplace: () => void;
+  onToggleTheme: () => void;
+  isDarkMode: boolean;
   publishing: boolean;
   isAuthenticated: boolean;
 }) {
@@ -624,6 +640,24 @@ function LargeModernHamburger({
             title="New design"
             subtitle="Start a blank presentation"
             onClick={() => handleAction(onNewDesign)}
+          />
+          <MenuCardItem
+            icon={Upload}
+            title="Import design"
+            subtitle="Open a JSON or PowerPoint deck"
+            onClick={() => handleAction(onImport)}
+          />
+          <MenuCardItem
+            icon={Search}
+            title="Find & replace"
+            subtitle="Search text across your slides"
+            onClick={() => handleAction(onFindReplace)}
+          />
+          <MenuCardItem
+            icon={isDarkMode ? Sun : Moon}
+            title={isDarkMode ? "Use light theme" : "Use dark theme"}
+            subtitle="Switch the editor appearance"
+            onClick={() => handleAction(onToggleTheme)}
           />
 
           {isAuthenticated && (
