@@ -22,6 +22,7 @@ import {
   MonitorPlay,
   Braces,
   Folder,
+  Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/wiki")({
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/wiki")({
       {
         name: "description",
         content:
-          "Learn DiapoLab: formats, panels, elements, shortcuts, effects and transitions, publishing templates and sharing decks.",
+          "Learn DiapoLab: formats, panels, elements, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
       },
       { property: "og:title", content: "Wiki — DiapoLab documentation" },
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
@@ -54,6 +55,7 @@ const SECTIONS = [
   { id: "ai", label: "AI slideshow JSON", icon: <Braces className="size-3.5" /> },
   { id: "shortcuts", label: "Shortcuts", icon: <Keyboard className="size-3.5" /> },
   { id: "effects", label: "Effects & transitions", icon: <WandSparkles className="size-3.5" /> },
+  { id: "accessibility", label: "Dark mode & a11y", icon: <Moon className="size-3.5" /> },
   { id: "publishing", label: "Publishing & sharing", icon: <Share2 className="size-3.5" /> },
   { id: "faq", label: "FAQ", icon: <CircleHelp className="size-3.5" /> },
 ];
@@ -63,9 +65,9 @@ const PANELS = [
   { icon: <Type className="size-4" />, name: "Text", desc: "Titles, headings and paragraphs, with custom fonts." },
   { icon: <Shapes className="size-4" />, name: "Elements", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
   { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
-  { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio." },
+  { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
   { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets and layout blocks." },
-  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, brand kit, canvas size and magic resize." },
+  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size and magic resize." },
   { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
 ];
 
@@ -75,7 +77,7 @@ const ELEMENTS: Array<[string, string]> = [
   ["Icons", "A searchable icon library, recolorable per element."],
   ["Images", "Crop, shape masks, and filters including glitch, pixelate and posterize."],
   ["Video & audio", "Trim window, playback speed and loop, straight on the slide."],
-  ["Charts", "Bar, line, area, pie and donut charts with style-matched colors."],
+  ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options)."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
   ["Quizzes & polls", "Right-or-wrong quizzes, and live polls whose votes sync across open windows."],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
@@ -93,8 +95,10 @@ const SHORTCUTS: Array<[string, string]> = [
   ["Arrows", "Nudge the selection (Shift = 10 px steps)"],
   ["Shift Click", "Add an element to the selection"],
   ["Double-click", "Edit a text element inline"],
+  ["Alt (while dragging)", "Temporarily bypass snapping"],
+  ["Wheel", "Scroll the workspace"],
+  ["Ctrl Wheel", "Zoom the canvas"],
   ["Esc", "Unpin the sidebar, close menus and dialogs"],
-  ["Wheel", "Zoom the canvas"],
 ];
 
 function Wiki() {
@@ -127,7 +131,7 @@ function Wiki() {
           </div>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
             Everything you need to build decks fast: formats, panels, elements,
-            shortcuts, effects, and how to share your work with the community.
+            shortcuts, effects, dark mode, and how to share your work with the community.
           </p>
         </div>
       </header>
@@ -209,7 +213,8 @@ function Wiki() {
               Hover the left rail to open the sidebar, or click a tool to pin it open.
               Each tool is a panel with its own job. Hide or show panels in{" "}
               <strong>Settings → Visible panels</strong>, and press{" "}
-              <Kbd>Esc</Kbd> to unpin.
+              <Kbd>Esc</Kbd> to unpin. A floating <strong>Layers</strong> list lets
+              you toggle visibility, lock, reorder and multi-select elements.
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
               {PANELS.map((p) => (
@@ -238,6 +243,9 @@ function Wiki() {
             <p>
               Everything that can live on a slide. Insert them from the panels or the
               command palette, then style each one in the inspector on the right.
+              Align and distribute actions work on a single element or a multi-selection,
+              and smart snapping keeps everything on the grid (hold <Kbd>Alt</Kbd> to
+              bypass it while dragging).
             </p>
             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
               {ELEMENTS.map(([name, desc]) => (
@@ -396,6 +404,11 @@ function Wiki() {
                 pixelate, posterize and film-grain noise effects.
               </li>
               <li>
+                <strong>Gradients</strong> — build multi-stop gradients with up to six
+                color stops and position sliders, for element fills and slide
+                backgrounds alike.
+              </li>
+              <li>
                 <strong>3D transforms</strong> — add perspective, rotate on X/Y, and
                 optional cursor-following tilt in presentation mode.
               </li>
@@ -405,6 +418,27 @@ function Wiki() {
                 a presentation.
               </li>
             </ul>
+          </Section>
+
+          <Section
+            id="accessibility"
+            icon={<Moon className="size-4" />}
+            kicker="Comfort"
+            title="Dark mode & accessibility"
+          >
+            <p>
+              Toggle <strong>dark mode</strong> with the moon/sun button in the toolbar.
+              The whole editor chrome switches to dark — panels, toolbar, zoom dock and
+              scrollbars — while the canvas keeps your slide's own colors, so what you
+              design is exactly what your audience sees.
+            </p>
+            <p>
+              The built-in <strong>accessibility checker</strong> (in Settings) reviews
+              your deck for WCAG contrast issues, fonts that are too small to read from
+              a distance, and elements that sit outside the visible canvas, so you can
+              fix them before presenting. Both dark mode and the checker toggles live in{" "}
+              <strong>Settings</strong>.
+            </p>
           </Section>
 
           <Section
