@@ -2008,8 +2008,6 @@ export function PropertiesPanel() {
                     </p>
                   </div>
                 </Field>
-                  </div>
-                </Field>
 
                 <Field label="Replace image">
                   <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">
