@@ -41,6 +41,7 @@ export function MediaPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { add, addGroup, canvasW, canvasH } = useEditor();
+  const bgMusic = useEditor((s) => s.pages[s.currentIndex]?.bgMusic);
   const inputRef = useRef<HTMLInputElement>(null);
   // Media the user imported before, saved in this browser.
   const [library, setLibrary] = useState<MediaLibraryItem[]>([]);
@@ -289,6 +290,53 @@ export function MediaPanel() {
           <p className="text-[10px] leading-snug text-slate-400">
             Images and GIFs land on the slide right away. Videos loop while presenting; audio shows a compact player.
           </p>
+          <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Background music (this slide)</p>
+            <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-[11px] font-semibold text-slate-700 transition hover:border-sky-300 hover:bg-sky-50">
+              <Music className="size-3.5" /> {bgMusic ? "Replace music" : "Add music to this slide"}
+              <input
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  try {
+                    if (file.size > 6 * 1024 * 1024) throw new Error("Music too large (max 6 MB).");
+                    const src = await readFileAsDataUrl(file);
+                    useEditor.getState().setBgMusic({ src, volume: 0.6, loop: true });
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Could not load this file.");
+                  }
+                }}
+              />
+            </label>
+            {bgMusic && (
+              <>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={bgMusic.volume ?? 0.6}
+                  onChange={(e) => useEditor.getState().setBgMusic({ ...bgMusic, volume: Number(e.target.value) })}
+                  className="w-full accent-sky-600"
+                  aria-label="Music volume"
+                />
+                <button
+                  type="button"
+                  onClick={() => useEditor.getState().setBgMusic(undefined)}
+                  className="w-full rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-[10px] font-semibold text-rose-600 transition hover:bg-rose-100"
+                >
+                  Remove music
+                </button>
+                <p className="text-[10px] leading-snug text-slate-400">
+                  Plays while this slide is presented. Pair with per-object audio cues in the inspector.
+                </p>
+              </>
+            )}
+          </div>
           <div className="space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Your library</p>
             {library.length === 0 ? (

@@ -22,6 +22,7 @@ import {
   type UiKind,
   KEYFRAME_EASINGS,
   type ElementKeyframe,
+  type MotionPath,
 } from "@/store/editor";
 import { useSettings } from "@/store/settings";
 import { prepareImage } from "@/lib/image-assets";
@@ -76,6 +77,61 @@ import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
+
+/** Client-side background removal: flood-fills from the image borders,
+ *  clearing every pixel close to the average border color. */
+async function removeImageBackground(src: string, tolerance = 32): Promise<string> {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Could not load this image."));
+    img.src = src;
+  });
+  const maxDim = 1400;
+  const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) throw new Error("Canvas is unavailable.");
+  ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const px = data.data;
+  const idx = (x: number, y: number) => (y * w + x) * 4;
+  const corners: number[][] = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]].map(([x, y]) => {
+    const i = idx(x, y);
+    return [px[i], px[i + 1], px[i + 2]];
+  });
+  const seed = [0, 1, 2].map((c) => corners.reduce((s, cc) => s + cc[c], 0) / corners.length);
+  const tol2 = tolerance * tolerance * 3;
+  const near = (i: number) => {
+    const dr = px[i] - seed[0];
+    const dg = px[i + 1] - seed[1];
+    const db = px[i + 2] - seed[2];
+    return dr * dr + dg * dg + db * db <= tol2;
+  };
+  const visited = new Uint8Array(w * h);
+  const stack: number[] = [];
+  for (let x = 0; x < w; x++) stack.push(x, 0, x, h - 1);
+  for (let y = 0; y < h; y++) stack.push(0, y, w - 1, y);
+  while (stack.length) {
+    const y = stack.pop()!;
+    const x = stack.pop()!;
+    if (x < 0 || y < 0 || x >= w || y >= h) continue;
+    const p = y * w + x;
+    if (visited[p]) continue;
+    visited[p] = 1;
+    const i = p * 4;
+    if (!near(i)) continue;
+    px[i + 3] = 0;
+    stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
+  }
+  ctx.putImageData(data, 0, 0);
+  return canvas.toDataURL("image/png");
+}
 
 const FONT_FAMILIES: string[] = Array.from(
   new Set(["Inter", "Orbitron", "JetBrains Mono", "Georgia", ...FONTS.map((f) => f.family)])
@@ -1509,6 +1565,38 @@ export function PropertiesPanel() {
                     unit="em"
                     onChange={(val) => update(el.id, { letterSpacing: val / 100 })}
                   />
+                  <Field label="Typewriter (presentation)">
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { typeSpeed: el.typeSpeed ? undefined : 28 } as never)}
+                        className={'w-full rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition ' + (el.typeSpeed ? 'border-sky-300 bg-sky-50 text-sky-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')}
+                      >
+                        {el.typeSpeed ? "Typewriter on" : "Typewriter off"}
+                      </button>
+                      {el.typeSpeed && (
+                        <SliderWithInput label="Speed" min={5} max={120} step={1} unit="cps" value={el.typeSpeed} onChange={(v) => update(el.id, { typeSpeed: v } as never)} />
+                      )}
+                    </div>
+                  </Field>
+                  <Field label="Count-up (presentation)">
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { countUp: el.countUp ? undefined : { duration: 1500 } } as never)}
+                        className={'w-full rounded-lg border px-2 py-1.5 text-[10px] font-semibold transition ' + (el.countUp ? 'border-sky-300 bg-sky-50 text-sky-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50')}
+                      >
+                        {el.countUp ? "Count-up on" : "Count-up off"}
+                      </button>
+                      {el.countUp && (
+                        <>
+                          <SliderWithInput label="Duration" min={300} max={6000} step={100} unit="ms" value={el.countUp.duration} onChange={(v) => update(el.id, { countUp: { ...el.countUp!, duration: v } } as never)} />
+                          <SliderWithInput label="Decimals" min={0} max={3} step={1} unit="" value={el.countUp.decimals ?? 0} onChange={(v) => update(el.id, { countUp: { ...el.countUp!, decimals: v } } as never)} />
+                          <p className="text-[10px] leading-snug text-slate-400">Animates the first number found in the text up to its final value (KPI, stats).</p>
+                        </>
+                      )}
+                    </div>
+                  </Field>
                 </Section>
 
                 <Section title="Style & Alignment">
@@ -1896,6 +1984,31 @@ export function PropertiesPanel() {
                     <SliderWithInput label="Horizontal" min={0} max={100} unit="%" value={el.cropX ?? 50} onChange={(v) => update(el.id, { cropX: v })} />
                     <SliderWithInput label="Vertical" min={0} max={100} unit="%" value={el.cropY ?? 50} onChange={(v) => update(el.id, { cropY: v })} />
                     <button type="button" onClick={() => update(el.id, { cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined })} className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">Reset crop</button>
+                    <SliderWithInput label="Fine rotation" min={-180} max={180} step={0.1} unit="deg" value={Number((el.rotation % 360).toFixed(1))} onChange={(v) => update(el.id, { rotation: v } as never)} />
+                  </div>
+                </Field>
+
+                <Field label="Remove background">
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const src = await removeImageBackground(el.src, 32);
+                          update(el.id, { src });
+                        } catch (err) {
+                          window.alert(err instanceof Error ? err.message : "Could not remove the background.");
+                        }
+                      }}
+                      className="w-full rounded-lg bg-slate-900 px-2 py-2 text-[11px] font-semibold text-white transition hover:bg-slate-700"
+                    >
+                      Erase the background (flood fill)
+                    </button>
+                    <p className="text-[10px] leading-snug text-slate-400">
+                      Works best on flat, uniform backgrounds. The result replaces the image (undo with Ctrl+Z).
+                    </p>
+                  </div>
+                </Field>
                   </div>
                 </Field>
 
@@ -2223,6 +2336,69 @@ export function PropertiesPanel() {
               </>
             )}
 
+{/* VIDEO ELEMENT */}
+            {el.type === "video" && (
+              <Section title="Video">
+                <Field label="Fit">
+                  <SegmentedControl
+                    value={el.fit ?? "cover"}
+                    onChange={(fit) => update(el.id, { fit } as never)}
+                    options={[
+                      { value: "cover", label: "Cover", title: "Remplit la zone, rogne l'excédent" },
+                      { value: "contain", label: "Contain", title: "Vidéo entière visible, letterbox" },
+                      { value: "fill", label: "Fill", title: "Étirée pour remplir (peut déformer)" },
+                    ]}
+                  />
+                </Field>
+                <Field label="Poster (cover image)">
+                  <div className="space-y-2">
+                    {el.poster && (
+                      <img src={el.poster} alt="" className="h-20 w-full rounded-lg border border-slate-200 object-cover" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = document.createElement("video");
+                        v.src = el.src;
+                        v.muted = true;
+                        v.playsInline = true;
+                        v.onloadedmetadata = () => {
+                          v.currentTime = Math.min((v.duration || 1) * 0.1, 1);
+                        };
+                        v.onseeked = () => {
+                          try {
+                            const c = document.createElement("canvas");
+                            c.width = v.videoWidth;
+                            c.height = v.videoHeight;
+                            c.getContext("2d")!.drawImage(v, 0, 0);
+                            update(el.id, { poster: c.toDataURL("image/jpeg", 0.85) } as never);
+                          } catch {
+                            window.alert("Could not capture a frame from this video.");
+                          }
+                        };
+                        v.onerror = () => window.alert("Could not load this video.");
+                      }}
+                      className="w-full rounded-lg bg-slate-900 px-2 py-2 text-[11px] font-semibold text-white transition hover:bg-slate-700"
+                    >
+                      Capture current frame as poster
+                    </button>
+                    {el.poster && (
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { poster: undefined } as never)}
+                        className="w-full rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-[10px] font-semibold text-rose-600 transition hover:bg-rose-100"
+                      >
+                        Remove poster
+                      </button>
+                    )}
+                    <p className="text-[10px] leading-snug text-slate-400">
+                      The poster is the image shown before the video plays (thumbnails, exports).
+                    </p>
+                  </div>
+                </Field>
+              </Section>
+            )}
+
 {/* SHADOW (all elements) */}
             <Section title="Shadow" defaultOpen={!!el.shadow}>
               <ToggleGrid label="Shadow" options={[{ id: "shadow", label: "Enable shadow", icon: Layers, checked: !!el.shadow, onChange: checked => update(el.id, { shadow: checked ? { x: 0, y: 12, blur: 24, color: "rgba(0,0,0,0.35)" } : undefined } as never) }]} />
@@ -2458,6 +2634,80 @@ export function PropertiesPanel() {
                   options={ELEMENT_ANIMATION_LABELS}
                   onChange={(v) => update(el.id, { animation: v as any })}
                 />
+              </Field>
+              <Field label="Motion path (presentation)">
+                <div className="space-y-2">
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {(["line", "arc", "s-curve", "zigzag", "orbit"] as const).map((s) => (
+                      <button
+                        key={s}
+                        title={"Motion path: " + s}
+                        onClick={() =>
+                          update(el.id, {
+                            motionPath:
+                              el.motionPath?.shape === s
+                                ? undefined
+                                : { shape: s, dx: 320, dy: 0, duration: 1200, easing: "expo-out" },
+                          } as never)
+                        }
+                        className={'rounded-lg border px-1 py-1.5 text-[9px] font-semibold capitalize transition ' + (el.motionPath?.shape === s ? 'border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20' : 'border-slate-200 text-slate-500 hover:border-slate-300')}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                  {el.motionPath && (
+                    <>
+                      <SliderWithInput label="End X" min={-1200} max={1200} step={10} unit="px" value={el.motionPath.dx} onChange={(v) => update(el.id, { motionPath: { ...el.motionPath!, dx: v } } as never)} />
+                      <SliderWithInput label="End Y" min={-1200} max={1200} step={10} unit="px" value={el.motionPath.dy} onChange={(v) => update(el.id, { motionPath: { ...el.motionPath!, dy: v } } as never)} />
+                      <SliderWithInput label="Duration" min={200} max={8000} step={100} unit="ms" value={el.motionPath.duration} onChange={(v) => update(el.id, { motionPath: { ...el.motionPath!, duration: v } } as never)} />
+                      <SliderWithInput label="Delay" min={0} max={6000} step={100} unit="ms" value={el.motionPath.delay ?? 0} onChange={(v) => update(el.id, { motionPath: { ...el.motionPath!, delay: v } } as never)} />
+                      {el.motionPath.shape === "orbit" && (
+                        <SliderWithInput label="Loops" min={1} max={5} step={1} unit="" value={el.motionPath.loops ?? 1} onChange={(v) => update(el.id, { motionPath: { ...el.motionPath!, loops: v } } as never)} />
+                      )}
+                      <label className="flex items-center gap-2 text-[10px] font-medium text-slate-600">
+                        <input
+                          type="checkbox"
+                          checked={!!el.motionPath.rotateAlong}
+                          onChange={(e) => update(el.id, { motionPath: { ...el.motionPath!, rotateAlong: e.target.checked } } as never)}
+                        />
+                        Rotate along the path
+                      </label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => window.dispatchEvent(new CustomEvent("diapolab:preview-keyframes", { detail: { id: el.id } }))}
+                          className="rounded-lg border border-slate-200 bg-white py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
+                        >
+                          Preview
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => update(el.id, { motionPath: undefined } as never)}
+                          className="rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-[10px] font-semibold text-rose-600 transition hover:bg-rose-100"
+                        >
+                          Remove path
+                        </button>
+                      </div>
+                      <p className="text-[10px] leading-snug text-slate-400">
+                        The element travels from its position to the End X/Y offset while presenting.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </Field>
+              <Field label="Audio cue (s)">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={(el as { audioCue?: number }).audioCue ?? 0}
+                  onChange={(e) => update(el.id, { audioCue: Number(e.target.value) > 0 ? Number(e.target.value) : undefined } as never)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-700 outline-none focus:border-sky-400"
+                />
+                <p className="mt-1 text-[10px] leading-snug text-slate-400">
+                  Entrance, keyframes and motion path wait for this timestamp of the slide (and of its background music).
+                </p>
               </Field>
               <Field label="Hover effect (while presenting)">
                 <Dropdown
