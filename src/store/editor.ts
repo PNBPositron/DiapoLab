@@ -51,6 +51,24 @@ export type ElementKeyframe = {
   snapshot?: Record<string, unknown>;
 };
 
+/** Motion path played while presenting: the element travels along a
+ *  parametric curve (offsets are relative to its resting position). */
+export type MotionPath = {
+  shape: "line" | "arc" | "s-curve" | "zigzag" | "orbit";
+  /** end offset in px from the resting position (orbit: radius vector) */
+  dx: number;
+  dy: number;
+  /** travel duration in ms */
+  duration: number;
+  /** extra delay before the travel starts, in ms */
+  delay?: number;
+  easing?: KeyframeEasing;
+  /** orient the element along the path tangent */
+  rotateAlong?: boolean;
+  /** orbit only: number of full revolutions */
+  loops?: number;
+};
+
 export type ElementBase = {
   id: string;
   x: number;
@@ -69,6 +87,11 @@ export type ElementBase = {
   keyframes?: ElementKeyframe[];
   /** total keyframe timeline length in ms (defaults to the last keyframe t) */
   keyframeDuration?: number;
+  /** motion path played while presenting (see MotionPath) */
+  motionPath?: MotionPath;
+  /** seconds from slide start (and background-music start) after which the
+   *  entrance animation / keyframes / motion path fire */
+  audioCue?: number;
   interaction?: ElementInteraction;
   shadow?: ElementShadow;
   /** elements sharing a groupId are selected & moved together (plugin widgets) */
@@ -148,6 +171,10 @@ export type TextElement = ElementBase & {
   maskShape?: ShapeKind;
   /** fill source: own color, or the slide's background (knockout) */
   fillSource?: "color" | "slide-bg";
+  /** typewriter reveal while presenting, in characters per second */
+  typeSpeed?: number;
+  /** count-up of the first number in the text while presenting */
+  countUp?: { duration: number; decimals?: number };
 };
 
 export type HoverEffect = "none" | "glitch" | "color" | "gradient";
@@ -790,6 +817,8 @@ export type Page = {
   transitionZoom?: number; // starting scale of the zoom transition (0.5–2)
   /** presenter notes — shown in presenter view, never on the slide */
   notes?: string;
+  /** background music played while this slide is presented */
+  bgMusic?: { src: string; volume?: number; loop?: boolean };
 };
 
 export const DEFAULT_W = 1920;
@@ -862,6 +891,8 @@ type State = {
   setTransition: (t: SlideTransition) => void;
   setTransitionZoom: (zoom: number) => void;
   setNotes: (notes: string) => void;
+  /** set / clear the current slide's background music */
+  setBgMusic: (music: { src: string; volume?: number; loop?: boolean } | undefined) => void;
   setCanvasSize: (w: number, h: number) => void;
   magicResize: (w: number, h: number) => void;
   applyBrandKit: (
@@ -1918,6 +1949,10 @@ export const useEditor = create<State>((set, get) => {
       updateCurrentPage((p) => ({ ...p, transitionZoom: Math.max(0.5, Math.min(2, zoom)) }));
     },
     setNotes: (notes) => updateCurrentPage((p) => ({ ...p, notes })),
+    setBgMusic: (music) => {
+      pushHistory();
+      updateCurrentPage((p) => ({ ...p, bgMusic: music }));
+    },
     undo: () => {
       const { history, future } = get();
       if (history.length === 0) return;

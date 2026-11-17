@@ -5,7 +5,7 @@ import { CanvasElement } from "./CanvasElement";
 import { SlideThumbnail } from "./SlideThumbnail";
 
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
-import type { AnyElement } from "@/store/editor";
+import type { AnyElement, Page } from "@/store/editor";
 import { backgroundStyle } from "@/lib/bg";
 
 export async function requestPresentationFullscreen(target: Element = document.documentElement) {
@@ -241,6 +241,7 @@ export function PresentationMode() {
           </div>
         </div>
       </div>
+      <BgMusic page={page} />
       {presenterOpen && (
         <div className="fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-md">
           <div className="flex items-center justify-between gap-2">
@@ -411,4 +412,22 @@ function MorphItem({
 
     </div>
   );
+}
+
+/** Background music for the presented slide. Starts when the slide enters
+ *  (that instant is t=0 for every element audio cue) and stops on exit. */
+function BgMusic({ page }: { page: Page }) {
+  useEffect(() => {
+    const music = page.bgMusic;
+    if (!music?.src) return;
+    const audio = new Audio(music.src);
+    audio.loop = music.loop ?? true;
+    audio.volume = Math.max(0, Math.min(1, music.volume ?? 0.6));
+    void audio.play().catch(() => undefined);
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
+  }, [page.id, page.bgMusic?.src]);
+  return null;
 }

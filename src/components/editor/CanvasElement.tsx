@@ -19,6 +19,7 @@ import {
   type ElementKeyframe,
   type VideoElement,
   type QrElement,
+  type MotionPath,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
@@ -395,7 +396,15 @@ export function CanvasElement({
   // every object type animates its effects: text shadows, shape & button
   // shadows, image filters, shape effects.
   const [kfFx, setKfFx] = useState<Record<string, unknown> | null>(null);
-  const element = (kfFx ? { ...sourceElement, ...kfFx } : sourceElement) as AnyElement;
+  // live text while presenting (typewriter reveal / count-up number)
+  const [liveText, setLiveText] = useState<string | null>(null);
+  // live pose while presenting (motion path travel)
+  const [pathPose, setPathPose] = useState<{ x: number; y: number; rot: number } | null>(null);
+  const element = (
+    kfFx || liveText != null
+      ? { ...sourceElement, ...(kfFx ?? {}), ...(liveText != null ? { text: liveText } : {}) }
+      : sourceElement
+  ) as AnyElement;
 
   // Live glitch: real interference never sits still. Every few frames the
   // SVG turbulence is re-seeded and the tear scale / RGB split offsets are
@@ -448,9 +457,13 @@ export function CanvasElement({
   //    above) — WAAPI ignores the reduced-motion rule, so a deck the
   //    presenter chose to animate keeps playing.
   // Both paths replay on demand (press R / presenter Replay button).
+  // audio cue: entrance, keyframes and motion path all wait for this
+  // timestamp (seconds from slide / background-music start)
+  const cueDelayMs = Math.max(0, Math.min(120000, ((element as { audioCue?: number }).audioCue ?? 0) * 1000));
+  const entryDelayMs = Math.max(0, Math.min(120000, (element.animationDelay ?? 0) + cueDelayMs));
   const entryShorthand =
     element.animation && element.animation !== "none"
-      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${Math.max(0, Math.min(10000, element.animationDelay ?? 0))}ms both`
+      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${entryDelayMs}ms both`
       : undefined;
   const entryAnimRef = useRef<Animation | null>(null);
 
@@ -498,6 +511,7 @@ export function CanvasElement({
     }));
     kfAnimRef.current = node.animate(frames, {
       duration,
+      delay: cueDelayMs,
       easing: "linear",
       fill: "forwards",
     });
@@ -577,6 +591,124 @@ export function CanvasElement({
       setKfFx(null);
     };
   }, [presenting, preview, morph, replayEpoch, sourceElement, kfPreviewEpoch]);
+
+  // ---- Motion path (presenting) ----
+  // rAF track moving the element along a parametric path (line, arc,
+  // s-curve, zigzag or orbit). The pose is merged into the transform chain
+  // below, so rotation / 3D tilt keep working during the travel.
+  const motionPath = (element as { motionPath?: MotionPath }).motionPath;
+  useEffect(() => {
+    setPathPose(null);
+    if ((!presenting && kfPreviewEpoch === 0) || preview || morph) return;
+    if (!motionPath) return;
+    const node = ref.current;
+    if (!node) return;
+    const ease = (t: number) =>
+      (KF_EASE_FN[motionPath.easing ?? "expo-out"] ?? KF_EASE_FN.linear)(Math.min(1, Math.max(0, t)));
+    const point = (t: number): { x: number; y: number; rot: number } => {
+      const dx = motionPath.dx;
+      const dy = motionPath.dy;
+      switch (motionPath.shape) {
+        case "arc": {
+          // quadratic bezier arcing above the straight chord
+          const cx = dx / 2;
+          const cy = dy / 2 - (Math.abs(dx) + Math.abs(dy)) * 0.28;
+          return { x: 2 * (1 - t) * t * cx + t * t * dx, y: 2 * (1 - t) * t * cy + t * t * dy, rot: 0 };
+        }
+        case "s-curve": {
+          // cubic bezier with horizontal controls: smooth S through the box
+          const u = 1 - t;
+          const x = 3 * u * u * t * (dx * 0.25) + 3 * u * t * t * (dx * 0.75) + t * t * t * dx;
+          const y = 3 * u * t * t * dy + t * t * t * dy;
+          return { x, y, rot: 0 };
+        }
+        case "zigzag": {
+          // linear X, triangular Y: a there-and-back detour
+          return { x: dx * t, y: dy * (t < 0.5 ? 2 * t : 2 * (1 - t)), rot: 0 };
+        }
+        case "orbit": {
+          const R = Math.hypot(dx, dy) / 2 || 60;
+          const loops = Math.max(1, Math.round(motionPath.loops ?? 1));
+          const a = 2 * Math.PI * loops * t;
+          return { x: R * (Math.cos(a) - 1), y: R * Math.sin(a), rot: 0 };
+        }
+        default:
+          return { x: dx * t, y: dy * t, rot: 0 };
+      }
+    };
+    const duration = Math.max(200, motionPath.duration || 1200);
+    const delay = Math.max(0, (motionPath.delay ?? 0) + cueDelayMs);
+    let raf = 0;
+    let start = 0;
+    const tick = (now: number) => {
+      if (!start) start = now;
+      const t = now - start - delay;
+      if (t < 0) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      const p = ease(Math.min(1, t / duration));
+      const pose = point(p);
+      if (motionPath.rotateAlong) {
+        const ahead = point(Math.min(1, p + 0.01));
+        pose.rot = (Math.atan2(ahead.y - pose.y, ahead.x - pose.x) * 180) / Math.PI;
+      }
+      setPathPose(pose);
+      if (t < duration) raf = requestAnimationFrame(tick);
+      else if (!presenting) setPathPose(null); // edit-mode preview snaps back
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [presenting, preview, morph, replayEpoch, kfPreviewEpoch, motionPath]);
+
+  // ---- Typewriter & count-up (presenting) ----
+  // Text-only live reveal: typewriter uncovers characters at a steady rate,
+  // count-up animates the first number in the text up to its final value.
+  const typeSpeed = (element as { typeSpeed?: number }).typeSpeed;
+  const countUp = (element as { countUp?: { duration: number; decimals?: number } }).countUp;
+  const srcText = (sourceElement as { text?: string }).text;
+  useEffect(() => {
+    setLiveText(null);
+    if ((!presenting && kfPreviewEpoch === 0) || preview || morph) return;
+    if (sourceElement.type !== "text" || !srcText) return;
+    if (countUp) {
+      const m = srcText.match(/-?\d[\d\s,]*/);
+      if (m) {
+        const target = parseFloat(m[0].replace(/[^\d.-]/g, "")) || 0;
+        const dur = Math.max(200, countUp.duration || 1500);
+        const dec = Math.max(0, Math.min(3, Math.round(countUp.decimals ?? 0)));
+        const start = performance.now() + cueDelayMs;
+        let raf = 0;
+        const tick = () => {
+          const p = Math.min(1, Math.max(0, (performance.now() - start) / dur));
+          const eased = 1 - Math.pow(1 - p, 3);
+          const value = (target * eased).toLocaleString("en-US", {
+            minimumFractionDigits: dec,
+            maximumFractionDigits: dec,
+          });
+          setLiveText(srcText.replace(m[0], value));
+          if (p < 1) raf = requestAnimationFrame(tick);
+          else if (!presenting) setLiveText(null);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+      }
+    }
+    if (typeSpeed && typeSpeed > 0) {
+      const cps = Math.max(4, Math.min(200, typeSpeed));
+      const dur = (srcText.length / cps) * 1000;
+      const start = performance.now() + cueDelayMs;
+      let raf = 0;
+      const tick = () => {
+        const p = Math.min(1, Math.max(0, (performance.now() - start) / dur));
+        setLiveText(srcText.slice(0, Math.ceil(srcText.length * p)));
+        if (p < 1) raf = requestAnimationFrame(tick);
+        else if (!presenting) setLiveText(null);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [presenting, preview, morph, replayEpoch, kfPreviewEpoch, sourceElement, srcText, typeSpeed, countUp]);
   const [useCssEntry, setUseCssEntry] = useState(
     () =>
       typeof window === "undefined" ||
@@ -613,7 +745,7 @@ export function CanvasElement({
     setUseCssEntry(false);
     entryAnimRef.current = node.animate(frames, {
       duration: 680,
-      delay: Math.max(0, Math.min(10000, element.animationDelay ?? 0)),
+      delay: entryDelayMs,
       easing: "cubic-bezier(0.22,1,0.36,1)",
       fill: "both",
     });
@@ -631,11 +763,14 @@ export function CanvasElement({
   // 3D transform chain: interactive tilt > static 3D angles > flat rotation.
   // Embeds (iframes) ignore 3D — tilting an iframe is unreliable across browsers.
   const allow3d = element.type !== "embed" && (element.perspective ?? 0) > 0;
-  const transform = tilt
+  const pathT = pathPose
+    ? `translate(${pathPose.x.toFixed(1)}px, ${pathPose.y.toFixed(1)}px) rotate(${pathPose.rot.toFixed(1)}deg) `
+    : "";
+  const transform = pathT + (tilt
     ? `perspective(${element.perspective ?? 800}px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotate(${element.rotation}deg)`
     : allow3d
       ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
-      : `rotate(${element.rotation}deg)`;
+      : `rotate(${element.rotation}deg)`);
 
   // Vector mask (clipped by a shape path, 0-100 viewBox scaled to the box).
   // Works for images (existing) and now text/shapes (clip on the root node).
