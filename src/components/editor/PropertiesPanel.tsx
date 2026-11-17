@@ -22,7 +22,6 @@ import {
   type UiKind,
   KEYFRAME_EASINGS,
   type ElementKeyframe,
-  type MotionPath,
 } from "@/store/editor";
 import { useSettings } from "@/store/settings";
 import { prepareImage } from "@/lib/image-assets";
