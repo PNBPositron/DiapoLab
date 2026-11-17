@@ -1902,26 +1902,50 @@ export function PropertiesPanel() {
                 <Field label="Replace image">
                   <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50">
                     <Upload className="size-3.5" />
-                    <span>Choose a new file</span>
+                    <span>Choose a photo or video</span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,video/*"
                       className="hidden"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         e.target.value = "";
                         if (!file) return;
                         try {
-                          const src = await prepareImage(file);
-                          update(el.id, { src, cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined });
+                          if (file.type.startsWith("video/")) {
+                            if (file.size > 25 * 1024 * 1024) throw new Error("Video too large (max 25 MB).");
+                            const src = await new Promise<string>((resolve, reject) => {
+                              const reader = new FileReader();
+                              reader.onload = () => resolve(String(reader.result));
+                              reader.onerror = () => reject(new Error("Could not read this file."));
+                              reader.readAsDataURL(file);
+                            });
+                            // Morph the image into a video in place: same id, box and mask,
+                            // so group membership (photo grids) is preserved.
+                            update(el.id, {
+                              type: "video",
+                              src,
+                              muted: true,
+                              loop: true,
+                              fit: "cover",
+                              cropZoom: undefined,
+                              cropX: undefined,
+                              cropY: undefined,
+                              cropRect: undefined,
+                              filters: undefined,
+                            } as never);
+                          } else {
+                            const src = await prepareImage(file);
+                            update(el.id, { src, cropZoom: undefined, cropX: undefined, cropY: undefined, cropRect: undefined });
+                          }
                         } catch (err) {
-                          window.alert(err instanceof Error ? err.message : "Could not load this image.");
+                          window.alert(err instanceof Error ? err.message : "Could not load this file.");
                         }
                       }}
                     />
                   </label>
                   <p className="mt-1 text-[10px] leading-snug text-slate-400">
-                    La position, la taille et le masque sont conservés ; le recadrage est réinitialisé.
+                    La position, la taille et le masque sont conservés ; le recadrage est réinitialisé. Une vidéo (max 25 Mo) remplace l\'image sur place, en muet avec boucle.
                   </p>
                 </Field>
 

@@ -12,7 +12,7 @@ type GridLayout = { id: string; label: string; cols: number; rows: number; cells
 
 /* Photo-grid presets: the whole grid is inserted as one grouped block of
  * placeholder cells. Pick a cell, then use "Replace image" in the inspector
- * to drop a photo in. */
+ * to drop a photo or a video in (a video morphs the cell in place). */
 const GRID_LAYOUTS: GridLayout[] = [
   { id: "two-cols", label: "Two columns", cols: 2, rows: 2, cells: [{ x: 0, y: 0, w: 1, h: 2 }, { x: 1, y: 0, w: 1, h: 2 }] },
   { id: "two-rows", label: "Two rows", cols: 2, rows: 2, cells: [{ x: 0, y: 0, w: 2, h: 1 }, { x: 0, y: 1, w: 2, h: 1 }] },
@@ -334,7 +334,7 @@ export function MediaPanel() {
         <div className="space-y-3 px-4">
           <p className="text-[10px] leading-snug text-slate-400">
             Choose a layout: a grouped block of placeholder cells is inserted. Select a cell, then use
-            "Replace image" in the inspector to add a photo.
+            "Replace image" in the inspector to drop in a photo or a video.
           </p>
           <div className="grid grid-cols-2 gap-2.5">
             {GRID_LAYOUTS.map((layout) => (
