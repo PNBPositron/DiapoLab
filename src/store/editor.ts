@@ -123,6 +123,8 @@ export type BgFit = "cover" | "contain";
 
 export type TextElement = ElementBase & {
   type: "text";
+  /** synced style role — restyled deck-wide from the inspector ("Push style") */
+  textRole?: "title" | "subtitle" | "body";
   text: string;
   fontSize: number;
   color: string;
@@ -351,6 +353,8 @@ export type IconElement = ElementBase & {
   src?: string; // optional Lineicons SVG asset
   color: string;
   strokeWidth: number;
+  /** micro-animation: pulse / spin / bounce / stroke-draw */
+  iconAnim?: "none" | "pulse" | "spin" | "bounce" | "draw";
 };
 
 export type QuizOption = { id: string; text: string };
@@ -408,6 +412,15 @@ export type EmbedElement = ElementBase & {
   src: string; // fully-formed iframe URL
   title?: string;
   allow?: string;
+};
+
+export type QrElement = ElementBase & {
+  type: "qr";
+  value: string;
+  fgColor: string;
+  bgColor: string;
+  /** optional logo (data URL) excavated at the center of the code */
+  centerImage?: string;
 };
 
 export type TableElement = ElementBase & {
@@ -763,7 +776,8 @@ export type AnyElement =
   | ButtonElement
   | EmbedElement
   | UiElement
-  | TableElement;
+  | TableElement
+  | QrElement;
 
 export type Page = {
   id: string;
@@ -883,6 +897,13 @@ type State = {
   addPage: () => void;
   removePage: (index: number) => void;
   duplicatePage: (index: number) => void;
+  /** insert a pre-built page right after the current one (slide blocks) */
+  insertPageAfter: (page: Page) => void;
+  /** restyle every text element carrying this role, across all pages */
+  restyleTextRole: (
+    role: "title" | "subtitle" | "body",
+    patch: Partial<{ fontFamily: string; fontSize: number; fontWeight: number; color: string }>,
+  ) => void;
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
   setPageDuration: (index: number, seconds: number) => void;
@@ -1090,6 +1111,20 @@ export const newTable = (overrides: Partial<TableElement> = {}): TableElement =>
   fgColor: "#0f172a",
   accentColor: "#2b6bff",
   fontSize: 15,
+  ...overrides,
+});
+
+export const newQr = (overrides: Partial<QrElement> = {}): QrElement => ({
+  id: uid(),
+  type: "qr",
+  x: 200,
+  y: 200,
+  width: 320,
+  height: 320,
+  rotation: 0,
+  value: "https://diapolab.vercel.app",
+  fgColor: "#0a0f1f",
+  bgColor: "#ffffff",
   ...overrides,
 });
 
@@ -1960,6 +1995,23 @@ export const useEditor = create<State>((set, get) => {
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
       set({ ...syncCurrent(next, index + 1), selectedId: null, selectedIds: [] });
+    },
+    insertPageAfter: (page) => {
+      pushHistory();
+      const { pages, currentIndex } = get();
+      const next = [...pages.slice(0, currentIndex + 1), page, ...pages.slice(currentIndex + 1)];
+      set({ ...syncCurrent(next, currentIndex + 1), selectedId: null, selectedIds: [] });
+    },
+    restyleTextRole: (role, patch) => {
+      pushHistory();
+      const { pages, currentIndex } = get();
+      const next = pages.map((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          e.type === "text" && e.textRole === role ? { ...e, ...patch } : e,
+        ),
+      }));
+      set(syncCurrent(next, currentIndex));
     },
     setCurrentPage: (index) => {
       const { pages } = get();

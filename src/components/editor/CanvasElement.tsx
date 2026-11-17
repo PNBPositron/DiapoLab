@@ -18,6 +18,7 @@ import {
   KEYFRAME_EASINGS,
   type ElementKeyframe,
   type VideoElement,
+  type QrElement,
 } from "@/store/editor";
 import { ShapeRender } from "./ShapeRender";
 import { pathFor } from "./ShapeRender";
@@ -1698,6 +1699,7 @@ export function CanvasElement({
             return (
               <div
                 aria-hidden="true"
+                className={element.iconAnim && element.iconAnim !== "none" ? `icon-anim-${element.iconAnim}` : undefined}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -1724,6 +1726,7 @@ export function CanvasElement({
             <Comp
               color={element.color}
               strokeWidth={element.strokeWidth}
+              className={element.iconAnim && element.iconAnim !== "none" ? `icon-anim-${element.iconAnim}` : undefined}
               style={{ width: "100%", height: "100%", display: "block" }}
             />
           );
@@ -1735,6 +1738,7 @@ export function CanvasElement({
         })()}
 
       {element.type === "chart" && <ChartRender element={element} />}
+      {element.type === "qr" && <QrRender element={element} />}
       {element.type === "table" && <TableRender element={element} />}
       {element.type === "ui" && <UiRender element={element} />}
       {element.type === "button" &&
@@ -2677,6 +2681,26 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
 /* controls. Only the control bar swallows pointer events; the video   */
 /* surface itself stays draggable.                                     */
 /* ------------------------------------------------------------------ */
+function QrRender({ element }: { element: QrElement }) {
+  return (
+    <div className="grid size-full place-items-center overflow-hidden" style={{ background: element.bgColor }}>
+      <QRCodeSVG
+        value={element.value || " "}
+        size={512}
+        fgColor={element.fgColor}
+        bgColor={element.bgColor}
+        level="M"
+        imageSettings={
+          element.centerImage
+            ? { href: element.centerImage, height: 96, width: 96, excavate: true }
+            : undefined
+        }
+        style={{ width: "94%", height: "94%" }}
+      />
+    </div>
+  );
+}
+
 const fmtTime = (s: number) => {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);

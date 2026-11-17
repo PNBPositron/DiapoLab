@@ -866,3 +866,13 @@ aside.editor-ui {
 .editor-dark nav.editor-tool-rail > button:focus-visible {
   background: rgba(148, 163, 184, 0.12) !important;
 }
+
+/* ── Animated icons: micro-animations on the canvas and while presenting ── */
+.icon-anim-pulse { animation: diapolab-icon-pulse 1.6s ease-in-out infinite; transform-origin: center; }
+.icon-anim-spin { animation: diapolab-icon-spin 3.2s linear infinite; transform-origin: center; }
+.icon-anim-bounce { animation: diapolab-icon-bounce 1.4s ease-in-out infinite; transform-origin: center; }
+.icon-anim-draw svg { stroke-dasharray: 640; stroke-dashoffset: 640; animation: diapolab-icon-draw 2.6s ease-in-out infinite; }
+@keyframes diapolab-icon-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+@keyframes diapolab-icon-spin { to { transform: rotate(360deg); } }
+@keyframes diapolab-icon-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8%); } }
+@keyframes diapolab-icon-draw { 0% { stroke-dashoffset: 640; } 55%, 100% { stroke-dashoffset: 0; } }

@@ -67,7 +67,12 @@ import {
   deleteBlock,
   cloneBlockElements,
   describeBlock,
+  loadSlideBlocks,
+  saveSlideBlock,
+  deleteSlideBlock,
+  cloneSlideBlock,
   type UserBlock,
+  type SlideBlock,
 } from "@/lib/user-blocks";
 
 type PresetSection = "ui" | "blocks" | "charts";
@@ -580,6 +585,31 @@ export function ComponentsPanel() {
   const [blocks, setBlocks] = useState<UserBlock[]>(() => loadBlocks());
   const [blockName, setBlockName] = useState("");
   const [blockSaved, setBlockSaved] = useState(false);
+  const [slideBlocks, setSlideBlocks] = useState<SlideBlock[]>(() => loadSlideBlocks());
+  const [slideName, setSlideName] = useState("");
+  const [slideSaved, setSlideSaved] = useState(false);
+  const refreshSlideBlocks = () => setSlideBlocks(loadSlideBlocks());
+  const handleSaveSlide = () => {
+    const st = useEditor.getState();
+    const page = st.pages[st.currentIndex];
+    if (!page) return;
+    saveSlideBlock(slideName, page, st.canvasW, st.canvasH);
+    setSlideName("");
+    setSlideSaved(true);
+    setTimeout(() => setSlideSaved(false), 1600);
+    refreshSlideBlocks();
+  };
+  const insertSlideBlock = (b: SlideBlock) => {
+    const clone = cloneSlideBlock(b);
+    useEditor.getState().insertPageAfter({
+      id: Math.random().toString(36).slice(2, 10),
+      duration: 3,
+      bgColor: clone.bgColor,
+      bgImage: clone.bgImage,
+      bgFit: clone.bgFit,
+      elements: clone.elements,
+    });
+  };
   const [creatorOpen, setCreatorOpen] = useState(false);
   // Pre-insert text customizers
   const [uiDraft, setUiDraft] = useState<UiDraft | null>(null);
@@ -986,6 +1016,56 @@ export function ComponentsPanel() {
               </div>
             ))}
           </div>
+          {/* Whole-slide blocks — save the full page (background included) */}
+          <div className="rounded-xl border border-indigo-100 bg-gradient-to-b from-indigo-50/70 to-white p-3 shadow-2xs">
+            <div className="panel-section-label">Save whole slide</div>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                value={slideName}
+                onChange={(e) => setSlideName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveSlide()}
+                placeholder="Name (e.g. Cover, Section divider)"
+                className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400"
+              />
+              <button
+                type="button"
+                onClick={handleSaveSlide}
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+              >
+                {slideSaved ? <Check className="size-3.5" /> : <Save className="size-3.5" />}
+                {slideSaved ? "Saved" : "Save slide"}
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-slate-400">
+              Background + all elements are stored in this browser; Insert adds a new page right after the current one.
+            </p>
+          </div>
+
+          {slideBlocks.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-semibold tracking-wider text-slate-400">
+                Saved slides ({slideBlocks.length})
+              </span>
+              {slideBlocks.map((b) => (
+                <div key={b.id} className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white p-2.5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-[0_12px_26px_-12px_rgba(79,70,229,0.28)]">
+                  <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-sm">
+                    <Bookmark className="size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs font-semibold text-slate-700">{b.name}</div>
+                    <div className="truncate text-[10px] text-slate-400">{b.elements.length} elements · {b.canvasW}×{b.canvasH}</div>
+                  </div>
+                  <button type="button" onClick={() => insertSlideBlock(b)} className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-blue-500">
+                    <Plus className="size-3" /> Insert
+                  </button>
+                  <button type="button" title="Delete slide block" onClick={() => { deleteSlideBlock(b.id); refreshSlideBlocks(); }} className="grid size-7 shrink-0 place-items-center rounded-lg border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100">
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Widget packs — imported via Add-ons, inserted from My blocks */}
           {pluginWidgets.length > 0 && (
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">

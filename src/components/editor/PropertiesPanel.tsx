@@ -23,6 +23,7 @@ import {
   KEYFRAME_EASINGS,
   type ElementKeyframe,
 } from "@/store/editor";
+import { useSettings } from "@/store/settings";
 import { prepareImage } from "@/lib/image-assets";
 import { toEmbedSrc } from "@/store/editor";
 import { ELEMENT_ANIMATION_LABELS } from "@/lib/motion-catalog";
@@ -1026,6 +1027,52 @@ export function PropertiesPanel() {
               </Section>
             )}
 
+            {/* QR ELEMENT */}
+            {el.type === "qr" && (
+              <Section title="QR code">
+                <Field label="Value / link">
+                  <textarea
+                    value={el.value}
+                    onChange={(e) => update(el.id, { value: e.target.value } as never)}
+                    rows={2}
+                    className="w-full resize-none rounded-lg border border-slate-200 px-3 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                  />
+                </Field>
+                <ModernColorPicker label="Code color" value={el.fgColor} onChange={(c) => update(el.id, { fgColor: c } as never)} />
+                <ModernColorPicker label="Background" value={el.bgColor} onChange={(c) => update(el.id, { bgColor: c } as never)} />
+                <Field label="Center logo">
+                  <div className="flex items-center gap-2">
+                    <label className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-dashed border-slate-300 py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-sky-400 hover:text-sky-700">
+                      <Upload className="size-3.5" />
+                      {el.centerImage ? "Replace logo" : "Upload logo"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) void prepareImage(f).then((src) => update(el.id, { centerImage: src } as never));
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {el.centerImage && (
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { centerImage: undefined } as never)}
+                        className="grid size-8 place-items-center rounded-lg border border-rose-200 text-rose-500 transition hover:bg-rose-50"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </Field>
+                <p className="text-[10px] leading-snug text-slate-400">
+                  Keep the logo small and the contrast high so scanners still read the code.
+                </p>
+              </Section>
+            )}
+
             {/* CHART ELEMENT */}
             {el.type === "chart" && (() => {
               const ch = el as ChartElement;
@@ -1375,6 +1422,46 @@ export function PropertiesPanel() {
             {el.type === "text" && (
               <>
                 <Section title="Typography">
+                  <Field label="Synced text style">
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {([["none", "None"], ["title", "Title"], ["subtitle", "Sub"], ["body", "Body"]] as const).map(([value, label]) => (
+                        <button
+                          key={value}
+                          onClick={() => {
+                            if (value === "none") {
+                              update(el.id, { textRole: undefined } as never);
+                              return;
+                            }
+                            update(el.id, { textRole: value, ...useSettings.getState().textStyles[value] } as never);
+                          }}
+                          className={`rounded-lg border px-1 py-1.5 text-[9px] font-semibold transition ${
+                            el.textRole === value
+                              ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                              : "border-slate-200 text-slate-500 hover:border-slate-300"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {el.textRole && (
+                      <button
+                        onClick={() =>
+                          useEditor
+                            .getState()
+                            .restyleTextRole(el.textRole!, {
+                              fontFamily: el.fontFamily,
+                              fontSize: el.fontSize,
+                              fontWeight: el.fontWeight,
+                              color: el.color,
+                            })
+                        }
+                        className="w-full rounded-lg border border-blue-200 bg-blue-50 py-1.5 text-[10px] font-semibold text-blue-700 transition hover:bg-blue-100"
+                      >
+                        Push this style to all &ldquo;{el.textRole}&rdquo; text
+                      </button>
+                    )}
+                  </Field>
                   <Field label="Content">
                     <textarea
                       rows={3}
@@ -1758,6 +1845,23 @@ export function PropertiesPanel() {
                   unit="px"
                   onChange={(strokeWidth) => update(el.id, { strokeWidth })}
                 />
+                <Field label="Animation">
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {([["none", "None"], ["pulse", "Pulse"], ["spin", "Spin"], ["bounce", "Bounce"], ["draw", "Draw"]] as const).map(([value, label]) => (
+                      <button
+                        key={value}
+                        onClick={() => update(el.id, { iconAnim: value } as never)}
+                        className={`rounded-lg border px-1 py-1.5 text-[9px] font-semibold transition ${
+                          (el.iconAnim ?? "none") === value
+                            ? "border-sky-500 bg-sky-50/50 text-sky-700 ring-2 ring-sky-500/20"
+                            : "border-slate-200 text-slate-500 hover:border-slate-300"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
               </Section>
             )}
 

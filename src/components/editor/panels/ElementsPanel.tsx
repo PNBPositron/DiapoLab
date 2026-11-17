@@ -10,6 +10,7 @@ import {
   Sparkles,
   Youtube,
   Music2,
+  QrCode,
   Filter,
   LayoutGrid,
   MapPin,
@@ -21,7 +22,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { newEmbed, toEmbedSrc, newIcon, newImage, newVideo, useEditor, type AnyElement } from "@/store/editor";
+import { newEmbed, newQr, toEmbedSrc, newIcon, newImage, newVideo, useEditor, type AnyElement } from "@/store/editor";
 import { ShapesPanel } from "./ShapesPanel";
 import { SMARTART_PRESETS } from "@/lib/smartart";
 import { prepareImage } from "@/lib/image-assets";
@@ -370,6 +371,17 @@ export function ElementsPanel() {
             <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><Music2 className="size-4" /><span className="text-[8px] font-medium">Spotify</span></div>
             <div className="flex flex-col items-center gap-1 rounded-lg border border-slate-200/80 bg-white/70 px-1 py-2 text-slate-500"><MapPin className="size-4" /><span className="text-[8px] font-medium">Maps</span></div>
           </div>
+          <button
+            type="button"
+            onClick={() => add(newQr())}
+            className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left transition hover:border-blue-300 hover:bg-blue-50/40"
+          >
+            <QrCode className="size-4 shrink-0 text-blue-600" />
+            <span className="min-w-0">
+              <span className="block text-xs font-semibold text-slate-700">QR code</span>
+              <span className="block text-[10px] text-slate-400">Styled QR with optional center logo</span>
+            </span>
+          </button>
           <p className="text-[9px] leading-relaxed text-slate-400">PDF / PPTX exports replace embeds with a linked placeholder card (iframes can't be captured).</p>
         </div>
       )}

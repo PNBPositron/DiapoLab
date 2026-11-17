@@ -47,6 +47,14 @@ export const DEFAULT_BRAND_KIT: BrandKit = {
   bodyFont: "Inter",
 };
 
+export type TextStyle = { fontFamily: string; fontSize: number; fontWeight: number; color: string };
+
+export const DEFAULT_TEXT_STYLES: Record<"title" | "subtitle" | "body", TextStyle> = {
+  title: { fontFamily: "Archivo Black", fontSize: 72, fontWeight: 900, color: "#0a0f1f" },
+  subtitle: { fontFamily: "Inter", fontSize: 40, fontWeight: 600, color: "#1e293b" },
+  body: { fontFamily: "Inter", fontSize: 24, fontWeight: 400, color: "#334155" },
+};
+
 type SettingsState = {
   autoHidePanel: boolean;
   editorTheme: string;
@@ -56,6 +64,7 @@ type SettingsState = {
   reduceMotion: boolean;
   editorDark: boolean;
   a11yCheck: boolean;
+  textStyles: Record<"title" | "subtitle" | "body", TextStyle>;
   brandKit: BrandKit;
   appAccent: string;
   customFonts: CustomFont[];
@@ -74,6 +83,7 @@ type SettingsState = {
   setReduceMotion: (v: boolean) => void;
   setEditorDark: (v: boolean) => void;
   setA11yCheck: (v: boolean) => void;
+  setTextStyle: (role: "title" | "subtitle" | "body", patch: Partial<TextStyle>) => void;
   resetMotion: () => void;
   togglePanel: (id: PanelId) => void;
   resetPanels: () => void;
@@ -118,6 +128,7 @@ export const useSettings = create<SettingsState>()(
       reduceMotion: true,
       editorDark: false,
       a11yCheck: false,
+      textStyles: { ...DEFAULT_TEXT_STYLES },
       brandKit: { ...DEFAULT_BRAND_KIT },
       appAccent: "#4f46e5",
       customThemes: [],
@@ -143,6 +154,8 @@ export const useSettings = create<SettingsState>()(
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
       setEditorDark: (editorDark) => set({ editorDark }),
       setA11yCheck: (a11yCheck) => set({ a11yCheck }),
+      setTextStyle: (role, patch) =>
+        set((s) => ({ textStyles: { ...s.textStyles, [role]: { ...s.textStyles[role], ...patch } } })),
       resetMotion: () =>
         set({
           panelDurationMs: DEFAULT_PANEL_DURATION,
@@ -182,6 +195,7 @@ export const useSettings = create<SettingsState>()(
           reduceMotion: true,
           editorDark: previous?.editorDark ?? false,
           a11yCheck: previous?.a11yCheck ?? false,
+          textStyles: previous?.textStyles ?? { ...DEFAULT_TEXT_STYLES },
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
         };
       },
