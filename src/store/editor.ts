@@ -346,6 +346,9 @@ export type ImageElement = ElementBase & {
   flipY?: boolean;
   gradient?: ShapeGradient; // optional color wash over the image
   gradientOpacity?: number; // 0..1
+  /** rotoscope mask (PNG data URL, same aspect as the source): painted
+   *  areas are hidden on the slide. The image itself stays untouched. */
+  rotoscopeMask?: string;
 };
 
 export type VideoElement = ElementBase & {

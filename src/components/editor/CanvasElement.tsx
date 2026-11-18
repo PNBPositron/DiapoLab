@@ -760,6 +760,20 @@ export function CanvasElement({
 
   const linkActive = element.type === "text" && !!element.href && presenting;
 
+  // Rotoscope mask: painted areas are hidden. The mask PNG shares the
+  // source image's aspect, so it is stretched over the element box.
+  const rotoscopeMask = (element as { rotoscopeMask?: string }).rotoscopeMask;
+  const maskStyle = rotoscopeMask
+    ? {
+        WebkitMaskImage: 'url("' + rotoscopeMask + '")',
+        maskImage: 'url("' + rotoscopeMask + '")',
+        WebkitMaskSize: "100% 100%",
+        maskSize: "100% 100%",
+        WebkitMaskRepeat: "no-repeat" as const,
+        maskRepeat: "no-repeat" as const,
+      }
+    : {};
+
   // 3D transform chain: interactive tilt > static 3D angles > flat rotation.
   // Embeds (iframes) ignore 3D — tilting an iframe is unreliable across browsers.
   const allow3d = element.type !== "embed" && (element.perspective ?? 0) > 0;
@@ -1625,6 +1639,7 @@ export function CanvasElement({
                 ]
                   .filter(Boolean)
                   .join(" "),
+                ...maskStyle,
               }}
             />
           )}

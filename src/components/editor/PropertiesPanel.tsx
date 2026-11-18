@@ -77,16 +77,41 @@ import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/sele
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
-/** Rotoscope editor: manual background eraser. Paint to erase pixels,
- *  switch to Restore to bring original pixels back, then Apply replaces
- *  the image with the rotoscoped PNG (transparent background). */
-function RotoscopeEditor({ src, onApply, onCancel }: { src: string; onApply: (dataUrl: string) => void; onCancel: () => void }) {
+/** Rotoscope editor: paint a mask over the image. Red = erased on the
+ *  slide. The original image is never modified; Apply stores the mask on
+ *  the element (re-editable at any time). */
+function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string; initialMask?: string; onApply: (maskDataUrl: string) => void; onCancel: () => void }) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const origRef = React.useRef<HTMLImageElement | null>(null);
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
+  const maskRef = React.useRef<HTMLCanvasElement | null>(null);
+  const tintRef = React.useRef<HTMLCanvasElement | null>(null);
   const drawingRef = React.useRef(false);
   const lastRef = React.useRef<{ x: number; y: number } | null>(null);
   const [brush, setBrush] = useState(40);
   const [mode, setMode] = useState<"erase" | "restore">("erase");
+
+  // composite: original image + red tint of the mask (erase = red)
+  const render = () => {
+    const c = canvasRef.current;
+    const img = imgRef.current;
+    const mask = maskRef.current;
+    const tint = tintRef.current;
+    if (!c || !img || !mask || !tint) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const tctx = tint.getContext("2d");
+    if (!tctx) return;
+    tctx.globalCompositeOperation = "source-over";
+    tctx.clearRect(0, 0, tint.width, tint.height);
+    tctx.drawImage(mask, 0, 0);
+    tctx.globalCompositeOperation = "source-in";
+    tctx.fillStyle = "rgba(244,63,94,0.55)";
+    tctx.fillRect(0, 0, tint.width, tint.height);
+    ctx.drawImage(tint, 0, 0);
+  };
 
   React.useEffect(() => {
     const img = new Image();
@@ -95,70 +120,75 @@ function RotoscopeEditor({ src, onApply, onCancel }: { src: string; onApply: (da
       const c = canvasRef.current;
       if (!c) return;
       const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-      c.width = Math.max(1, Math.round(img.naturalWidth * scale));
-      c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const w = Math.max(1, Math.round(img.naturalWidth * scale));
+      const h = Math.max(1, Math.round(img.naturalHeight * scale));
+      c.width = w;
+      c.height = h;
       const ctx = c.getContext("2d");
-      if (ctx) ctx.drawImage(img, 0, 0, c.width, c.height);
-      origRef.current = img;
+      if (ctx) ctx.drawImage(img, 0, 0, w, h);
+      imgRef.current = img;
+      const mask = maskRef.current ?? document.createElement("canvas");
+      mask.width = w;
+      mask.height = h;
+      maskRef.current = mask;
+      const tint = tintRef.current ?? document.createElement("canvas");
+      tint.width = w;
+      tint.height = h;
+      tintRef.current = tint;
+      const mctx = mask.getContext("2d");
+      if (!mctx) return;
+      mctx.clearRect(0, 0, w, h);
+      if (initialMask) {
+        const m = new Image();
+        m.crossOrigin = "anonymous";
+        m.onload = () => {
+          mctx.drawImage(m, 0, 0, w, h);
+          render();
+        };
+        m.src = initialMask;
+      }
+      render();
     };
     img.src = src;
-  }, [src]);
+  }, [src, initialMask]);
 
   const paintTo = (clientX: number, clientY: number) => {
     const c = canvasRef.current;
-    const orig = origRef.current;
-    const ctx = c?.getContext("2d");
-    if (!c || !ctx || !orig) return;
+    const mask = maskRef.current;
+    if (!c || !mask) return;
     const r = c.getBoundingClientRect();
     const x = ((clientX - r.left) / r.width) * c.width;
     const y = ((clientY - r.top) / r.height) * c.height;
     const rad = Math.max(1, (brush * (c.width / Math.max(1, r.width))) / 2);
-    if (mode === "erase") {
-      const from = lastRef.current ?? { x, y };
-      ctx.save();
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(x, y);
-      ctx.lineWidth = rad * 2;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.stroke();
-      ctx.restore();
-    } else {
-      // restore: re-draw the original image through a round clip, dabbed
-      // along the stroke so fast moves stay continuous
-      const from = lastRef.current ?? { x, y };
-      const dist = Math.hypot(x - from.x, y - from.y) || 1;
-      const steps = Math.max(1, Math.ceil(dist / (rad / 2)));
-      for (let s = 1; s <= steps; s++) {
-        const dx = from.x + ((x - from.x) * s) / steps;
-        const dy = from.y + ((y - from.y) * s) / steps;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(dx, dy, rad, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(orig, 0, 0, c.width, c.height);
-        ctx.restore();
-      }
-    }
+    const mctx = mask.getContext("2d");
+    if (!mctx) return;
+    mctx.save();
+    if (mode === "restore") mctx.globalCompositeOperation = "destination-out";
+    const from = lastRef.current ?? { x, y };
+    mctx.strokeStyle = "#ffffff";
+    mctx.beginPath();
+    mctx.moveTo(from.x, from.y);
+    mctx.lineTo(x, y);
+    mctx.lineWidth = rad * 2;
+    mctx.lineCap = "round";
+    mctx.lineJoin = "round";
+    mctx.stroke();
+    mctx.restore();
     lastRef.current = { x, y };
+    render();
   };
 
   const reset = () => {
-    const c = canvasRef.current;
-    const orig = origRef.current;
-    const ctx = c?.getContext("2d");
-    if (!c || !ctx || !orig) return;
-    ctx.globalCompositeOperation = "source-over";
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.drawImage(orig, 0, 0, c.width, c.height);
+    const mask = maskRef.current;
+    if (!mask) return;
+    mask.getContext("2d")?.clearRect(0, 0, mask.width, mask.height);
+    render();
   };
 
   return (
     <div className="fixed inset-0 z-[120] flex flex-col gap-3 bg-slate-950/95 p-4" onPointerDown={(e) => e.stopPropagation()}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-300">Rotoscope</span>
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-300">Rotoscope mask</span>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -202,12 +232,12 @@ function RotoscopeEditor({ src, onApply, onCancel }: { src: string; onApply: (da
           <button
             type="button"
             onClick={() => {
-              const c = canvasRef.current;
-              if (c) onApply(c.toDataURL("image/png"));
+              const mask = maskRef.current;
+              if (mask) onApply(mask.toDataURL("image/png"));
             }}
             className="rounded-lg bg-sky-600 px-4 py-1.5 text-[11px] font-bold text-white transition hover:bg-sky-500"
           >
-            Apply
+            Apply mask
           </button>
         </div>
       </div>
@@ -235,7 +265,7 @@ function RotoscopeEditor({ src, onApply, onCancel }: { src: string; onApply: (da
         />
       </div>
       <p className="text-center text-[10px] text-slate-400">
-        Paint with Erase to remove the background, Restore to bring pixels back. Checkerboard shows transparency.
+        Paint with Erase (red = hidden on the slide), Restore to bring pixels back, then Apply mask. The original image is kept.
       </p>
     </div>
   );
@@ -2097,17 +2127,26 @@ export function PropertiesPanel() {
                   </div>
                 </Field>
 
-                <Field label="Rotoscope (erase background)">
+                <Field label="Rotoscope mask">
                   <div className="space-y-2">
                     <button
                       type="button"
                       onClick={() => setRotoscopeOpen(true)}
                       className="w-full rounded-lg bg-slate-900 px-2 py-2 text-[11px] font-semibold text-white transition hover:bg-slate-700"
                     >
-                      Open rotoscope editor
+                      {el.rotoscopeMask ? "Edit rotoscope mask" : "Open rotoscope editor"}
                     </button>
+                    {el.rotoscopeMask && (
+                      <button
+                        type="button"
+                        onClick={() => update(el.id, { rotoscopeMask: undefined } as never)}
+                        className="w-full rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-[10px] font-semibold text-rose-600 transition hover:bg-rose-100"
+                      >
+                        Remove mask
+                      </button>
+                    )}
                     <p className="text-[10px] leading-snug text-slate-400">
-                      Paint the background away with the Erase brush, switch to Restore to bring pixels back. Apply replaces the image (undo with Ctrl+Z).
+                      Paint the background away (red = hidden). The original image is kept and the mask stays editable.
                     </p>
                   </div>
                 </Field>
@@ -2941,8 +2980,9 @@ export function PropertiesPanel() {
             {rotoscopeOpen && el.type === "image" && (
               <RotoscopeEditor
                 src={el.src}
-                onApply={(dataUrl) => {
-                  update(el.id, { src: dataUrl });
+                initialMask={el.rotoscopeMask}
+                onApply={(mask) => {
+                  update(el.id, { rotoscopeMask: mask } as never);
                   setRotoscopeOpen(false);
                 }}
                 onCancel={() => setRotoscopeOpen(false)}
