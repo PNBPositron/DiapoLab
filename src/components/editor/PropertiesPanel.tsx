@@ -77,59 +77,168 @@ import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/sele
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
-/** Client-side background removal: flood-fills from the image borders,
- *  clearing every pixel close to the average border color. */
-async function removeImageBackground(src: string, tolerance = 32): Promise<string> {
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error("Could not load this image."));
+/** Rotoscope editor: manual background eraser. Paint to erase pixels,
+ *  switch to Restore to bring original pixels back, then Apply replaces
+ *  the image with the rotoscoped PNG (transparent background). */
+function RotoscopeEditor({ src, onApply, onCancel }: { src: string; onApply: (dataUrl: string) => void; onCancel: () => void }) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const origRef = React.useRef<HTMLImageElement | null>(null);
+  const drawingRef = React.useRef(false);
+  const lastRef = React.useRef<{ x: number; y: number } | null>(null);
+  const [brush, setBrush] = useState(40);
+  const [mode, setMode] = useState<"erase" | "restore">("erase");
+
+  React.useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = canvasRef.current;
+      if (!c) return;
+      const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+      c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = c.getContext("2d");
+      if (ctx) ctx.drawImage(img, 0, 0, c.width, c.height);
+      origRef.current = img;
+    };
     img.src = src;
-  });
-  const maxDim = 1400;
-  const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
-  const w = Math.max(1, Math.round(img.naturalWidth * scale));
-  const h = Math.max(1, Math.round(img.naturalHeight * scale));
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) throw new Error("Canvas is unavailable.");
-  ctx.drawImage(img, 0, 0, w, h);
-  const data = ctx.getImageData(0, 0, w, h);
-  const px = data.data;
-  const idx = (x: number, y: number) => (y * w + x) * 4;
-  const corners: number[][] = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]].map(([x, y]) => {
-    const i = idx(x, y);
-    return [px[i], px[i + 1], px[i + 2]];
-  });
-  const seed = [0, 1, 2].map((c) => corners.reduce((s, cc) => s + cc[c], 0) / corners.length);
-  const tol2 = tolerance * tolerance * 3;
-  const near = (i: number) => {
-    const dr = px[i] - seed[0];
-    const dg = px[i + 1] - seed[1];
-    const db = px[i + 2] - seed[2];
-    return dr * dr + dg * dg + db * db <= tol2;
+  }, [src]);
+
+  const paintTo = (clientX: number, clientY: number) => {
+    const c = canvasRef.current;
+    const orig = origRef.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx || !orig) return;
+    const r = c.getBoundingClientRect();
+    const x = ((clientX - r.left) / r.width) * c.width;
+    const y = ((clientY - r.top) / r.height) * c.height;
+    const rad = Math.max(1, (brush * (c.width / Math.max(1, r.width))) / 2);
+    if (mode === "erase") {
+      const from = lastRef.current ?? { x, y };
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(x, y);
+      ctx.lineWidth = rad * 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke();
+      ctx.restore();
+    } else {
+      // restore: re-draw the original image through a round clip, dabbed
+      // along the stroke so fast moves stay continuous
+      const from = lastRef.current ?? { x, y };
+      const dist = Math.hypot(x - from.x, y - from.y) || 1;
+      const steps = Math.max(1, Math.ceil(dist / (rad / 2)));
+      for (let s = 1; s <= steps; s++) {
+        const dx = from.x + ((x - from.x) * s) / steps;
+        const dy = from.y + ((y - from.y) * s) / steps;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(dx, dy, rad, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(orig, 0, 0, c.width, c.height);
+        ctx.restore();
+      }
+    }
+    lastRef.current = { x, y };
   };
-  const visited = new Uint8Array(w * h);
-  const stack: number[] = [];
-  for (let x = 0; x < w; x++) stack.push(x, 0, x, h - 1);
-  for (let y = 0; y < h; y++) stack.push(0, y, w - 1, y);
-  while (stack.length) {
-    const y = stack.pop()!;
-    const x = stack.pop()!;
-    if (x < 0 || y < 0 || x >= w || y >= h) continue;
-    const p = y * w + x;
-    if (visited[p]) continue;
-    visited[p] = 1;
-    const i = p * 4;
-    if (!near(i)) continue;
-    px[i + 3] = 0;
-    stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
-  }
-  ctx.putImageData(data, 0, 0);
-  return canvas.toDataURL("image/png");
+
+  const reset = () => {
+    const c = canvasRef.current;
+    const orig = origRef.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx || !orig) return;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.drawImage(orig, 0, 0, c.width, c.height);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] flex flex-col gap-3 bg-slate-950/95 p-4" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-300">Rotoscope</span>
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMode("erase")}
+            className={'rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition ' + (mode === "erase" ? 'border-sky-400 bg-sky-500/20 text-sky-300' : 'border-slate-600 text-slate-300 hover:border-slate-400')}
+          >
+            Erase
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("restore")}
+            className={'rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition ' + (mode === "restore" ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300' : 'border-slate-600 text-slate-300 hover:border-slate-400')}
+          >
+            Restore
+          </button>
+          <label className="flex items-center gap-2 text-[10px] font-medium text-slate-300">
+            Brush
+            <input
+              type="range"
+              min={4}
+              max={200}
+              value={brush}
+              onChange={(e) => setBrush(Number(e.target.value))}
+              className="w-32 accent-sky-500"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={reset}
+            className="rounded-lg border border-slate-600 px-3 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:border-slate-400"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-lg border border-slate-600 px-3 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:border-slate-400"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const c = canvasRef.current;
+              if (c) onApply(c.toDataURL("image/png"));
+            }}
+            className="rounded-lg bg-sky-600 px-4 py-1.5 text-[11px] font-bold text-white transition hover:bg-sky-500"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl border border-slate-700 bg-[repeating-conic-gradient(#1e293b_0%_25%,#0f172a_0%_50%)] bg-[length:24px_24px]">
+        <canvas
+          ref={canvasRef}
+          className="max-h-full max-w-full cursor-crosshair touch-none"
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture(e.pointerId);
+            drawingRef.current = true;
+            lastRef.current = null;
+            paintTo(e.clientX, e.clientY);
+          }}
+          onPointerMove={(e) => {
+            if (drawingRef.current) paintTo(e.clientX, e.clientY);
+          }}
+          onPointerUp={() => {
+            drawingRef.current = false;
+            lastRef.current = null;
+          }}
+          onPointerLeave={() => {
+            drawingRef.current = false;
+            lastRef.current = null;
+          }}
+        />
+      </div>
+      <p className="text-center text-[10px] text-slate-400">
+        Paint with Erase to remove the background, Restore to bring pixels back. Checkerboard shows transparency.
+      </p>
+    </div>
+  );
 }
 
 const FONT_FAMILIES: string[] = Array.from(
@@ -533,6 +642,7 @@ export function PropertiesPanel() {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [colorPaletteOpen, setColorPaletteOpen] = useState(false);
   const [imageFilterOpen, setImageFilterOpen] = useState(false);
+  const [rotoscopeOpen, setRotoscopeOpen] = useState(false);
   const [jsonDraft, setJsonDraft] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [jsonDirty, setJsonDirty] = useState(false);
@@ -1987,24 +2097,17 @@ export function PropertiesPanel() {
                   </div>
                 </Field>
 
-                <Field label="Remove background">
+                <Field label="Rotoscope (erase background)">
                   <div className="space-y-2">
                     <button
                       type="button"
-                      onClick={async () => {
-                        try {
-                          const src = await removeImageBackground(el.src, 32);
-                          update(el.id, { src });
-                        } catch (err) {
-                          window.alert(err instanceof Error ? err.message : "Could not remove the background.");
-                        }
-                      }}
+                      onClick={() => setRotoscopeOpen(true)}
                       className="w-full rounded-lg bg-slate-900 px-2 py-2 text-[11px] font-semibold text-white transition hover:bg-slate-700"
                     >
-                      Erase the background (flood fill)
+                      Open rotoscope editor
                     </button>
                     <p className="text-[10px] leading-snug text-slate-400">
-                      Works best on flat, uniform backgrounds. The result replaces the image (undo with Ctrl+Z).
+                      Paint the background away with the Erase brush, switch to Restore to bring pixels back. Apply replaces the image (undo with Ctrl+Z).
                     </p>
                   </div>
                 </Field>
@@ -2835,6 +2938,16 @@ export function PropertiesPanel() {
                 </button>
               </div>
             </Section>
+            {rotoscopeOpen && el.type === "image" && (
+              <RotoscopeEditor
+                src={el.src}
+                onApply={(dataUrl) => {
+                  update(el.id, { src: dataUrl });
+                  setRotoscopeOpen(false);
+                }}
+                onCancel={() => setRotoscopeOpen(false)}
+              />
+            )}
           </div>
         </aside>
       )}
