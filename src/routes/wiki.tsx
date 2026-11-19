@@ -67,7 +67,7 @@ const PANELS = [
   { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
   { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
   { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets and layout blocks." },
-  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size and magic resize." },
+  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size, magic resize and speaker notes." },
   { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
 ];
 
@@ -79,9 +79,10 @@ const ELEMENTS: Array<[string, string]> = [
   ["Video & audio", "Trim window, playback speed and loop, straight on the slide."],
   ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options)."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
-  ["Quizzes & polls", "Right-or-wrong quizzes, and live polls whose votes sync across open windows."],
+  ["Quizzes & polls", "Right-or-wrong quizzes (re-skinned by the UI style pack), and live polls synced via Supabase Realtime, with a QR code so the audience votes from their phone."],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
   ["UI components", "Twenty-four kinds (cards, terminals, phones...) in thirteen style packs."],
+  ["FlowCraft diagrams", "Sixteen diagram types: flows, structures, networks and layouts, with per-style gradients and group restyling."],
   ["Embeds", "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically."],
 ];
 
@@ -180,6 +181,13 @@ function Wiki() {
               it with the Design panel and the brand kit, then hit{" "}
               <strong>Present</strong> in the toolbar.
             </Callout>
+            <p>
+              Each slide can also carry <strong>speaker notes</strong>, written in the{" "}
+              <strong>Speaker notes</strong> section of the Design panel. They are
+              saved with the slide, never rendered on the canvas, and show up in{" "}
+              <strong>presenter view</strong> next to the timer and a preview of the
+              next slide.
+            </p>
           </Section>
 
           <Section
@@ -455,9 +463,9 @@ function Wiki() {
             </p>
             <p className="mt-2">
               <Presentation className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Share a deck</strong> — the share button copies a private
-              view-only link. Anyone with the link can watch the deck in presentation
-              mode.
+              <strong>Share a deck</strong> — the share button copies a private share
+              link. Anyone with the link opens a clean view-only page with a Present
+              button and a page counter, without ever seeing your editor.
             </p>
             <p className="mt-2">
               <strong>Export & import</strong> — the Export menu saves the current
