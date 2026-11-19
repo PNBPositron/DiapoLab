@@ -77,9 +77,10 @@ import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/sele
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
-/** Rotoscope editor: paint a mask over the image. Red = erased on the
- *  slide. The original image is never modified; Apply stores the mask on
- *  the element (re-editable at any time). */
+/** Rotoscope editor: paint a mask over the image, or outline a shape
+ *  point by point to cut it out (keep inside / hide outside). Red =
+ *  hidden on the slide. The original image is never modified; Apply
+ *  stores the mask on the element (re-editable at any time). */
 function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string; initialMask?: string; onApply: (maskDataUrl: string) => void; onCancel: () => void }) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const imgRef = React.useRef<HTMLImageElement | null>(null);
@@ -92,6 +93,7 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
   const [outlineMode, setOutlineMode] = useState(false);
   const [pointCount, setPointCount] = useState(0);
   const pointsRef = React.useRef<{ x: number; y: number }[]>([]);
+  const [outlineKeep, setOutlineKeep] = useState(true);
 
   // composite: original image + red tint of the mask (erase = red)
   const render = () => {
@@ -230,12 +232,19 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
     const mctx = mask.getContext("2d");
     if (!mctx) return;
     mctx.save();
-    mctx.globalCompositeOperation = "source-over";
+    if (outlineKeep) {
+      mctx.globalCompositeOperation = "source-over";
+      mctx.fillStyle = "#ffffff";
+      mctx.fillRect(0, 0, mask.width, mask.height);
+      mctx.globalCompositeOperation = "destination-out";
+    } else {
+      mctx.globalCompositeOperation = "source-over";
+      mctx.fillStyle = "#ffffff";
+    }
     mctx.beginPath();
     mctx.moveTo(pts[0].x, pts[0].y);
     for (let i = 1; i < pts.length; i++) mctx.lineTo(pts[i].x, pts[i].y);
     mctx.closePath();
-    mctx.fillStyle = "#ffffff";
     mctx.fill();
     mctx.restore();
     pointsRef.current = [];
@@ -268,6 +277,20 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
             <>
               <button
                 type="button"
+                onClick={() => setOutlineKeep(true)}
+                className={'rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition ' + (outlineKeep ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300' : 'border-slate-600 text-slate-300 hover:border-slate-400')}
+              >
+                Keep shape
+              </button>
+              <button
+                type="button"
+                onClick={() => setOutlineKeep(false)}
+                className={'rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition ' + (!outlineKeep ? 'border-rose-400 bg-rose-500/20 text-rose-300' : 'border-slate-600 text-slate-300 hover:border-slate-400')}
+              >
+                Hide area
+              </button>
+              <button
+                type="button"
                 onClick={undoPoint}
                 disabled={pointCount === 0}
                 className="rounded-lg border border-slate-600 px-3 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:border-slate-400 disabled:opacity-40"
@@ -280,7 +303,7 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
                 disabled={pointCount < 3}
                 className="rounded-lg border border-emerald-400 bg-emerald-500/20 px-3 py-1.5 text-[11px] font-semibold text-emerald-300 transition disabled:opacity-40"
               >
-                Add outline area
+                {outlineKeep ? "Cut out shape" : "Hide area"}
               </button>
             </>
           )}
@@ -368,7 +391,7 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
         />
       </div>
       <p className="text-center text-[10px] text-slate-400">
-        Brush mode: paint with Erase (red = hidden on the slide) or Restore to bring pixels back. Outline mode: click to drop points along the shape, then Add outline area. Repeat outlines to keep erasing; then Apply mask. The original image is kept.
+        Brush mode: paint with Erase (red = hidden on the slide) or Restore to bring pixels back. Outline mode: click to drop points around the shape, then Cut out shape to keep the outlined area and hide everything outside (or switch to Hide area to hide the outlined zone instead). Use Reset to start over, then Apply mask. The original image is kept.
       </p>
     </div>
   );
