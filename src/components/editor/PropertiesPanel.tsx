@@ -89,6 +89,9 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
   const lastRef = React.useRef<{ x: number; y: number } | null>(null);
   const [brush, setBrush] = useState(40);
   const [mode, setMode] = useState<"erase" | "restore">("erase");
+  const [outlineMode, setOutlineMode] = useState(false);
+  const [pointCount, setPointCount] = useState(0);
+  const pointsRef = React.useRef<{ x: number; y: number }[]>([]);
 
   // composite: original image + red tint of the mask (erase = red)
   const render = () => {
@@ -111,6 +114,31 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
     tctx.fillStyle = "rgba(244,63,94,0.55)";
     tctx.fillRect(0, 0, tint.width, tint.height);
     ctx.drawImage(tint, 0, 0);
+    const pts = pointsRef.current;
+    if (pts.length > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(244,63,94,0.30)";
+      ctx.fill();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (const p of pts) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(244,63,94,0.9)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   };
 
   React.useEffect(() => {
@@ -178,10 +206,49 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
     render();
   };
 
+  const addPoint = (clientX: number, clientY: number) => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    const x = ((clientX - r.left) / r.width) * c.width;
+    const y = ((clientY - r.top) / r.height) * c.height;
+    pointsRef.current = pointsRef.current.concat([{ x, y }]);
+    setPointCount(pointsRef.current.length);
+    render();
+  };
+
+  const undoPoint = () => {
+    pointsRef.current = pointsRef.current.slice(0, -1);
+    setPointCount(pointsRef.current.length);
+    render();
+  };
+
+  const closeOutline = () => {
+    const mask = maskRef.current;
+    const pts = pointsRef.current;
+    if (!mask || pts.length < 3) return;
+    const mctx = mask.getContext("2d");
+    if (!mctx) return;
+    mctx.save();
+    mctx.globalCompositeOperation = "source-over";
+    mctx.beginPath();
+    mctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) mctx.lineTo(pts[i].x, pts[i].y);
+    mctx.closePath();
+    mctx.fillStyle = "#ffffff";
+    mctx.fill();
+    mctx.restore();
+    pointsRef.current = [];
+    setPointCount(0);
+    render();
+  };
+
   const reset = () => {
     const mask = maskRef.current;
     if (!mask) return;
     mask.getContext("2d")?.clearRect(0, 0, mask.width, mask.height);
+    pointsRef.current = [];
+    setPointCount(0);
     render();
   };
 
@@ -190,6 +257,35 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-300">Rotoscope mask</span>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => { setOutlineMode((v) => !v); drawingRef.current = false; lastRef.current = null; }}
+            className={'rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition ' + (outlineMode ? 'border-amber-400 bg-amber-500/20 text-amber-300' : 'border-slate-600 text-slate-300 hover:border-slate-400')}
+          >
+            Outline (points)
+          </button>
+          {outlineMode && (
+            <>
+              <button
+                type="button"
+                onClick={undoPoint}
+                disabled={pointCount === 0}
+                className="rounded-lg border border-slate-600 px-3 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:border-slate-400 disabled:opacity-40"
+              >
+                Undo point
+              </button>
+              <button
+                type="button"
+                onClick={closeOutline}
+                disabled={pointCount < 3}
+                className="rounded-lg border border-emerald-400 bg-emerald-500/20 px-3 py-1.5 text-[11px] font-semibold text-emerald-300 transition disabled:opacity-40"
+              >
+                Add outline area
+              </button>
+            </>
+          )}
+          {!outlineMode && (
+            <>
           <button
             type="button"
             onClick={() => setMode("erase")}
@@ -215,6 +311,8 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
               className="w-32 accent-sky-500"
             />
           </label>
+            </>
+          )}
           <button
             type="button"
             onClick={reset}
@@ -246,6 +344,11 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
           ref={canvasRef}
           className="max-h-full max-w-full cursor-crosshair touch-none"
           onPointerDown={(e) => {
+            if (outlineMode) {
+              e.preventDefault();
+              addPoint(e.clientX, e.clientY);
+              return;
+            }
             e.currentTarget.setPointerCapture(e.pointerId);
             drawingRef.current = true;
             lastRef.current = null;
@@ -265,7 +368,7 @@ function RotoscopeEditor({ src, initialMask, onApply, onCancel }: { src: string;
         />
       </div>
       <p className="text-center text-[10px] text-slate-400">
-        Paint with Erase (red = hidden on the slide), Restore to bring pixels back, then Apply mask. The original image is kept.
+        Brush mode: paint with Erase (red = hidden on the slide) or Restore to bring pixels back. Outline mode: click to drop points along the shape, then Add outline area. Repeat outlines to keep erasing; then Apply mask. The original image is kept.
       </p>
     </div>
   );
