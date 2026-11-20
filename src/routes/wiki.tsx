@@ -23,6 +23,7 @@ import {
   Braces,
   Folder,
   Moon,
+  Scissors,
 } from "lucide-react";
 
 export const Route = createFileRoute("/wiki")({
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/wiki")({
       {
         name: "description",
         content:
-          "Learn DiapoLab: formats, panels, elements, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
+          "Learn DiapoLab: formats, panels, elements, motion paths, audio, rotoscope, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
       },
       { property: "og:title", content: "Wiki — DiapoLab documentation" },
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
@@ -51,10 +52,11 @@ const SECTIONS = [
   { id: "formats", label: "Canvas formats", icon: <MonitorPlay className="size-3.5" /> },
   { id: "panels", label: "Panels", icon: <LayoutGrid className="size-3.5" /> },
   { id: "elements", label: "Elements", icon: <Shapes className="size-3.5" /> },
+  { id: "rotoscope", label: "Rotoscope", icon: <Scissors className="size-3.5" /> },
   { id: "palette", label: "Command palette", icon: <Command className="size-3.5" /> },
   { id: "ai", label: "AI slideshow JSON", icon: <Braces className="size-3.5" /> },
   { id: "shortcuts", label: "Shortcuts", icon: <Keyboard className="size-3.5" /> },
-  { id: "effects", label: "Effects & transitions", icon: <WandSparkles className="size-3.5" /> },
+  { id: "effects", label: "Effects & motion", icon: <WandSparkles className="size-3.5" /> },
   { id: "accessibility", label: "Dark mode & a11y", icon: <Moon className="size-3.5" /> },
   { id: "publishing", label: "Publishing & sharing", icon: <Share2 className="size-3.5" /> },
   { id: "faq", label: "FAQ", icon: <CircleHelp className="size-3.5" /> },
@@ -66,20 +68,23 @@ const PANELS = [
   { icon: <Shapes className="size-4" />, name: "Elements", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
   { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
   { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
-  { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets and layout blocks." },
+  { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets, whole-slide blocks and layout presets." },
   { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size, magic resize and speaker notes." },
   { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
 ];
 
 const ELEMENTS: Array<[string, string]> = [
-  ["Text", "Inline-editable titles and paragraphs, with fonts, transforms and masks."],
+  ["Text", "Inline-editable titles and paragraphs, with fonts, transforms, typewriter and count-up animations, masks."],
   ["Shapes", "Fifty-plus shapes with fills, gradients, strokes and visual effects."],
-  ["Icons", "A searchable icon library, recolorable per element."],
-  ["Images", "Crop, shape masks, and filters including glitch, pixelate and posterize."],
-  ["Video & audio", "Trim window, playback speed and loop, straight on the slide."],
+  ["Icons", "A searchable icon library, recolorable per element, with animated icons."],
+  ["Images", "Crop, shape masks, one-click remove background and rotoscope cutouts, plus filters including glitch, pixelate and posterize."],
+  ["Photo grids", "Photo and illustration grids where any cell can be swapped for a video."],
+  ["Whole-slide blocks", "Full-canvas blocks (cover, agenda, section, closing) you fill in a single pass."],
+  ["Video & audio", "Trim window, playback speed, loop and a custom poster frame, straight on the slide."],
   ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options)."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
   ["Quizzes & polls", "Right-or-wrong quizzes (re-skinned by the UI style pack), and live polls synced via Supabase Realtime, with a QR code so the audience votes from their phone."],
+  ["QR codes", "A standalone QR element with editable colors and styling, ready to place on any slide."],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
   ["UI components", "Twenty-four kinds (cards, terminals, phones...) in thirteen style packs."],
   ["FlowCraft diagrams", "Sixteen diagram types: flows, structures, networks and layouts, with per-style gradients and group restyling."],
@@ -132,7 +137,8 @@ function Wiki() {
           </div>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
             Everything you need to build decks fast: formats, panels, elements,
-            shortcuts, effects, dark mode, and how to share your work with the community.
+            motion, audio, rotoscope cutouts, shortcuts, effects, dark mode, and how
+            to share your work with the community.
           </p>
         </div>
       </header>
@@ -272,6 +278,31 @@ function Wiki() {
           </Section>
 
           <Section
+            id="rotoscope"
+            icon={<Scissors className="size-4" />}
+            kicker="Images"
+            title="Rotoscope & cutouts"
+          >
+            <p>
+              Select an image and open the <strong>rotoscope editor</strong> from the
+              inspector to cut a subject out of its background. Paint over the areas to
+              hide with the erase/restore brushes, or switch to{" "}
+              <strong>Outline (points)</strong> mode and click point by point around the
+              subject, then close the shape. The tinted overlay shows exactly what will
+              be hidden, and you choose whether the outlined shape is kept or masked out.
+            </p>
+            <p>
+              The cutout is stored as a <strong>non-destructive mask</strong> on the
+              element: the original image is never modified, and you can reopen the
+              editor at any time to refine the mask.
+            </p>
+            <Callout icon={<Zap className="size-3.5" />}>
+              For a quick cutout, start from Outline mode and click a point every few
+              pixels around the subject; undo a point with the step-back button.
+            </Callout>
+          </Section>
+
+          <Section
             id="palette"
             icon={<Command className="size-4" />}
             kicker="Power tool"
@@ -378,7 +409,7 @@ function Wiki() {
             id="effects"
             icon={<WandSparkles className="size-4" />}
             kicker="Motion"
-            title="Effects & transitions"
+            title="Effects & motion"
           >
             <ul className="space-y-2">
               <li>
@@ -391,6 +422,21 @@ function Wiki() {
                 <strong>Element animations</strong> — entrance animations per element
                 (pop, fade-up, glitch, bounce, spin, blur-in and more), with a delay
                 to stagger objects.
+              </li>
+              <li>
+                <strong>Typewriter & count-up</strong> — animate text typing itself
+                letter by letter, and count numbers up to their final value, ideal for
+                big figures and KPI slides.
+              </li>
+              <li>
+                <strong>Motion paths</strong> — trace a custom path in the inspector and
+                make any element travel along it, with audio cues that fire as the
+                element passes each point.
+              </li>
+              <li>
+                <strong>Audio & music</strong> — attach audio cues to elements, and set
+                a background music track per slide. Everything stays synced to the slide
+                timeline while presenting.
               </li>
               <li>
                 <strong>Keyframe animations</strong> — capture any element state on a
