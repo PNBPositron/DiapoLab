@@ -136,7 +136,7 @@ export type PublicTemplate = {
   style?: string | null;
   creator?: string | null;
   license?: string | null;
-  creator_profile?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
+  creator_profile?: { id?: string; username?: string | null; pronouns?: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {
@@ -150,7 +150,7 @@ export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const ids = [...new Set(rows.map((row) => row.user_id))];
   if (!ids.length) return rows;
   const { data: profiles } = await (supabase as any).rpc("get_creator_profiles", { _ids: ids });
-  const byId = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
+  const byId = new Map<string, NonNullable<PublicTemplate["creator_profile"]>>((profiles ?? []).map((profile: any) => [profile.id, profile]));
   return rows.map((row) => ({ ...row, creator_profile: byId.get(row.user_id) ?? null }));
 }
 

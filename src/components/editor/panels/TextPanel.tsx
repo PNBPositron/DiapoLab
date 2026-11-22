@@ -87,7 +87,7 @@ export function TextPanel() {
   const [activeCategory, setActiveCategory] = useState("All");
   const customFonts = useSettings((s) => s.customFonts);
   const allFonts = useMemo(
-    () => [...FONTS, ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" }))],
+    () => [...FONTS, ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" }) as FontDef)],
     [customFonts],
   );
 

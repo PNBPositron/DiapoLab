@@ -446,6 +446,7 @@ const filteredCommunity = filterTemplates(community, {
         canLike={!!user}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        loadTemplate={loadTemplate}
       />
     </div>
   );
@@ -672,6 +673,7 @@ function AllTemplatesDialog({
   canLike,
   sortBy,
   setSortBy,
+  loadTemplate,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -682,6 +684,7 @@ function AllTemplatesDialog({
   canLike: boolean;
   sortBy: "likes" | "recent";
   setSortBy: (s: "likes" | "recent") => void;
+  loadTemplate: (c: PublicTemplate) => void;
 }) {
   const sorted = sortTemplates(templates, likeCounts, sortBy);
   return (
