@@ -13,7 +13,7 @@ type Step = 0 | 1 | 2;
 const PANEL_OPTIONS = [
   { id: "home", label: "Templates", icon: LayoutGrid, hint: "Browse community decks" },
   { id: "text", label: "Text", icon: Type, hint: "Add titles & paragraphs" },
-  { id: "elements", label: "Elements", icon: Shapes, hint: "Shapes & icons" },
+  { id: "elements", label: "Shapes", icon: Shapes, hint: "Images, shapes & icons" },
   { id: "library", label: "Library", icon: Library, hint: "Photos & illustrations" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },

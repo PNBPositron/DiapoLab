@@ -16,7 +16,7 @@ import { MyDesignsDialog } from "./MyDesignsDialog";
 const TOOLS = [
   { id: "home", label: "Home", icon: Home },
   { id: "text", label: "Text", icon: Type },
-  { id: "elements", label: "Elements", icon: Shapes },
+  { id: "elements", label: "Shapes", icon: Shapes },
   { id: "library", label: "Library", icon: Library },
   { id: "media", label: "Media", icon: Image },
   { id: "components", label: "Presets", icon: Layers },

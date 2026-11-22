@@ -138,7 +138,7 @@ export function ElementsPanel() {
 
   return (
     <div className="panel-content">
-      <PanelHeader kicker="Elements" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
+      <PanelHeader kicker="Shapes" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
 
       {/* Upload zone */}
       <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-slate-300/90 bg-white/70 px-3 py-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.25)]">
