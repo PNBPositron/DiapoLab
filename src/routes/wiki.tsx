@@ -24,6 +24,8 @@ import {
   Folder,
   Moon,
   Scissors,
+  Puzzle,
+  Plug,
 } from "lucide-react";
 
 export const Route = createFileRoute("/wiki")({
@@ -34,7 +36,7 @@ export const Route = createFileRoute("/wiki")({
       {
         name: "description",
         content:
-          "Learn DiapoLab: formats, panels, elements, motion paths, audio, rotoscope, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
+          "Learn DiapoLab: formats, panels, elements, plugins and widget packs, motion paths, audio, rotoscope, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
       },
       { property: "og:title", content: "Wiki — DiapoLab documentation" },
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
@@ -52,6 +54,7 @@ const SECTIONS = [
   { id: "formats", label: "Canvas formats", icon: <MonitorPlay className="size-3.5" /> },
   { id: "panels", label: "Panels", icon: <LayoutGrid className="size-3.5" /> },
   { id: "elements", label: "Elements", icon: <Shapes className="size-3.5" /> },
+  { id: "plugins", label: "Plugins & packs", icon: <Puzzle className="size-3.5" /> },
   { id: "rotoscope", label: "Rotoscope", icon: <Scissors className="size-3.5" /> },
   { id: "palette", label: "Command palette", icon: <Command className="size-3.5" /> },
   { id: "ai", label: "AI slideshow JSON", icon: <Braces className="size-3.5" /> },
@@ -275,6 +278,40 @@ function Wiki() {
                 </div>
               ))}
             </div>
+          </Section>
+
+          <Section
+            id="plugins"
+            icon={<Puzzle className="size-4" />}
+            kicker="Extend"
+            title="Plugins & widget packs"
+          >
+            <p>
+              Plugins extend the editor with ready-made widgets and mini-apps. Four
+              ships built in — you never have to install them: <strong>Widget
+              packs</strong> (glitch, terminal, digital, glass and modern text and
+              shape groups that drop on the canvas as one grouped block),{" "}
+              <strong>Paint</strong> (a drawing studio: brush, shapes, arrows),{" "}
+              <strong>Video</strong> (upload, trim and insert clips) and{" "}
+              <strong>AI Search</strong> (web search with sourced results from
+              Context.dev).
+            </p>
+            <p>
+              You can also plug in your own: the plugin formats are small pieces of
+              JavaScript — <code>diapolabPlugin({"{ name, apps, widgets }"})</code>,
+              <code>diapolabApp({"{ name, apps }"})</code> for apps only, or{" "}
+              <code>diapolabPack({"{ name, widgets }"})</code> for widget packs only.
+              Import the code from the Components panel or the command palette, then
+              enable, disable or remove each plugin. Apps of type{" "}
+              <strong>runtime</strong> run your HTML in a sandboxed iframe with a tiny{" "}
+              <code>diapolab.insert()</code> API that places elements on the slide, and
+              any imported plugin can be exported back to portable code to share or
+              publish it.
+            </p>
+            <Callout icon={<Zap className="size-3.5" />}>
+              Plugin widgets behave like native elements: they are restyled by the
+              inspector, group as one block, and can be saved inside any deck.
+            </Callout>
           </Section>
 
           <Section
@@ -520,6 +557,13 @@ function Wiki() {
               .pptx decks and .json designs back into the editor.
             </p>
             <p className="mt-2">
+              <strong>Creator profiles</strong> — sign in to set a username, display
+              name and avatar. Your published templates appear on your public profile
+              page, and other users can follow your work by subscribing to you from
+              the marketplace and their profile pages.
+            </p>
+            <p className="mt-2">
+              <Plug className="mr-1 inline size-3.5 text-blue-500" />
               <strong>Cloud saving</strong> — sign in to save your designs online and
               reopen them from the Projects panel on any device.
             </p>
