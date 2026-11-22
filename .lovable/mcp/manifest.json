@@ -12,8 +12,6 @@
   "mcp": {
     "server": {
       "name": "positron-studio-mcp",
-      "protocol": "streamable-http",
-      "oauth": {"authorization_server": "https://ixohivvtozrrmanfpdyr.supabase.co/auth/v1"},
       "version": "0.3.0",
       "title": "DiapoLab"
     },
@@ -164,6 +162,32 @@
               "maximum": 50
             }
           }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_public_template",
+        "title": "Get a public template",
+        "description": "Read a published community DiapoLab template by id, including all slide/page content. No authentication required.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Template id."
+            }
+          },
+          "required": [
+            "id"
+          ]
         },
         "outputSchema": null
       }
