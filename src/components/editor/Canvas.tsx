@@ -147,7 +147,7 @@ export function Canvas() {
       <div className="absolute inset-0 overflow-auto pb-16">
         <div className="flex min-h-full min-w-full w-max items-center justify-center p-10">
           <div
-            className="brutal-shadow-lg relative shrink-0"
+            className="relative shrink-0"
             style={{
               width: canvasW * scale,
               height: canvasH * scale,
@@ -159,7 +159,7 @@ export function Canvas() {
           >
             <div
               id="canvas-export"
-              className="absolute left-0 top-0 overflow-hidden rounded-[2px] shadow-[0_0_0_1px_rgba(15,23,42,0.08)]"
+              className="absolute left-0 top-0 overflow-hidden rounded-[2px] ring-1 ring-slate-200 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.14),0_2px_8px_-2px_rgba(15,23,42,0.06)]"
               style={{
                 width: canvasW,
                 height: canvasH,
@@ -232,11 +232,11 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-2xl border border-white/70 bg-white/90 p-1.5 text-slate-700 shadow-[0_14px_34px_-16px_rgba(15,23,42,0.38),0_2px_8px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-slate-200/90 bg-white/92 px-2.5 py-1 text-slate-700 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md">
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-7 w-7 rounded-full"
           title="Zoom out"
           aria-label="Zoom out"
           disabled={scale <= 0.1}
@@ -249,7 +249,7 @@ export function Canvas() {
           onClick={() => setZoom(null)}
           title="Fit to screen"
           aria-label="Fit to screen"
-          className="min-w-12 rounded-md px-1 py-0.5 text-center font-mono text-xs transition hover:bg-slate-100"
+          className="min-w-12 rounded-full px-2 py-0.5 text-center font-mono text-xs font-semibold tabular-nums text-slate-700 transition hover:bg-slate-100"
         >
           {Math.round(scale * 100)}%
         </button>
@@ -264,10 +264,10 @@ export function Canvas() {
         >
           <Plus />
         </Button>
-        <span className="hidden px-2 font-mono text-[10px] text-muted-foreground sm:inline">
+        <span className="hidden px-2 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
           {canvasW}×{canvasH}
         </span>
-        <span className="px-2 font-mono text-[10px] text-slate-500">
+        <span className="px-2 font-mono text-[11px] tabular-nums text-slate-500">
           {currentIndex + 1} / {pages.length}
         </span>
         <Button
@@ -308,11 +308,11 @@ export function Canvas() {
           <PopoverContent
             side="top"
             align="end"
-            className="selector-panel space-y-3 rounded-xl p-3"
+            className="selector-panel space-y-3 rounded-2xl p-3.5"
           >
             <PanelHeader title="Slide transition" />
             {selectedId && (
-              <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-2.5">
+              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-2.5">
                 <div className="mb-1.5 flex items-center justify-between">
                   <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
                   <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>

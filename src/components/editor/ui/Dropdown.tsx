@@ -105,7 +105,7 @@ export function Dropdown<T extends string = string>({
           setOpen((v) => !v);
         }}
         onKeyDown={onKeyDown}
-        className={`flex w-full items-center justify-between gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-left text-xs text-slate-800 transition hover:border-slate-300 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-50 ${open ? "border-indigo-400 ring-2 ring-indigo-100" : ""} ${className}`}
+        className={`flex w-full items-center justify-between gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-left text-xs text-slate-800 transition hover:border-slate-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:opacity-50 ${open ? "border-blue-500 ring-2 ring-blue-500/15" : ""} ${className}`}
       >
         <span className="flex min-w-0 items-center gap-1.5">
           {selected?.swatch && (
@@ -127,7 +127,7 @@ export function Dropdown<T extends string = string>({
         <div
           ref={listRef}
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg animate-in fade-in zoom-in-95 duration-150"
+          className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 max-h-60 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-[0_14px_32px_-10px_rgba(15,23,42,0.16)] animate-in fade-in zoom-in-95 duration-150"
         >
           {normalized.map((o, i) => {
             const active = i === activeIndex;
@@ -140,9 +140,9 @@ export function Dropdown<T extends string = string>({
                 aria-selected={isSelected}
                 onMouseEnter={() => setActiveIndex(i)}
                 onClick={() => select(o.value)}
-                className={`flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors ${
+                className={`flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-1.5 text-left text-xs transition-colors ${
                   isSelected
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? "bg-blue-50 text-blue-700"
                     : active
                       ? "bg-slate-100 text-slate-900"
                       : "text-slate-700"

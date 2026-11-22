@@ -380,7 +380,7 @@ export function VideoAppDialog({
                   </button>
                 ))}
                 <span className="mx-0.5 h-4 w-px bg-slate-200" />
-                <span title="Playback speed" className="inline-flex"><Gauge className="size-3 text-slate-400" /></span>
+                <Gauge className="size-3 text-slate-400" aria-label="Playback speed" />
                 {[0.5, 1, 1.5, 2].map((r) => (
                   <button
                     key={r}

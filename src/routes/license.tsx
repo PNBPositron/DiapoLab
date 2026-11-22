@@ -48,11 +48,11 @@ function LicensePage() {
   return (
     <LegalShell
       title="MIT License"
-      subtitle="permissive open source · copyright (c) 2026"
+      subtitle="Permissive open source · Copyright (c) 2026"
       icon={<Scale className="size-5" />}
-      kicker="DiapoLab documentation"
+      kicker="Documentation"
     >
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:border-blue-200/80 hover:shadow-[0_16px_40px_-16px_rgba(37,99,235,0.18)]">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6">
         <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
           DiapoLab is free software for creating, remixing, exporting and sharing
           presentations. You can use the editor in personal and commercial projects
@@ -62,41 +62,41 @@ function LicensePage() {
           {PERMISSIONS.map((p) => (
             <div
               key={p.title}
-              className="group rounded-xl border border-slate-200 bg-slate-50/70 p-4 transition-all hover:border-blue-300 hover:bg-blue-50/50"
+              className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
             >
-              <span className="grid size-8 place-items-center rounded-lg bg-blue-600 text-white shadow-sm transition-colors">
+              <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">
                 {p.icon}
               </span>
-              <div className="mt-2.5 text-xs font-semibold text-slate-800">{p.title}</div>
-              <div className="mt-1 text-[11px] leading-snug text-slate-400">{p.desc}</div>
+              <div className="mt-3 text-xs font-semibold text-slate-900">{p.title}</div>
+              <div className="mt-1 text-xs leading-relaxed text-slate-500">{p.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
             <Check className="size-4" />
           </span>
-          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">In short</h2>
+          <h2 className="font-display text-sm font-semibold text-slate-900">In short</h2>
         </div>
         <ul className="mt-3 space-y-1.5 text-sm text-slate-600">
-          <li>✓ use it commercially, privately, or in your own product</li>
-          <li>✓ modify, fork and redistribute it freely</li>
-          <li>✓ keep the copyright and license notice in copies</li>
-          <li>✓ no warranty and no liability</li>
+          <li>✓ Use it commercially, privately, or in your own product</li>
+          <li>✓ Modify, fork and redistribute it freely</li>
+          <li>✓ Keep the copyright and license notice in copies</li>
+          <li>✓ Provided with no warranty and no liability</li>
         </ul>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
-        <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-white px-5 py-4">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+        <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
             <FileText className="size-4" />
           </span>
-          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">Full text</h2>
+          <h2 className="font-display text-sm font-semibold text-slate-900">Full text</h2>
         </div>
-        <pre className="whitespace-pre-wrap bg-slate-950 px-5 py-4 font-mono text-[11px] leading-relaxed text-slate-200">{`MIT License
+        <pre className="whitespace-pre-wrap bg-slate-950 px-5 py-4 font-mono text-xs leading-relaxed text-slate-200">{`MIT License
 
 Copyright (c) 2026 DiapoLab
 
@@ -119,12 +119,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`}</pre>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
             <Users className="size-4" />
           </span>
-          <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">
+          <h2 className="font-display text-sm font-semibold text-slate-900">
             Community content
           </h2>
         </div>

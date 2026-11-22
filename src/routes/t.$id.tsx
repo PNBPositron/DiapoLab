@@ -92,59 +92,56 @@ function SharedTemplate() {
   }, [id, share]);
 
   return (
-    <div className="relative grid min-h-screen place-items-center overflow-hidden bg-slate-50 p-6">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_20%_-10%,rgba(99,102,241,0.18),transparent),radial-gradient(50rem_36rem_at_90%_110%,rgba(37,99,235,0.16),transparent)]"
-      />
-      <div className="relative w-full max-w-xl rounded-3xl border border-slate-200/80 bg-white/85 p-10 text-center shadow-[0_24px_70px_-24px_rgba(15,23,42,0.35)] backdrop-blur-xl">
-        <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-[0_12px_28px_-10px_rgba(37,99,235,0.6)]">
-          {error ? <Link2Off className="size-6" /> : <Sparkles className="size-6" />}
+    <div className="grid min-h-screen place-items-center bg-white p-6 text-slate-900">
+      <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-[0_20px_56px_-20px_rgba(15,23,42,0.12)] sm:p-10">
+        <span className="mx-auto grid size-12 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
+          {error ? <Link2Off className="size-5" /> : <Sparkles className="size-5" />}
         </span>
-        <h1 className="mt-6 text-2xl font-black tracking-tight text-slate-900">
+        <h1 className="mt-5 font-display text-2xl font-semibold tracking-tight text-slate-900">
           {error ? "Link unavailable" : name || "Loading…"}
         </h1>
         {error ? (
           <>
-            <p className="mt-3 text-sm leading-relaxed text-slate-500">{error}</p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">{error}</p>
             <Link
               to="/"
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition hover:bg-slate-700 active:scale-[0.98]"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800"
             >
               Open DiapoLab
             </Link>
           </>
         ) : (
           <>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">Shared deck</span>
-              <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-blue-600">View only</span>
-              {ready && <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1">{pageCount} pages</span>}
-            </div>
+            <p className="mt-3 text-xs font-medium tabular-nums text-slate-500">
+              Shared deck · <span className="text-blue-600">View only</span>
+              {ready ? ` · ${pageCount} ${pageCount === 1 ? "page" : "pages"}` : ""}
+            </p>
             <button
               disabled={!ready}
               onClick={() => {
                 requestPresentationFullscreen();
                 useEditor.getState().setPresenting(true);
               }}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_14px_32px_-10px_rgba(37,99,235,0.55)] transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-blue-600 px-7 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
             >
               {ready ? <Play className="size-4 fill-white" /> : <Loader2 className="size-4 animate-spin" />}
               {ready ? "Present" : "Preparing…"}
             </button>
             {ready && shareUrl && (
               <div className="mt-7 flex flex-col items-center gap-2">
-                <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.25)]">
+                <div className="rounded-2xl border border-slate-200 bg-white p-3">
                   <QRCodeSVG value={shareUrl} size={92} level="M" marginSize={1} />
                 </div>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <span className="text-xs text-slate-500">
                   Scan to open this deck on your phone
                 </span>
               </div>
             )}
           </>
         )}
-        <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Made with DiapoLab</p>
+        <p className="mt-8 text-xs text-slate-400">
+          Made with <Link to="/" className="font-medium text-slate-600 hover:text-blue-600">DiapoLab</Link>
+        </p>
       </div>
       <PresentationMode />
     </div>

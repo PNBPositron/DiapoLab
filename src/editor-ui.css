@@ -23,13 +23,13 @@
     -webkit-backdrop-filter: none;
   }
 
-  .editor-tool-rail > button {
+  .editor-tool-rail button {
     box-shadow: none;
     backdrop-filter: none;
   }
 
-  .editor-tool-rail > button:hover,
-  .editor-tool-rail > button:focus-visible {
+  .editor-tool-rail button:hover,
+  .editor-tool-rail button:focus-visible {
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
   }
 
@@ -50,11 +50,11 @@
     width: 6px;
   }
   .editor-side-panel::-webkit-scrollbar-thumb {
-    background: rgba(100, 116, 139, 0.25);
+    background: rgba(148, 163, 184, 0.35);
     border-radius: 99px;
   }
   .editor-side-panel::-webkit-scrollbar-thumb:hover {
-    background: rgba(100, 116, 139, 0.4);
+    background: rgba(100, 116, 139, 0.5);
   }
   .editor-side-panel::-webkit-scrollbar-track {
     background: transparent;
@@ -62,43 +62,40 @@
 
   .editor-side-panel .brutal-border,
   .editor-side-panel .brutal-border-2 {
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: none;
     transition:
-      border-color 160ms ease,
-      box-shadow 160ms ease,
-      background-color 160ms ease;
+      border-color 150ms ease,
+      background-color 150ms ease;
   }
 
   .editor-side-panel .brutal-border:hover,
   .editor-side-panel .brutal-border-2:hover {
-    border-color: rgba(148, 163, 184, 0.45);
-    box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.1);
+    border-color: #cbd5e1;
   }
 
   .editor-side-panel .brutal-press:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.12);
   }
 
   .editor-side-panel .brutal-press:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(0) scale(0.99);
   }
 
   .editor-side-panel .bg-ink {
     background: #f8fafc;
-    color: #334155;
+    color: #0f172a;
   }
 
   .editor-side-panel .bg-surface {
     background: #ffffff;
-    color: #334155;
+    color: #0f172a;
   }
 
   .editor-side-panel .bg-surface-2 {
-    background: #f1f5f9;
-    color: #334155;
+    background: #f8fafc;
+    color: #0f172a;
   }
 
   .editor-side-panel .text-teal,
@@ -110,34 +107,34 @@
   }
 
   .editor-side-panel .text-teal {
-    color: #1e293b;
+    color: #0f172a;
   }
 
   .editor-side-panel .border-teal\/20,
   .editor-side-panel .border-teal\/25,
   .editor-side-panel .border-teal\/30,
   .editor-side-panel .border-teal\/40 {
-    border-color: rgba(148, 163, 184, 0.25);
+    border-color: #e2e8f0;
   }
 
-  /* Inputs: soft filled style, modern focus ring */
+  /* Inputs: clean crisp pure-white field with hairline border */
   .editor-side-panel input:not([type="color"]),
   .editor-side-panel textarea,
   .editor-side-panel select {
-    border-color: rgba(148, 163, 184, 0.28);
-    border-radius: 0.625rem;
-    background: rgba(248, 250, 252, 0.8);
-    color: #334155;
+    border-color: #e2e8f0;
+    border-radius: 0.75rem;
+    background: #f8fafc;
+    color: #0f172a;
     transition:
-      border-color 160ms ease,
-      box-shadow 160ms ease,
-      background-color 160ms ease;
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease;
   }
 
   .editor-side-panel input:not([type="color"]):hover,
   .editor-side-panel textarea:hover,
   .editor-side-panel select:hover {
-    border-color: rgba(148, 163, 184, 0.5);
+    border-color: #cbd5e1;
   }
 
   .editor-side-panel input:not([type="color"])::placeholder,
@@ -148,33 +145,19 @@
   .editor-side-panel input:not([type="color"]):focus,
   .editor-side-panel textarea:focus,
   .editor-side-panel select:focus {
-    border-color: rgba(59, 130, 246, 0.55);
+    border-color: #2563eb;
     background: #ffffff;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   }
 
   .editor-side-panel button {
-    border-radius: 0.625rem;
+    border-radius: 0.75rem;
     transition:
-      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 160ms ease,
-      border-color 160ms ease,
-      background-color 160ms ease;
-  }
-
-  .editor-side-panel .grid > button,
-  .editor-side-panel .grid > label {
-    transition:
-      transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 160ms ease,
-      box-shadow 160ms ease,
-      background-color 160ms ease;
-  }
-
-  .editor-side-panel .grid > button:hover,
-  .editor-side-panel .grid > label:hover {
-    transform: translateY(-1px);
+      transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 140ms ease,
+      border-color 140ms ease,
+      background-color 140ms ease;
   }
 
   .editor-side-panel .font-mono {
@@ -182,27 +165,26 @@
   }
 
   .editor-side-panel .font-display {
-    font-family: "Manrope", Inter, system-ui, sans-serif;
+    font-family: "Manrope", system-ui, sans-serif;
   }
 
   .editor-side-panel .panel-content {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.875rem;
     min-width: 0;
-    color: #1e293b;
+    color: #0f172a;
   }
 
-  /* Give every panel a consistent visual rhythm, regardless of its internal controls. */
   .editor-side-panel .panel-content > :is(section, [class*="rounded"], [class*="border"]),
   .editor-side-panel > :is(section, [class*="rounded"], [class*="border"]) {
-    border-color: rgba(148, 163, 184, 0.24);
-    border-radius: 0.875rem;
+    border-color: #e2e8f0;
+    border-radius: 1rem;
   }
 
   .editor-side-panel h2,
   .editor-side-panel h3 {
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   .editor-side-panel label {
@@ -210,10 +192,10 @@
   }
 
   .editor-side-panel button:not(:disabled):focus-visible {
-    outline: 2px solid rgba(59, 130, 246, 0.45);
+    outline: 2px solid rgba(37, 99, 235, 0.45);
     outline-offset: 2px;
   }
-  /* Inputs keep their soft :focus border + shadow instead of a rectangle. */
+
   .editor-side-panel input:focus-visible,
   .editor-side-panel textarea:focus-visible,
   .editor-side-panel select:focus-visible {
@@ -222,7 +204,7 @@
 
   .editor-side-panel .panel-intro {
     color: #64748b;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     line-height: 1.5;
     padding: 0 0.125rem;
   }
@@ -230,7 +212,7 @@
   .editor-side-panel .panel-choice-grid,
   .editor-side-panel .panel-action-grid {
     display: grid;
-    gap: 0.625rem;
+    gap: 0.5rem;
   }
 
   .editor-side-panel .panel-choice-grid {
@@ -241,68 +223,61 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  /* Cards: clean white surface, hairline border, lift on hover */
   .editor-side-panel .panel-choice-grid > button,
   .editor-side-panel .panel-action-grid > button,
   .editor-side-panel .panel-action-grid > label {
-    border-color: rgba(148, 163, 184, 0.22);
+    border-color: #e2e8f0;
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    box-shadow: none;
     transition:
-      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 200ms ease,
-      box-shadow 200ms ease,
-      background-color 200ms ease;
+      border-color 150ms ease,
+      background-color 150ms ease,
+      box-shadow 150ms ease;
   }
 
   .editor-side-panel .panel-choice-grid > button:hover,
   .editor-side-panel .panel-action-grid > button:hover,
   .editor-side-panel .panel-action-grid > label:hover {
-    border-color: rgba(148, 163, 184, 0.45);
-    background: #ffffff;
-    box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.14);
-    transform: translateY(-2px);
+    border-color: #cbd5e1;
+    background: #f8fafc;
   }
 
   .editor-side-panel .panel-choice-grid > button:active,
   .editor-side-panel .panel-action-grid > button:active,
   .editor-side-panel .panel-action-grid > label:active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-    transition-duration: 80ms;
+    transform: scale(0.985);
   }
 
-  /* Selected state: accent ring instead of heavy grey inset */
   .editor-side-panel .panel-choice-grid > button[aria-pressed="true"],
   .editor-side-panel .panel-action-grid > button[aria-pressed="true"] {
-    border-color: rgba(59, 130, 246, 0.5);
-    box-shadow:
-      inset 0 0 0 1px rgba(59, 130, 246, 0.5),
-      0 4px 12px -4px rgba(59, 130, 246, 0.25);
+    border-color: #2563eb;
+    background: #eff6ff;
   }
 
   .editor-side-panel .panel-section-label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0.375rem 0 0.125rem;
-    color: #94a3b8;
-    font-size: 0.625rem;
+    margin: 0.25rem 0 0.125rem;
+    color: #64748b;
+    font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.02em;
   }
 
   .editor-side-panel .panel-section-label::after {
     content: "";
     height: 1px;
     flex: 1;
-    background: linear-gradient(90deg, rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0.08));
+    background: #e2e8f0;
   }
 }
 
 /* Keep editor chrome readable without overriding slide element font families. */
 .editor-ui {
   font-family: Manrope, system-ui, sans-serif;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 .editor-ui > header,
 .editor-ui > nav,
@@ -315,15 +290,15 @@
   font-family: Manrope, system-ui, sans-serif;
 }
 
-/* The selector kit owns its color and interaction states, rather than the
-   legacy broad side-panel button/input rules above. */
+/* The selector kit owns its color and interaction states. */
 .editor-side-panel {
-  width: 280px;
-  padding: 12px;
+  width: 288px;
+  padding: 14px;
   background: var(--selector-surface);
   color: var(--selector-ink);
-  border-color: color-mix(in srgb, var(--selector-border) 55%, transparent);
-  box-shadow: var(--selector-panel-shadow);
+  border-color: var(--selector-border);
+  border-radius: 1.375rem;
+  box-shadow: 0 18px 44px -12px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
   overflow-x: hidden;
   scrollbar-gutter: stable;
 }
@@ -332,7 +307,7 @@
   padding-right: 0;
 }
 .editor-side-panel .selector-grid > .selector-option {
-  border-radius: 12px;
+  border-radius: 16px;
 }
 .editor-side-panel .selector-chips > .selector-chip {
   border-radius: 999px;
@@ -341,20 +316,22 @@
   transform: none;
 }
 .editor-side-panel .selector-option-art > svg {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 }
 .editor-inspector {
   color: var(--selector-ink);
   background: var(--selector-surface);
   border-color: var(--selector-border);
-  box-shadow: var(--selector-panel-shadow);
+  border-radius: 1.375rem;
+  box-shadow: 0 18px 44px -12px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
 }
 .editor-inspector input:not([type="color"]):not([type="radio"]):not([type="range"]),
 .editor-inspector textarea,
 .editor-inspector select {
   min-width: 0;
   max-width: 100%;
+  border-radius: 0.75rem;
   background: var(--selector-muted);
   border-color: var(--selector-border);
   color: var(--selector-ink);
@@ -374,68 +351,70 @@
   box-shadow: none;
 }
 
-/* Modern floating canvas zoom dock. */
+/* Crisp pure-white canvas zoom pill dock (Apple/Google style). */
+.zoom-dock {
+  border-radius: 9999px;
+  border-color: rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+}
 .zoom-dock button {
-  border-radius: 0.75rem;
-  color: #64748b;
-  transition:
-    background-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+  border-radius: 9999px;
+  color: #475569;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .zoom-dock button:hover:not(:disabled) {
-  background: #eff6ff;
-  color: #2563eb;
-  transform: translateY(-1px);
+  background: #f1f5f9;
+  color: #0f172a;
 }
 .zoom-dock button:active:not(:disabled) {
-  transform: scale(0.94);
+  transform: scale(0.95);
 }
 .zoom-dock output {
-  border-radius: 0.625rem;
+  border-radius: 9999px;
   background: #f8fafc;
-  color: #334155;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  padding: 0.35rem 0.55rem;
+  color: #0f172a;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3rem 0.6rem;
 }
 .zoom-dock span {
   border-left: 1px solid #e2e8f0;
   margin-left: 0.15rem;
-  padding-left: 0.65rem;
+  padding-left: 0.6rem;
 }
 
-/* Shared editor chrome: quiet surfaces, consistent rhythm, clear focus. */
-.editor-ui > header,
-.editor-ui > nav,
-.editor-ui > .editor-toolbar,
-.editor-ui .pages-bar,
-.editor-ui .timeline-bar {
-  background: transparent;
-  border-color: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+/* Clean pure-white structural chrome: crisp borders, no heavy backdrop blur. */
+.editor-ui > header {
+  background: #ffffff;
+  border-color: #e2e8f0;
 }
-.editor-ui .pages-bar,
-.editor-ui .timeline-bar {
-  background: transparent !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.editor-ui .pages-bar {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  gap: 0.75rem;
 }
+.editor-ui .timeline-bar {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+.editor-ui main {
+  background-color: #ffffff;
+}
+.editor-ui main > .pointer-events-none.absolute.inset-0 {
+  opacity: 0.08;
+}
+
 .editor-ui .brutal-border,
 .editor-ui .brutal-border-2 {
   border-color: var(--border);
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-}
-.editor-ui .brutal-press:hover {
-  border-color: color-mix(in srgb, var(--blue) 42%, var(--border));
-  box-shadow: 0 8px 20px -10px rgba(79, 70, 229, 0.35);
+  border-radius: 1rem;
+  box-shadow: none;
 }
 .editor-ui button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--blue) 70%, white);
+  outline: 2px solid rgba(37, 99, 235, 0.45);
   outline-offset: 2px;
 }
 .editor-ui input:focus-visible,
@@ -470,7 +449,7 @@
 .editor-ui .border-teal\/20,
 .editor-ui .border-teal\/25,
 .editor-ui .border-teal\/30 {
-  border-color: color-mix(in srgb, var(--teal) 16%, transparent);
+  border-color: #e2e8f0;
 }
 .editor-ui .bg-blue {
   background: var(--blue);
@@ -484,178 +463,23 @@
   font-family: var(--font-mono);
 }
 
-/* The editor shell is a light-white workspace; controls float above it as individual surfaces. */
-.editor-ui {
-  background-color: #fbfcfe !important;
-}
-
-.editor-ui main {
-  background-color: #ffffff !important;
-  border-color: transparent !important;
-}
-
-.editor-ui main > .pointer-events-none.absolute.inset-0 {
-  opacity: 0.12;
-}
-
-/* Keep the chrome transparent while giving each actionable control its own lift. */
+/* Tool rail: quiet, aligned, no jarring dock magnification */
 .editor-tool-rail {
-  gap: 0.625rem;
-  padding: 0.625rem;
+  background: #ffffff;
+}
+.editor-tool-rail button {
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
-.editor-tool-rail > button {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  color: #64748b;
-}
-
-.editor-tool-rail > button:hover,
-.editor-tool-rail > button:focus-visible {
-  border-color: transparent;
-  background: transparent;
-  color: #2563eb;
-  box-shadow: none;
-}
-
-.editor-ui .pages-bar {
-  gap: 1rem;
-}
-
-/* Slide thumbnail bar: transparent on the white app background.
-   Scoped to the thumbnail buttons only — the small control buttons
-   (move, duplicate, delete, search, present) keep their own styling. */
-.editor-ui .pages-bar .group > button {
-  background: transparent;
-  box-shadow: none;
-}
-.editor-ui .pages-bar .group > button:hover {
-  box-shadow: none;
-}
-
-
-.editor-ui .toolbar button,
-.editor-ui > header button,
-.editor-ui > nav button {
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 18px -14px rgba(15, 23, 42, 0.35);
-}
-
-.editor-ui .toolbar button:hover,
-.editor-ui > header button:hover,
-.editor-ui > nav button:hover {
-  box-shadow: 0 10px 22px -14px rgba(37, 99, 235, 0.32);
-}
-
-/* Toolbar flyout menus (hamburger, export, user): no per-button shadow,
-   it renders as a white line under each menu item. */
-.editor-ui .toolbar-flyout > button,
-.editor-ui .toolbar-flyout button {
-  box-shadow: none;
-}
-.editor-ui .toolbar-flyout button:hover {
-  box-shadow: none;
-}
-
-/* Sidebar tool rail: fully transparent buttons, no white card, no shadow. */
-.editor-ui nav.editor-tool-rail > button,
-.editor-ui nav.editor-tool-rail > button:hover,
-.editor-ui nav.editor-tool-rail > button:focus-visible,
-.editor-ui nav.editor-tool-rail > button:active {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-
-/* ── Minimal floating chrome pass ─────────────────────────────────────────
-   One consistent elevation scale, hairline borders, generous radii.
-   Panels float over the white workspace instead of sitting on it. */
-.editor-side-panel,
-.editor-inspector {
+/* Toolbar flyouts */
+.toolbar-flyout {
+  border-color: #e2e8f0;
   border-radius: 1.25rem;
-  border-color: rgba(226, 232, 240, 0.7);
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.03),
-    0 24px 48px -20px rgba(15, 23, 42, 0.16);
-}
-
-/* Calmer cards inside panels: hairline border, no double shadow. */
-.editor-ui .brutal-border,
-.editor-ui .brutal-border-2 {
-  box-shadow: none;
-}
-.editor-side-panel .brutal-border,
-.editor-side-panel .brutal-border-2 {
-  box-shadow: none;
-}
-
-/* Discreet focus: thin ring instead of a heavy outline. */
-.editor-ui button:focus-visible {
-  outline: 1.5px solid rgba(37, 99, 235, 0.45);
-  outline-offset: 2px;
-}
-.editor-ui input:focus-visible,
-.editor-ui textarea:focus-visible,
-.editor-ui select:focus-visible {
-  outline: none;
-}
-
-/* Hover lift kept minimal everywhere in the chrome. */
-.editor-side-panel .panel-choice-grid > button:hover,
-.editor-side-panel .panel-action-grid > button:hover,
-.editor-side-panel .panel-action-grid > label:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.12);
-}
-
-/* Floating zoom dock. */
-.zoom-dock {
-  border-radius: 1rem;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 16px 32px -18px rgba(15, 23, 42, 0.2);
-}
-
-
-/* ── macOS dock bubble hover for the sidebar tool rail ──────────────────────
-   The hovered tool grows and lifts, its direct neighbors grow a little. */
-.editor-tool-rail > button {
-  transform-origin: center;
-  transition:
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 160ms ease;
-}
-
-.editor-tool-rail > button:hover,
-.editor-tool-rail > button:focus-visible {
-  transform: translateY(-3px) scale(1.18);
-  z-index: 10;
-}
-
-/* Neighbor above the hovered button */
-.editor-tool-rail > button:has(+ button:hover) {
-  transform: translateY(-1px) scale(1.07);
-  z-index: 5;
-}
-
-/* Neighbor below the hovered button */
-.editor-tool-rail > button:hover + button {
-  transform: translateY(-1px) scale(1.07);
-  z-index: 5;
-}
-
-.editor-tool-rail > button:active {
-  transform: translateY(-1px) scale(1.03);
-  transition-duration: 90ms;
+  box-shadow: 0 18px 44px -12px rgba(15, 23, 42, 0.16), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
 }
 
 /* ── Chrome text casing ─────────────────────────────────────────────────────
-   Labels in the editor chrome (sidebar, toolbar, bottom bars) are authored
-   in sentence case; assorted Tailwind `uppercase` utilities and the
-   .panel-section-label rule forced full caps. Normalize to sentence case
-   across the chrome only — slide content is untouched (scoped selectors,
-   unlayered so they win over the utilities layer). */
+   Normalize chrome labels to sentence case without touching slide content. */
 .editor-ui header,
 .editor-ui nav,
 .editor-ui footer,
@@ -671,51 +495,12 @@
   text-transform: none;
 }
 
-/* ── Web embeds: export fallback ──────────────────────────────────────────
-   While capturing the canvas (PNG / JPG / PDF / GIF), html-to-image cannot
-   rasterize cross-origin iframes — swap the live iframe for the static
-   fallback card rendered inside every embed element. */
+/* ── Web embeds: export fallback ────────────────────────────────────────── */
 #canvas-export[data-exporting] iframe.embed-live {
   display: none !important;
 }
 #canvas-export[data-exporting] .embed-fallback {
   display: flex !important;
-}
-
-/* ── Modern refresh: ambient workspace, glass chrome, crisp accents ────── */
-
-/* Ambient workspace backdrop with two soft brand glows. */
-.editor-ui {
-  background:
-    radial-gradient(1100px 520px at 82% -12%, rgba(79, 139, 255, 0.08), transparent 62%),
-    radial-gradient(820px 460px at 4% 112%, rgba(99, 102, 241, 0.07), transparent 62%),
-    linear-gradient(180deg, #fbfcfe 0%, #f6f8fc 100%) !important;
-}
-
-/* Canvas stage: fully transparent so the ambient workspace shows through
-   (the slide canvas itself keeps its own white surface). */
-.editor-ui main {
-  background-color: transparent !important;
-  border-color: transparent !important;
-}
-
-/* Panels, inspector and zoom dock share one glass elevation. */
-.editor-side-panel,
-.editor-inspector,
-.zoom-dock {
-  border-color: rgba(226, 232, 240, 0.7) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 24px 48px -20px rgba(15, 23, 42, 0.18) !important;
-}
-
-/* Flyout menus: one consistent floating-card treatment. */
-.toolbar-flyout {
-  border-color: rgba(226, 232, 240, 0.85) !important;
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    0 24px 56px -16px rgba(15, 23, 42, 0.24) !important;
 }
 
 /* Thin scrollbars across the whole chrome. */
@@ -728,13 +513,13 @@
 .editor-inspector::-webkit-scrollbar-thumb,
 .toolbar-flyout::-webkit-scrollbar-thumb,
 .pages-bar::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.25);
+  background: rgba(148, 163, 184, 0.35);
   border-radius: 99px;
 }
 .editor-inspector::-webkit-scrollbar-thumb:hover,
 .toolbar-flyout::-webkit-scrollbar-thumb:hover,
 .pages-bar::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(100, 116, 139, 0.5);
 }
 .editor-inspector::-webkit-scrollbar-track,
 .toolbar-flyout::-webkit-scrollbar-track,
@@ -744,7 +529,7 @@
 
 /* Brand selection color inside the chrome. */
 .editor-ui ::selection {
-  background: rgba(59, 130, 246, 0.18);
+  background: rgba(37, 99, 235, 0.14);
 }
 
 /* ── Dark editor chrome (Settings > Dark editor) ───────────────────────── */
@@ -757,6 +542,15 @@
     radial-gradient(820px 460px at 4% 112%, rgba(99, 102, 241, 0.10), transparent 62%),
     linear-gradient(180deg, #0b1220 0%, #0d1526 100%) !important;
   color: #e2e8f0;
+}
+.editor-dark.editor-ui > header,
+.editor-dark .pages-bar,
+.editor-dark .editor-tool-rail {
+  background: #0d1526 !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+.editor-dark.editor-ui main {
+  background-color: transparent !important;
 }
 .editor-dark .editor-side-panel,
 .editor-dark .editor-inspector,
@@ -859,11 +653,11 @@ aside.editor-ui {
 
 /* Rail buttons stay on the backdrop in dark mode: no light pills, the active
    tool is shown by its blue label + accent bar. */
-.editor-dark nav.editor-tool-rail > button {
+.editor-dark nav.editor-tool-rail button {
   background: transparent !important;
 }
-.editor-dark nav.editor-tool-rail > button:hover,
-.editor-dark nav.editor-tool-rail > button:focus-visible {
+.editor-dark nav.editor-tool-rail button:hover,
+.editor-dark nav.editor-tool-rail button:focus-visible {
   background: rgba(148, 163, 184, 0.12) !important;
 }
 

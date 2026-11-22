@@ -87,7 +87,7 @@ export function TextPanel() {
   const [activeCategory, setActiveCategory] = useState("All");
   const customFonts = useSettings((s) => s.customFonts);
   const allFonts = useMemo(
-    () => [...FONTS, ...customFonts.map((f): FontDef => ({ family: f.name, weight: 400, category: "Custom" }))],
+    () => [...FONTS, ...customFonts.map((f) => ({ family: f.name, weight: 400, category: "Custom" }) as FontDef)],
     [customFonts],
   );
 
@@ -100,12 +100,12 @@ export function TextPanel() {
   }, [allFonts, search, activeCategory]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-3 text-slate-800">
+    <div className="panel-content flex h-full w-full flex-col gap-3.5 text-slate-800">
       <PanelHeader kicker="Text" title="Text & fonts" description="Insert styled headings or pick a font from the library." icon={Type} />
       {/* Quick Add Presets */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-semibold tracking-wider text-slate-400">
-          Text Styles
+        <span className="text-[11px] font-semibold text-slate-500">
+          Text styles
         </span>
         <div className="flex flex-col gap-2">
           {PRESETS.map((p) => {
@@ -189,7 +189,7 @@ export function TextPanel() {
               )
             }
             title={`Insert ${f.family}`}
-            className="group flex items-center justify-between rounded-lg border border-transparent bg-white/70 px-3 py-2 text-left transition-all hover:border-slate-200 hover:bg-white hover:shadow-2xs active:scale-[0.99]"
+            className="group flex items-center justify-between rounded-lg border border-slate-200/70 bg-white px-3 py-2 text-left transition-colors hover:border-slate-300 hover:bg-slate-50/70 active:scale-[0.99]"
           >
             <div className="flex flex-col min-w-0 pr-2">
               <span

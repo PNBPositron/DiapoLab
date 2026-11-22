@@ -72,9 +72,6 @@ export async function toggleSubscription(creatorId: string, subscribed: boolean)
   }
 }
 
-export function profileLabel(
-  profile: Pick<Profile, "display_name" | "username"> | null | undefined,
-  fallback = "Creator",
-) {
+export function profileLabel(profile: Pick<Profile, "display_name"> & { username?: string | null } | null | undefined, fallback = "Creator") {
   return profile?.display_name?.trim() || (profile?.username ? `@${profile.username}` : fallback);
 }

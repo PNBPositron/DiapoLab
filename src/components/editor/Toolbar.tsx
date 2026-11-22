@@ -253,231 +253,229 @@ export function Toolbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between px-4">
-      {/* LEFT: Logo + modern project name */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex items-center gap-2.5">
-          <Link to="/" className="flex items-center" aria-label="DiapoLab home">
-            <DiapoLabLogo className="h-7 w-auto" />
-          </Link>
-        </div>
+    <header className="toolbar sticky top-0 z-30 flex h-14 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
+      {/* LEFT: Logo + project title */}
+      <div className="flex min-w-0 items-center gap-3">
+        <Link to="/" className="flex shrink-0 items-center" aria-label="DiapoLab home">
+          <DiapoLabLogo className="h-6 w-auto" />
+        </Link>
 
-        {/* Decorative vertical divider */}
-        <div className="hidden h-5 w-px bg-slate-200/70 md:block" />
+        <div className="hidden h-5 w-px bg-slate-200 md:block" />
 
-        {/* Presentation name editing */}
         <div className="hidden items-center gap-2 md:flex">
-          <div className="group relative flex items-center">
-            <input
-              value={designName}
-              onChange={(e) => setDesignName(e.target.value)}
-              placeholder="Untitled design"
-              className="h-8 rounded-lg border border-transparent bg-transparent px-2.5 font-mono text-xs font-medium text-slate-700 transition-all hover:bg-slate-100/80 focus:border-slate-300 focus:bg-white focus:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10"
-            />
-          </div>
+          <input
+            value={designName}
+            onChange={(e) => setDesignName(e.target.value)}
+            placeholder="Untitled design"
+            aria-label="Design name"
+            className="h-8 w-44 rounded-full border border-transparent bg-transparent px-3.5 text-xs font-semibold text-slate-800 transition-colors hover:bg-slate-50 focus:border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/10 lg:w-56"
+          />
 
           {savedAt && (
-            <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-blue-700 animate-in fade-in">
-              <span className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 animate-in fade-in">
+              <CheckCircle2 className="size-3.5" />
               Saved
-            </div>
+            </span>
           )}
         </div>
       </div>
 
-      {/* RIGHT: Tools, AI, Save, Export and Hamburger Menu */}
-      <div className="flex items-center gap-1 rounded-[1.25rem] border border-white/70 bg-white/60 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_16px_40px_-16px_rgba(15,23,42,0.22)] ring-1 ring-slate-900/[0.03] backdrop-blur-2xl">
-        {/* Undo / Redo grouped macOS/Figma style */}
-        <div className="flex items-center rounded-xl p-0.5">
+      {/* RIGHT: Organized action clusters */}
+      <div className="flex items-center gap-1.5">
+        {/* History group */}
+        <div className="flex items-center gap-0.5">
           <button
             onClick={undo}
             disabled={history.length === 0}
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90 disabled:pointer-events-none disabled:opacity-30"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
           >
-            <Undo2 className="h-4 w-4" strokeWidth={2.2} />
+            <Undo2 className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div className="h-4 w-px bg-slate-200" />
           <button
             onClick={redo}
             disabled={future.length === 0}
             title="Redo (Ctrl+Shift+Z)"
             aria-label="Redo"
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-90 disabled:pointer-events-none disabled:opacity-30"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
           >
-            <Redo2 className="h-4 w-4" strokeWidth={2.2} />
+            <Redo2 className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
 
-        {/* Import JSON */}
-        <button
-          onClick={() => importRef.current?.click()}
-          title="Import .json design or .pptx deck"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-        >
-          <Upload className="h-4 w-4" strokeWidth={2.2} />
-        </button>
-        <input
-          ref={importRef}
-          type="file"
-          accept="application/json,.json,application/vnd.openxmlformats-officedocument.presentationml.presentation,.pptx"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) handleImport(f);
-            e.target.value = "";
-          }}
-        />
-        {/* Find & replace */}
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
-          title="Find & replace (Ctrl+F)"
-          aria-label="Find & replace"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-        >
-          <Search className="h-4 w-4" strokeWidth={2.2} />
-        </button>
+        <div className="hidden h-4 w-px bg-slate-200 sm:block" />
 
-        {/* Dark mode quick toggle */}
-        <button
-          onClick={() => setEditorDark(!editorDark)}
-          title={editorDark ? "Light mode" : "Dark mode"}
-          aria-label={editorDark ? "Switch to light mode" : "Switch to dark mode"}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-        >
-          {editorDark ? <Sun className="h-4 w-4" strokeWidth={2.2} /> : <Moon className="h-4 w-4" strokeWidth={2.2} />}
-        </button>
-
-        {/* Save / Sign-in button */}
-        {user ? (
+        {/* Workspace tools */}
+        <div className="hidden items-center gap-0.5 sm:flex">
           <button
-            onClick={handleSave}
-            disabled={saving}
-            title="Save design"
-            className="flex h-9 items-center gap-2 rounded-xl border border-transparent bg-transparent px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 transition-all hover:border-slate-200 hover:bg-slate-100 active:scale-95 disabled:opacity-60"
+            onClick={() => importRef.current?.click()}
+            title="Import .json design or .pptx deck"
+            aria-label="Import file"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
-            {saving ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" />
-            ) : (
-              <Save className="h-3.5 w-3.5 text-slate-500" strokeWidth={2.4} />
-            )}
-            <span>Save</span>
+            <Upload className="h-4 w-4" strokeWidth={2} />
           </button>
-        ) : (
-          <Link
-            to="/auth"
-            search={{ next: undefined }}
-            className="flex h-9 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 font-display text-[11px] font-medium tracking-wider text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95"
-          >
-            <Cloud className="h-3.5 w-3.5 text-blue-500" strokeWidth={2.4} />
-            <span>Sign in</span>
-          </Link>
-        )}
-
-        {/* Modern gradient Export button */}
-        <div className="relative" ref={exportRef}>
+          <input
+            ref={importRef}
+            type="file"
+            accept="application/json,.json,application/vnd.openxmlformats-officedocument.presentationml.presentation,.pptx"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleImport(f);
+              e.target.value = "";
+            }}
+          />
           <button
-            onClick={() => setExportOpen((v) => !v)}
-            disabled={!!exporting}
-            className="flex h-9 items-center gap-2 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600 px-3.5 font-display text-[11px] font-semibold tracking-wider text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.55),inset_0_1px_0_rgba(255,255,255,0.28)] transition-all hover:from-blue-400 hover:to-blue-500 active:scale-95 disabled:opacity-60"
+            onClick={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
+            title="Find & replace (Ctrl+F)"
+            aria-label="Find & replace"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
-            {exporting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
-            ) : (
-              <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
-            )}
-            <span>{exporting ? exporting : "Export"}</span>
-            <ChevronDown
-              className={`h-3 w-3 transition-transform duration-200 ${exportOpen ? "rotate-180" : ""}`}
-              strokeWidth={2.5}
-            />
+            <Search className="h-4 w-4" strokeWidth={2} />
           </button>
+          <button
+            onClick={() => setEditorDark(!editorDark)}
+            title={editorDark ? "Light mode" : "Dark mode"}
+            aria-label={editorDark ? "Switch to light mode" : "Switch to dark mode"}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          >
+            {editorDark ? <Sun className="h-4 w-4" strokeWidth={2} /> : <Moon className="h-4 w-4" strokeWidth={2} />}
+          </button>
+        </div>
 
-          {exportOpen && (
-            <div className="toolbar-flyout absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl animate-in fade-in zoom-in-95">
-              <div className="px-3 py-1.5 text-[9px] font-bold tracking-wider text-slate-400">
-                Document formats
-              </div>
-              {(["png", "jpg", "pdf", "pptx", "markdown", "json", "gif"] as const).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => runExport(k)}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left font-display text-xs text-slate-700 transition-colors hover:bg-slate-100/90"
-                >
-                  <span className="font-semibold text-slate-800">.{k.toUpperCase()}</span>
-                  <span className="font-mono text-[10px] text-slate-400">
-                    {k === "png"
-                      ? "Current slide"
-                      : k === "gif"
-                      ? "Animated"
-                      : k === "json"
-                      ? "Source file"
-                      : "All slides"}
-                  </span>
-                </button>
-              ))}
-            </div>
+        <div className="h-4 w-px bg-slate-200" />
+
+        {/* File & primary actions */}
+        <div className="flex items-center gap-1.5">
+          {user ? (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              title="Save design"
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-60"
+            >
+              {saving ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" />
+              ) : (
+                <Save className="h-3.5 w-3.5 text-slate-500" strokeWidth={2} />
+              )}
+              <span>Save</span>
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              search={{ next: undefined }}
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
+            >
+              <Cloud className="h-3.5 w-3.5 text-blue-600" strokeWidth={2} />
+              <span>Sign in</span>
+            </Link>
           )}
+
+          {/* Export dropdown (clean secondary action) */}
+          <div className="relative" ref={exportRef}>
+            <button
+              onClick={() => setExportOpen((v) => !v)}
+              disabled={!!exporting}
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200 bg-white px-3.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-60"
+            >
+              {exporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" strokeWidth={2} />
+              ) : (
+                <Download className="h-3.5 w-3.5 text-slate-500" strokeWidth={2} />
+              )}
+              <span>{exporting ? exporting : "Export"}</span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-150 ${exportOpen ? "rotate-180" : ""}`}
+                strokeWidth={2}
+              />
+            </button>
+
+            {exportOpen && (
+              <div className="toolbar-flyout absolute right-0 top-10 z-50 w-56 rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95">
+                <div className="px-2.5 py-1.5 text-[11px] font-semibold text-slate-400">
+                  Export format
+                </div>
+                {(["png", "jpg", "pdf", "pptx", "markdown", "json", "gif"] as const).map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => runExport(k)}
+                    className="flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    <span className="font-semibold text-slate-800">.{k.toUpperCase()}</span>
+                    <span className="font-mono text-[10px] text-slate-400">
+                      {k === "png"
+                        ? "Current slide"
+                        : k === "gif"
+                        ? "Animated"
+                        : k === "json"
+                        ? "Source file"
+                        : "All slides"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Primary CTA: Present */}
+          <button
+            onClick={async () => {
+              const enteredFullscreen = await requestPresentationFullscreen();
+              if (enteredFullscreen) setPresenting(true);
+            }}
+            title="Present slideshow"
+            type="button"
+            className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full bg-blue-600 px-4 text-xs font-semibold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98]"
+          >
+            <Play className="h-3.5 w-3.5 fill-current" />
+            <span>Present</span>
+          </button>
         </div>
 
-        {/* Present */}
-        <button
-          onClick={async () => {
-            const enteredFullscreen = await requestPresentationFullscreen();
-            if (enteredFullscreen) setPresenting(true);
-          }}
-          title="Present"
-          type="button"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98]"
-        >
-          <Play className="h-3.5 w-3.5 fill-white" /> Present
-        </button>
+        <div className="hidden h-4 w-px bg-slate-200 md:block" />
 
-        {/* GitHub repository */}
-        <button
-          onClick={() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer")}
-          title="GitHub repository"
-          aria-label="GitHub repository"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-        >
-          <Github className="h-4 w-4" strokeWidth={2.2} />
-        </button>
-
-        {/* Private share */}
-        {user && (
+        {/* Utility & Menu */}
+        <div className="flex items-center gap-0.5">
+          {user && (
+            <button
+              onClick={handlePrivateShare}
+              disabled={publishing}
+              title="Copy private share link"
+              aria-label="Copy private share link"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60"
+            >
+              {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" strokeWidth={2} />}
+            </button>
+          )}
           <button
-            onClick={handlePrivateShare}
-            disabled={publishing}
-            title="Copy private share link"
-            aria-label="Copy private share link"
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95 disabled:opacity-60"
+            onClick={() => setSettingsDialogOpen(true)}
+            title="Settings"
+            aria-label="Settings"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
-            {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" strokeWidth={2.2} />}
+            <Settings className="h-4 w-4" strokeWidth={2} />
           </button>
-        )}
+          <button
+            onClick={() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer")}
+            title="GitHub repository"
+            aria-label="GitHub repository"
+            className="hidden h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:flex"
+          >
+            <Github className="h-4 w-4" strokeWidth={2} />
+          </button>
+          {user && <UserMenu email={user.email ?? ""} onEditProfile={() => setProfileDialogOpen(true)} />}
 
-        {/* Settings */}
-        <button
-          onClick={() => setSettingsDialogOpen(true)}
-          title="Settings"
-          aria-label="Settings"
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 active:scale-95"
-        >
-          <Settings className="h-4 w-4" strokeWidth={2.2} />
-        </button>
-
-        {/* User profile */}
-        {user && <UserMenu email={user.email ?? ""} onEditProfile={() => setProfileDialogOpen(true)} />}
-
-        {/* NEW ENLARGED & ULTRA-STYLED HAMBURGER MENU */}
-        <LargeModernHamburger
-          onNewDesign={newDesign}
-          onPublish={handlePublish}
-          onClear={clear}
-          publishing={publishing}
-          isAuthenticated={!!user}
-        />
+          <LargeModernHamburger
+            onNewDesign={newDesign}
+            onPublish={handlePublish}
+            onClear={clear}
+            publishing={publishing}
+            isAuthenticated={!!user}
+          />
+        </div>
       </div>
 
 
@@ -506,30 +504,30 @@ export function Toolbar() {
 
       {/* Published link notification */}
       {shareLink && (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-2 font-display text-sm tracking-wider text-blue-600">
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.2)] animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-2 font-display text-sm font-semibold text-blue-600">
               <CheckCircle2 className="size-5" /> Published successfully
             </div>
-            <p className="mt-2 font-mono text-xs text-slate-500">
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
               Your presentation is now online. Anyone with this link can view it.
             </p>
             <input
               readOnly
               value={shareLink}
               onFocus={(e) => e.currentTarget.select()}
-              className="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 font-mono text-xs text-slate-700 select-all focus:outline-none"
+              className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-mono text-xs text-slate-700 select-all focus:outline-none"
             />
             <div className="mt-5 flex gap-2.5">
               <button
                 onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
-                className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-display text-xs tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
+                className="flex-1 rounded-full bg-blue-600 px-4 py-2.5 font-display text-xs font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
               >
                 Copy link
               </button>
               <button
                 onClick={() => setShareLink(null)}
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-display text-xs tracking-wider text-slate-700 transition-all hover:bg-slate-100 active:scale-95"
+                className="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2.5 font-display text-xs font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
               >
                 Close
               </button>
@@ -576,47 +574,42 @@ function LargeModernHamburger({
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Trigger button — soft ring on hover, filled slate when open */}
+      {/* Trigger button */}
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-label="Toggle Navigation Menu"
         title="Menu"
-        className={`group relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-200 active:scale-95 ${
+        className={`group relative flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
           open
-            ? "border-slate-800 bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-            : "border-slate-200/90 bg-white/80 text-slate-600 shadow-sm hover:bg-white hover:text-slate-900 hover:ring-4 hover:ring-slate-900/[0.06]"
+            ? "border-slate-900 bg-slate-900 text-white"
+            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
         }`}
       >
-        {/* Animated 3-line hamburger → X */}
-        <div className="relative flex h-4 w-4.5 flex-col justify-between">
+        <div className="relative flex h-3.5 w-4 flex-col justify-between">
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              open ? "translate-y-[7px] rotate-45 bg-white" : "bg-current"
+            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+              open ? "translate-y-[6px] rotate-45 bg-white" : "bg-current"
             }`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+            className={`h-0.5 w-full rounded-full transition-all duration-150 ${
               open ? "scale-x-0 opacity-0" : "opacity-100"
             } bg-current`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              open ? "-translate-y-[7px] -rotate-45 bg-white" : "bg-current"
+            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+              open ? "-translate-y-[6px] -rotate-45 bg-white" : "bg-current"
             }`}
           />
         </div>
       </button>
 
-      {/* Expanded dropdown — fully opaque, wider, spring entrance */}
+      {/* Dropdown */}
       {open && (
-        <div className="toolbar-flyout absolute right-0 top-12 z-50 w-80 origin-top-right rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_24px_56px_-12px_rgba(15,23,42,0.24)] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
-          {/* CREATE & AI SECTION */}
-          <div className="flex items-center gap-1.5 px-3 pb-1 pt-2">
-            <span className="size-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" />
-            <span className="text-[9px] font-bold tracking-wider text-slate-400">
-              Create
-            </span>
+        <div className="toolbar-flyout absolute right-0 top-10 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-2.5 pb-1 pt-1.5 text-[11px] font-semibold text-slate-400">
+            Create
           </div>
 
           <MenuCardItem
@@ -627,71 +620,62 @@ function LargeModernHamburger({
           />
 
           {isAuthenticated && (
-            <>
-              <MenuCardItem
-                icon={publishing ? Loader2 : Upload}
-                iconColor="text-blue-600"
-                iconBg="bg-blue-50 group-hover:bg-blue-100/80"
-                title={publishing ? "Publishing…" : "Publish template to community"}
-                subtitle="Share this deck in the marketplace"
-                disabled={publishing}
-                onClick={() => handleAction(onPublish)}
-              />
-            </>
+            <MenuCardItem
+              icon={publishing ? Loader2 : Upload}
+              iconColor="text-blue-600"
+              iconBg="bg-blue-50 group-hover:bg-blue-100"
+              title={publishing ? "Publishing…" : "Publish template"}
+              subtitle="Share this deck in the marketplace"
+              disabled={publishing}
+              onClick={() => handleAction(onPublish)}
+            />
           )}
 
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+          <div className="my-1.5 h-px bg-slate-100" />
 
-          {/* SEPARATOR */}
-          <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-
-          {/* EXPLORE SECTION */}
-          <div className="flex items-center gap-1.5 px-3 pb-1 pt-1">
-            <span className="size-1.5 rounded-full bg-blue-400" />
-            <span className="text-[9px] font-bold tracking-wider text-slate-400">
-              Explore
-            </span>
+          <div className="px-2.5 pb-1 pt-1 text-[11px] font-semibold text-slate-400">
+            Explore
           </div>
 
           <MenuCardItem
             icon={LayoutTemplate}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+            iconColor="text-slate-600"
+            iconBg="bg-slate-100 group-hover:bg-slate-200/70"
             title="Marketplace"
             subtitle="Community templates & add-ons"
             onClick={() => handleAction(() => navigate({ to: "/marketplace" }))}
           />
           <MenuCardItem
             icon={BookOpen}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+            iconColor="text-slate-600"
+            iconBg="bg-slate-100 group-hover:bg-slate-200/70"
             title="Wiki"
             subtitle="Guides, shortcuts & FAQ"
             onClick={() => handleAction(() => navigate({ to: "/wiki" }))}
           />
           <MenuCardItem
             icon={Scale}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+            iconColor="text-slate-600"
+            iconBg="bg-slate-100 group-hover:bg-slate-200/70"
             title="License"
             subtitle="Terms & usage rights"
             onClick={() => handleAction(() => navigate({ to: "/license" }))}
           />
           <MenuCardItem
             icon={ShieldCheck}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-50 group-hover:bg-blue-100/80"
+            iconColor="text-slate-600"
+            iconBg="bg-slate-100 group-hover:bg-slate-200/70"
             title="Privacy policy"
             subtitle="How your data is handled"
             onClick={() => handleAction(() => navigate({ to: "/privacypolicy" }))}
           />
 
-          {/* DANGER SECTION */}
+          <div className="my-1.5 h-px bg-slate-100" />
+
           <MenuCardItem
             icon={Trash2}
-            iconColor="text-red-600"
-            iconBg="bg-red-50 group-hover:bg-red-100"
+            iconColor="text-rose-600"
+            iconBg="bg-rose-50 group-hover:bg-rose-100"
             title="Clear canvas"
             subtitle="Reset this slide to zero"
             variant="destructive"
@@ -733,13 +717,13 @@ function MenuCardItem({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`group flex w-full items-center justify-between rounded-xl p-2 text-left transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
+      className={`group flex w-full items-center justify-between rounded-2xl p-2 text-left transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
         isDestructive ? "hover:bg-red-50/70" : "hover:bg-slate-100/90"
       }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`flex size-8 items-center justify-center rounded-lg transition-all duration-150 group-hover:scale-105 ${iconBg}`}
+          className={`flex size-8 items-center justify-center rounded-xl transition-all duration-150 group-hover:scale-105 ${iconBg}`}
         >
           <Icon className={`size-4 ${iconColor}`} />
         </div>
@@ -788,12 +772,12 @@ function UserMenu({ email, onEditProfile }: { email: string; onEditProfile: () =
       <button
         onClick={() => setOpen((v) => !v)}
         title={email}
-        className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-white active:scale-95"
+        className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-95"
       >
-        <UserIcon className="h-4 w-4" strokeWidth={2.2} />
+        <UserIcon className="h-4 w-4" strokeWidth={2} />
       </button>
       {open && (
-        <div className="toolbar-flyout absolute right-0 top-12 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl animate-in fade-in zoom-in-95">
+        <div className="toolbar-flyout absolute right-0 top-10 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
             <p className="text-[10px] font-semibold tracking-wider text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>

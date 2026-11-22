@@ -184,8 +184,8 @@ const interpFilters = (
   b: ImageFilters | undefined,
   p: number,
 ): ImageFilters => {
-  const f1 = { ...DEFAULT_FILTERS, ...(a ?? {}) } as unknown as Record<string, number>;
-  const f2 = { ...DEFAULT_FILTERS, ...(b ?? {}) } as unknown as Record<string, number>;
+  const f1 = { ...DEFAULT_FILTERS, ...(a ?? {}) } as Record<string, number>;
+  const f2 = { ...DEFAULT_FILTERS, ...(b ?? {}) } as Record<string, number>;
   const out: Record<string, number> = {};
   for (const key of Object.keys(f1))
     if (typeof f1[key] === "number" && typeof f2[key] === "number") out[key] = kfLerp(f1[key], f2[key], p);
@@ -410,7 +410,7 @@ export function CanvasElement({
   // SVG turbulence is re-seeded and the tear scale / RGB split offsets are
   // re-rolled, so the bands and fringes flicker continuously on the slide.
   useEffect(() => {
-    const g = (element as { filters?: ImageFilters }).filters?.glitch ?? 0;
+    const g = element.filters?.glitch ?? 0;
     if (!g || preview) return;
     const rand = (m: number) => (Math.random() * 2 - 1) * m;
     const timer = setInterval(() => {
@@ -426,7 +426,7 @@ export function CanvasElement({
       if (bOff) bOff.setAttribute("dx", rand(g * 0.18).toFixed(1));
     }, 90);
     return () => clearInterval(timer);
-  }, [element.id, (element as { filters?: ImageFilters }).filters?.glitch, preview]);
+  }, [element.id, element.filters?.glitch, preview]);
 
   // Live 3D tilt toward the cursor (presenting + hoverTilt enabled)
   const [tilt, setTilt] = useState<{ rx: number; ry: number } | null>(null);
@@ -1431,12 +1431,12 @@ export function CanvasElement({
           <VideoEditReader element={element} />
         ) : (
           <video
-            ref={(v) => { if (v) v.playbackRate = element.rate ?? 1; }}
             src={element.src}
             poster={element.poster}
             muted={element.muted ?? true}
             loop={element.loop ?? true}
             autoPlay
+            playbackRate={element.rate ?? 1}
             playsInline
             controls={presenting}
             onLoadedMetadata={(e) => {
@@ -2842,7 +2842,7 @@ function QrRender({ element }: { element: QrElement }) {
         level="M"
         imageSettings={
           element.centerImage
-            ? { src: element.centerImage, height: 96, width: 96, excavate: true }
+            ? { href: element.centerImage, height: 96, width: 96, excavate: true }
             : undefined
         }
         style={{ width: "94%", height: "94%" }}
@@ -2874,15 +2874,13 @@ function VideoEditReader({ element }: { element: VideoElement }) {
   return (
     <div className="group/video relative size-full">
       <video
-        ref={(v) => {
-          ref.current = v;
-          if (v) v.playbackRate = element.rate ?? 1;
-        }}
+        ref={ref}
         src={element.src}
         poster={element.poster}
         muted={muted}
         loop={element.loop ?? true}
         autoPlay
+        playbackRate={element.rate ?? 1}
         playsInline
         onLoadedMetadata={(e) => {
           setDur(e.currentTarget.duration || 0);

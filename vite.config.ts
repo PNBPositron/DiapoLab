@@ -31,6 +31,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     vite: {
+      server: {
+        host: "0.0.0.0",
+        port: 3000,
+        allowedHosts: true,
+      },
       // Keep TanStack Router in the dependency bundle so HMR never requests
       // stale deep-import URLs from an older router build.
       optimizeDeps: {
@@ -45,13 +50,13 @@ export default defineConfig(({ mode }) => {
     },
     envPrefix: ["VITE_", "NEXT_PUBLIC_", "SUPABASE_"],
     define: {
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl ?? ""),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey,
+        supabasePublishableKey ?? "",
       ),
-      "import.meta.env.SUPABASE_URL": JSON.stringify(supabaseUrl),
+      "import.meta.env.SUPABASE_URL": JSON.stringify(supabaseUrl ?? ""),
       "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey,
+        supabasePublishableKey ?? "",
       ),
     },
   };

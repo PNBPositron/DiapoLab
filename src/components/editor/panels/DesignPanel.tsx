@@ -77,12 +77,12 @@ export function DesignPanel() {
       />
 
       {/* ── Same shared SegmentedControl as the ComponentsPanel ── */}
-      <div className="px-4">
+      <div>
         <SegmentedControl
           value={section}
           onChange={setSection}
           label="Design category"
-          options={SECTIONS.map(({ id, title, subtitle, Icon }) => ({
+          options={SECTIONS.map(({ id, title, subtitle }) => ({
             value: id,
             label: SHORT[id],
             title: title + " — " + subtitle,
@@ -90,13 +90,13 @@ export function DesignPanel() {
         />
       </div>
 
-      {/* ── Active section — micro-caption label, then content ── */}
+      {/* ── Active section — caption label, then content ── */}
       <div>
-        <div className="mb-1.5 flex items-center gap-1.5 px-4 text-[9px] font-bold tracking-[0.14em] text-slate-400">
-          <ActiveIcon className="size-3 text-blue-400" />
-          {active.title.toUpperCase()}
-          <span className="font-normal tracking-normal text-slate-300 normal-case">
-            {active.subtitle}
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-slate-700">
+          <ActiveIcon className="size-3.5 text-blue-600" />
+          <span>{active.title}</span>
+          <span className="font-normal text-slate-400">
+            · {active.subtitle}
           </span>
         </div>
         <div className="animate-in fade-in-50 duration-150">{active.children}</div>

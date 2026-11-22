@@ -163,26 +163,19 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const totalPanels = Object.keys(PANEL_LABELS).length;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-xs sm:p-6" onClick={onClose}>
       <div
-        className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-3xl border border-slate-200 bg-slate-50/95 text-slate-800 shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:my-6"
+        className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)] sm:my-6"
         onClick={(event) => event.stopPropagation()}
       >
-        {/* Header — gradient + halo + icon */}
-        <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-slate-50 via-white to-blue-50/50 px-4 pb-5 pt-4 sm:px-6">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 88% 10%, rgba(37,99,235,0.14) 0%, transparent 55%)",
-            }}
-          />
+        {/* Header */}
+        <header className="relative border-b border-slate-200 bg-white px-5 pb-4 pt-4 sm:px-6">
           <div className="relative flex items-center gap-3 pr-12">
-            <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)]">
+            <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white">
               <SettingsIcon className="size-4.5" />
             </div>
             <div className="min-w-0">
-              <h2 className="font-display text-lg font-semibold tracking-tight text-slate-800">
+              <h2 className="font-display text-lg font-semibold tracking-tight text-slate-900">
                 Settings
               </h2>
               <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -194,7 +187,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         <button
           onClick={onClose}
           aria-label="Close settings"
-          className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-800"
+          className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800"
         >
           <X className="size-4" />
         </button>
@@ -228,7 +221,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   </span>
                   <button
                     onClick={applyJson}
-                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-blue-700 active:scale-95"
+                    className="flex items-center gap-1.5 rounded-full bg-blue-600 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-blue-700 active:scale-95"
                   >
                     <Check className="size-3" /> Apply changes
                   </button>
@@ -255,7 +248,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   <button
                     key={id}
                     onClick={() => togglePanel(id)}
-                    className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-xs font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left text-xs font-medium transition-all duration-200 ${
                       on
                         ? "border-blue-200 bg-blue-50/70 text-blue-700 shadow-[0_2px_8px_rgba(37,99,235,0.08)]"
                         : "border-slate-200 bg-white text-slate-400 hover:border-slate-300 hover:bg-slate-50"
@@ -317,14 +310,14 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   className="mt-2 w-full accent-blue-600 disabled:opacity-40"
                 />
               </label>
-              <div className="h-8 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+              <div className="h-8 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
                 <div
                   key={`${panelDurationMs}-${panelStiffness}-${reduceMotion}`}
-                  className="h-full w-1/3 bg-blue-500"
+                  className="h-full w-1/3 rounded-full bg-blue-500"
                   style={{ animation: reduceMotion ? undefined : `panel-motion-demo ${panelDurationMs}ms ${springEasing(panelStiffness)} both` }}
                 />
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                 <div>
                   <div className="text-[11px] font-semibold text-slate-700">Reduced motion</div>
                   <p className="mt-0.5 text-[10px] text-slate-400">Disable panel animations.</p>
@@ -347,14 +340,14 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   <button
                     key={theme.id}
                     onClick={() => setEditorTheme(theme.id)}
-                    className={`relative rounded-xl border p-3 text-left transition-all duration-200 ${
+                    className={`relative rounded-2xl border p-3.5 text-left transition-all duration-200 ${
                       on
                         ? "border-blue-400 bg-blue-50/70 shadow-[0_4px_16px_rgba(37,99,235,0.12)]"
                         : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
                     {on && (
-                      <span className="absolute right-2 top-2 grid size-4 place-items-center rounded-full bg-blue-600 text-white shadow">
+                      <span className="absolute right-2.5 top-2.5 grid size-4 place-items-center rounded-full bg-blue-600 text-white shadow">
                         <Check className="size-2.5" strokeWidth={3} />
                       </span>
                     )}
@@ -373,7 +366,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             desc="Dark editor chrome and on-slide accessibility checks."
           >
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                 <div>
                   <div className="text-[11px] font-semibold text-slate-700">Dark editor</div>
                   <p className="mt-0.5 text-[10px] text-slate-400">
@@ -382,7 +375,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 </div>
                 <Switch on={editorDark} label="Dark editor" onClick={() => setEditorDark(!editorDark)} />
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
                 <div>
                   <div className="text-[11px] font-semibold text-slate-700">Accessibility checker</div>
                   <p className="mt-0.5 text-[10px] text-slate-400">
@@ -413,9 +406,9 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   return (
                     <li
                       key={link.id}
-                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
+                      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
                     >
-                      <div className="grid size-12 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-400">
+                      <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-400">
                         <Link2 className="size-4" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -426,7 +419,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                       <button
                         onClick={() => copyShare(link)}
                         disabled={shareBusy === link.id}
-                        className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100"
+                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
                         aria-label={`Copy link for ${link.design_name ?? "deleted design"}`}
                         title="Copy link"
                       >
@@ -436,7 +429,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100"
+                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
                         aria-label={`Open link for ${link.design_name ?? "deleted design"}`}
                         title="Open link"
                       >
@@ -445,7 +438,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                       <button
                         onClick={() => removeShare(link)}
                         disabled={shareBusy === link.id}
-                        className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
                         aria-label={`Revoke link for ${link.design_name ?? "deleted design"}`}
                         title="Revoke link"
                       >
@@ -476,9 +469,9 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 {templates.map((template) => (
                   <li
                     key={template.id}
-                    className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
+                    className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
                   >
-                    <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                    <div className="size-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
                       {template.thumbnail && <img src={template.thumbnail} alt="" className="h-full w-full object-cover" />}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -490,7 +483,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => rename(template)}
                       disabled={busy === template.id}
-                      className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100"
+                      className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
                       aria-label={`Rename ${template.name}`}
                     >
                       <Pencil className="size-3.5" />
@@ -498,7 +491,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => remove(template)}
                       disabled={busy === template.id}
-                      className="grid size-8 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                      className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
                       aria-label={`Unpublish ${template.name}`}
                     >
                       {busy === template.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}

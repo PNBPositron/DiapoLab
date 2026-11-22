@@ -55,6 +55,7 @@ export function MediaPanel() {
     stream: MediaStream;
     recorder: MediaRecorder;
     chunks: Blob[];
+    url: string;
   } | null>(null);
   const recRef = useRef(rec);
   recRef.current = rec;
@@ -111,7 +112,7 @@ export function MediaPanel() {
       stream.getVideoTracks()[0]?.addEventListener("ended", () => {
         if (recorder.state !== "inactive") recorder.stop();
       });
-      setRec({ mode, stream, recorder, chunks });
+      setRec({ mode, stream, recorder, chunks, url: "" });
     } catch {
       setError("Recording cancelled or permission denied.");
     }
@@ -274,7 +275,7 @@ export function MediaPanel() {
                 <span className="size-2 animate-pulse rounded-full bg-rose-500" />
                 Recording {rec.mode === "screen" ? "screen" : "webcam"}…
               </div>
-              <video ref={(v) => { if (v) v.srcObject = rec.stream; }} muted autoPlay playsInline className="w-full rounded-lg border border-rose-200 bg-black" />
+              <video src={rec.url} muted autoPlay playsInline className="w-full rounded-lg border border-rose-200 bg-black" />
               <button
                 type="button"
                 onClick={stopRec}

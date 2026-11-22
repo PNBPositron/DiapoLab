@@ -15,7 +15,7 @@ import {
   Share2,
   FileUp,
   Presentation,
-  MousePointer2,
+  ChevronRight,
   Zap,
   ArrowLeft,
   CircleHelp,
@@ -68,7 +68,7 @@ const SECTIONS = [
 const PANELS = [
   { icon: <LayoutGrid className="size-4" />, name: "Home", desc: "Community templates and starter decks, loaded in one click." },
   { icon: <Type className="size-4" />, name: "Text", desc: "Titles, headings and paragraphs, with custom fonts." },
-  { icon: <Shapes className="size-4" />, name: "Shapes", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
+  { icon: <Shapes className="size-4" />, name: "Elements", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
   { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
   { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
   { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets, whole-slide blocks and layout presets." },
@@ -112,33 +112,56 @@ const SHORTCUTS: Array<[string, string]> = [
 
 function Wiki() {
   return (
-    <div className="min-h-screen bg-slate-50/60">
-      {/* Hero */}
-      <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/40 to-slate-100">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-70"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 88% -10%, rgba(37,99,235,0.16) 0%, transparent 55%), radial-gradient(circle at 8% 120%, rgba(99,102,241,0.1) 0%, transparent 45%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-6 py-12">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 shadow-sm backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
-          >
-            <ArrowLeft className="size-3.5" /> back to editor
-          </Link>
-          <div className="mt-6 flex items-center gap-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]">
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* Top navigation */}
+      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
+              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-lg object-contain" />
+              <span>DiapoLab</span>
+            </Link>
+            <span className="text-slate-300">/</span>
+            <span className="text-xs font-medium text-slate-500">Wiki</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/marketplace"
+              className="hidden rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
+            >
+              Marketplace
+            </Link>
+            <Link
+              to="/mcp-guide"
+              className="hidden rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
+            >
+              MCP guide
+            </Link>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
+            >
+              <ArrowLeft className="size-3.5" /> Back to editor
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
+          <div className="flex items-center gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
               <BookOpen className="size-5" />
             </span>
             <div>
-              <p className="logo-wordmark text-[11px] text-blue-600">DiapoLab</p>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Wiki</h1>
+              <p className="text-xs font-semibold text-blue-600">Documentation</p>
+              <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                DiapoLab Wiki
+              </h1>
             </div>
           </div>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-500">
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600">
             Everything you need to build decks fast: formats, panels, elements,
             motion, audio, rotoscope cutouts, shortcuts, effects, dark mode, and how
             to share your work with the community.
@@ -148,23 +171,24 @@ function Wiki() {
 
       <div className="mx-auto flex max-w-6xl gap-10 px-6 py-10">
         {/* TOC */}
-        <aside className="sticky top-8 hidden h-fit w-52 shrink-0 flex-col gap-1 lg:flex">
-          <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+        <aside className="sticky top-20 hidden h-fit w-52 shrink-0 flex-col gap-0.5 lg:flex">
+          <p className="mb-2 px-3 text-xs font-semibold text-slate-500">
             On this page
           </p>
           {SECTIONS.map((s) => (
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-500 transition hover:bg-blue-50 hover:text-blue-600"
+              className="flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-blue-600"
             >
-              {s.icon} {s.label}
+              <span className="text-slate-400">{s.icon}</span>
+              {s.label}
             </a>
           ))}
         </aside>
 
         {/* Content */}
-        <main className="min-w-0 flex-1 space-y-10">
+        <main className="min-w-0 flex-1 space-y-6">
           <Section
             id="getting-started"
             icon={<Sparkles className="size-4" />}
@@ -233,18 +257,18 @@ function Wiki() {
               <Kbd>Esc</Kbd> to unpin. A floating <strong>Layers</strong> list lets
               you toggle visibility, lock, reorder and multi-select elements.
             </p>
-            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {PANELS.map((p) => (
                 <div
                   key={p.name}
-                  className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-3"
+                  className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-colors hover:border-slate-300"
                 >
-                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-slate-900 text-white">
+                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
                     {p.icon}
                   </span>
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-slate-800">{p.name}</div>
-                    <div className="mt-0.5 text-[11px] leading-snug text-slate-400">{p.desc}</div>
+                    <div className="text-xs font-semibold text-slate-900">{p.name}</div>
+                    <div className="mt-0.5 text-xs leading-relaxed text-slate-500">{p.desc}</div>
                   </div>
                 </div>
               ))}
@@ -264,17 +288,14 @@ function Wiki() {
               and smart snapping keeps everything on the grid (hold <Kbd>Alt</Kbd> to
               bypass it while dragging).
             </p>
-            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {ELEMENTS.map(([name, desc]) => (
                 <div
                   key={name}
-                  className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-3"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5 transition-colors hover:border-slate-300"
                 >
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-blue-500" />
-                  <div className="min-w-0">
-                    <div className="text-xs font-semibold text-slate-800">{name}</div>
-                    <div className="mt-0.5 text-[11px] leading-snug text-slate-400">{desc}</div>
-                  </div>
+                  <div className="text-xs font-semibold text-slate-900">{name}</div>
+                  <div className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</div>
                 </div>
               ))}
             </div>
@@ -370,12 +391,12 @@ function Wiki() {
               properties consistent with the example so the result can be imported
               safely as a .json design.
             </p>
-            <div className="mt-4 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-300">slideshow.json</span>
-                <span className="text-[10px] text-slate-500">starter contract</span>
+            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
+              <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2.5">
+                <span className="font-mono text-xs font-semibold text-blue-300">slideshow.json</span>
+                <span className="text-xs text-slate-400">Starter contract</span>
               </div>
-              <pre className="overflow-x-auto p-4 text-[10px] leading-relaxed text-slate-300"><code>{`{
+              <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-slate-200"><code>{`{
   "title": "Product launch",
   "canvas": { "width": 1920, "height": 1080, "format": "16:9" },
   "pages": [
@@ -420,15 +441,13 @@ function Wiki() {
             kicker="Speed"
             title="Shortcuts"
           >
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-              {SHORTCUTS.map(([keys, label], i) => (
+            <div className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              {SHORTCUTS.map(([keys, label]) => (
                 <div
                   key={keys}
-                  className={`flex items-center justify-between gap-3 px-4 py-2.5 ${
-                    i % 2 === 1 ? "bg-slate-50/60" : ""
-                  }`}
+                  className="flex items-center justify-between gap-3 px-4 py-2.5"
                 >
-                  <span className="text-xs text-slate-600">{label}</span>
+                  <span className="text-xs font-medium text-slate-700">{label}</span>
                   <Kbd>{keys}</Kbd>
                 </div>
               ))}
@@ -611,7 +630,7 @@ function Wiki() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600"
+                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
                 >
                   {link.label}
                 </Link>
@@ -640,12 +659,12 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-8">
+    <section id={id} className="scroll-mt-20 rounded-3xl border border-slate-200 bg-white p-6">
       <div className="flex items-center gap-2">
-        <span className="text-blue-500">{icon}</span>
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">{kicker}</p>
+        <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">{icon}</span>
+        <p className="text-xs font-semibold text-blue-600">{kicker}</p>
       </div>
-      <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
+      <h2 className="mt-2 font-display text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
       <div className="mt-3 space-y-2.5 text-sm leading-relaxed text-slate-600">{children}</div>
     </section>
   );
@@ -653,7 +672,7 @@ function Section({
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="rounded-md border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-500 shadow-sm">
+    <kbd className="rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[11px] font-medium text-slate-700">
       {children}
     </kbd>
   );
@@ -661,8 +680,8 @@ function Kbd({ children }: { children: React.ReactNode }) {
 
 function Callout({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/70 px-3.5 py-3 text-xs leading-relaxed text-blue-800">
-      <span className="mt-0.5 shrink-0 text-blue-500">{icon}</span>
+    <div className="mt-3 flex items-start gap-2.5 rounded-2xl border border-blue-200 bg-blue-50/50 px-4 py-3 text-xs leading-relaxed text-blue-900">
+      <span className="mt-0.5 shrink-0 text-blue-600">{icon}</span>
       <span>{children}</span>
     </div>
   );
@@ -670,12 +689,12 @@ function Callout({ icon, children }: { icon: React.ReactNode; children: React.Re
 
 function Faq({ q, children }: { q: string; children: React.ReactNode }) {
   return (
-    <details className="group rounded-xl border border-slate-200 bg-white px-4 py-3 [&_summary::-webkit-details-marker]:hidden">
-      <summary className="flex cursor-pointer items-center justify-between gap-3 text-xs font-semibold text-slate-700">
+    <details className="group rounded-2xl border border-slate-200 bg-white px-4 py-3 [&_summary::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer items-center justify-between gap-3 text-xs font-semibold text-slate-800">
         {q}
-        <MousePointer2 className="size-3 shrink-0 text-slate-300 transition-transform group-open:rotate-90" />
+        <ChevronRight className="size-3.5 shrink-0 text-slate-400 transition-transform group-open:rotate-90" />
       </summary>
-      <p className="mt-2 text-xs leading-relaxed text-slate-500">{children}</p>
+      <p className="mt-2 text-xs leading-relaxed text-slate-600">{children}</p>
     </details>
   );
 }

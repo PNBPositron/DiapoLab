@@ -108,68 +108,68 @@ export function FindReplaceDialog() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/30 p-4 backdrop-blur-sm"
       onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
     >
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl animate-in fade-in zoom-in-95">
-        <div className="flex items-center gap-2.5">
-          <span className="grid size-8 place-items-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/30">
+      <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)] animate-in fade-in zoom-in-95">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
             <Search className="size-4" />
           </span>
           <div className="flex flex-col">
-            <h2 className="font-display text-sm font-semibold tracking-tight text-slate-800">Find &amp; replace</h2>
-            <p className="text-[10px] font-medium tracking-[0.04em] text-slate-400">Searches every slide of the deck</p>
+            <h2 className="font-display text-sm font-semibold tracking-tight text-slate-900">Find &amp; replace</h2>
+            <p className="text-xs text-slate-500">Searches every slide of the deck</p>
           </div>
           <button
             onClick={() => setOpen(false)}
             aria-label="Close"
-            className="ml-auto flex size-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="ml-auto flex size-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
           >
             <X className="size-4" />
           </button>
         </div>
 
-        <div className="mt-4 space-y-2">
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-blue-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100">
+        <div className="mt-4 space-y-2.5">
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/50 px-3.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
             <Search className="size-3.5 shrink-0 text-slate-400" />
             <input
               ref={searchRef}
               value={query}
               onChange={(e) => { setQuery(e.target.value); setDone(null); }}
               placeholder="Find in deck…"
-              className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
             />
             <button
               onClick={() => setMatchCase((v) => !v)}
               title={matchCase ? "Match case: on" : "Match case: off"}
-              className={`shrink-0 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold transition ${
-                matchCase ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-500 hover:bg-slate-300"
+              className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold transition ${
+                matchCase ? "bg-blue-600 text-white" : "bg-slate-200/70 text-slate-600 hover:bg-slate-200"
               }`}
             >
               Aa
             </button>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-blue-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100">
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/50 px-3.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
             <svg className="size-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2 13.2 9.8M15 2l-4 4 2 2"/><path d="m16 20 2 2 4-4"/><path d="M3 3l14 14"/></svg>
             <input
               value={replacement}
               onChange={(e) => { setReplacement(e.target.value); setDone(null); }}
               onKeyDown={(e) => { if (e.key === "Enter") replaceAll(); }}
               placeholder="Replace with…"
-              className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
             />
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3.5 flex items-center gap-2.5">
           <button
             onClick={replaceAll}
             disabled={!query.trim() || hits.length === 0}
-            className="rounded-xl bg-blue-600 px-4 py-2 font-display text-[11px] font-semibold tracking-wider text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95 disabled:opacity-40"
+            className="rounded-full bg-blue-600 px-4.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
           >
             Replace all
           </button>
-          <span className="text-[11px] font-medium text-slate-500">
+          <span className="text-xs font-medium tabular-nums text-slate-500">
             {query.trim()
               ? hits.length === 0
                 ? "No matches in this deck"
@@ -177,26 +177,26 @@ export function FindReplaceDialog() {
               : "Type to search"}
           </span>
           {done != null && (
-            <span className="ml-auto flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700 animate-in fade-in">
+            <span className="ml-auto flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-emerald-700 animate-in fade-in">
               <Check className="size-3" /> {done} replaced
             </span>
           )}
         </div>
 
         {hits.length > 0 && (
-          <div className="mt-3 max-h-64 space-y-1 overflow-y-auto pr-1">
+          <div className="mt-3 max-h-64 space-y-1.5 overflow-y-auto pr-1">
             {hits.map((h, i) => (
               <button
                 key={h.elementId + i}
                 onClick={() => gotoHit(h)}
-                className="flex w-full items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2 text-left text-xs text-slate-600 transition hover:border-blue-200 hover:bg-blue-50/50"
+                className="flex w-full items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 text-left text-xs text-slate-600 transition hover:border-blue-300 hover:bg-blue-50/40"
               >
-                <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-slate-500">
+                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-slate-600">
                   Slide {h.page + 1}
                 </span>
                 <span className="truncate">
                   {h.before}
-                  <mark className="rounded-sm bg-yellow-200/80 px-0.5 text-slate-900">{h.match}</mark>
+                  <mark className="rounded-sm bg-blue-100 px-0.5 font-medium text-blue-900">{h.match}</mark>
                   {h.after}
                 </span>
               </button>

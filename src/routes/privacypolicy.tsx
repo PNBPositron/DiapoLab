@@ -36,7 +36,7 @@ const PP_SECTIONS = [
 
 function PrivacyPolicy() {
   return (
-    <LegalShell title="Privacy Policy" subtitle="last updated · October 2026" icon={<ShieldCheck className="size-5" />} kicker="DiapoLab documentation">
+    <LegalShell title="Privacy Policy" subtitle="Last updated · October 2026" icon={<ShieldCheck className="size-5" />} kicker="Documentation">
       <Section title="What we store" icon={<CloudCog className="size-4" />}>
         <p>
           Designs you save, templates and themes you publish, and the likes you give are stored in
@@ -83,7 +83,7 @@ export function LegalShell({
   title,
   subtitle,
   icon,
-  kicker = "DiapoLab documentation",
+  kicker = "Documentation",
   children,
 }: {
   title: string;
@@ -93,38 +93,45 @@ export function LegalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-slate-50/60 text-slate-900">
-      {/* Hero */}
-      <header className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/40 to-slate-100">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-70"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 88% -10%, rgba(37,99,235,0.16) 0%, transparent 55%), radial-gradient(circle at 8% 120%, rgba(99,102,241,0.1) 0%, transparent 45%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-4xl px-6 py-12">
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* Top navigation */}
+      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-4xl items-center justify-between gap-4 px-6">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
+              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-lg object-contain" />
+              <span>DiapoLab</span>
+            </Link>
+            <span className="text-slate-300">/</span>
+            <span className="text-xs font-medium text-slate-500">{title}</span>
+          </div>
           <div className="flex items-center gap-2">
             <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 shadow-sm backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
+              to="/wiki"
+              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
             >
-              <ArrowLeft className="size-3.5" /> back to editor
+              <BookOpen className="size-3.5" /> Wiki
             </Link>
             <Link
-              to="/wiki"
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-slate-500 shadow-sm backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
             >
-              <BookOpen className="size-3.5" /> wiki
+              <ArrowLeft className="size-3.5" /> Back to editor
             </Link>
           </div>
-          <div className="mt-8 flex items-center gap-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]">
+        </div>
+      </nav>
+
+      {/* Header */}
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-4xl px-6 py-10">
+          <div className="flex items-center gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
               {icon ?? <ShieldCheck className="size-5" />}
             </span>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">{kicker}</p>
-              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+              <p className="text-xs font-semibold text-blue-600">{kicker}</p>
+              <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
             </div>
           </div>
           <p className="mt-3 text-sm text-slate-500">{subtitle}</p>
@@ -132,7 +139,7 @@ export function LegalShell({
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <div className="space-y-5">{children}</div>
+        <div className="space-y-4">{children}</div>
         <nav className="mt-12 flex flex-wrap gap-2 border-t border-slate-200 pt-6">
           {[
             { to: "/privacypolicy" as const, label: "Privacy policy" },
@@ -143,7 +150,7 @@ export function LegalShell({
             <Link
               key={link.to}
               to={link.to}
-              className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600"
+              className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
             >
               {link.label}
             </Link>
@@ -164,14 +171,14 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200/80 hover:shadow-[0_16px_40px_-16px_rgba(37,99,235,0.18)]">
-      <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 to-white px-5 py-4">
+    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+      <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5">
         {icon && (
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
             {icon}
           </span>
         )}
-        <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-800">{title}</h2>
+        <h2 className="font-display text-sm font-semibold text-slate-900">{title}</h2>
       </div>
       <div className="space-y-2 px-5 py-4 text-sm leading-relaxed text-slate-600">{children}</div>
     </section>

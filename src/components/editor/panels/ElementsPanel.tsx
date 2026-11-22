@@ -51,7 +51,7 @@ const DIAGRAM_ICONS: Record<string, LucideIcon> = {
 };
 
 
-/* Refined tile: frosted card, gradient chip, subtle lift + blue glow on hover. */
+/* Refined tile: crisp pure white card, hairline border, clean active state. */
 function ActionTile({
   Icon,
   label,
@@ -64,17 +64,17 @@ function ActionTile({
   onClick?: () => void;
 }) {
   const state = active
-    ? "border-blue-500/50 bg-blue-50/80 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.35),0_8px_20px_-8px_rgba(59,130,246,0.45)]"
-    : "border-slate-200/80 bg-white/80 shadow-[0_1px_2px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_12px_26px_-10px_rgba(37,99,235,0.22)]";
+    ? "border-blue-600 bg-blue-50/60 ring-1 ring-blue-600/20"
+    : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70";
   const chip = active
-    ? "bg-linear-to-tr from-blue-500 to-indigo-600 text-white shadow-xs"
-    : "bg-slate-100/80 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600";
+    ? "bg-blue-600 text-white"
+    : "bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600";
   return (
-    <button onClick={onClick} className={`group relative flex h-20 flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:translate-y-0 active:scale-[0.97] ${state}`}>
-      <span className={`grid size-9 place-items-center rounded-xl transition-all duration-200 ${chip}`}>
+    <button onClick={onClick} className={`group relative flex h-20 flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border transition-colors active:scale-[0.98] ${state}`}>
+      <span className={`grid size-8 place-items-center rounded-lg transition-colors ${chip}`}>
         <Icon className="size-4" />
       </span>
-      <span className="text-[10px] font-semibold tracking-wide text-slate-600 group-hover:text-slate-800">
+      <span className="text-[11px] font-medium text-slate-700 group-hover:text-slate-900">
         {label}
       </span>
     </button>
@@ -138,17 +138,17 @@ export function ElementsPanel() {
 
   return (
     <div className="panel-content">
-      <PanelHeader kicker="Shapes" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
+      <PanelHeader kicker="Elements" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
 
       {/* Upload zone */}
-      <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed border-slate-300/90 bg-white/70 px-3 py-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50/40 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.25)]">
-        <span className="grid size-9 place-items-center rounded-xl bg-slate-100/80 text-slate-500 transition-colors group-hover:bg-blue-100 group-hover:text-blue-600">
+      <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/30">
+        <span className="grid size-9 place-items-center rounded-lg bg-slate-100 text-slate-600 transition-colors group-hover:bg-blue-100 group-hover:text-blue-600">
           {uploading ? <Loader2 className="size-4 animate-spin" /> : <UploadCloud className="size-4" />}
         </span>
-        <span className="text-xs font-semibold text-slate-700">
+        <span className="text-xs font-semibold text-slate-800">
           {uploading ? "Preparing media…" : "Upload image, GIF or video"}
         </span>
-        <span className="text-[9px] text-slate-400">Images, GIFs & videos · video ≤ 25 MB</span>
+        <span className="text-[10px] text-slate-400">Images, GIFs & videos · video ≤ 25 MB</span>
         <input type="file" accept="image/*,video/*" className="sr-only" disabled={uploading} onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) void addFile(file);
@@ -158,23 +158,23 @@ export function ElementsPanel() {
 
       {/* Add image by URL — permanent, survives refresh & design sharing. */}
       <div className="space-y-1.5">
-        <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.14)]">
+        <label className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
           <Link2 className="size-4 shrink-0 text-slate-400" />
           <input
             type="url"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addByUrl()}
-            placeholder="Coller le lien d'une image…"
+            placeholder="Paste an image URL…"
             aria-label="Image URL"
             className="min-w-0 flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
           />
           <button
             type="button"
             onClick={addByUrl}
-            className="shrink-0 rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-semibold text-white transition hover:bg-slate-700 active:scale-95"
+            className="shrink-0 rounded-md bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-white transition hover:bg-slate-800"
           >
-            Ajouter
+            Add
           </button>
         </label>
         {urlError && (

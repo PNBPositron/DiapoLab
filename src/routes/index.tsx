@@ -56,16 +56,13 @@ function Editor() {
   }, []);
 
   return (
-    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden bg-slate-50 text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
+    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden bg-white text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
       <h1 className="sr-only">DiapoLab — NextGen Open Source Presentation Editor</h1>
       <Toolbar />
-      {/* Sidebar spans the full workspace height (it runs alongside the
-          pages bar), but the rail buttons are centered against the canvas
-          area only — see the measured inset in Sidebar. */}
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 bg-white">
         <Sidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <main className="relative min-h-0 flex-1 overflow-hidden border-x border-slate-200 bg-slate-100">
+        <div className="flex min-w-0 flex-1 flex-col bg-white">
+          <main className="relative min-h-0 flex-1 overflow-hidden bg-white">
             <Canvas />
             <SelectionToolbar />
           </main>

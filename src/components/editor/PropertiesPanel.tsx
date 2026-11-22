@@ -896,7 +896,7 @@ export function PropertiesPanel() {
       shadow: el.shadow ? { ...el.shadow } : undefined,
       filters:
         "filters" in el && (el as { filters?: ImageFilters }).filters
-          ? { ...DEFAULT_FILTERS, ...(el as { filters?: ImageFilters }).filters }
+          ? { ...(el as { filters?: ImageFilters }).filters }
           : undefined,
       effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
       snapshot,
@@ -912,15 +912,12 @@ export function PropertiesPanel() {
   };
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
-    <div className="pointer-events-none fixed left-1/2 top-4 z-40 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
-      <div className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-white/70 bg-white/85 p-1.5 shadow-[0_20px_50px_rgba(15,23,42,0.18),0_0_0_1px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/5 backdrop-blur-2xl">
-        {/* Type badge */}
-        <div className="flex items-center gap-1.5 rounded-full bg-slate-900/95 px-3 py-1.5 shadow-sm">
-          <span className="size-1.5 rounded-full bg-sky-400" />
-          <span className="text-[10px] font-bold tracking-wider text-white">
-            {el.type}
-          </span>
-        </div>
+    <div className="pointer-events-none fixed left-1/2 top-[4.25rem] z-30 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2 py-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.14)] backdrop-blur-md">
+        {/* Type tag */}
+        <span className="px-2 py-0.5 text-[11px] font-semibold capitalize text-slate-600">
+          {el.type}
+        </span>
 
         {el.type === "text" && (
           <>
@@ -929,8 +926,8 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => setColorPaletteOpen(!colorPaletteOpen)}
-                className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${
-                  colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""
+                className={`grid size-8 place-items-center rounded-full transition hover:bg-slate-100 ${
+                  colorPaletteOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""
                 }`}
                 title="Text color"
               >
@@ -952,11 +949,11 @@ export function PropertiesPanel() {
             </div>
 
             {/* Bold / Italic */}
-            <div className="flex h-8 items-center gap-0.5 rounded-lg bg-slate-100/80 p-0.5">
+            <div className="flex h-8 items-center gap-0.5 rounded-full bg-slate-100/80 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { fontWeight: (el.fontWeight ?? 400) >= 700 ? 400 : 700 })}
-                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
                   (el.fontWeight ?? 400) >= 700 ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
                 title="Bold"
@@ -966,7 +963,7 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { italic: !el.italic })}
-                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
                   el.italic ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
                 title="Italic"
@@ -976,11 +973,11 @@ export function PropertiesPanel() {
             </div>
 
             {/* Align */}
-            <div className="flex h-8 items-center gap-0.5 rounded-lg bg-slate-100/80 p-0.5">
+            <div className="flex h-8 items-center gap-0.5 rounded-full bg-slate-100/80 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "left" })}
-                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
                   (el.align ?? "left") === "left" ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
                 title="Align left"
@@ -990,7 +987,7 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "center" })}
-                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
                   (el.align ?? "left") === "center" ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
                 title="Align center"
@@ -1000,7 +997,7 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "right" })}
-                className={`grid size-7 place-items-center rounded-md text-slate-500 transition hover:text-slate-900 ${
+                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
                   (el.align ?? "left") === "right" ? "bg-white text-slate-900 shadow-sm" : ""
                 }`}
                 title="Align right"
@@ -1010,11 +1007,11 @@ export function PropertiesPanel() {
             </div>
 
             {/* Font size stepper */}
-            <div className="flex h-8 items-center rounded-lg bg-slate-100/80 p-0.5">
+            <div className="flex h-8 items-center rounded-full bg-slate-100/80 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })}
-                className="grid size-6 place-items-center rounded-md text-slate-500 hover:bg-white hover:text-slate-900"
+                className="grid size-6 place-items-center rounded-full text-slate-500 hover:bg-white hover:text-slate-900"
               >
                 <Minus className="size-3" />
               </button>
@@ -1032,7 +1029,7 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })}
-                className="grid size-6 place-items-center rounded-md text-slate-500 hover:bg-white hover:text-slate-900"
+                className="grid size-6 place-items-center rounded-full text-slate-500 hover:bg-white hover:text-slate-900"
               >
                 <Plus className="size-3" />
               </button>
@@ -1042,8 +1039,8 @@ export function PropertiesPanel() {
 
         {el.type === "shape" && (
           <div className="relative">
-            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-lg transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Shape color">
-              <div className="size-4 rounded-md border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
+            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-full transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Shape color">
+              <div className="size-4 rounded-full border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
             </button>
             {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
           </div>
@@ -1051,10 +1048,10 @@ export function PropertiesPanel() {
 
         {el.type === "image" && (
           <>
-            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-sky-100 text-sky-700 ring-2 ring-sky-500/30" : ""}`} title="Crop image (double-clic : mode recadrage)"><Crop className="size-3.5" /></button>
+            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-blue-100 text-blue-700 ring-2 ring-blue-500/30" : ""}`} title="Crop image (double-clic : mode recadrage)"><Crop className="size-3.5" /></button>
             <div className="relative">
-              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-sky-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
-              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-lg border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-sky-300 hover:bg-sky-50">{preset.name}</button>)}</div>}
+              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
+              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-xl border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-blue-300 hover:bg-blue-50">{preset.name}</button>)}</div>}
             </div>
           </>
         )}
@@ -1112,14 +1109,14 @@ export function PropertiesPanel() {
           <Trash2 className="size-3.5" />
         </button>
 
-        <div className="mx-0.5 h-5 w-px bg-slate-200/80" />
+        <div className="mx-0.5 h-5 w-px bg-slate-200" />
 
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
-          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition active:scale-95 ${
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition active:scale-95 ${
             advancedOpen
-              ? "bg-sky-600 text-white shadow-[0_6px_16px_rgba(14,165,233,0.4)]"
-              : "bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.4)] hover:brightness-110"
+              ? "bg-slate-900 text-white hover:bg-slate-800"
+              : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
         >
           <Sliders className="size-3.5" />
@@ -1134,7 +1131,7 @@ export function PropertiesPanel() {
       {floatingHUD}
 
       {advancedOpen && (
-        <aside className="editor-inspector fixed right-4 top-4 bottom-4 z-40 flex w-[280px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_20px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition-all duration-300">
+        <aside className="editor-inspector fixed right-3 top-[4.25rem] bottom-3 z-40 flex w-[280px] flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_18px_44px_-12px_rgba(15,23,42,0.14)] transition-all duration-200">
           <div className="px-3 pt-3">
             <PanelHeader
               title={
@@ -1147,7 +1144,7 @@ export function PropertiesPanel() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-7 text-selector-subtle"
+                className="size-7 rounded-full text-selector-subtle"
                 aria-label="Close inspector"
                 title="Close inspector"
                 onClick={() => setAdvancedOpen(false)}
@@ -1165,7 +1162,7 @@ export function PropertiesPanel() {
                 {(["x", "y"] as const).map((key) => (
                   <label
                     key={key}
-                    className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs"
+                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 shadow-2xs"
                   >
                     <span className="w-3 text-[10px] font-bold uppercase text-slate-400">{key}</span>
                     <input
@@ -1181,7 +1178,7 @@ export function PropertiesPanel() {
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs">
+                <label className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 shadow-2xs">
                   <span className="w-3 text-[10px] font-bold uppercase text-slate-400">w</span>
                   <input
                     type="number"
@@ -1200,7 +1197,7 @@ export function PropertiesPanel() {
                     className="w-full min-w-0 border-0 bg-transparent text-right font-mono text-[11px] text-slate-800 outline-none"
                   />
                 </label>
-                <label className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1.5 shadow-2xs">
+                <label className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 shadow-2xs">
                   <span className="w-3 text-[10px] font-bold uppercase text-slate-400">h</span>
                   <input
                     type="number"
@@ -3004,16 +3001,16 @@ export function PropertiesPanel() {
 {/* ALIGN & DISTRIBUTE */}
             <Section title="Align & Distribute">
               <div className="grid grid-cols-6 gap-1.5">
-                <button type="button" title="Align left" aria-label="Align left" onClick={() => alignSelected("left")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartHorizontal className="size-4" /></button>
-                <button type="button" title="Align horizontal center" aria-label="Align horizontal center" onClick={() => alignSelected("center-h")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterHorizontal className="size-4" /></button>
-                <button type="button" title="Align right" aria-label="Align right" onClick={() => alignSelected("right")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndHorizontal className="size-4" /></button>
-                <button type="button" title="Align top" aria-label="Align top" onClick={() => alignSelected("top")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartVertical className="size-4" /></button>
-                <button type="button" title="Align vertical center" aria-label="Align vertical center" onClick={() => alignSelected("middle")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterVertical className="size-4" /></button>
-                <button type="button" title="Align bottom" aria-label="Align bottom" onClick={() => alignSelected("bottom")} className="grid aspect-square place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndVertical className="size-4" /></button>
+                <button type="button" title="Align left" aria-label="Align left" onClick={() => alignSelected("left")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartHorizontal className="size-4" /></button>
+                <button type="button" title="Align horizontal center" aria-label="Align horizontal center" onClick={() => alignSelected("center-h")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterHorizontal className="size-4" /></button>
+                <button type="button" title="Align right" aria-label="Align right" onClick={() => alignSelected("right")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndHorizontal className="size-4" /></button>
+                <button type="button" title="Align top" aria-label="Align top" onClick={() => alignSelected("top")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartVertical className="size-4" /></button>
+                <button type="button" title="Align vertical center" aria-label="Align vertical center" onClick={() => alignSelected("middle")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterVertical className="size-4" /></button>
+                <button type="button" title="Align bottom" aria-label="Align bottom" onClick={() => alignSelected("bottom")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndVertical className="size-4" /></button>
               </div>
               <div className="grid grid-cols-2 gap-1.5">
-                <button type="button" title="Distribute horizontally (3+ objects)" aria-label="Distribute horizontally" onClick={() => distributeSelected("h")} className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignHorizontalDistributeCenter className="size-4" /> Horizontal</button>
-                <button type="button" title="Distribute vertically (3+ objects)" aria-label="Distribute vertically" onClick={() => distributeSelected("v")} className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignVerticalDistributeCenter className="size-4" /> Vertical</button>
+                <button type="button" title="Distribute horizontally (3+ objects)" aria-label="Distribute horizontally" onClick={() => distributeSelected("h")} className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignHorizontalDistributeCenter className="size-4" /> Horizontal</button>
+                <button type="button" title="Distribute vertically (3+ objects)" aria-label="Distribute vertically" onClick={() => distributeSelected("v")} className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignVerticalDistributeCenter className="size-4" /> Vertical</button>
               </div>
               <p className="text-[10px] text-slate-400">
                 One object aligns to the slide. Select several (Shift+click) to align to the selection or distribute evenly.
@@ -3026,28 +3023,28 @@ export function PropertiesPanel() {
                 <button
                   type="button"
                   onClick={() => bringForward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
                 >
                   <ArrowUp className="size-3.5" /> Forward
                 </button>
                 <button
                   type="button"
                   onClick={() => sendBackward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
                 >
                   <ArrowDown className="size-3.5" /> Backward
                 </button>
                 <button
                   type="button"
                   onClick={() => duplicate(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
                 >
                   <Copy className="size-3.5" /> Duplicate
                 </button>
                 <button
                   type="button"
                   onClick={() => remove(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 shadow-2xs hover:bg-rose-100"
+                  className="flex items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 shadow-2xs hover:bg-rose-100"
                 >
                   <Trash2 className="size-3.5" /> Delete
                 </button>
@@ -3074,7 +3071,7 @@ export function PropertiesPanel() {
                 }}
                 spellCheck={false}
                 aria-label="Selected element JSON"
-                className="min-h-48 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                className="min-h-48 w-full resize-y rounded-xl border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
               {jsonError && <p className="text-[10px] font-medium text-rose-500">{jsonError}</p>}
               <div className="flex items-center gap-1.5">
@@ -3082,14 +3079,14 @@ export function PropertiesPanel() {
                   type="button"
                   onClick={applyJson}
                   disabled={!jsonDirty}
-                  className="flex-1 rounded-lg bg-sky-600 py-1.5 text-[10px] font-bold tracking-wider text-white transition hover:bg-sky-500 disabled:opacity-40"
+                  className="flex-1 rounded-full bg-blue-600 py-1.5 text-[10px] font-bold tracking-wider text-white transition hover:bg-blue-700 disabled:opacity-40"
                 >
                   Apply
                 </button>
                 <button
                   type="button"
                   onClick={formatJson}
-                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
                 >
                   Format
                 </button>
@@ -3097,7 +3094,7 @@ export function PropertiesPanel() {
                   type="button"
                   onClick={resetJson}
                   disabled={!jsonDirty}
-                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
                 >
                   Reset
                 </button>

@@ -66,27 +66,23 @@ function VotePage() {
   const total = Object.values(votes).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="relative grid min-h-screen place-items-center overflow-hidden bg-slate-950 p-6 text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_20%_-10%,rgba(34,211,238,0.16),transparent),radial-gradient(50rem_36rem_at_90%_110%,rgba(168,85,247,0.14),transparent)]"
-      />
-      <div className="relative w-full max-w-md">
-        <div className="mb-4 flex items-center justify-between">
-          <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
-            <Radio className="size-3.5 animate-pulse" /> Live poll
+    <div className="grid min-h-screen place-items-center bg-white p-6 text-slate-900">
+      <div className="w-full max-w-md">
+        <div className="mb-3 flex items-center justify-between px-1">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600">
+            <Radio className="size-3.5" /> Live poll
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/40">
-            {connected ? <Wifi className="size-3.5 text-emerald-400" /> : <WifiOff className="size-3.5" />}
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
+            {connected ? <Wifi className="size-3.5 text-emerald-600" /> : <WifiOff className="size-3.5 text-slate-400" />}
             {connected ? "Connected" : "Connecting…"}
           </span>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_70px_-24px_rgba(0,0,0,0.8)] backdrop-blur-xl">
-          <h1 className="text-xl font-black leading-snug tracking-tight">{question}</h1>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_16px_48px_-16px_rgba(15,23,42,0.12)]">
+          <h1 className="font-display text-xl font-semibold leading-snug tracking-tight text-slate-900">{question}</h1>
 
           {options.length === 0 ? (
-            <p className="mt-6 text-sm text-white/50">
+            <p className="mt-5 text-sm text-slate-500">
               The presenter hasn't opened this poll yet. This page updates automatically.
             </p>
           ) : (
@@ -100,31 +96,34 @@ function VotePage() {
                     key={opt.id}
                     disabled={!!picked}
                     onClick={() => cast(opt.id)}
-                    className="relative overflow-hidden rounded-xl border px-4 py-3 text-left transition active:scale-[0.98] disabled:cursor-default"
-                    style={{
-                      borderColor: mine ? "#22d3ee" : "rgba(255,255,255,0.14)",
-                      background: "rgba(255,255,255,0.05)",
-                      cursor: picked ? "default" : "pointer",
-                    }}
+                    className={`relative overflow-hidden rounded-2xl border px-4 py-3 text-left transition disabled:cursor-default ${
+                      mine
+                        ? "border-blue-500 bg-blue-50/40"
+                        : "border-slate-200 bg-white hover:border-blue-300"
+                    }`}
                   >
                     {picked && (
                       <span
                         aria-hidden
-                        className="absolute inset-y-0 left-0 bg-cyan-400/20"
+                        className="absolute inset-y-0 left-0 bg-blue-500/12"
                         style={{ width: pct + "%", transition: "width 420ms cubic-bezier(0.16,1,0.3,1)" }}
                       />
                     )}
                     <span className="relative flex items-center justify-between gap-3">
-                      <span className="flex items-center gap-3 text-sm font-semibold">
-                        <span className="grid size-6 place-items-center rounded-md bg-cyan-400 text-[11px] font-black text-slate-950">
+                      <span className="flex items-center gap-3 text-sm font-semibold text-slate-900">
+                        <span
+                          className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                            mine ? "bg-blue-600 text-white" : "border border-slate-200 bg-slate-50 text-slate-700"
+                          }`}
+                        >
                           {String.fromCharCode(65 + i)}
                         </span>
                         {opt.text}
                       </span>
                       {picked && (
-                        <span className="flex items-center gap-2 text-xs tabular-nums text-white/70">
+                        <span className="flex items-center gap-2 text-xs font-semibold tabular-nums text-slate-700">
                           {pct}%
-                          {mine && <Check className="size-4 text-cyan-300" strokeWidth={3} />}
+                          {mine && <Check className="size-4 text-blue-600" strokeWidth={2.5} />}
                         </span>
                       )}
                     </span>
@@ -135,10 +134,10 @@ function VotePage() {
           )}
 
           {picked && (
-            <p className="mt-4 text-xs text-white/50">Vote sent — thanks! Results update live.</p>
+            <p className="mt-4 text-xs text-slate-500">Vote sent — thanks! Results update live.</p>
           )}
         </div>
-        <p className="mt-6 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-white/25">
+        <p className="mt-6 text-center text-xs text-slate-400">
           Made with DiapoLab
         </p>
       </div>

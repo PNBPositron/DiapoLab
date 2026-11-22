@@ -15,6 +15,97 @@ function serializeAuth<T>(_name: string, _acquireTimeout: number, fn: () => Prom
   return run;
 }
 
+function createMockSupabaseClient(): ReturnType<typeof createClient<Database>> {
+  const notConfiguredError = new Error(
+    "Cloud sync is not configured in this environment. Your work is saved locally in your browser.",
+  );
+
+  const makeQueryBuilder = (isWrite = false) => {
+    let singleMode: "none" | "single" | "maybeSingle" = "none";
+    const resolvePayload = () => {
+      if (isWrite) {
+        return { data: null, error: notConfiguredError };
+      }
+      if (singleMode === "single") return { data: null, error: notConfiguredError };
+      if (singleMode === "maybeSingle") return { data: null, error: null };
+      return { data: [], error: null };
+    };
+    const builder: Record<string, unknown> = new Proxy(
+      {},
+      {
+        get(_, prop) {
+          if (prop === "then") {
+            const p = Promise.resolve(resolvePayload());
+            return p.then.bind(p);
+          }
+          if (prop === "single") {
+            return () => {
+              singleMode = "single";
+              return builder;
+            };
+          }
+          if (prop === "maybeSingle") {
+            return () => {
+              singleMode = "maybeSingle";
+              return builder;
+            };
+          }
+          if (prop === "insert" || prop === "update" || prop === "upsert" || prop === "delete") {
+            return () => makeQueryBuilder(true);
+          }
+          return () => builder;
+        },
+      },
+    );
+    return builder;
+  };
+
+  const makeChannel = () => {
+    const ch: Record<string, unknown> = {
+      on: () => ch,
+      subscribe: (cb?: (status: string) => void) => {
+        if (cb) setTimeout(() => cb("CLOSED"), 0);
+        return ch;
+      },
+      send: async () => "ok",
+      unsubscribe: async () => "ok",
+    };
+    return ch;
+  };
+
+  const mock = {
+    auth: {
+      getSession: async () => ({ data: { session: null }, error: null }),
+      getUser: async () => ({ data: { user: null }, error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      signOut: async () => ({ error: null }),
+      signInWithPassword: async () => ({ data: { user: null, session: null }, error: notConfiguredError }),
+      signUp: async () => ({ data: { user: null, session: null }, error: notConfiguredError }),
+      setSession: async () => ({ data: { user: null, session: null }, error: null }),
+      exchangeCodeForSession: async () => ({ data: { user: null, session: null }, error: null }),
+      oauth: {
+        getAuthorizationDetails: async () => ({ data: null, error: notConfiguredError }),
+        approveAuthorization: async () => ({ data: null, error: notConfiguredError }),
+        denyAuthorization: async () => ({ data: null, error: notConfiguredError }),
+      },
+    },
+    from: () => makeQueryBuilder(false),
+    rpc: async () => ({ data: null, error: null }),
+    channel: () => makeChannel(),
+    removeChannel: async () => "ok",
+    storage: {
+      from: () => ({
+        list: async () => ({ data: [], error: null }),
+        upload: async () => ({ data: null, error: notConfiguredError }),
+        remove: async () => ({ data: null, error: notConfiguredError }),
+        getPublicUrl: () => ({ data: { publicUrl: "" } }),
+      }),
+    },
+  };
+
+  return mock as unknown as ReturnType<typeof createClient<Database>>;
+}
+
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
@@ -36,13 +127,8 @@ function createSupabaseClient() {
         process.env.SUPABASE_ANON_KEY));
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn("[AI Studio] Supabase env vars not configured — using offline mock client");
+    return createMockSupabaseClient();
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

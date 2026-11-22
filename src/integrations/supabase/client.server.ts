@@ -11,13 +11,22 @@ function createSupabaseAdminClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_SERVICE_ROLE_KEY ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn("[AI Studio] Server Supabase env vars not configured — using mock client");
+    const noOp = async () => ({ data: null, error: new Error("Supabase not configured") });
+    return {
+      auth: { getUser: async () => ({ data: { user: null }, error: null }) },
+      from: () =>
+        new Proxy(
+          {},
+          {
+            get: () => () => ({
+              then: (r: (v: { data: never[]; error: null }) => unknown) =>
+                Promise.resolve({ data: [], error: null }).then(r),
+            }),
+          },
+        ),
+      rpc: noOp,
+    } as unknown as ReturnType<typeof createClient<Database>>;
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {

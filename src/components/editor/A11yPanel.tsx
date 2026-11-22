@@ -94,17 +94,17 @@ export function A11yPanel() {
   }, [page, canvasW, canvasH]);
 
   return (
-    <div className="a11y-panel fixed bottom-24 right-5 z-40 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_24px_48px_-20px_rgba(15,23,42,0.2)] backdrop-blur-xl">
+    <div className="a11y-panel fixed bottom-24 right-4 z-40 w-72 overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.14)] backdrop-blur-md">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left"
+        className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left transition-colors hover:bg-slate-50"
         aria-expanded={open}
       >
         <Accessibility className="size-4 text-blue-600" />
-        <span className="flex-1 text-[11px] font-bold tracking-wide text-slate-800">Accessibility</span>
+        <span className="flex-1 text-xs font-semibold text-slate-800">Accessibility</span>
         <span
-          className={`rounded-full px-1.5 py-px font-mono text-[9px] font-bold ${
-            issues.length === 0 ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+          className={`rounded-full px-2 py-px font-mono text-[10px] font-semibold tabular-nums ${
+            issues.length === 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
           }`}
         >
           {issues.length}
@@ -125,7 +125,7 @@ export function A11yPanel() {
                   <button
                     onClick={() => issue.elementId && select(issue.elementId)}
                     disabled={!issue.elementId}
-                    className="flex w-full items-start gap-2 rounded-lg px-1.5 py-1.5 text-left transition hover:bg-slate-50 disabled:cursor-default disabled:hover:bg-transparent"
+                    className="flex w-full items-start gap-2 rounded-xl px-2 py-1.5 text-left transition hover:bg-slate-50 disabled:cursor-default disabled:hover:bg-transparent"
                   >
                     <AlertTriangle className="mt-px size-3.5 shrink-0 text-amber-500" />
                     <span className="min-w-0">

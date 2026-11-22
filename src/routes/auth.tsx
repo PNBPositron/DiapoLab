@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Loader2, Eye, EyeOff, ArrowRight, Sparkles, Cloud, Palette, MonitorSmartphone } from "lucide-react";
+import { ArrowLeft, Loader2, Eye, EyeOff, ArrowRight, Sparkles, Cloud, Palette, MonitorSmartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/hooks/use-auth";
 
@@ -71,46 +71,53 @@ function AuthPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 p-4 sm:p-6">
-      {/* Décor de fond : dégradés doux façon aurora */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,0.10),transparent_40%),radial-gradient(circle_at_85%_80%,rgba(124,91,214,0.10),transparent_40%)]" />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 sm:p-6">
+      <div className="mb-4 flex w-full max-w-4xl items-center justify-between">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
+        >
+          <ArrowLeft className="size-3.5" /> Back to editor
+        </Link>
+        <Link
+          to="/wiki"
+          className="rounded-full px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+        >
+          Documentation
+        </Link>
+      </div>
 
-      <div className="relative grid w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.12)] lg:grid-cols-2">
-        {/* Panneau gauche — branding */}
-        <div className="relative hidden flex-col justify-between overflow-hidden bg-slate-900 p-10 text-white lg:flex">
-          <div className="pointer-events-none absolute -left-20 -top-20 size-72 rounded-full bg-blue-600/30 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -right-16 size-80 rounded-full bg-indigo-500/25 blur-3xl" />
-
-          <Link to="/" className="relative flex items-center gap-3">
-            <img src="/favicon.ico" alt="DiapoLab" className="size-10 rounded-xl object-contain" />
-            <span className="font-display text-lg font-semibold">
-              <span className="logo-wordmark">DiapoLab</span>
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_56px_-20px_rgba(15,23,42,0.12)] lg:grid-cols-2">
+        {/* Left panel — brand & highlights */}
+        <div className="hidden flex-col justify-between border-r border-slate-200 bg-slate-50/70 p-10 text-slate-900 lg:flex">
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src="/favicon.ico" alt="DiapoLab" className="size-9 rounded-xl object-contain" />
+            <span className="font-display text-base font-semibold tracking-tight text-slate-900">
+              DiapoLab
             </span>
           </Link>
 
-          <div className="relative space-y-8">
+          <div className="space-y-8">
             <div>
-              <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight">
-                Design slides that
-                <br />
-                <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                  feel alive.
-                </span>
+              <p className="text-xs font-semibold text-blue-600">Presentation studio</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-slate-900">
+                Design slides that{" "}
+                <span className="text-blue-600">feel alive.</span>
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-400">
-                The futuristic presentation editor — shapes, morphs, transitions and more.
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Build decks with shapes, morph transitions, live polls, and clean exports.
               </p>
             </div>
 
-            <ul className="space-y-4">
+            <ul className="space-y-3.5">
               {[
                 { icon: Cloud, text: "Save your designs and pick up on any device" },
                 { icon: Palette, text: "40+ shape effects, liquid glass, themes" },
                 { icon: MonitorSmartphone, text: "Present fullscreen with laser & annotation tools" },
               ].map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-center gap-3 text-sm text-slate-300">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
-                    <Icon className="size-4 text-blue-400" />
+                <li key={text} className="flex items-center gap-3 text-xs font-medium text-slate-700">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-blue-600">
+                    <Icon className="size-4" />
                   </span>
                   {text}
                 </li>
@@ -118,17 +125,17 @@ function AuthPage() {
             </ul>
           </div>
 
-          <p className="relative font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            ▶ diapolab · design & presentation editor
+          <p className="text-xs text-slate-500">
+            DiapoLab · Design &amp; presentation editor
           </p>
         </div>
 
-        {/* Panneau droit — formulaire */}
-        <div className="flex flex-col justify-center p-6 sm:p-10">
+        {/* Right panel — form */}
+        <div className="flex flex-col justify-center bg-white p-6 sm:p-10">
           <Link to="/" className="mb-6 flex items-center gap-2.5 lg:hidden">
             <img src="/favicon.ico" alt="DiapoLab" className="size-8 rounded-lg object-contain" />
-            <span className="font-display text-base font-semibold uppercase tracking-[0.18em] text-slate-800">
-              <span className="logo-wordmark">DiapoLab</span>
+            <span className="font-display text-base font-semibold tracking-tight text-slate-900">
+              DiapoLab
             </span>
           </Link>
 
@@ -148,7 +155,7 @@ function AuthPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ada Lovelace"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
                 />
               </Field>
             )}
@@ -159,7 +166,7 @@ function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
               />
             </Field>
             <Field label="Password">
@@ -171,13 +178,13 @@ function AuthPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 pr-10 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:text-slate-700"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -185,7 +192,7 @@ function AuthPage() {
             </Field>
 
             {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-600">
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-600">
                 {error}
               </div>
             )}
@@ -193,7 +200,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+              className="group flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -211,7 +218,7 @@ function AuthPage() {
                 setMode(mode === "signin" ? "signup" : "signin");
                 setError(null);
               }}
-              className="text-sm text-slate-500 transition hover:text-slate-800"
+              className="text-xs text-slate-500 transition hover:text-slate-900"
             >
               {mode === "signin" ? (
                 <>
@@ -233,7 +240,7 @@ function AuthPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700">
         {label}
       </span>
       {children}

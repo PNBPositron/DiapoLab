@@ -13,7 +13,7 @@ type Step = 0 | 1 | 2;
 const PANEL_OPTIONS = [
   { id: "home", label: "Templates", icon: LayoutGrid, hint: "Browse community decks" },
   { id: "text", label: "Text", icon: Type, hint: "Add titles & paragraphs" },
-  { id: "elements", label: "Shapes", icon: Shapes, hint: "Images, shapes & icons" },
+  { id: "elements", label: "Elements", icon: Shapes, hint: "Shapes & icons" },
   { id: "library", label: "Library", icon: Library, hint: "Photos & illustrations" },
   { id: "components", label: "Presets", icon: Layers, hint: "Ready-made widgets" },
   { id: "design", label: "Design", icon: Palette, hint: "Colors & master style" },
@@ -91,16 +91,16 @@ export function WelcomeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) skip(); }}>
-      <DialogContent className="max-w-xl border-slate-200 bg-white p-0">
+      <DialogContent className="max-w-xl rounded-3xl sm:rounded-3xl border-slate-200 bg-white p-0">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 rounded-t-2xl border-b border-slate-200 bg-gradient-to-br from-blue-50 to-white px-6 py-5">
+        <div className="flex items-center justify-between gap-3 rounded-t-3xl border-b border-slate-200 bg-white px-6 py-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-slate-900 text-white shadow-md">
+            <span className="grid size-10 place-items-center rounded-2xl bg-blue-600 text-white">
               <MonitorPlay className="size-5" />
             </span>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">Welcome to DiapoLab</p>
-              <h2 className="text-base font-semibold text-slate-900">
+              <p className="text-xs font-medium text-blue-600">Welcome to DiapoLab</p>
+              <h2 className="text-base font-semibold tracking-tight text-slate-900">
                 {step === 0 ? "What are you making today?" : step === 1 ? "Start from a template?" : "Where do you want to begin?"}
               </h2>
             </div>
@@ -124,19 +124,19 @@ export function WelcomeDialog() {
                     <button
                       key={p.name}
                       onClick={() => setFormat({ name: p.name, w: p.w, h: p.h })}
-                      className={`relative flex flex-col items-center gap-2 rounded-xl border px-2 py-3.5 transition-all active:scale-[0.97] ${
+                      className={`relative flex flex-col items-center gap-2 rounded-2xl border px-2 py-3.5 transition-all active:scale-[0.97] ${
                         active
                           ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
                           : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40"
                       }`}
                     >
                       {active && (
-                        <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-blue-600 text-white">
+                        <span className="absolute right-2 top-2 grid size-4 place-items-center rounded-full bg-blue-600 text-white">
                           <Check className="size-2.5" strokeWidth={3} />
                         </span>
                       )}
                       <span
-                        className={`block rounded-[3px] border-2 ${active ? "border-blue-400 bg-blue-100" : "border-slate-300 bg-slate-100"}`}
+                        className={`block rounded-[5px] border-2 ${active ? "border-blue-400 bg-blue-100" : "border-slate-300 bg-slate-100"}`}
                         style={{ width: p.w >= p.h ? 34 : Math.round(34 * (p.w / p.h)), height: p.w >= p.h ? Math.round(26 * (p.h / p.w)) || 16 : 26 }}
                       />
                       <span className="text-[11px] font-semibold text-slate-800">{p.name}</span>
@@ -153,11 +153,11 @@ export function WelcomeDialog() {
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   onClick={() => { setUseTemplate(false); setPickedTemplate(null); }}
-                  className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-left transition ${
+                  className={`flex items-start gap-2.5 rounded-2xl border px-3.5 py-3 text-left transition ${
                     !useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-xl ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
                     <LayoutGrid className="size-3.5" />
                   </span>
                   <span>
@@ -167,11 +167,11 @@ export function WelcomeDialog() {
                 </button>
                 <button
                   onClick={() => setUseTemplate(true)}
-                  className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-left transition ${
+                  className={`flex items-start gap-2.5 rounded-2xl border px-3.5 py-3 text-left transition ${
                     useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-xl ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
                     <Layers className="size-3.5" />
                   </span>
                   <span>
@@ -184,13 +184,13 @@ export function WelcomeDialog() {
               {useTemplate && (
                 <div className="mt-3.5">
                   {templatesLoading ? (
-                    <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 py-10 text-[11px] text-slate-400">
+                    <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 py-10 text-[11px] text-slate-400">
                       <Loader2 className="size-3.5 animate-spin text-blue-500" /> Loading templates…
                     </div>
                   ) : templatesError ? (
-                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">{templatesError}</div>
+                    <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">{templatesError}</div>
                   ) : templates.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-200 px-3.5 py-8 text-center text-[11px] text-slate-400">
+                    <div className="rounded-2xl border border-dashed border-slate-200 px-3.5 py-8 text-center text-[11px] text-slate-400">
                       No public templates yet — start blank for now.
                     </div>
                   ) : (
@@ -201,7 +201,7 @@ export function WelcomeDialog() {
                           <button
                             key={t.id}
                             onClick={() => setPickedTemplate(t)}
-                            className={`group relative overflow-hidden rounded-xl border text-left transition-all ${
+                            className={`group relative overflow-hidden rounded-2xl border text-left transition-all ${
                               active ? "border-blue-600 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-blue-300"
                             }`}
                           >
@@ -238,11 +238,11 @@ export function WelcomeDialog() {
                     <button
                       key={id}
                       onClick={() => setPanel(id)}
-                      className={`flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
+                      className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition ${
                         active ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
                       }`}
                     >
-                      <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}>
+                      <span className={`grid size-8 shrink-0 place-items-center rounded-xl ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}>
                         <Icon className="size-4" />
                       </span>
                       <span className="min-w-0">
@@ -258,7 +258,7 @@ export function WelcomeDialog() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 rounded-b-2xl border-t border-slate-200 bg-slate-50 px-6 py-4">
+        <div className="flex items-center justify-between gap-3 rounded-b-3xl border-t border-slate-200 bg-slate-50 px-6 py-4">
           <button onClick={skip} className="text-[11px] font-medium text-slate-400 transition hover:text-slate-600">
             Skip
           </button>
@@ -266,7 +266,7 @@ export function WelcomeDialog() {
             {step > 0 && (
               <button
                 onClick={() => setStep((s) => (s - 1) as Step)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 active:scale-[0.97]"
+                className="rounded-full border border-slate-200 bg-white px-4.5 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 active:scale-[0.97]"
               >
                 Back
               </button>
@@ -275,14 +275,14 @@ export function WelcomeDialog() {
               <button
                 onClick={() => setStep((s) => (s + 1) as Step)}
                 disabled={nextDisabled}
-                className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
+                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
               >
                 Continue
               </button>
             ) : (
               <button
                 onClick={finish}
-                className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
+                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
               >
                 Start creating
               </button>

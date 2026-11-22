@@ -35,14 +35,14 @@ export function SelectionToolbar() {
     sendBackward,
   } = useEditor();
 
-  if (presenting || !selectedId || selectedIds.length === 0) return null;
+  if (presenting || !selectedId || selectedIds.length <= 1) return null;
   const el = elements.find((e) => e.id === selectedId);
   if (!el) return null;
 
   const isText = el.type === "text" || el.type === "button";
   const text = el as { fontSize?: number; fontWeight?: number };
   const btn =
-    "grid size-7 place-items-center rounded-md text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:scale-95";
+    "grid size-7 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:scale-95";
   const clampFont = (v: number) => Math.max(8, Math.min(400, Math.round(v)));
 
   // Arrange the multi-selection into a photo grid over its bounding box,
@@ -66,7 +66,11 @@ export function SelectionToolbar() {
   };
 
   return (
-    <div className="absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-slate-200 bg-white/95 px-1.5 py-1 shadow-[0_4px_20px_rgba(15,23,42,0.14)] backdrop-blur">
+    <div className="absolute left-1/2 top-16 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-2.5 py-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md">
+      <span className="px-2 text-[11px] font-medium tabular-nums text-slate-500">
+        {selectedIds.length} selected
+      </span>
+      <span className="mx-1 h-4 w-px bg-slate-200" />
       {isText && (
         <>
           <button
@@ -141,7 +145,7 @@ export function SelectionToolbar() {
         type="button"
         title="Delete"
         onClick={removeSelected}
-        className="grid size-7 place-items-center rounded-md text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+        className="grid size-7 place-items-center rounded-full text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 active:scale-95"
       >
         <Trash2 className="size-3.5" />
       </button>

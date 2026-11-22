@@ -23,7 +23,7 @@ function SettingsPage() {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-ink">
+    <main className="min-h-screen bg-white">
       <h1 className="sr-only">DiapoLab settings</h1>
       <SettingsDialog onClose={() => navigate({ to: "/" })} />
     </main>

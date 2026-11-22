@@ -75,20 +75,20 @@ export function PublishMetaDialog({
       license,
     });
 
-  const field = "mt-1.5 w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15";
-  const label = "block text-xs font-semibold text-foreground";
+  const field = "mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15";
+  const label = "block text-xs font-semibold text-slate-700";
 
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next && !busy) onCancel(); }}>
-      <DialogContent className="w-[calc(100vw-2rem)] max-w-lg max-h-[min(90vh,760px)] overflow-y-auto rounded-lg border-border bg-card p-0 text-card-foreground shadow-2xl" onInteractOutside={(event) => { if (busy) event.preventDefault(); }} onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }}>
-        <div className="border-b border-border px-6 pb-5 pt-6">
-          <div className="mb-4 flex size-10 items-center justify-center rounded-md bg-primary/15 text-primary"><Globe2 className="size-5" /></div>
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-lg max-h-[min(90vh,760px)] overflow-y-auto rounded-3xl sm:rounded-3xl border border-slate-200 bg-white p-0 text-slate-900 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)]" onInteractOutside={(event) => { if (busy) event.preventDefault(); }} onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }}>
+        <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-6 py-5">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600"><Globe2 className="size-5" /></div>
           <DialogHeader>
-            <DialogTitle className="text-left font-display text-xl font-semibold text-card-foreground">Publish {kind === "theme" ? "theme" : "template"}</DialogTitle>
-            <DialogDescription className="text-left text-sm text-muted-foreground">Add the details people will see in the marketplace.</DialogDescription>
+            <DialogTitle className="text-left font-display text-base font-semibold text-slate-900">Publish {kind === "theme" ? "theme" : "template"}</DialogTitle>
+            <DialogDescription className="text-left text-xs text-slate-500">Add the details people will see in the marketplace.</DialogDescription>
           </DialogHeader>
         </div>
-        <form onSubmit={(event) => { event.preventDefault(); submit(); }} className="space-y-4 px-6 pb-6">
+        <form onSubmit={(event) => { event.preventDefault(); submit(); }} className="space-y-4 px-6 py-5">
           <label className={label}>Name <span className="text-primary">*</span>
             <input autoFocus required maxLength={100} value={name} onChange={(event) => setName(event.target.value)} placeholder="Give it a name" className={field} />
           </label>
