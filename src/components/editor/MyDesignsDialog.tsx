@@ -15,10 +15,14 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
     setError(null);
     try {
       const designs = await listDesigns();
+      // Sort newest edits first in case the API or a fallback returns them unsorted.
+      const sorted = [...designs].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      );
       // Preload every font family referenced by the saved designs so
       // thumbnails render with the correct fonts instead of fallbacks.
-      designs.forEach((d) => ensureFontsForPages(d.pages as never));
-      setItems(designs);
+      sorted.forEach((d) => ensureFontsForPages(d.pages as never));
+      setItems(sorted);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }
@@ -81,7 +85,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               </h2>
               {items && (
                 <p className="mt-0.5 text-sm text-slate-500">
-                  {items.length} saved {items.length === 1 ? "design" : "designs"} · stored on this device
+                  {items.length} saved {items.length === 1 ? "design" : "designs"} · newest edits first
                 </p>
               )}
             </div>
@@ -144,7 +148,6 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                     ) : (
                       <div className="aspect-video w-full bg-slate-100" />
                     )}
-                    {/* Voile bleu au hover */}
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
                       <span className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg">
                         <Layers className="size-3.5" /> Open design
