@@ -14,9 +14,14 @@
 - [x] Liens de partage privés : table `design_shares` + RPC `get_shared_design` (migration `20261022090000_private_share_links.sql`), page viewer `/t/$id` moderne (glass, bouton Present, compteur de pages) ; distinction lien invalide vs migration non appliquée.
 - [x] Thumbnails sans UI de sélection ni animations d'entrée (mode `preview`).
 - [x] Centre/modernisation du popup de publication, compression des images, renommage Designs → Projects, thèmes de quiz, zoom de transition réglable, zoom d'aperçu ajustable, ombres et édition de quiz vérifiés, transitions morph corrigées.
+- [x] Panneau « Elements » renommé « Shapes » partout (onglet, réglages, accueil, wiki, en-tête du panneau).
+- [x] Zéro erreur de type : 22 erreurs corrigées (garde de géométrie des formes, branchement `onLoad` de la boîte « Tous les modèles », types `gifenc`, champs de profil, `search` manquant sur le lien de template, etc.) — `typecheck` propre, build OK.
+- [x] Champs `username` + `pronouns` ajoutés à la table `profiles` (migration drizzle) : la recherche de profils ne renvoie plus d'erreur 400.
+- [x] Formes aux dimensions manquantes ou non numériques rendues invisibles au lieu de produire des attributs SVG `NaN`.
 
 ## ⏳ En attente d'une action utilisateur
 
+- [ ] Icônes mortes du modèle publié « Company Light Corporate Theme » : 12 éléments `icon` pointent vers `/lineicons/*.svg` absents de l'app. Décision demandée (remplacer par des icônes intégrées / supprimer / laisser).
 - [ ] **Appliquer les migrations SQL dans Supabase** (SQL Editor) pour activer les liens privés sur la base hébergée : `supabase/migrations/20261022090000_private_share_links.sql`.
 - [ ] Vérifier le popup de publication de bout en bout (bloqué : besoin d'un compte connecté — pas encore d'utilisateur de test).
 - [ ] Vérifier le build Vercel après les derniers commits (présenter view, QR polls, notes) et tester un poll live depuis un téléphone.
