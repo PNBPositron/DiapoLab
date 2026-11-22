@@ -13,6 +13,10 @@ export function isEmbeddedImage(value: string | undefined) {
   return Boolean(value?.startsWith("data:image/"));
 }
 
+// Keep individual embedded images small enough to persist reliably inside the
+// design and template JSON payloads without depending on external file hosting.
+export const MAX_IMAGE_DATA_URL_LENGTH = 1_300_000;
+
 /** Resize and encode once on import, before the image enters design history or persistence. */
 export async function prepareImage(file: File, maxSide = 1920): Promise<string> {
   if (!file.type.startsWith("image/")) {
@@ -30,7 +34,7 @@ export async function prepareImage(file: File, maxSide = 1920): Promise<string> 
     });
     let scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
     if (!image.naturalWidth || !image.naturalHeight) throw new Error("Could not read this image.");
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 8; attempt++) {
       const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
       canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -38,10 +42,10 @@ export async function prepareImage(file: File, maxSide = 1920): Promise<string> 
       if (!context) throw new Error("Image processing is unavailable.");
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       const result = canvas.toDataURL("image/webp", attempt > 1 ? 0.7 : 0.8);
-      if (result.length < 1_300_000 || attempt === 4) return result;
+      if (result.length <= MAX_IMAGE_DATA_URL_LENGTH) return result;
       scale *= 0.75;
     }
-    throw new Error("Could not prepare this image.");
+    throw new Error("Image is too large to embed in a design. Choose a smaller image.");
   } finally {
     URL.revokeObjectURL(url);
   }

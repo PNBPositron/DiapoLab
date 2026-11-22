@@ -10,6 +10,11 @@ describe("morph matching", () => {
     expect(matches.get("a")?.x).toBe(20);
     expect(matches.get("b")?.x).toBe(300);
   });
+  test("identity takes precedence even when an element changes type", () => {
+    const original = newText({ id: "stable", x: 40 });
+    const replacement = newShape("rect", { id: "stable", x: 200 });
+    expect(matchMorphElements([original], [replacement]).get("stable")?.x).toBe(40);
+  });
   test("matches duplicated slides with new IDs one-to-one", () => {
     const a = newShape("rect", { id: "a", x: 40 });
     const b = newShape("rect", { id: "b", x: 80 });
@@ -17,14 +22,14 @@ describe("morph matching", () => {
     expect(matches.get("c")?.x).toBe(40);
     expect(matches.get("d")?.x).toBe(80);
   });
-  test("does not consume an exact content match for an edited title", () => {
+  test("exact content is matched before same-type order", () => {
     const a = newText({ text: "Title", x: 10 });
     const b = newText({ text: "Unchanged", x: 50 });
     const matches = matchMorphElements([a, b], [{ ...a, id: "new", text: "Edited" }, { ...b, id: "same" }]);
     expect(matches.get("same")?.x).toBe(50);
     expect(matches.get("new")?.x).toBe(10);
   });
-  test("new unmatched element fades in rather than matching another type", () => {
+  test("new unmatched element does not match another type", () => {
     expect(matchMorphElements([newText()], [newShape("rect", { id: "new" })]).has("new")).toBe(false);
   });
 });
