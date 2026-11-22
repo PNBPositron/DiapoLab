@@ -155,7 +155,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
   };
 
   const capturePreview = async () => {
-    if (capturing) return;
+    if (capturing || !preview) return;
     setCapturing(true);
     try {
       let dataUrl: string | null = null;

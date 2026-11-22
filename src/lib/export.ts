@@ -378,7 +378,7 @@ function pptxShadow(sh: { x: number; y: number; blur: number; color: string }) {
   const angle = Math.round((Math.atan2(-sh.y, Math.max(1e-6, sh.x)) * 180) / Math.PI);
   const offset = Math.round(Math.hypot(sh.x, sh.y) * 0.75 * 100) / 100;
   const blur = Math.max(0, Math.round(sh.blur * 0.75));
-  return { type: "outer", angle, offset, blur, color: cssColorToHex(sh.color) || "000000" };
+  return { type: "outer" as const, angle, offset, blur, color: cssColorToHex(sh.color) || "000000" };
 }
 
 export async function exportPPTX(name: string) {

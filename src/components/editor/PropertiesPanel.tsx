@@ -896,7 +896,7 @@ export function PropertiesPanel() {
       shadow: el.shadow ? { ...el.shadow } : undefined,
       filters:
         "filters" in el && (el as { filters?: ImageFilters }).filters
-          ? { ...(el as { filters?: ImageFilters }).filters }
+          ? { ...DEFAULT_FILTERS, ...(el as { filters?: ImageFilters }).filters }
           : undefined,
       effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
       snapshot,

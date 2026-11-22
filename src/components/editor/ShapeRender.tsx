@@ -163,8 +163,16 @@ export function ShapeRender({
   /** replaces the shape's own fill/gradient/image overlay (used for slide-bg knockout) */
   fillOverride?: string;
 }) {
-  const { shape, fill, stroke, strokeWidth, width, height, gradient, cornerRadius, imageOverlay } =
-    element;
+  const { shape, fill, stroke, gradient, cornerRadius, imageOverlay } = element;
+  // Stored designs can carry missing or non-numeric geometry; coerce so the
+  // shape renders invisibly instead of emitting NaN SVG attributes.
+  const num = (v: unknown, fallback: number) => {
+    const n = typeof v === "string" ? Number(v) : v;
+    return typeof n === "number" && Number.isFinite(n) ? n : fallback;
+  };
+  const strokeWidth = num(element.strokeWidth, 0);
+  const width = num(element.width, 0);
+  const height = num(element.height, 0);
   const gradId = `g-${element.id}`;
   const imageId = `image-${element.id}`;
   const fillRef = fillOverride ?? (imageOverlay ? `url(#${imageId})` : gradient ? `url(#${gradId})` : fill);

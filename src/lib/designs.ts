@@ -150,7 +150,16 @@ export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const ids = [...new Set(rows.map((row) => row.user_id))];
   if (!ids.length) return rows;
   const { data: profiles } = await (supabase as any).from("profiles").select("id, username, display_name, avatar_url").in("id", ids);
-  const byId = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
+  const byId = new Map<string, NonNullable<PublicTemplate["creator_profile"]>>(
+    (profiles ?? []).map((profile: any) => [
+      profile.id as string,
+      {
+        username: (profile?.username ?? null) as string | null,
+        display_name: (profile?.display_name ?? null) as string | null,
+        avatar_url: (profile?.avatar_url ?? null) as string | null,
+      },
+    ]),
+  );
   return rows.map((row) => ({ ...row, creator_profile: byId.get(row.user_id) ?? null }));
 }
 
