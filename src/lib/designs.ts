@@ -136,7 +136,7 @@ export type PublicTemplate = {
   style?: string | null;
   creator?: string | null;
   license?: string | null;
-  creator_profile?: { id?: string; username?: string | null; pronouns?: string | null; display_name: string | null; avatar_url: string | null } | null;
+  creator_profile?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {
@@ -149,8 +149,8 @@ export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const rows = (data ?? []) as unknown as PublicTemplate[];
   const ids = [...new Set(rows.map((row) => row.user_id))];
   if (!ids.length) return rows;
-  const { data: profiles } = await (supabase as any).rpc("get_creator_profiles", { _ids: ids });
-  const byId = new Map<string, NonNullable<PublicTemplate["creator_profile"]>>((profiles ?? []).map((profile: any) => [profile.id, profile]));
+  const { data: profiles } = await (supabase as any).from("profiles").select("id, username, display_name, avatar_url").in("id", ids);
+  const byId = new Map((profiles ?? []).map((profile: any) => [profile.id, profile]));
   return rows.map((row) => ({ ...row, creator_profile: byId.get(row.user_id) ?? null }));
 }
 
@@ -208,11 +208,14 @@ export async function listTemplateLikeCounts(
   templateIds: string[],
 ): Promise<Record<string, number>> {
   if (templateIds.length === 0) return {};
-  const { data, error } = await (supabase as any).rpc("get_template_like_counts", { _ids: templateIds });
+  const { data, error } = await supabase
+    .from("template_likes")
+    .select("template_id")
+    .in("template_id", templateIds);
   if (error) throw error;
   const counts: Record<string, number> = {};
-  for (const row of (data ?? []) as Array<{ template_id: string; like_count: number }>) {
-    counts[row.template_id] = Number(row.like_count);
+  for (const row of (data ?? []) as Array<{ template_id: string }>) {
+    counts[row.template_id] = (counts[row.template_id] ?? 0) + 1;
   }
   return counts;
 }

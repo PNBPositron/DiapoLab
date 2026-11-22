@@ -52,6 +52,6 @@ function PublicProfile() {
         <button onClick={subscribe} disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50">{subscribed ? <Check className="size-3.5" /> : null}{subscribed ? "Subscribed" : "Subscribe"}</button>
       </section>
       <h2 className="mt-10 text-sm font-bold uppercase tracking-[0.16em] text-slate-500">Published templates</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">{templates.map((template) => <Link key={template.id} to="/t/$id" params={{ id: template.id }} search={{ share: undefined }} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-blue-300"><h3 className="font-semibold">{template.name}</h3><p className="mt-1 text-xs text-slate-500">{template.pages?.length ?? 0} slides</p></Link>)}</div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">{templates.map((template) => <Link key={template.id} to="/t/$id" params={{ id: template.id }} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-blue-300"><h3 className="font-semibold">{template.name}</h3><p className="mt-1 text-xs text-slate-500">{template.pages?.length ?? 0} slides</p></Link>)}</div>
     </>}</div></main>;
 }

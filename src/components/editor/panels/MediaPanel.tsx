@@ -112,7 +112,7 @@ export function MediaPanel() {
       stream.getVideoTracks()[0]?.addEventListener("ended", () => {
         if (recorder.state !== "inactive") recorder.stop();
       });
-      setRec({ mode, stream, recorder, chunks, url: "" });
+      setRec({ mode, stream, recorder, chunks, url: URL.createObjectURL(stream) });
     } catch {
       setError("Recording cancelled or permission denied.");
     }

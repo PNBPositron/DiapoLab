@@ -56,6 +56,8 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          pronouns: string | null
+          username: string | null
           updated_at: string
         }
         Insert: {
@@ -69,7 +71,9 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
-          id?: string
+          pronouns?: string | null
+          username?: string | null
+          created_at?: string
           updated_at?: string
         }
         Relationships: []
@@ -189,21 +193,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_creator_profiles: {
-        Args: { _ids: string[] }
-        Returns: {
-          avatar_url: string
-          display_name: string
-          id: string
-        }[]
-      }
-      get_template_like_counts: {
-        Args: { _ids: string[] }
-        Returns: {
-          like_count: number
-          template_id: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
