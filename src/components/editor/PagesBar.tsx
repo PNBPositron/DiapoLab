@@ -51,7 +51,7 @@ export function PagesBar() {
   }
 
   return (
-    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/90 bg-white px-5 py-2.5 text-slate-700">
+    <div className="pages-bar flex shrink-0 items-center bg-transparent px-5 pb-3.5 pt-1 text-slate-700">
       <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
@@ -59,10 +59,10 @@ export function PagesBar() {
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-xl border bg-white transition-all duration-150 ${
+                className={`relative overflow-hidden rounded-[14px] bg-white transition-all duration-150 ${
                   active
-                    ? "border-blue-600 ring-2 ring-blue-600/20 shadow-[0_8px_20px_-6px_rgba(37,99,235,0.28)]"
-                    : "border-slate-200/90 opacity-85 hover:-translate-y-0.5 hover:border-slate-300 hover:opacity-100"
+                    ? "border-2 border-blue-600 ring-4 ring-blue-500/15 shadow-[0_12px_28px_-8px_rgba(37,99,235,0.34)]"
+                    : "border border-slate-200/90 opacity-90 shadow-[0_8px_22px_-8px_rgba(15,23,42,0.12)] hover:-translate-y-0.5 hover:border-slate-300 hover:opacity-100"
                 }`}
                 style={{ width: thumbW + 2, height: thumbH + 2 }}
               >
@@ -72,8 +72,8 @@ export function PagesBar() {
                   canvasH={canvasH}
                   className="h-full w-full"
                 />
-                <span className={`absolute bottom-1.5 right-1.5 rounded-full px-1.5 py-px font-mono text-[10px] font-semibold tabular-nums transition-opacity ${
-                  active ? "bg-blue-600 text-white opacity-100" : "bg-slate-900/75 text-white opacity-0 group-hover:opacity-100"
+                <span className={`absolute bottom-1.5 right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-mono text-[10px] font-bold tabular-nums transition-opacity ${
+                  active ? "bg-blue-600 text-white opacity-100 shadow-xs" : "bg-slate-900/75 text-white opacity-0 group-hover:opacity-100"
                 }`}>
                   {i + 1}
                 </span>
@@ -125,7 +125,7 @@ export function PagesBar() {
           onClick={addPage}
           title="Add page"
           aria-label="Add page"
-          className="grid shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 bg-white text-slate-400 transition-colors hover:border-blue-400 hover:bg-blue-50/40 hover:text-blue-600"
+          className="grid shrink-0 place-items-center rounded-[14px] border border-dashed border-slate-300/90 bg-white/60 text-slate-500 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.10)] backdrop-blur-md transition-all hover:border-blue-400 hover:bg-white/90 hover:text-blue-600"
           style={{ height: thumbH + 2, width: Math.max(36, Math.round(thumbH * 0.72)) }}
         >
           <Plus className="h-4 w-4" strokeWidth={2} />

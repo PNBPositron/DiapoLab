@@ -167,7 +167,7 @@ export function Canvas() {
           >
             <div
               id="canvas-export"
-              className="absolute left-0 top-0 overflow-hidden rounded-[2px] ring-1 ring-slate-200/90 shadow-[0_22px_54px_-14px_rgba(15,23,42,0.14),0_4px_14px_-4px_rgba(15,23,42,0.06)]"
+              className="absolute left-0 top-0 overflow-hidden rounded-[24px] ring-1 ring-slate-200/80 shadow-[0_26px_64px_-16px_rgba(37,99,235,0.13),0_10px_28px_-8px_rgba(15,23,42,0.10)]"
               style={{
                 width: canvasW,
                 height: canvasH,
@@ -195,7 +195,16 @@ export function Canvas() {
                   className="pointer-events-none absolute inset-0 z-0"
                   style={{ background: bgColor }}
                 />
-              ) : null}
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="editor-slide-dots pointer-events-none absolute inset-0 z-0"
+                  style={{
+                    backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.28) 1.5px, transparent 1.5px)",
+                    backgroundSize: "28px 28px",
+                  }}
+                />
+              )}
               <div className="relative z-10 size-full">
                 {elements
                   .filter((el) => !el.hidden)
@@ -240,11 +249,11 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2.5 text-slate-700 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
+      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center gap-1 rounded-full border border-white/95 bg-white/92 px-3 text-slate-700 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.15),0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-xl">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-7 w-7 rounded-full"
           title="Zoom out"
           aria-label="Zoom out"
           disabled={scale <= 0.1}
@@ -257,14 +266,14 @@ export function Canvas() {
           onClick={() => setZoom(null)}
           title="Fit to screen"
           aria-label="Fit to screen"
-          className="min-w-12 rounded-full px-2 py-1 text-center font-mono text-xs font-semibold tabular-nums text-slate-700 transition hover:bg-slate-100"
+          className="min-w-11 whitespace-nowrap rounded-full px-2 py-1 text-center font-mono text-xs font-semibold tabular-nums text-slate-800 transition hover:bg-slate-100"
         >
           {Math.round(scale * 100)}%
         </button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-7 w-7 rounded-full"
           title="Zoom in"
           aria-label="Zoom in"
           disabled={scale >= 3}
@@ -275,13 +284,13 @@ export function Canvas() {
         <span className="hidden whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
           {canvasW}×{canvasH}
         </span>
-        <span className="whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums text-slate-500">
+        <span className="whitespace-nowrap px-2.5 font-mono text-[11px] font-medium tabular-nums text-slate-600">
           {currentIndex + 1} / {pages.length}
         </span>
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-7 w-7 rounded-full"
           title={snapping ? "Snapping on (Alt to bypass while dragging)" : "Snapping off"}
           aria-label="Toggle snapping"
           aria-pressed={snapping}
@@ -292,7 +301,7 @@ export function Canvas() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className="h-7 w-7 rounded-full"
           title="Slide version history"
           aria-label="Slide version history"
           onClick={() => setHistoryOpen(true)}
@@ -306,7 +315,7 @@ export function Canvas() {
               variant="ghost"
               aria-label="Slide transition"
               title="Slide transition & animations"
-              className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-medium text-slate-600"
+              className="h-7 gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-medium text-slate-700"
             >
               <WandSparkles className="size-3.5" aria-hidden="true" />
               {formatTransitionLabel(currentTransition)}

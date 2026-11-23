@@ -76,7 +76,8 @@ type Collection = "Highlights" | "Transhumans" | "Icons";
 export function IllustrationsPanel({ embedded = false }: { embedded?: boolean } = {}) {
   const { add } = useEditor();
   const editorTheme = useSettings((state) => state.editorTheme);
-  const isDark = editorTheme?.includes("dark");
+  const editorDark = useSettings((state) => state.editorDark);
+  const isDark = editorDark || editorTheme?.includes("dark");
 
   const [activeTab, setActiveTab] = useState<Collection>("Highlights");
   const [searchQuery, setSearchQuery] = useState("");

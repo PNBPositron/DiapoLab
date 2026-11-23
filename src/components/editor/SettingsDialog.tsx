@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2 } from "lucide-react";
+import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2, Wallpaper } from "lucide-react";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId, type TransitionSoundStyle } from "@/store/settings";
+import { WorkspaceBackgroundPicker } from "./WorkspaceBackground";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, listMyShareLinks, deleteShareLink, type PublicTemplate, type ShareLink } from "@/lib/designs";
@@ -379,6 +380,15 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 );
               })}
             </div>
+          </Section>
+
+          {/* Workspace background */}
+          <Section
+            icon={<Wallpaper className="size-4" />}
+            label="Workspace background"
+            desc="Choose a preset backdrop, solid tint, or upload your own image behind the canvas."
+          >
+            <WorkspaceBackgroundPicker />
           </Section>
 
           {/* Appearance & accessibility */}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Home, Type, Shapes, Layers, Layers3, Palette, Folder, Library, Image } from "lucide-react";
+import { Home, Type, Shapes, Layers, Layers3, Palette, Folder, Library, Image, Sun, Moon } from "lucide-react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
@@ -28,7 +28,7 @@ const TOOLS = [
 
 export function Sidebar() {
   const { tool, setTool } = useEditor();
-  const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme } = useSettings();
+  const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme, editorDark, setEditorDark } = useSettings();
   const [hovering, setHovering] = useState(false);
   // Pinned panels stay open after the cursor leaves (Doory-style).
   const [pinned, setPinned] = useState(false);
@@ -91,36 +91,79 @@ export function Sidebar() {
           setHovering(true);
         }}
         title={t.label}
-        className={`group relative flex w-full flex-col items-center gap-1.5 rounded-2xl py-2.5 text-[11px] font-medium transition-colors ${
+        className={`group relative flex w-full flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium transition-all ${
           active
-            ? "bg-blue-50 text-blue-700"
-            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+            ? "bg-blue-50/90 text-blue-600 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.12)]"
+            : "text-slate-600 hover:bg-slate-100/75 hover:text-slate-900"
         }`}
       >
         {active && (
           <span aria-hidden className="absolute left-0.5 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-blue-600" />
         )}
-        <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.9} />
+        <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.85} />
         <span className="leading-none">{t.label}</span>
       </button>
     );
   };
 
   return (
-    <aside className="editor-ui relative flex h-full" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
+    <aside
+      className="editor-ui relative z-20 flex h-full shrink-0 py-3 pl-3"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
       <nav
-        className="editor-tool-rail flex h-full w-[5rem] min-h-0 shrink-0 flex-col justify-between overflow-y-auto overscroll-contain border-r border-slate-200 bg-white px-2 py-3"
+        aria-label="Editor tools"
+        className="editor-tool-rail flex h-full w-[76px] min-h-0 shrink-0 flex-col justify-between overflow-y-auto overscroll-contain rounded-[24px] border border-slate-200/80 bg-white/88 px-1.5 py-2.5 shadow-[0_14px_38px_-12px_rgba(15,23,42,0.10),0_4px_14px_-4px_rgba(15,23,42,0.05)] backdrop-blur-xl"
       >
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           {primaryTools.map(renderToolBtn)}
         </div>
-        {bottomTools.length > 0 && (
-          <div className="mt-3 flex flex-col gap-1.5 border-t border-slate-100 pt-3">
-            {bottomTools.map(renderToolBtn)}
+        <div className="mt-2 flex flex-col gap-2 border-t border-slate-200/70 pt-2">
+          {bottomTools.map(renderToolBtn)}
+          <div
+            role="group"
+            aria-label="Editor color mode"
+            className="editor-theme-pill mx-auto flex items-center rounded-full border border-slate-200/80 bg-slate-100/90 p-0.5"
+          >
+            <button
+              type="button"
+              onClick={() => setEditorDark(false)}
+              aria-pressed={!editorDark}
+              title="Light mode"
+              aria-label="Light mode"
+              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-full transition-all ${
+                !editorDark
+                  ? "bg-white text-amber-500 shadow-[0_1px_4px_rgba(15,23,42,0.12)]"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              <Sun className="h-3.5 w-3.5" strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditorDark(true)}
+              aria-pressed={editorDark}
+              title="Dark mode"
+              aria-label="Dark mode"
+              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-full transition-all ${
+                editorDark
+                  ? "bg-slate-800 text-blue-300 shadow-[0_1px_4px_rgba(15,23,42,0.3)]"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              <Moon className="h-3.5 w-3.5" strokeWidth={2} />
+            </button>
           </div>
-        )}
+        </div>
       </nav>
-      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[5.375rem] top-2.5 z-40 h-[calc(100%-1.25rem)] w-[304px] origin-left overflow-y-auto rounded-[22px] border border-slate-200/90 bg-white p-4 shadow-[0_20px_50px_-14px_rgba(15,23,42,0.16)] will-change-[transform,opacity] ${panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"}`}>
+      <div
+        aria-hidden={!panelOpen}
+        style={{ transition: panelTransition }}
+        className={`editor-side-panel absolute left-[96px] top-3 z-40 h-[calc(100%-1.5rem)] w-[304px] origin-left overflow-y-auto rounded-[24px] border border-white/90 bg-white/95 p-4 shadow-[0_24px_56px_-14px_rgba(15,23,42,0.16),0_4px_14px_-4px_rgba(37,99,235,0.08)] backdrop-blur-xl will-change-[transform,opacity] ${
+          panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"
+        }`}
+      >
         {tool === "home" && <TemplatesPanel />}
         {tool === "text" && <TextPanel />}
         {tool === "elements" && <ElementsPanel />}

@@ -66,7 +66,7 @@ export function SelectionToolbar() {
   };
 
   return (
-    <div className="absolute left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1.5 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
+    <div className="selection-toolbar absolute left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1.5 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
       <span className="px-2 text-[11px] font-semibold tabular-nums text-slate-600">
         {selectedIds.length} selected
       </span>

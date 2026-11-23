@@ -7,8 +7,7 @@
   }
 
   .editor-tool-rail {
-    background: transparent;
-    border: 0;
+    background: rgba(255, 255, 255, 0.86);
   }
 
   .editor-ui {
@@ -29,7 +28,7 @@
 
   .editor-tool-rail button:hover,
   .editor-tool-rail button:focus-visible {
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
   }
 
   .editor-side-panel {
@@ -275,7 +274,7 @@
 /* Keep editor chrome readable without overriding slide element font families. */
 .editor-ui {
   font-family: Manrope, system-ui, sans-serif;
-  background-color: #ffffff;
+  background-color: transparent;
   color: #0f172a;
 }
 .editor-ui > header,
@@ -385,22 +384,22 @@
   padding-left: 0.6rem;
 }
 
-/* Clean pure-white structural chrome: crisp borders, subtle frosted header. */
+/* Frosted translucent structural chrome floating over the ambient workspace. */
 .editor-ui > header {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(226, 232, 240, 0.85);
 }
 .editor-ui .pages-bar {
-  background: #ffffff;
-  border-color: #e2e8f0;
+  background: transparent;
+  border-color: transparent;
   gap: 0.75rem;
 }
 .editor-ui .timeline-bar {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.85);
   border-color: #e2e8f0;
 }
 .editor-ui main {
-  background-color: #ffffff;
+  background-color: transparent;
 }
 .editor-ui main > .pointer-events-none.absolute.inset-0 {
   opacity: 0.08;
@@ -462,9 +461,9 @@
   font-family: var(--font-mono);
 }
 
-/* Tool rail: quiet, aligned, no jarring dock magnification */
+/* Tool rail: floating frosted glass dock */
 .editor-tool-rail {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.85);
 }
 .editor-tool-rail button {
   transition: background-color 150ms ease, color 150ms ease;
@@ -494,7 +493,14 @@
   text-transform: none;
 }
 
-/* ── Web embeds: export fallback ────────────────────────────────────────── */
+/* ── Web embeds & editor-only stage ornaments: export cleanup ───────────── */
+#canvas-export[data-exporting] {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#canvas-export[data-exporting] .editor-slide-dots {
+  display: none !important;
+}
 #canvas-export[data-exporting] iframe.embed-live {
   display: none !important;
 }
@@ -534,19 +540,32 @@
 /* ── Dark editor chrome (Settings > Dark editor) ───────────────────────── */
 .editor-dark {
   color-scheme: dark;
+  --selector-surface: #16213a;
+  --selector-muted: #0d1629;
+  --selector-ink: #f1f5f9;
+  --selector-subtle: #94a3b8;
+  --selector-border: rgba(148, 163, 184, 0.22);
+  --selector-accent: #60a5fa;
+  --selector-active: rgba(37, 99, 235, 0.22);
+  --selector-shadow: 0 2px 10px rgba(2, 6, 23, 0.4);
+  --selector-panel-shadow: 0 18px 42px -12px rgba(2, 6, 23, 0.65), 0 4px 12px rgba(2, 6, 23, 0.4);
 }
 .editor-dark.editor-ui {
-  background:
-    radial-gradient(1100px 520px at 82% -12%, rgba(79, 139, 255, 0.12), transparent 62%),
-    radial-gradient(820px 460px at 4% 112%, rgba(99, 102, 241, 0.10), transparent 62%),
-    linear-gradient(180deg, #0b1220 0%, #0d1526 100%) !important;
+  background: transparent !important;
   color: #e2e8f0;
 }
-.editor-dark.editor-ui > header,
-.editor-dark .pages-bar,
-.editor-dark .editor-tool-rail {
-  background: #0d1526 !important;
+.editor-dark.editor-ui > header {
+  background: rgba(13, 21, 38, 0.84) !important;
   border-color: rgba(148, 163, 184, 0.16) !important;
+}
+.editor-dark .pages-bar {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.editor-dark .editor-tool-rail {
+  background: rgba(16, 26, 46, 0.88) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 0 14px 38px -12px rgba(2, 6, 23, 0.55) !important;
 }
 .editor-dark.editor-ui main {
   background-color: transparent !important;
@@ -555,34 +574,68 @@
 .editor-dark .editor-inspector,
 .editor-dark .zoom-dock,
 .editor-dark .toolbar-flyout,
-.editor-dark .a11y-panel {
+.editor-dark .a11y-panel,
+.editor-dark .floating-hud,
+.editor-dark .selection-toolbar {
   background: #101a2e !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0;
 }
-/* Chrome text: light slate, but keep accent-colored labels (blue/sky/rose/emerald/amber). */
-.editor-dark .editor-side-panel :is(button, input, textarea, select, label, p, span, h2, h3, output):not([class*="text-blue"]):not([class*="text-sky"]):not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-white"]) {
+.editor-dark .editor-side-panel .panel-content {
+  color: #e2e8f0;
+}
+.editor-dark .editor-side-panel .panel-intro,
+.editor-dark .editor-side-panel .panel-section-label {
+  color: #94a3b8 !important;
+}
+.editor-dark .editor-side-panel .panel-section-label::after {
+  background: rgba(148, 163, 184, 0.22) !important;
+}
+.editor-dark .editor-side-panel .panel-choice-grid > button,
+.editor-dark .editor-side-panel .panel-action-grid > button,
+.editor-dark .editor-side-panel .panel-action-grid > label {
+  background: #16213a;
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
+}
+.editor-dark .editor-side-panel .panel-choice-grid > button:hover,
+.editor-dark .editor-side-panel .panel-action-grid > button:hover,
+.editor-dark .editor-side-panel .panel-action-grid > label:hover {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.34);
+}
+.editor-dark .editor-side-panel .panel-choice-grid > button[aria-pressed="true"],
+.editor-dark .editor-side-panel .panel-action-grid > button[aria-pressed="true"] {
+  background: rgba(37, 99, 235, 0.22);
+  border-color: #60a5fa;
+}
+/* Chrome text: light slate, preserving accent classes and inline color previews. */
+.editor-dark :is(.editor-side-panel, .editor-inspector) :is(div, button, input, textarea, select, label, p, span, h2, h3, h4, output):not([class*="text-blue"]):not([class*="text-indigo"]):not([class*="text-sky"]):not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-white"]):not([style*="color"]) {
   color: #cbd5e1;
 }
 .editor-dark .a11y-panel :is(button, p, span):not([class*="text-blue"]):not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-amber"]) {
   color: #cbd5e1;
 }
-/* Panel buttons: dark surface, except colored/gradient/inline-styled ones (swatches). */
-.editor-dark .editor-side-panel button:not([class*="bg-blue"]):not([class*="bg-sky"]):not([class*="bg-rose"]):not([class*="bg-emerald"]):not([class*="bg-gradient"]):not([style*="background"]) {
+/* Panel buttons: dark surface, excluding selector kit buttons, solid colored CTAs, gradients, and color swatches. */
+.editor-dark :is(.editor-side-panel, .editor-inspector) button:not([class*="selector-"]):not([class*="bg-blue-6"]):not([class*="bg-blue-7"]):not([class*="bg-indigo-6"]):not([class*="bg-sky-6"]):not([class*="bg-rose-6"]):not([class*="bg-emerald-6"]):not([class*="bg-slate-9"]):not([class*="bg-gradient"]):not([style*="background"]) {
   background-color: rgba(148, 163, 184, 0.08);
   border-color: rgba(148, 163, 184, 0.22);
 }
-.editor-dark .editor-side-panel button:hover:not([class*="bg-blue"]):not([class*="bg-sky"]):not([class*="bg-rose"]):not([class*="bg-gradient"]):not([style*="background"]) {
+.editor-dark :is(.editor-side-panel, .editor-inspector) button:hover:not([class*="selector-"]):not([class*="bg-blue-6"]):not([class*="bg-blue-7"]):not([class*="bg-indigo-6"]):not([class*="bg-sky-6"]):not([class*="bg-rose-6"]):not([class*="bg-emerald-6"]):not([class*="bg-slate-9"]):not([class*="bg-gradient"]):not([style*="background"]) {
   background-color: rgba(148, 163, 184, 0.16);
 }
-/* Inputs: dark filled fields. */
-.editor-dark .editor-side-panel input:not([type="color"]):not([type="range"]),
-.editor-dark .editor-side-panel textarea,
-.editor-dark .editor-side-panel select {
-  background: rgba(15, 23, 42, 0.6) !important;
-  border-color: rgba(148, 163, 184, 0.25) !important;
-  color: #e2e8f0 !important;
+/* Inputs: dark filled fields inside side panels & inspector. */
+.editor-dark :is(.editor-side-panel, .editor-inspector) input:not([type="color"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+.editor-dark :is(.editor-side-panel, .editor-inspector) textarea,
+.editor-dark :is(.editor-side-panel, .editor-inspector) select {
+  background: #0d1629 !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  color: #f1f5f9 !important;
 }
-/* Toolbar buttons: dark pills, except the gradient Export button. */
+.editor-dark :is(.editor-side-panel, .editor-inspector) :is(input, textarea)::placeholder {
+  color: #64748b !important;
+}
+/* Toolbar buttons: dark pills, except primary gradient/blue CTAs. */
 .editor-dark .editor-ui > header button:not([class*="bg-gradient"]):not([class*="bg-blue"]) {
   background-color: rgba(148, 163, 184, 0.1);
   border-color: rgba(148, 163, 184, 0.2);
@@ -607,37 +660,86 @@
   background: rgba(148, 163, 184, 0.3);
 }
 
-/* ── Dark chrome: full coverage of Tailwind-styled surfaces ───────────────
-   The base dark rules above only restyle a few known surfaces; panels,
-   dialogs and cards are styled with Tailwind utilities, so map them to
-   dark equivalents. Scoped with :not(#canvas-export …) so slide content,
-   exports and the presentation canvas are never touched. */
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="bg-white"]:not([style*="background"]) {
+/* ── Dark chrome: full coverage of Tailwind-styled surfaces & text ─────────
+   Scoped strictly to editor chrome containers so #canvas-export and slide
+   content are never touched. */
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header, .pages-bar) [class*="bg-white"]:not([style*="background"]):not(.size-4.rounded-full) {
   background-color: #16213a !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="bg-slate-50"]:not([style*="background"]) {
-  background-color: rgba(148, 163, 184, 0.07) !important;
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header) [class*="bg-slate-50"]:not([style*="background"]) {
+  background-color: rgba(15, 23, 42, 0.6) !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="bg-slate-100"]:not([style*="background"]),
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="bg-slate-200"]:not([style*="background"]) {
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header) :is([class*="bg-slate-100"], [class*="bg-slate-200"]):not([style*="background"]) {
   background-color: rgba(148, 163, 184, 0.14) !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="border-slate-1"],
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="border-slate-2"],
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="border-slate-3"] {
-  border-color: rgba(148, 163, 184, 0.2) !important;
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel) [class*="bg-slate-9"]:not([style*="background"]) {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-4"],
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-5"] {
+/* Pale tinted cards & soft gradients used in light mode panels. */
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .floating-hud, .selection-toolbar) :is([class*="bg-blue-50"], [class*="bg-blue-100"]):not([style*="background"]) {
+  background-color: rgba(37, 99, 235, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout) :is([class*="bg-indigo-50"], [class*="bg-indigo-100"]):not([style*="background"]) {
+  background-color: rgba(99, 102, 241, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout) :is([class*="bg-sky-50"], [class*="bg-sky-100"]):not([style*="background"]) {
+  background-color: rgba(14, 165, 233, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .floating-hud) :is([class*="bg-amber-50"], [class*="bg-amber-100"]):not([style*="background"]) {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .floating-hud, .selection-toolbar) :is([class*="bg-rose-50"], [class*="bg-rose-100"]):not([style*="background"]) {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout) :is([class*="bg-emerald-50"], [class*="bg-emerald-100"]):not([style*="background"]) {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector) :is([class*="from-blue-50"], [class*="from-indigo-50"], [class*="from-white"], [class*="from-slate-"]):not([style*="background"]) {
+  background-image: none !important;
+  background-color: #16213a !important;
+}
+/* Borders */
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header) :is([class*="border-slate-1"], [class*="border-slate-2"], [class*="border-slate-3"], [class*="border-blue-1"], [class*="border-blue-2"], [class*="border-indigo-1"], [class*="border-indigo-2"], [class*="border-white"]) {
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .floating-hud) :is([class*="border-amber-2"], [class*="border-amber-3"]) {
+  border-color: rgba(245, 158, 11, 0.38) !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .floating-hud) [class*="border-rose-2"] {
+  border-color: rgba(244, 63, 94, 0.38) !important;
+}
+/* High-contrast dark-mode text colors */
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header, .pages-bar) :is([class*="text-slate-3"], [class*="text-slate-4"], [class*="text-slate-5"]):not([style*="color"]) {
   color: #94a3b8 !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-6"],
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-7"] {
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header, .pages-bar) :is([class*="text-slate-6"], [class*="text-slate-7"]):not([style*="color"]) {
   color: #cbd5e1 !important;
 }
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-8"],
-.editor-dark :not(#canvas-export):not(#canvas-export *) :not(main):not(aside):not(.editor-tool-rail):not(.editor-tool-rail *) [class*="text-slate-9"] {
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header, .pages-bar) :is([class*="text-slate-8"], [class*="text-slate-9"]):not([style*="color"]) {
   color: #f1f5f9 !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .a11y-panel, .floating-hud, .selection-toolbar, header) :is([class*="text-blue-6"], [class*="text-blue-7"], [class*="text-blue-8"], [class*="text-blue-9"]):not([class*="bg-blue-6"]):not([style*="color"]) {
+  color: #93c5fd !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout) :is([class*="text-indigo-6"], [class*="text-indigo-7"], [class*="text-indigo-8"], [class*="text-indigo-9"]):not([class*="bg-indigo-6"]):not([style*="color"]) {
+  color: #a5b4fc !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout) :is([class*="text-sky-6"], [class*="text-sky-7"]):not([style*="color"]) {
+  color: #7dd3fc !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .floating-hud) :is([class*="text-amber-6"], [class*="text-amber-7"]):not([style*="color"]) {
+  color: #fcd34d !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector, .floating-hud) :is([class*="text-rose-5"], [class*="text-rose-6"], [class*="text-rose-7"]):not([style*="color"]) {
+  color: #fda4af !important;
+}
+.editor-dark :is(.editor-side-panel, .editor-inspector) :is([class*="text-emerald-6"], [class*="text-emerald-7"]):not([style*="color"]) {
+  color: #6ee7b7 !important;
+}
+/* Keep primary white-text CTA buttons crisp when utility classes coexist. */
+.editor-dark :is(.editor-side-panel, .editor-inspector, .toolbar-flyout, .floating-hud, header) :is([class*="bg-blue-6"], [class*="bg-blue-7"], [class*="bg-indigo-6"], [class*="bg-rose-6"], [class*="bg-gradient"])[class*="text-white"] {
+  color: #ffffff !important;
 }
 /* Thumbnails: the black border disappears on the dark backdrop — lighten it. */
 .editor-dark .pages-bar .group > button {
@@ -652,12 +754,19 @@ aside.editor-ui {
 
 /* Rail buttons stay on the backdrop in dark mode: no light pills, the active
    tool is shown by its blue label + accent bar. */
-.editor-dark nav.editor-tool-rail button {
+.editor-dark nav.editor-tool-rail button:not(.editor-theme-btn) {
   background: transparent !important;
 }
-.editor-dark nav.editor-tool-rail button:hover,
-.editor-dark nav.editor-tool-rail button:focus-visible {
+.editor-dark nav.editor-tool-rail button:not(.editor-theme-btn):hover,
+.editor-dark nav.editor-tool-rail button:not(.editor-theme-btn):focus-visible {
   background: rgba(148, 163, 184, 0.12) !important;
+}
+.editor-dark .editor-theme-pill {
+  background: rgba(15, 23, 42, 0.65) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+.editor-dark .editor-theme-btn[aria-pressed="true"] {
+  background: rgba(51, 65, 85, 0.95) !important;
 }
 
 /* ── Animated icons: micro-animations on the canvas and while presenting ── */

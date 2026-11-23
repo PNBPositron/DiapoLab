@@ -914,7 +914,7 @@ export function PropertiesPanel() {
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
     <div className="pointer-events-none fixed left-1/2 top-[4.25rem] z-30 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
-      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2 py-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.14)] backdrop-blur-md">
+      <div className="floating-hud pointer-events-auto flex items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2 py-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.14)] backdrop-blur-md">
         {/* Type tag */}
         <span className="px-2 py-0.5 text-[11px] font-semibold capitalize text-slate-600">
           {el.type}
@@ -1132,7 +1132,7 @@ export function PropertiesPanel() {
       {floatingHUD}
 
       {advancedOpen && (
-        <aside className="editor-inspector fixed right-3 top-[4.25rem] bottom-3 z-40 flex w-[280px] flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-[0_18px_44px_-12px_rgba(15,23,42,0.14)] transition-all duration-200">
+        <aside className="editor-inspector fixed right-3 top-[4.75rem] bottom-3 z-40 flex w-[280px] flex-col overflow-hidden rounded-[24px] border border-white/90 bg-white/95 shadow-[0_24px_56px_-14px_rgba(15,23,42,0.16),0_4px_14px_-4px_rgba(37,99,235,0.08)] backdrop-blur-xl transition-all duration-200">
           <div className="px-3 pt-3">
             <PanelHeader
               title={

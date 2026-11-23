@@ -59,6 +59,16 @@ export const DEFAULT_TEXT_STYLES: Record<"title" | "subtitle" | "body", TextStyl
 
 export type TransitionSoundStyle = "whoosh" | "click";
 
+export type WorkspaceBgId =
+  | "clean"
+  | "aurora"
+  | "warm-paper"
+  | "sage-mist"
+  | "custom-color"
+  | "custom-image";
+
+export const DEFAULT_WORKSPACE_BG: WorkspaceBgId = "clean";
+
 type SettingsState = {
   autoHidePanel: boolean;
   editorTheme: string;
@@ -69,6 +79,9 @@ type SettingsState = {
   transitionSound: boolean;
   transitionSoundStyle: TransitionSoundStyle;
   editorDark: boolean;
+  workspaceBg: WorkspaceBgId;
+  workspaceBgColor: string;
+  workspaceBgImage: string | null;
   a11yCheck: boolean;
   textStyles: Record<"title" | "subtitle" | "body", TextStyle>;
   brandKit: BrandKit;
@@ -90,6 +103,10 @@ type SettingsState = {
   setTransitionSound: (v: boolean) => void;
   setTransitionSoundStyle: (v: TransitionSoundStyle) => void;
   setEditorDark: (v: boolean) => void;
+  setWorkspaceBg: (id: WorkspaceBgId) => void;
+  setWorkspaceBgColor: (color: string) => void;
+  setWorkspaceBgImage: (dataUrl: string | null) => void;
+  resetWorkspaceBg: () => void;
   setA11yCheck: (v: boolean) => void;
   setTextStyle: (role: "title" | "subtitle" | "body", patch: Partial<TextStyle>) => void;
   resetMotion: () => void;
@@ -138,6 +155,9 @@ export const useSettings = create<SettingsState>()(
       transitionSound: true,
       transitionSoundStyle: "whoosh",
       editorDark: false,
+      workspaceBg: DEFAULT_WORKSPACE_BG,
+      workspaceBgColor: "#e8eef7",
+      workspaceBgImage: null,
       a11yCheck: false,
       textStyles: { ...DEFAULT_TEXT_STYLES },
       brandKit: { ...DEFAULT_BRAND_KIT },
@@ -166,6 +186,19 @@ export const useSettings = create<SettingsState>()(
       setTransitionSound: (transitionSound) => set({ transitionSound }),
       setTransitionSoundStyle: (transitionSoundStyle) => set({ transitionSoundStyle }),
       setEditorDark: (editorDark) => set({ editorDark }),
+      setWorkspaceBg: (workspaceBg) => set({ workspaceBg }),
+      setWorkspaceBgColor: (workspaceBgColor) =>
+        set({ workspaceBgColor, workspaceBg: "custom-color" }),
+      setWorkspaceBgImage: (workspaceBgImage) =>
+        set((s) => ({
+          workspaceBgImage,
+          workspaceBg: workspaceBgImage
+            ? "custom-image"
+            : s.workspaceBg === "custom-image"
+              ? DEFAULT_WORKSPACE_BG
+              : s.workspaceBg,
+        })),
+      resetWorkspaceBg: () => set({ workspaceBg: DEFAULT_WORKSPACE_BG }),
       setA11yCheck: (a11yCheck) => set({ a11yCheck }),
       setTextStyle: (role, patch) =>
         set((s) => ({ textStyles: { ...s.textStyles, [role]: { ...s.textStyles[role], ...patch } } })),
@@ -185,10 +218,9 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 11,
+      version: 13,
       migrate: (state) => {
         const previous = state as SettingsState;
-        const previousTheme = previous?.editorTheme;
         // Unsplash + Illustrations merged into the Library panel — carry the
         // old visibility flags over so the rail button stays visible.
         const prevPanels = (previous?.panels ?? {}) as Record<string, boolean | undefined>;
@@ -199,6 +231,12 @@ export const useSettings = create<SettingsState>()(
         if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         if (panels.media === undefined) panels.media = true;
         if (panels.layers === undefined) panels.layers = true;
+        const prevBg = previous?.workspaceBg as string | undefined;
+        const validBgs: WorkspaceBgId[] = ["clean", "aurora", "warm-paper", "sage-mist", "custom-color", "custom-image"];
+        const workspaceBg: WorkspaceBgId =
+          prevBg && validBgs.includes(prevBg as WorkspaceBgId)
+            ? (prevBg as WorkspaceBgId)
+            : DEFAULT_WORKSPACE_BG;
         return {
           ...previous,
           customFonts: previous?.customFonts ?? [],
@@ -210,6 +248,9 @@ export const useSettings = create<SettingsState>()(
           transitionSound: previous?.transitionSound ?? true,
           transitionSoundStyle: previous?.transitionSoundStyle ?? "whoosh",
           editorDark: previous?.editorDark ?? false,
+          workspaceBg,
+          workspaceBgColor: previous?.workspaceBgColor ?? "#e8eef7",
+          workspaceBgImage: previous?.workspaceBgImage ?? null,
           a11yCheck: previous?.a11yCheck ?? false,
           textStyles: previous?.textStyles ?? { ...DEFAULT_TEXT_STYLES },
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },

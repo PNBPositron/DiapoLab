@@ -11,6 +11,7 @@ import { PagesBar } from "@/components/editor/PagesBar";
 import { WelcomeDialog } from "@/components/editor/WelcomeDialog";
 import { FindReplaceDialog } from "@/components/editor/FindReplaceDialog";
 import { A11yPanel } from "@/components/editor/A11yPanel";
+import { WorkspaceBackgroundLayer } from "@/components/editor/WorkspaceBackground";
 import { useSettings } from "@/store/settings";
 import { registerCustomFont } from "@/lib/fontLoader";
 
@@ -56,13 +57,15 @@ function Editor() {
   }, []);
 
   return (
-    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden bg-white text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
+    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
+      <WorkspaceBackgroundLayer />
+
       <h1 className="sr-only">DiapoLab — NextGen Open Source Presentation Editor</h1>
       <Toolbar />
-      <div className="flex min-h-0 flex-1 bg-white">
+      <div className="relative z-10 flex min-h-0 flex-1 bg-transparent">
         <Sidebar />
-        <div className="flex min-w-0 flex-1 flex-col bg-white">
-          <main className="relative min-h-0 flex-1 overflow-hidden bg-white">
+        <div className="flex min-w-0 flex-1 flex-col bg-transparent">
+          <main className="relative min-h-0 flex-1 overflow-hidden bg-transparent">
             <Canvas />
             <SelectionToolbar />
           </main>
