@@ -12,7 +12,10 @@ import {
   TRANSITION_OPTIONS,
   TRANSITION_ICONS,
   ELEMENT_ANIMATION_OPTIONS,
+  isThreeTransition,
+  formatTransitionLabel,
 } from "@/lib/motion-catalog";
+import { ThreeTransitionStage } from "./ThreeTransitionStage";
 
 export function Canvas() {
   const {
@@ -37,6 +40,8 @@ export function Canvas() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const activePreviewTransition = hoveredTransition ?? currentTransition;
+  const isThreePreview = isThreeTransition(activePreviewTransition);
   const scale = zoom ?? fitScale;
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
 
@@ -264,10 +269,10 @@ export function Canvas() {
         >
           <Plus className="size-3.5" />
         </Button>
-        <span className="hidden px-2.5 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
+        <span className="hidden whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
           {canvasW}×{canvasH}
         </span>
-        <span className="px-2.5 font-mono text-[11px] tabular-nums text-slate-500">
+        <span className="whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums text-slate-500">
           {currentIndex + 1} / {pages.length}
         </span>
         <Button
@@ -298,10 +303,10 @@ export function Canvas() {
               variant="ghost"
               aria-label="Slide transition"
               title="Slide transition & animations"
-              className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-medium capitalize text-slate-600"
+              className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-medium text-slate-600"
             >
               <WandSparkles className="size-3.5" aria-hidden="true" />
-              {currentTransition.replaceAll("-", " ")}
+              {formatTransitionLabel(currentTransition)}
               <ChevronDown className="size-3" />
             </Button>
           </PopoverTrigger>
@@ -329,17 +334,31 @@ export function Canvas() {
             <div
               className="transition-mini"
               role="img"
-              aria-label={`${hoveredTransition ?? currentTransition} transition preview`}
+              aria-label={`${formatTransitionLabel(activePreviewTransition)} transition preview`}
             >
-              <div
-                key={hoveredTransition ?? currentTransition}
-                className="transition-mini-stage"
-                data-transition={hoveredTransition ?? currentTransition}
-              >
-                <span className="transition-mini-mark" />
-                <span className="transition-mini-line" />
-                <span className="transition-mini-line" />
-              </div>
+              {isThreePreview ? (
+                <ThreeTransitionStage
+                  mode="mini"
+                  transition={activePreviewTransition}
+                  outgoingPage={pages.length > 1 ? pages[currentIndex > 0 ? currentIndex - 1 : 1] : undefined}
+                  incomingPage={pages.length > 1 ? page : undefined}
+                  canvasW={canvasW}
+                  canvasH={canvasH}
+                  playTrigger={0}
+                  interactive
+                  className="h-full w-full"
+                />
+              ) : (
+                <div
+                  key={activePreviewTransition}
+                  className="transition-mini-stage"
+                  data-transition={activePreviewTransition}
+                >
+                  <span className="transition-mini-mark" />
+                  <span className="transition-mini-line" />
+                  <span className="transition-mini-line" />
+                </div>
+              )}
             </div>
             <OptionGrid
               columns={3}
@@ -349,7 +368,7 @@ export function Canvas() {
               onPreview={setHoveredTransition}
               options={TRANSITION_OPTIONS.map((value) => ({
                 value,
-                label: value.replaceAll("-", " "),
+                label: formatTransitionLabel(value),
                 icon: TRANSITION_ICONS[value],
               }))}
             />

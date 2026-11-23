@@ -121,7 +121,12 @@ export type ElementAnimation =
   | "wobble-in"
   | "slingshot-in"
   | "flicker-in"
-  | "stretch-in";
+  | "stretch-in"
+  | "3d-flip-x"
+  | "3d-flip-y"
+  | "3d-tumble"
+  | "3d-orbit-in"
+  | "3d-pop-depth";
 export type SlideTransition =
   | "none"
   | "fade"
@@ -141,7 +146,12 @@ export type SlideTransition =
   | "swirl"
   | "warp"
   | "prism"
-  | "origami";
+  | "origami"
+  | "3d-cube"
+  | "3d-carousel"
+  | "3d-flip"
+  | "3d-fold"
+  | "3d-helix";
 export type BgFit = "cover" | "contain";
 
 export type TextElement = ElementBase & {

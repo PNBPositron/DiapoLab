@@ -1615,6 +1615,93 @@
   }
 }
 
+/* ---- 3D perspective element entrance animations ---- */
+@keyframes el-3d-flip-x {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotateX(-78deg) translateZ(-90px);
+  }
+  65% {
+    opacity: 1;
+    transform: perspective(900px) rotateX(6deg) translateZ(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes el-3d-flip-y {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotateY(78deg) translateZ(-90px);
+  }
+  65% {
+    opacity: 1;
+    transform: perspective(900px) rotateY(-6deg) translateZ(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes el-3d-tumble {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotate3d(0.85, 1, 0.25, -72deg) translateZ(-140px) scale(0.76);
+  }
+  68% {
+    opacity: 1;
+    transform: perspective(900px) rotate3d(0.2, 0.3, 0.1, 6deg) translateZ(16px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes el-3d-orbit-in {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) translate3d(72px, -24px, -180px) rotateY(-46deg) rotateX(14deg);
+  }
+  70% {
+    opacity: 1;
+    transform: perspective(900px) translate3d(-6px, 2px, 14px) rotateY(4deg) rotateX(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes el-3d-pop-depth {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) translateZ(-260px) rotateX(18deg) scale(0.84);
+  }
+  65% {
+    opacity: 1;
+    transform: perspective(900px) translateZ(24px) rotateX(-3deg) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.el-anim-3d-flip-x {
+  transform-style: preserve-3d;
+}
+.el-anim-3d-flip-y {
+  transform-style: preserve-3d;
+}
+.el-anim-3d-tumble {
+  transform-style: preserve-3d;
+}
+.el-anim-3d-orbit-in {
+  transform-style: preserve-3d;
+}
+.el-anim-3d-pop-depth {
+  transform-style: preserve-3d;
+}
+
 /* ---- Mini previews for the new transitions (PagesBar popover) ---- */
 .transition-mini-stage[data-transition="reveal"] {
   animation: selector-reveal 1.8s ease infinite;

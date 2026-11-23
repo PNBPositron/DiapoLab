@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ZoomIn,
   FlipHorizontal,
+  FlipVertical,
   Shapes,
   Zap,
   MoveLeft,
@@ -22,10 +23,15 @@ import {
   Sparkles,
   ChevronDown,
   RotateCw,
+  Rotate3d,
+  Orbit,
   CircleDot,
   Undo2,
   Rocket,
   StretchHorizontal,
+  Cuboid,
+  GalleryHorizontalEnd,
+  BookOpen,
 } from "lucide-react";
 import type { ElementAnimation, SlideTransition } from "@/store/editor";
 
@@ -34,6 +40,29 @@ import type { ElementAnimation, SlideTransition } from "@/store/editor";
  * animations. Every picker (PagesBar popover, PropertiesPanel dropdown)
  * imports from here, so a new motion only has to be added once.
  */
+
+export type ThreeSlideTransition = "3d-cube" | "3d-carousel" | "3d-flip" | "3d-fold" | "3d-helix";
+
+export const THREE_TRANSITIONS: ThreeSlideTransition[] = [
+  "3d-cube",
+  "3d-carousel",
+  "3d-flip",
+  "3d-fold",
+  "3d-helix",
+];
+
+const THREE_TRANSITION_SET = new Set<string>(THREE_TRANSITIONS);
+
+export function isThreeTransition(transition?: SlideTransition): transition is ThreeSlideTransition {
+  return !!transition && THREE_TRANSITION_SET.has(transition);
+}
+
+export function formatTransitionLabel(transition: SlideTransition): string {
+  if (transition.startsWith("3d-")) {
+    return `3D ${transition.slice(3).replaceAll("-", " ")}`;
+  }
+  return transition.replaceAll("-", " ");
+}
 
 export const TRANSITION_OPTIONS: SlideTransition[] = [
   "none",
@@ -55,6 +84,11 @@ export const TRANSITION_OPTIONS: SlideTransition[] = [
   "warp",
   "prism",
   "origami",
+  "3d-cube",
+  "3d-carousel",
+  "3d-flip",
+  "3d-fold",
+  "3d-helix",
 ];
 
 export const TRANSITION_ICONS: Record<SlideTransition, LucideIcon> = {
@@ -77,6 +111,11 @@ export const TRANSITION_ICONS: Record<SlideTransition, LucideIcon> = {
   warp: Waves,
   prism: Rainbow,
   origami: Pyramid,
+  "3d-cube": Cuboid,
+  "3d-carousel": GalleryHorizontalEnd,
+  "3d-flip": Rotate3d,
+  "3d-fold": BookOpen,
+  "3d-helix": Orbit,
 };
 
 export const ELEMENT_ANIMATION_OPTIONS: Array<{
@@ -103,6 +142,11 @@ export const ELEMENT_ANIMATION_OPTIONS: Array<{
   { value: "slingshot-in", label: "Slingshot In", short: "Slingshot", icon: Rocket },
   { value: "flicker-in", label: "Neon Flicker", short: "Flicker", icon: Zap },
   { value: "stretch-in", label: "Stretch In", short: "Stretch", icon: StretchHorizontal },
+  { value: "3d-flip-x", label: "3D Flip X", short: "3D Flip X", icon: FlipVertical },
+  { value: "3d-flip-y", label: "3D Flip Y", short: "3D Flip Y", icon: FlipHorizontal },
+  { value: "3d-tumble", label: "3D Tumble", short: "3D Tumble", icon: Rotate3d },
+  { value: "3d-orbit-in", label: "3D Orbit In", short: "3D Orbit", icon: Orbit },
+  { value: "3d-pop-depth", label: "3D Depth Pop", short: "3D Depth", icon: Layers },
 ];
 
 /** label/value pairs for the PropertiesPanel Dropdown. */

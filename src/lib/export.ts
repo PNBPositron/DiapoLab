@@ -296,6 +296,11 @@ const TRANSITION_XML: Record<string, string> = {
   warp: '<p:strips dir="ld"/>',
   prism: "<p:plus/>",
   origami: "<p:diamond/>",
+  "3d-cube": '<p:cover dir="l"/>',
+  "3d-carousel": '<p:push dir="l"/>',
+  "3d-flip": '<p:wipe dir="l"/>',
+  "3d-fold": "<p:diamond/>",
+  "3d-helix": '<p:zoom dir="in"/>',
 };
 
 /** PowerPoint "Morph" lives behind a 2015 namespace — emit it through

@@ -98,6 +98,7 @@ export function TemplatesPanel() {
 
   useEffect(() => {
     setCommunityLoading(true);
+    setError(null);
     listPublicTemplates()
       .then(async (tpls) => {
         setCommunity(tpls);
@@ -106,13 +107,21 @@ export function TemplatesPanel() {
         tpls.forEach((t) => ensureFontsForPages(t.pages as never));
         const ids = tpls.map((t) => t.id);
         const [counts, mine] = await Promise.all([
-          listTemplateLikeCounts(ids),
+          listTemplateLikeCounts(ids).catch(() => ({} as Record<string, number>)),
           listMyLikedTemplateIds().catch(() => new Set<string>()),
         ]);
         setLikeCounts(counts);
         setLikedIds(mine);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
+      .catch((e) => {
+        const msg =
+          e instanceof Error
+            ? e.message
+            : typeof (e as { message?: unknown })?.message === "string"
+              ? (e as { message: string }).message
+              : "Failed to load templates";
+        setError(msg);
+      })
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
@@ -133,7 +142,7 @@ export function TemplatesPanel() {
     useEditor.getState().setCanvasSize(c.canvas_w, c.canvas_h);
   };
 
-const filteredCommunity = filterTemplates(community, {
+  const filteredCommunity = filterTemplates(community, {
     query,
     style: styleFilter,
     creator: creatorFilter,

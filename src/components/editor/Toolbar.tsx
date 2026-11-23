@@ -253,26 +253,26 @@ export function Toolbar() {
   };
 
   return (
-    <header className="toolbar sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200/90 bg-white/95 px-5 backdrop-blur-md">
+    <header className="toolbar sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between gap-3 border-b border-slate-200/90 bg-white/95 px-5 backdrop-blur-md">
       {/* LEFT: Logo + project title */}
-      <div className="flex min-w-0 items-center gap-3.5">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <Link to="/" className="flex shrink-0 items-center transition-opacity hover:opacity-85" aria-label="DiapoLab home">
           <DiapoLabLogo className="h-7 w-auto" />
         </Link>
 
-        <div className="hidden h-6 w-px bg-slate-200/80 md:block" />
+        <div className="hidden h-6 w-px shrink-0 bg-slate-200/80 md:block" />
 
-        <div className="hidden items-center gap-2.5 md:flex">
+        <div className="hidden min-w-0 flex-1 items-center gap-2 md:flex">
           <input
             value={designName}
             onChange={(e) => setDesignName(e.target.value)}
             placeholder="Untitled design"
             aria-label="Design name"
-            className="h-9 w-48 rounded-full border border-slate-200/80 bg-slate-50/75 px-4 text-[13px] font-semibold tracking-tight text-slate-800 transition-all hover:border-slate-300/80 hover:bg-slate-100/70 focus:border-blue-500/60 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 lg:w-64"
+            className="h-9 w-full min-w-[96px] max-w-[220px] rounded-full border border-slate-200/80 bg-slate-50/75 px-4 text-[13px] font-semibold tracking-tight text-slate-800 transition-all hover:border-slate-300/80 hover:bg-slate-100/70 focus:border-blue-500/60 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
           />
 
           {savedAt && (
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 text-[11px] font-semibold text-emerald-700 animate-in fade-in">
+            <span className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 text-[11px] font-semibold text-emerald-700 animate-in fade-in">
               <CheckCircle2 className="size-3.5" />
               Saved
             </span>
@@ -281,7 +281,7 @@ export function Toolbar() {
       </div>
 
       {/* RIGHT: Organized action clusters */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex shrink-0 items-center gap-2">
         {/* History capsule */}
         <div className="flex items-center gap-0.5 rounded-full bg-slate-100/80 p-1">
           <button
@@ -305,7 +305,7 @@ export function Toolbar() {
         </div>
 
         {/* Workspace tools capsule */}
-        <div className="hidden items-center gap-0.5 rounded-full bg-slate-100/80 p-1 sm:flex">
+        <div className="hidden items-center gap-0.5 rounded-full bg-slate-100/80 p-1 lg:flex">
           <button
             onClick={() => importRef.current?.click()}
             title="Import .json design or .pptx deck"

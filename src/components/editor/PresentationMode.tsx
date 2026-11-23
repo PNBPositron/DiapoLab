@@ -5,8 +5,16 @@ import { CanvasElement } from "./CanvasElement";
 import { SlideThumbnail } from "./SlideThumbnail";
 
 import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
+import {
+  THREE_TRANSITIONS,
+  formatTransitionLabel,
+  isThreeTransition,
+  type ThreeSlideTransition,
+} from "@/lib/motion-catalog";
 import type { AnyElement, Page } from "@/store/editor";
 import { backgroundStyle } from "@/lib/bg";
+import { ThreeTransitionStage } from "./ThreeTransitionStage";
+import { Box, ChevronLeft, ChevronRight, RotateCcw, Rotate3d, X } from "lucide-react";
 
 export async function requestPresentationFullscreen(target: Element = document.documentElement) {
   if (document.fullscreenElement) return true;
@@ -25,6 +33,17 @@ export function PresentationMode() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [presenterOpen, setPresenterOpen] = useState(false);
+  const [stage3dOpen, setStage3dOpen] = useState(false);
+  const [stage3dKind, setStage3dKind] = useState<ThreeSlideTransition>("3d-cube");
+  const [stage3dPlayTrigger, setStage3dPlayTrigger] = useState(0);
+  const [stage3dResetSignal, setStage3dResetSignal] = useState(0);
+  const [threeTransition, setThreeTransition] = useState<{
+    transition: ThreeSlideTransition;
+    outgoingPage?: Page;
+    incomingPage: Page;
+    playTrigger: number;
+  } | null>(null);
+  const [threeFadingOut, setThreeFadingOut] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   // bump to replay the current slide's entrance animations (key R)
   const [replayEpoch, setReplayEpoch] = useState(0);
@@ -79,6 +98,11 @@ export function PresentationMode() {
       if (e.key === "r" || e.key === "R") {
         e.preventDefault();
         setReplayEpoch((n) => n + 1);
+        setStage3dPlayTrigger((n) => n + 1);
+      }
+      if (e.key === "3") {
+        e.preventDefault();
+        setStage3dOpen((o) => !o);
       }
       if (/^[1-9]$/.test(e.key)) {
         const n = parseInt(e.key, 10) - 1;
@@ -114,6 +138,9 @@ export function PresentationMode() {
     if (presenting) {
       setElapsed(0);
       setPresenterOpen(false);
+      setStage3dOpen(false);
+      setThreeTransition(null);
+      setThreeFadingOut(false);
     }
   }, [presenting]);
 
@@ -123,9 +150,7 @@ export function PresentationMode() {
     return () => clearInterval(t);
   }, [presenterOpen]);
 
-  // Explicit outgoing-slide backdrop: while a transition plays, the previous
-  // slide stays painted under the entering one (instead of the empty frame),
-  // then it is cleared. Independent of AnimatePresence exit behavior.
+  // Explicit outgoing-slide backdrop + Three.js 3D transition handoff
   const [backdropIndex, setBackdropIndex] = useState<number | null>(null);
   const prevIndexRef = useRef(currentIndex);
   useEffect(() => {
@@ -134,14 +159,52 @@ export function PresentationMode() {
     prevIndexRef.current = currentIndex;
     const prev = pages[prevIndex];
     const incoming = pages[currentIndex];
-    if (!prev || !incoming || incoming.transition === "morph" || incoming.transition === "none") {
+    if (!incoming) {
+      setBackdropIndex(null);
+      setThreeTransition(null);
+      return;
+    }
+    if (isThreeTransition(incoming.transition)) {
+      setBackdropIndex(null);
+      setStage3dKind(incoming.transition);
+      setThreeFadingOut(false);
+      setThreeTransition({
+        transition: incoming.transition,
+        outgoingPage: prev,
+        incomingPage: incoming,
+        playTrigger: Date.now(),
+      });
+      return;
+    }
+    if (stage3dOpen) {
+      setBackdropIndex(null);
+      setThreeFadingOut(false);
+      setThreeTransition({
+        transition: stage3dKind,
+        outgoingPage: prev,
+        incomingPage: incoming,
+        playTrigger: Date.now(),
+      });
+      return;
+    }
+    setThreeTransition(null);
+    if (!prev || incoming.transition === "morph" || incoming.transition === "none") {
       setBackdropIndex(null);
       return;
     }
     setBackdropIndex(prevIndex);
     const t = setTimeout(() => setBackdropIndex(null), 1000);
     return () => clearTimeout(t);
-  }, [currentIndex, pages]);
+  }, [currentIndex, pages, stage3dOpen, stage3dKind]);
+
+  useEffect(() => {
+    if (!threeFadingOut) return;
+    const t = setTimeout(() => {
+      setThreeTransition(null);
+      setThreeFadingOut(false);
+    }, 150);
+    return () => clearTimeout(t);
+  }, [threeFadingOut]);
 
   const backdropPage = backdropIndex !== null ? pages[backdropIndex] : undefined;
 
@@ -154,16 +217,26 @@ export function PresentationMode() {
     ? backdropPage.bgColor
     : "#ffffff";
   const morphing = page.transition === "morph";
+  const isThree = isThreeTransition(page.transition);
   const motionTransitionNames = new Set(["tv", "neon", "cube", "prism", "origami"]);
   const transition =
     page.transition &&
     page.transition !== "none" &&
     !morphing &&
+    !isThree &&
     page.transition !== "zoom" &&
     !motionTransitionNames.has(page.transition)
       ? `slide-transition-${page.transition}`
       : "";
   const preset = transitionPreset(page.transition);
+  const showThreeCanvas = !!threeTransition || stage3dOpen;
+  const activeThreeKind: ThreeSlideTransition = stage3dOpen
+    ? stage3dKind
+    : threeTransition?.transition ?? (isThreeTransition(page.transition) ? page.transition : "3d-cube");
+  const activeOutgoing =
+    threeTransition?.outgoingPage ?? (currentIndex > 0 ? pages[currentIndex - 1] : pages[currentIndex + 1]);
+  const activeIncoming = threeTransition?.incomingPage ?? page;
+  const activeTrigger = stage3dOpen ? stage3dPlayTrigger : (threeTransition?.playTrigger ?? 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines">
@@ -241,9 +314,126 @@ export function PresentationMode() {
           </div>
         </div>
       </div>
+      {showThreeCanvas && (
+        <div
+          className={`fixed inset-0 z-30 transition-opacity duration-150 ${
+            threeFadingOut && !stage3dOpen ? "pointer-events-none opacity-0" : "opacity-100"
+          }`}
+        >
+          <ThreeTransitionStage
+            mode="present"
+            transition={activeThreeKind}
+            outgoingPage={activeOutgoing}
+            incomingPage={activeIncoming}
+            canvasW={canvasW}
+            canvasH={canvasH}
+            playTrigger={activeTrigger}
+            interactive={stage3dOpen}
+            resetSignal={stage3dResetSignal}
+            onTransitionComplete={() => {
+              if (!stage3dOpen) setThreeFadingOut(true);
+            }}
+            className="h-full w-full"
+          />
+        </div>
+      )}
+
+      {/* Compact bottom HUD dock — never uses backdrop-blur over WebGL */}
+      <div className="fixed bottom-4 right-4 z-[55] flex items-center gap-1.5">
+        {stage3dOpen ? (
+          <div className="flex flex-wrap items-center gap-1.5 rounded-full border border-white/15 bg-slate-950/90 px-2.5 py-1.5 text-white shadow-xl">
+            <button
+              type="button"
+              onClick={() => currentIndex > 0 && setCurrentPage(currentIndex - 1)}
+              disabled={currentIndex === 0}
+              aria-label="Previous slide"
+              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span className="px-1 font-mono text-[11px] tabular-nums text-white/75">
+              {currentIndex + 1}/{pages.length}
+            </span>
+            <button
+              type="button"
+              onClick={() => currentIndex < pages.length - 1 && setCurrentPage(currentIndex + 1)}
+              disabled={currentIndex >= pages.length - 1}
+              aria-label="Next slide"
+              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+            <span className="mx-0.5 h-4 w-px bg-white/15" />
+            {THREE_TRANSITIONS.map((kind) => (
+              <button
+                key={kind}
+                type="button"
+                onClick={() => {
+                  setStage3dKind(kind);
+                  setStage3dPlayTrigger((n) => n + 1);
+                }}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                  stage3dKind === kind
+                    ? "bg-blue-600 text-white"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {formatTransitionLabel(kind)}
+              </button>
+            ))}
+            <span className="mx-0.5 h-4 w-px bg-white/15" />
+            <button
+              type="button"
+              onClick={() => setStage3dPlayTrigger((n) => n + 1)}
+              title="Replay 3D transition (R)"
+              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
+            >
+              <Rotate3d className="size-3.5" />
+              Replay
+            </button>
+            <button
+              type="button"
+              onClick={() => setStage3dResetSignal((n) => n + 1)}
+              title="Reset 3D camera"
+              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10"
+            >
+              <RotateCcw className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setStage3dOpen(false)}
+              title="Exit 3D stage (3)"
+              className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (isThreeTransition(page.transition)) {
+                setStage3dKind(page.transition);
+              }
+              setStage3dOpen(true);
+              setStage3dPlayTrigger((n) => n + 1);
+            }}
+            title="Inspect & orbit slide in Three.js 3D Stage (Press 3)"
+            className="flex h-8 items-center gap-1.5 rounded-full border border-white/15 bg-slate-950/90 px-3 text-[11px] font-medium text-white/85 shadow-lg transition hover:border-blue-400/50 hover:text-white"
+          >
+            <Box className="size-3.5 text-blue-400" />
+            3D Stage
+          </button>
+        )}
+      </div>
+
       <BgMusic page={page} />
       {presenterOpen && (
-        <div className="fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/90 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] backdrop-blur-md">
+        <div
+          className={`fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] ${
+            showThreeCanvas ? "" : "backdrop-blur-md"
+          }`}
+        >
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">Presenter · slide {currentIndex + 1}/{pages.length}</span>
             <span className="font-mono text-sm tabular-nums text-white/90">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
@@ -262,7 +452,7 @@ export function PresentationMode() {
             </div>
             {pages[currentIndex + 1] && <div className="w-40 shrink-0"><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Next</span><SlideThumbnail page={pages[currentIndex + 1]} canvasW={canvasW} canvasH={canvasH} className="mt-1 rounded-lg border border-white/15" /></div>}
           </div>
-          <p className="text-[10px] text-white/35">Press P to hide · arrows to navigate</p>
+          <p className="text-[10px] text-white/35">Press P for notes · 3 for 3D Stage · arrows to navigate</p>
         </div>
       )}
     </div>
