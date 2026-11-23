@@ -1,7 +1,21 @@
 import type { ShapeElement, ShapeKind } from "@/store/editor";
 
 // Shapes drawn as outline + inner cut-out need even-odd filling to keep the hole.
-const EVENODD_SHAPES: ShapeKind[] = ["frame_cut"];
+export const EVENODD_SHAPES: ShapeKind[] = [
+  "frame_cut",
+  "ring",
+  "hex_ring",
+  "angular_frame",
+  "tag_badge",
+];
+
+// Open line-art shapes should render with stroke only (no accidental SVG fill polygons).
+export const STROKE_ONLY_SHAPES: ShapeKind[] = [
+  "circuit",
+  "cyber_frame",
+  "scanner",
+  "corner_bracket",
+];
 
 function dotGridPath(cols = 6, rows = 5, r = 3.2): string {
   const parts: string[] = [];
@@ -37,9 +51,99 @@ function dottedTrianglePath(perSide = 7, r = 3): string {
   return parts.join(" ");
 }
 
+function radialStarPath(points: number, rOuter = 47, rInner = 29, rounded = false): string {
+  const step = Math.PI / points;
+  const pts: Array<[number, number]> = [];
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? rOuter : rInner;
+    const a = i * step - Math.PI / 2;
+    pts.push([+(50 + Math.cos(a) * r).toFixed(2), +(50 + Math.sin(a) * r).toFixed(2)]);
+  }
+  if (!rounded) {
+    return `M${pts.map((p) => `${p[0]} ${p[1]}`).join(" L")} Z`;
+  }
+  // Smooth scalloped seal via quadratic curves through midpoints
+  const mid = (a: [number, number], b: [number, number]): [number, number] => [
+    +((a[0] + b[0]) / 2).toFixed(2),
+    +((a[1] + b[1]) / 2).toFixed(2),
+  ];
+  const start = mid(pts[pts.length - 1], pts[0]);
+  const segs = [`M${start[0]} ${start[1]}`];
+  for (let i = 0; i < pts.length; i++) {
+    const next = pts[(i + 1) % pts.length];
+    const m = mid(pts[i], next);
+    segs.push(`Q${pts[i][0]} ${pts[i][1]} ${m[0]} ${m[1]}`);
+  }
+  segs.push("Z");
+  return segs.join(" ");
+}
+
+function flowerPath(petals = 6, rOuter = 46, rInner = 20): string {
+  const parts: string[] = [];
+  const step = (Math.PI * 2) / petals;
+  for (let i = 0; i < petals; i++) {
+    const a0 = i * step - Math.PI / 2 - step * 0.42;
+    const aMid = i * step - Math.PI / 2;
+    const a1 = i * step - Math.PI / 2 + step * 0.42;
+    const sx = +(50 + Math.cos(a0) * rInner).toFixed(2);
+    const sy = +(50 + Math.sin(a0) * rInner).toFixed(2);
+    const ex = +(50 + Math.cos(a1) * rInner).toFixed(2);
+    const ey = +(50 + Math.sin(a1) * rInner).toFixed(2);
+    const cx1 = +(50 + Math.cos(aMid - step * 0.28) * (rOuter * 1.12)).toFixed(2);
+    const cy1 = +(50 + Math.sin(aMid - step * 0.28) * (rOuter * 1.12)).toFixed(2);
+    const cx2 = +(50 + Math.cos(aMid + step * 0.28) * (rOuter * 1.12)).toFixed(2);
+    const cy2 = +(50 + Math.sin(aMid + step * 0.28) * (rOuter * 1.12)).toFixed(2);
+    if (i === 0) parts.push(`M${sx} ${sy}`);
+    else parts.push(`L${sx} ${sy}`);
+    parts.push(`C${cx1} ${cy1}, ${cx2} ${cy2}, ${ex} ${ey}`);
+  }
+  parts.push("Z");
+  return parts.join(" ");
+}
+
+const SEAL_PATH = radialStarPath(12, 47, 36, true);
+const SUNBURST_PATH = radialStarPath(12, 47, 25, false);
+const FLOWER_PATH = flowerPath(6, 46, 18);
+
 // Reusable path generators (normalized 0-100 viewBox) so previews and canvas share geometry.
 export function pathFor(kind: ShapeKind): string | null {
   switch (kind) {
+    case "rounded_rect":
+      return "M18 8 H82 A14 14 0 0 1 96 22 V78 A14 14 0 0 1 82 92 H18 A14 14 0 0 1 4 78 V22 A14 14 0 0 1 18 8 Z";
+    case "squircle":
+      return "M50 4 C82 4 96 18 96 50 C96 82 82 96 50 96 C18 96 4 82 4 50 C4 18 18 4 50 4 Z";
+    case "right_triangle":
+      return "M6 6 L94 94 H6 Z";
+    case "arch":
+      return "M12 94 V46 A38 38 0 0 1 88 46 V94 Z";
+    case "burst4":
+      return "M50 4 L63 37 L96 50 L63 63 L50 96 L37 63 L4 50 L37 37 Z";
+    case "arrow_left":
+      return "M94 34 H44 V10 L6 50 L44 90 V66 H94 Z";
+    case "arrow_up":
+      return "M50 6 L90 44 H66 V94 H34 V44 H10 Z";
+    case "arrow_down":
+      return "M34 6 H66 V56 H90 L50 94 L10 56 H34 Z";
+    case "double_arrow":
+      return "M6 50 L32 20 V37 H68 V20 L94 50 L68 80 V63 H32 V80 Z";
+    case "process_step":
+      return "M6 16 H74 L94 50 L74 84 H6 L26 50 Z";
+    case "curved_arrow":
+      return "M14 82 C14 40 40 26 68 26 V10 L94 34 L68 58 V42 C48 42 32 50 32 82 Z";
+    case "thought_bubble":
+      return "M24 66 C10 66 6 54 14 44 C8 32 18 18 34 20 C40 8 62 8 68 20 C84 18 94 32 86 44 C94 56 84 66 70 66 Z M27 72 A6 6 0 1 0 27 84 A6 6 0 1 0 27 72 Z M14 86 A4 4 0 1 0 14 94 A4 4 0 1 0 14 86 Z";
+    case "tag_badge":
+      return "M8 22 H64 L94 50 L64 78 H8 Z M23 44 A6 6 0 1 1 23 56 A6 6 0 1 1 23 44 Z";
+    case "curly_brace":
+      return "M64 6 C47 6 40 15 40 30 V39 C40 45 34 49 24 50 C34 51 40 55 40 61 V70 C40 85 47 94 64 94 H72 V84 H64 C55 84 52 79 52 69 V58 C52 53 48 51 43 50 C48 49 52 47 52 42 V31 C52 21 55 16 64 16 H72 V6 Z";
+    case "seal":
+      return SEAL_PATH;
+    case "sunburst":
+      return SUNBURST_PATH;
+    case "clover":
+      return "M50 50 C30 34 30 8 50 8 C70 8 70 34 50 50 C66 30 92 30 92 50 C92 70 66 70 50 50 C70 66 70 92 50 92 C30 92 30 66 50 50 C34 70 8 70 8 50 C8 30 34 30 50 50 Z";
+    case "banner_fold":
+      return "M8 22 H92 L79 50 L92 78 H8 L21 50 Z";
     case "frame_cut":
       return "M3 3 H70 L97 30 V97 H30 L3 70 Z M12 12 L12 66 L34 88 L88 88 L88 34 L66 12 Z";
     case "diagonal_stripes":
@@ -93,7 +197,7 @@ export function pathFor(kind: ShapeKind): string | null {
     case "cloud":
       return "M22 72 C 4 72, 4 46, 22 46 C 22 28, 48 22, 54 38 C 64 26, 84 32, 84 50 C 96 50, 96 72, 84 72 Z";
     case "speech":
-      return "M8 14 L 92 14 L 92 70 L 50 70 L 30 92 L 32 70 L 8 70 Z";
+      return "M14 12 H86 A10 10 0 0 1 96 22 V60 A10 10 0 0 1 86 70 H46 L24 90 L28 70 H14 A10 10 0 0 1 4 60 V22 A10 10 0 0 1 14 12 Z";
     case "octagon":
       return "M33 3 H67 L97 33 V67 L67 97 H33 L3 67 V33 Z";
     case "capsule":
@@ -107,7 +211,7 @@ export function pathFor(kind: ShapeKind): string | null {
     case "starburst":
       return "M50 3 L62.2 20.4 L83.2 16.8 L79.6 37.8 L97 50 L79.6 62.2 L83.2 83.2 L62.2 79.6 L50 97 L37.8 79.6 L16.8 83.2 L20.4 62.2 L3 50 L20.4 37.8 L16.8 16.8 L37.8 20.4 Z";
     case "flower":
-      return "M50 4 L64.1 30.6 L93.7 35.8 L72.8 57.4 L77 87.2 L50 74 L23 87.2 L27.2 57.4 L6.3 35.8 L35.9 30.6 Z";
+      return FLOWER_PATH;
     case "gear":
       return "M86 50 L84.4 60.6 L94.3 68.4 L87 80.6 L75.5 75.5 L66.8 81.8 L68.4 94.3 L54.5 97.8 L50 86 L39.4 84.4 L31.6 94.3 L19.4 87 L24.5 75.5 L18.2 66.8 L5.7 68.4 L2.2 54.5 L14 50 L15.6 39.4 L5.7 31.6 L13 19.4 L24.5 24.5 L33.2 18.2 L31.6 5.7 L45.5 2.2 L50 14 L60.6 15.6 L68.4 5.7 L80.6 13 L75.5 24.5 L81.8 33.2 L94.3 31.6 L97.8 45.5 Z";
     case "shield":
@@ -131,7 +235,7 @@ export function pathFor(kind: ShapeKind): string | null {
     case "leaf":
       return "M8 92 C8 40 40 8 92 8 C92 60 60 92 8 92 Z";
     case "ribbon":
-      return "M8 6 H92 L76 26 L92 46 H8 L24 26 Z";
+      return "M8 14 H92 L76 50 L92 86 H8 L24 50 Z";
     case "sparkle4":
       return "M50 2 C55 30 70 45 98 50 C70 55 55 70 50 98 C45 70 30 55 2 50 C30 45 45 30 50 2 Z";
     case "confetti":
@@ -320,6 +424,31 @@ export function ShapeRender({
   }
   const d = pathFor(shape);
   if (d) {
+    const strokeOnly = STROKE_ONLY_SHAPES.includes(shape);
+    const isRounded =
+      strokeOnly ||
+      shape === "rounded_rect" ||
+      shape === "squircle" ||
+      shape === "speech" ||
+      shape === "thought_bubble" ||
+      shape === "cloud" ||
+      shape === "flower" ||
+      shape === "clover" ||
+      shape === "seal" ||
+      shape === "blob" ||
+      shape === "drop" ||
+      shape === "heart" ||
+      shape === "wave";
+    const resolvedStroke =
+      strokeOnly && (stroke === "transparent" || strokeWidth <= 0)
+        ? fillRef === "transparent"
+          ? "#2563eb"
+          : fillRef
+        : stroke;
+    const resolvedStrokeWidth =
+      strokeOnly && (stroke === "transparent" || strokeWidth <= 0)
+        ? 4
+        : strokeWidth / 2;
     return (
       <svg
         width="100%"
@@ -332,11 +461,12 @@ export function ShapeRender({
         {defs}
         <path
           d={d}
-          fillRule={EVENODD_SHAPES.includes(shape) ? "evenodd" : undefined}
-          fill={fillRef}
-          stroke={stroke}
-          strokeWidth={strokeWidth / 2}
-          strokeLinejoin="miter"
+          fillRule={!strokeOnly && EVENODD_SHAPES.includes(shape) ? "evenodd" : undefined}
+          fill={strokeOnly ? "none" : fillRef}
+          stroke={resolvedStroke}
+          strokeWidth={resolvedStrokeWidth}
+          strokeLinecap={isRounded ? "round" : undefined}
+          strokeLinejoin={isRounded ? "round" : "miter"}
         />
       </svg>
     );

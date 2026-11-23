@@ -1122,6 +1122,17 @@
   background: var(--selector-surface);
   box-shadow: var(--selector-shadow);
 }
+.selector-segments:has(> :nth-child(4)) .selector-segment {
+  padding: 4px 5px;
+  gap: 3px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.selector-segments:has(> :nth-child(4)) .selector-segment > svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
 .selector-toggles {
   gap: 8px;
 }

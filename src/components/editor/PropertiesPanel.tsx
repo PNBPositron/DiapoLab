@@ -417,6 +417,8 @@ const UI_CAPTION_DEFAULTS: Partial<Record<UiKind, string>> = {
 const MASK_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "", label: "None" },
   { value: "circle", label: "Circle" },
+  { value: "squircle", label: "Squircle" },
+  { value: "arch", label: "Arch" },
   { value: "hexagon", label: "Hexagon" },
   { value: "pentagon", label: "Pentagon" },
   { value: "octagon", label: "Octagon" },

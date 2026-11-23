@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Clapperboard,
+  LayoutGrid,
   Maximize2,
   Palette,
   Sparkles,
@@ -10,9 +11,10 @@ import { ColorPanel } from "./ColorPanel";
 import { SizePanel } from "./SizePanel";
 import { BrandKitPanel } from "./BrandKitPanel";
 import { MasterStylePanel } from "./MasterStylePanel";
+import { AutoArrangePanel } from "./AutoArrangePanel";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 
-type SectionId = "canvas" | "brand" | "background";
+type SectionId = "canvas" | "brand" | "background" | "arrange";
 
 function BrandAndMasterSection() {
   return (
@@ -61,6 +63,14 @@ const SECTIONS: {
     subtitle: "Solid, gradient, or canvas texture",
     Icon: Palette,
     children: <ColorPanel />,
+  },
+  {
+    id: "arrange",
+    short: "Arrange",
+    title: "Auto-arrange",
+    subtitle: "Overlap-free layout for selected items",
+    Icon: LayoutGrid,
+    children: <AutoArrangePanel />,
   },
 ];
 

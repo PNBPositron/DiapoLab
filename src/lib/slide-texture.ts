@@ -1,5 +1,5 @@
 import type { AnyElement, Page } from "@/store/editor";
-import { pathFor } from "@/components/editor/ShapeRender";
+import { EVENODD_SHAPES, pathFor, STROKE_ONLY_SHAPES } from "@/components/editor/ShapeRender";
 
 const imageCache = new Map<string, HTMLImageElement>();
 const pendingLoads = new Map<string, Promise<HTMLImageElement | null>>();
@@ -196,16 +196,28 @@ function paintElement(
 
     const d = pathFor(el.shape);
     if (d && typeof Path2D !== "undefined") {
+      const strokeOnly = STROKE_ONLY_SHAPES.includes(el.shape);
+      const evenOdd = EVENODD_SHAPES.includes(el.shape);
       ctx.save();
       ctx.scale(el.width / 100, el.height / 100);
       const path = new Path2D(d);
-      if (el.fill !== "transparent") {
+      if (!strokeOnly && el.fill !== "transparent") {
         ctx.fillStyle = fillStyle;
-        ctx.fill(path);
+        ctx.fill(path, evenOdd ? "evenodd" : "nonzero");
       }
-      if (el.strokeWidth > 0 && el.stroke && el.stroke !== "transparent") {
-        ctx.strokeStyle = el.stroke;
-        ctx.lineWidth = el.strokeWidth / Math.max(0.01, Math.min(el.width, el.height) / 100);
+      const effectiveStroke =
+        strokeOnly && (!el.stroke || el.stroke === "transparent" || el.strokeWidth <= 0)
+          ? fillStyle
+          : el.stroke;
+      const effectiveStrokeWidth =
+        strokeOnly && (el.strokeWidth <= 0 || !el.stroke || el.stroke === "transparent")
+          ? 8
+          : el.strokeWidth;
+      if (effectiveStrokeWidth > 0 && effectiveStroke && effectiveStroke !== "transparent") {
+        ctx.strokeStyle = effectiveStroke;
+        ctx.lineCap = strokeOnly ? "round" : "butt";
+        ctx.lineJoin = strokeOnly ? "round" : "miter";
+        ctx.lineWidth = effectiveStrokeWidth / Math.max(0.01, Math.min(el.width, el.height) / 100);
         ctx.stroke(path);
       }
       ctx.restore();
