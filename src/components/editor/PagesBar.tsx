@@ -51,8 +51,8 @@ export function PagesBar() {
   }
 
   return (
-    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200 bg-white px-4 py-2 text-slate-700">
-      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-2.5 overflow-x-auto py-1">
+    <div className="pages-bar flex shrink-0 items-center border-t border-slate-200/90 bg-white px-5 py-2.5 text-slate-700">
+      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (
@@ -61,8 +61,8 @@ export function PagesBar() {
                 onClick={() => setCurrentPage(i)}
                 className={`relative overflow-hidden rounded-xl border bg-white transition-all duration-150 ${
                   active
-                    ? "border-blue-600 ring-2 ring-blue-600/20 shadow-[0_6px_16px_-4px_rgba(37,99,235,0.22)]"
-                    : "border-slate-200 opacity-85 hover:border-slate-300 hover:opacity-100"
+                    ? "border-blue-600 ring-2 ring-blue-600/20 shadow-[0_8px_20px_-6px_rgba(37,99,235,0.28)]"
+                    : "border-slate-200/90 opacity-85 hover:-translate-y-0.5 hover:border-slate-300 hover:opacity-100"
                 }`}
                 style={{ width: thumbW + 2, height: thumbH + 2 }}
               >
@@ -72,7 +72,7 @@ export function PagesBar() {
                   canvasH={canvasH}
                   className="h-full w-full"
                 />
-                <span className={`absolute bottom-1.5 right-1.5 rounded-full px-1.5 py-px font-mono text-[9px] font-semibold tabular-nums transition-opacity ${
+                <span className={`absolute bottom-1.5 right-1.5 rounded-full px-1.5 py-px font-mono text-[10px] font-semibold tabular-nums transition-opacity ${
                   active ? "bg-blue-600 text-white opacity-100" : "bg-slate-900/75 text-white opacity-0 group-hover:opacity-100"
                 }`}>
                   {i + 1}

@@ -118,7 +118,7 @@ export function Sidebar() {
           </div>
         )}
       </nav>
-      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[5.375rem] top-2.5 z-40 h-[calc(100%-1.25rem)] w-[288px] origin-left overflow-y-auto rounded-[22px] border border-slate-200 bg-white p-3.5 shadow-[0_18px_44px_-12px_rgba(15,23,42,0.14)] will-change-[transform,opacity] ${panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"}`}>
+      <div aria-hidden={!panelOpen} style={{ transition: panelTransition }} className={`editor-side-panel absolute left-[5.375rem] top-2.5 z-40 h-[calc(100%-1.25rem)] w-[304px] origin-left overflow-y-auto rounded-[22px] border border-slate-200/90 bg-white p-4 shadow-[0_20px_50px_-14px_rgba(15,23,42,0.16)] will-change-[transform,opacity] ${panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"}`}>
         {tool === "home" && <TemplatesPanel />}
         {tool === "text" && <TextPanel />}
         {tool === "elements" && <ElementsPanel />}

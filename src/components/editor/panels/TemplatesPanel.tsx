@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, Rocket, Crown } from "lucide-react";
+import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, X } from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -116,9 +116,6 @@ export function TemplatesPanel() {
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
 
-    const sortedCommunity = sortTemplates(community, likeCounts, "likes");
-  const featured = sortedCommunity[0] ?? null;
-
   const importPptx = async (file: File) => {
     setImportingPptx(true);
     try {
@@ -185,26 +182,26 @@ const filteredCommunity = filterTemplates(community, {
     (licenseFilter !== "all" ? 1 : 0);
 
   return (
-    <div className="space-y-4">
-      <PanelHeader kicker="Templates" title="Start from a deck" description="Browse community templates, then load one onto your canvas in a click." icon={LayoutGrid} />
+    <div className="panel-content flex flex-col gap-4">
+      <PanelHeader kicker="Home" title="Start from a deck" description="Create from scratch, import PowerPoint, or pick a template." icon={LayoutGrid} />
 
       {/* ── Quick start ─────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-2 px-4">
+      <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => useEditor.getState().newDesign()}
-          className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.97]"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98]"
         >
-          <span className="grid size-8 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+          <span className="grid size-9 place-items-center rounded-xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <FilePlus2 className="size-4" />
           </span>
-          <span className="text-[10px] font-semibold text-slate-700">Blank deck</span>
+          <span className="text-[11px] font-semibold tracking-tight text-slate-700">Blank deck</span>
         </button>
 
-        <label className={`group flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
-          <span className="grid size-8 place-items-center rounded-lg bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+        <label className={`group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
+          <span className="grid size-9 place-items-center rounded-xl bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
             {importingPptx ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
           </span>
-          <span className="text-[10px] font-semibold text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
+          <span className="text-[11px] font-semibold tracking-tight text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
           <input
             type="file"
             accept=".pptx"
@@ -220,90 +217,57 @@ const filteredCommunity = filterTemplates(community, {
 
         <button
           onClick={() => useEditor.getState().setPresenting(true)}
-          className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_10px_24px_-10px_rgba(37,99,235,0.3)] active:scale-[0.97]"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98]"
         >
-          <span className="grid size-8 place-items-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+          <span className="grid size-9 place-items-center rounded-xl bg-sky-50 text-sky-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <Presentation className="size-4" />
           </span>
-          <span className="text-[10px] font-semibold text-slate-700">Present</span>
+          <span className="text-[11px] font-semibold tracking-tight text-slate-700">Present</span>
         </button>
       </div>
 
-      {/* ── Featured deck ───────────────────────────── */}
-      {featured && featured.pages?.[0] && (
-        <div className="px-4">
-          <div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.14em] text-slate-400">
-            <Crown className="size-3 text-blue-400" /> Featured deck
-          </div>
-          <button
-            onClick={() => loadTemplate(featured)}
-            className="group relative block w-full overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_16px_36px_-12px_rgba(37,99,235,0.3)]"
-            title={`Load ${featured.name}`}
-          >
-            <div className="relative w-full overflow-hidden">
-              <SlideThumbnail
-                page={featured.pages[0] as Page}
-                canvasW={featured.canvas_w}
-                canvasH={featured.canvas_h}
-                className="aspect-video min-h-[150px] w-full transition-transform duration-300 group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
-                <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
-                  <Rocket className="size-3 text-blue-600" /> Use this deck
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-              <span className="truncate text-xs font-semibold text-slate-800">{featured.name}</span>
-              <span className="flex shrink-0 items-center gap-1 text-[9px] font-medium text-rose-400">
-                <Heart className="size-2.5" /> {likeCounts[featured.id] ?? 0}
-              </span>
-            </div>
-          </button>
-        </div>
-      )}
-
       {error && (
-        <div className="mx-4 flex items-start justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
+        <div className="flex items-start justify-between gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
           <span>{error}</span>
           <button
             onClick={() => setError(null)}
             className="shrink-0 font-semibold text-rose-400 transition hover:text-rose-600"
             aria-label="Dismiss"
           >
-            ✕
+            <X className="size-3.5" />
           </button>
         </div>
       )}
 
-      {/* Search + filtres */}
-      <div className="relative z-30 space-y-2.5 px-4">
+      {/* Search + filters */}
+      <div className="relative z-30 space-y-3">
         {/* Search */}
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
+        <div className="flex items-center gap-2 rounded-full border border-slate-200/90 bg-slate-50/80 px-3.5 transition-all focus-within:border-blue-500/70 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search name or creator…"
-            className="min-w-0 flex-1 bg-transparent py-2.5 text-xs text-slate-800 outline-none placeholder:text-slate-400"
+            placeholder="Search templates or creators…"
+            className="min-w-0 flex-1 !border-0 !bg-transparent py-2 text-xs text-slate-800 outline-none !shadow-none placeholder:text-slate-400 focus:!ring-0"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="shrink-0 text-[10px] font-medium text-slate-400 transition hover:text-slate-600"
+              aria-label="Clear search"
+              className="grid size-5 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-200/70 hover:text-slate-700"
             >
-              clear
+              <X className="size-3" />
             </button>
           )}
         </div>
 
-        {/* Style — titre au-dessus des chips */}
+        {/* Style filters */}
         <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
-            <SlidersHorizontal className="size-2.5" />
+          <span className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+            <SlidersHorizontal className="size-3 text-slate-400" />
             Style
           </span>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             <StyleChip
               active={styleFilter === "all"}
               onClick={() => setStyleFilter("all")}
@@ -323,49 +287,50 @@ const filteredCommunity = filterTemplates(community, {
           </div>
         </div>
 
-        {/* Creator — titre au-dessus des chips */}
-        <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
-            <Users className="size-2.5" />
-            Creator
-          </span>
-          <div className="flex flex-wrap gap-1">
-            {["all", "builtin", "community"].map((o) => (
-              <button
-                key={o}
-                onClick={() => setCreatorFilter(o)}
-                className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
-                  creatorFilter === o
-                    ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
-                }`}
-              >
-                {o}
-              </button>
-            ))}
+        {/* Creator & License compact rows */}
+        <div className="grid grid-cols-2 gap-2.5">
+          <div>
+            <span className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+              <Users className="size-3 text-slate-400" />
+              Creator
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {["all", "builtin", "community"].map((o) => (
+                <button
+                  key={o}
+                  onClick={() => setCreatorFilter(o)}
+                  className={`!rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+                    creatorFilter === o
+                      ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
+                      : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* License — titre au-dessus des chips */}
-        <div>
-          <span className="mb-1 flex items-center gap-1 text-[9px] font-semibold tracking-wide text-slate-400">
-            <Layers className="size-2.5" />
-            License
-          </span>
-          <div className="flex flex-wrap gap-1">
-            {["all", "CC0", "community"].map((o) => (
-              <button
-                key={o}
-                onClick={() => setLicenseFilter(o)}
-                className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
-                  licenseFilter === o
-                    ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
-                }`}
-              >
-                {o}
-              </button>
-            ))}
+          <div>
+            <span className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+              <Layers className="size-3 text-slate-400" />
+              License
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {["all", "CC0", "community"].map((o) => (
+                <button
+                  key={o}
+                  onClick={() => setLicenseFilter(o)}
+                  className={`!rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+                    licenseFilter === o
+                      ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
+                      : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -376,26 +341,26 @@ const filteredCommunity = filterTemplates(community, {
               setCreatorFilter("all");
               setLicenseFilter("all");
             }}
-            className="text-[10px] font-medium text-blue-600 transition hover:text-blue-700"
+            className="text-[11px] font-semibold text-blue-600 transition hover:text-blue-700"
           >
             Reset {activeFilters} filter{activeFilters > 1 ? "s" : ""}
           </button>
         )}
       </div>
 
-      {/* Liste */}
-      <div className="space-y-3 px-4">
+      {/* Template list */}
+      <div className="space-y-3">
         {communityLoading ? (
           <TemplateSkeleton />
         ) : community.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-12 text-center">
-            <div className="grid size-11 place-items-center rounded-xl bg-blue-50 text-blue-500">
+            <div className="grid size-11 place-items-center rounded-2xl bg-blue-50 text-blue-500">
               <LayoutGrid className="size-5" />
             </div>
-            <div>
-              <p className="text-xs font-medium text-slate-600">No community templates yet</p>
+            <div className="px-4">
+              <p className="text-xs font-semibold text-slate-700">No community templates yet</p>
               <p className="mt-1 text-[11px] text-slate-400">
-                Be the first — sign in and hit the share icon in the toolbar.
+                Sign in and publish your deck from the top menu to share it here.
               </p>
             </div>
           </div>
@@ -423,18 +388,17 @@ const filteredCommunity = filterTemplates(community, {
         )}
       </div>
 
-      <div className="px-4">
-        <button
-          onClick={() => setShowAll(true)}
-          disabled={community.length === 0}
-          className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_28px_rgba(37,99,235,0.35)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
-        >
-          <LayoutGrid className="size-3.5" /> Show all templates
-          <span className="rounded-full bg-white/20 px-1.5 py-0.5 font-mono text-[9px]">
-            {filteredCommunity.length}
-          </span>
-        </button>
-      </div>
+      <button
+        onClick={() => setShowAll(true)}
+        disabled={community.length === 0}
+        className="group flex w-full items-center justify-center gap-2 !rounded-full bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_-6px_rgba(37,99,235,0.45)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_26px_-6px_rgba(37,99,235,0.5)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+      >
+        <LayoutGrid className="size-3.5" />
+        <span>Show all templates</span>
+        <span className="font-mono text-[11px] tabular-nums text-blue-100">
+          · {filteredCommunity.length}
+        </span>
+      </button>
 
       <AllTemplatesDialog
         open={showAll}
@@ -473,15 +437,15 @@ function StyleChip({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-semibold capitalize transition ${
+      className={`flex items-center gap-1.5 !rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
         active
-          ? "border-blue-600 bg-blue-600 text-white shadow-sm"
-          : "border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600"
+          ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
+          : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
       {dot && <span className="size-1.5 rounded-full" style={{ backgroundColor: dot }} />}
-      {label}
-      <span className={`font-mono text-[8px] ${active ? "text-blue-200" : "text-slate-300"}`}>
+      <span>{label}</span>
+      <span className={`font-mono text-[10px] tabular-nums ${active ? "text-blue-100" : "text-slate-400"}`}>
         {count}
       </span>
     </button>
@@ -498,14 +462,14 @@ function TemplateSkeleton() {
       {[0, 1, 2].map((i) => (
         <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           <div className="aspect-video min-h-[130px] animate-pulse bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100" />
-          <div className="space-y-1.5 px-3 py-2.5">
-            <div className="h-2.5 w-2/3 animate-pulse rounded bg-slate-100" />
-            <div className="h-2 w-1/4 animate-pulse rounded bg-slate-100" />
+          <div className="space-y-1.5 px-3.5 py-3">
+            <div className="h-3 w-2/3 animate-pulse rounded-full bg-slate-100" />
+            <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-slate-100" />
           </div>
         </div>
       ))}
-      <div className="flex items-center justify-center gap-2 py-1 text-[10px] text-slate-400">
-        <Loader2 className="size-3 animate-spin text-blue-500" />
+      <div className="flex items-center justify-center gap-2 py-1 text-[11px] text-slate-400">
+        <Loader2 className="size-3.5 animate-spin text-blue-500" />
         Loading templates…
       </div>
     </div>
@@ -535,61 +499,27 @@ function TemplateCard({
   const style = getStyle(c);
   const meta = STYLE_META[style];
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_12px_32px_rgba(37,99,235,0.14)]">
-      <button onClick={onLoad} className="block w-full text-left" title={`Load ${c.name}`}>
-        <div className="relative w-full overflow-hidden">
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_14px_32px_-12px_rgba(15,23,42,0.16)]">
+      <button onClick={onLoad} className="block w-full !rounded-none text-left" title={`Load ${c.name}`}>
+        <div className="relative w-full overflow-hidden border-b border-slate-100">
           {c.pages?.[0] ? (
             <SlideThumbnail
               page={c.pages[0] as Page}
               canvasW={c.canvas_w}
               canvasH={c.canvas_h}
-              className="w-full min-h-[130px] transition-transform duration-300 group-hover:scale-[1.03]"
+              className="w-full min-h-[132px] transition-transform duration-300 group-hover:scale-[1.03]"
             />
           ) : (
             <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#f1f5f9" }} />
           )}
           {/* Hover overlay with CTA */}
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
-            <span className="flex translate-y-1 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[10px] font-bold tracking-wide text-slate-800 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
-              <Download className="size-3 text-blue-600" /> Use template
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/20 group-hover:opacity-100">
+            <span className="flex translate-y-1 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-[11px] font-semibold text-slate-900 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+              <Download className="size-3.5 text-blue-600" /> Use template
             </span>
           </div>
         </div>
       </button>
-
-      {/* Style badge with dot colored per style */}
-      <div className="pointer-events-none absolute left-2 top-2 flex gap-1">
-        <span className="flex items-center gap-1 rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold capitalize text-white backdrop-blur">
-          <span className="size-1.5 rounded-full" style={{ backgroundColor: meta.dot }} />
-          {meta.label}
-        </span>
-        {slides > 1 && (
-          <span className="flex items-center gap-0.5 rounded-full bg-slate-950/70 px-2 py-0.5 text-[9px] font-semibold text-white backdrop-blur">
-            <Layers className="size-2.5" />
-            {slides}
-          </span>
-        )}
-      </div>
-
-      {c.creator_profile?.username && (
-        <Link
-          to="/profile/$username" params={{ username: c.creator_profile.username }}
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-2 border-t border-slate-100 px-3 py-2 text-left hover:bg-slate-50"
-          title={`View ${c.creator_profile.display_name || c.creator_profile.username}'s profile`}
-        >
-          {c.creator_profile.avatar_url ? (
-            <img src={c.creator_profile.avatar_url} alt="" className="size-5 rounded-full object-cover" />
-          ) : (
-            <span className="flex size-5 items-center justify-center rounded-full bg-slate-200 text-[9px] font-semibold text-slate-600">
-              {(c.creator_profile.display_name || c.creator_profile.username).slice(0, 1).toUpperCase()}
-            </span>
-          )}
-          <span className="min-w-0 truncate text-[10px] font-medium text-slate-600">
-            {c.creator_profile.display_name || `@${c.creator_profile.username}`}
-          </span>
-        </Link>
-      )}
 
       {/* Like — top-right */}
       <button
@@ -599,24 +529,46 @@ function TemplateCard({
         }}
         disabled={!canLike}
         title={canLike ? (liked ? "Unlike" : "Like") : "Sign in to like"}
-        className={`absolute right-2 top-2 flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold backdrop-blur transition-all active:scale-95 ${
+        className={`absolute right-2.5 top-2.5 flex items-center gap-1 !rounded-full border px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-2xs backdrop-blur-md transition-all active:scale-95 ${
           liked
-            ? "border-rose-200 bg-rose-50 text-rose-500"
-            : "border-slate-200/80 bg-white/90 text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
-        } ${!canLike ? "opacity-60" : ""}`}
+            ? "border-rose-200 bg-rose-50/95 text-rose-500"
+            : "border-white/70 bg-white/90 text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
+        } ${!canLike ? "opacity-70" : ""}`}
       >
         <Heart className="size-3" fill={liked ? "currentColor" : "none"} strokeWidth={2} />
         {likeCount}
       </button>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-        <div className="truncate text-xs font-semibold text-slate-800" title={c.name}>
+      {c.creator_profile?.username && (
+        <Link
+          to="/profile/$username" params={{ username: c.creator_profile.username }}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-2 border-b border-slate-100 px-3.5 py-2 text-left transition-colors hover:bg-slate-50/80"
+          title={`View ${c.creator_profile.display_name || c.creator_profile.username}'s profile`}
+        >
+          {c.creator_profile.avatar_url ? (
+            <img src={c.creator_profile.avatar_url} alt="" className="size-5 rounded-full object-cover" />
+          ) : (
+            <span className="flex size-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
+              {(c.creator_profile.display_name || c.creator_profile.username).slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <span className="min-w-0 truncate text-[11px] font-medium text-slate-600">
+            {c.creator_profile.display_name || `@${c.creator_profile.username}`}
+          </span>
+        </Link>
+      )}
+
+      {/* Footer — crisp title + unboxed single-line metadata */}
+      <div className="px-3.5 py-2.5">
+        <div className="truncate text-[13px] font-semibold tracking-tight text-slate-900" title={c.name}>
           {c.name}
         </div>
-        <div className="flex shrink-0 items-center gap-1 text-[9px] font-medium text-slate-400">
-          <Layers className="size-2.5" />
-          {slides} slide{slides === 1 ? "" : "s"}
+        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500 tabular-nums">
+          <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: meta.dot }} />
+          <span>{meta.label}</span>
+          <span className="text-slate-300">·</span>
+          <span>{slides} slide{slides === 1 ? "" : "s"}</span>
         </div>
       </div>
     </div>
@@ -689,36 +641,36 @@ function AllTemplatesDialog({
   const sorted = sortTemplates(templates, likeCounts, sortBy);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden border-slate-200 bg-slate-50 p-0">
-        <DialogHeader className="border-b border-slate-200 bg-white px-5 py-4">
-          <DialogTitle className="text-sm font-semibold tracking-wide text-slate-800">
-            All templates
-            <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
-              {templates.length}
+      <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden rounded-3xl border-slate-200 bg-white p-0 shadow-[0_24px_72px_-16px_rgba(15,23,42,0.2)] sm:rounded-3xl">
+        <DialogHeader className="border-b border-slate-100 bg-white px-6 py-5">
+          <DialogTitle className="flex items-center gap-2 text-base font-semibold tracking-tight text-slate-900">
+            <span>All templates</span>
+            <span className="font-mono text-xs font-normal tabular-nums text-slate-400">
+              · {templates.length}
             </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-5 py-2.5">
-          <div className="flex items-center gap-1.5 rounded-lg bg-slate-100 p-1">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 bg-white px-6 py-3">
+          <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1">
             {(["likes", "recent"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setSortBy(s)}
-                className={`rounded-md px-3 py-1.5 text-[10px] font-semibold tracking-wide transition ${
+                className={`rounded-full px-3.5 py-1 text-xs font-semibold capitalize transition ${
                   sortBy === s
-                    ? "bg-white text-slate-800 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                {s}
+                {s === "likes" ? "Most liked" : "Recent"}
               </button>
             ))}
           </div>
-          <span className="text-[10px] text-slate-400">
+          <span className="font-mono text-xs tabular-nums text-slate-400">
             {templates.length} template{templates.length === 1 ? "" : "s"}
           </span>
         </div>
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto bg-slate-50/40 p-6">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {sorted.map((c) => (
               <TemplateCard

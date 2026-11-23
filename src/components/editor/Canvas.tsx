@@ -159,7 +159,7 @@ export function Canvas() {
           >
             <div
               id="canvas-export"
-              className="absolute left-0 top-0 overflow-hidden rounded-[2px] ring-1 ring-slate-200 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.14),0_2px_8px_-2px_rgba(15,23,42,0.06)]"
+              className="absolute left-0 top-0 overflow-hidden rounded-[2px] ring-1 ring-slate-200/90 shadow-[0_22px_54px_-14px_rgba(15,23,42,0.14),0_4px_14px_-4px_rgba(15,23,42,0.06)]"
               style={{
                 width: canvasW,
                 height: canvasH,
@@ -232,48 +232,48 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-slate-200/90 bg-white/92 px-2.5 py-1 text-slate-700 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.12)] backdrop-blur-md">
+      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2.5 text-slate-700 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-8 w-8 rounded-full"
           title="Zoom out"
           aria-label="Zoom out"
           disabled={scale <= 0.1}
           onClick={() => changeZoom(scale - 0.1)}
         >
-          <Minus />
+          <Minus className="size-3.5" />
         </Button>
         <button
           type="button"
           onClick={() => setZoom(null)}
           title="Fit to screen"
           aria-label="Fit to screen"
-          className="min-w-12 rounded-full px-2 py-0.5 text-center font-mono text-xs font-semibold tabular-nums text-slate-700 transition hover:bg-slate-100"
+          className="min-w-12 rounded-full px-2 py-1 text-center font-mono text-xs font-semibold tabular-nums text-slate-700 transition hover:bg-slate-100"
         >
           {Math.round(scale * 100)}%
         </button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-8 w-8 rounded-full"
           title="Zoom in"
           aria-label="Zoom in"
           disabled={scale >= 3}
           onClick={() => changeZoom(scale + 0.1)}
         >
-          <Plus />
+          <Plus className="size-3.5" />
         </Button>
-        <span className="hidden px-2 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
+        <span className="hidden px-2.5 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
           {canvasW}×{canvasH}
         </span>
-        <span className="px-2 font-mono text-[11px] tabular-nums text-slate-500">
+        <span className="px-2.5 font-mono text-[11px] tabular-nums text-slate-500">
           {currentIndex + 1} / {pages.length}
         </span>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-8 w-8 rounded-full"
           title={snapping ? "Snapping on (Alt to bypass while dragging)" : "Snapping off"}
           aria-label="Toggle snapping"
           aria-pressed={snapping}
@@ -284,7 +284,7 @@ export function Canvas() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7"
+          className="h-8 w-8 rounded-full"
           title="Slide version history"
           aria-label="Slide version history"
           onClick={() => setHistoryOpen(true)}
@@ -298,7 +298,7 @@ export function Canvas() {
               variant="ghost"
               aria-label="Slide transition"
               title="Slide transition & animations"
-              className="h-7 gap-1.5 px-2 text-[11px] capitalize text-slate-600"
+              className="h-8 gap-1.5 rounded-full px-2.5 text-xs font-medium capitalize text-slate-600"
             >
               <WandSparkles className="size-3.5" aria-hidden="true" />
               {currentTransition.replaceAll("-", " ")}
@@ -308,7 +308,7 @@ export function Canvas() {
           <PopoverContent
             side="top"
             align="end"
-            className="selector-panel space-y-3 rounded-2xl p-3.5"
+            className="selector-panel space-y-3 rounded-3xl p-3.5"
           >
             <PanelHeader title="Slide transition" />
             {selectedId && (
