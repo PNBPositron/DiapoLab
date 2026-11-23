@@ -10,6 +10,7 @@ export type PanelId =
   | "library"
   | "media"
   | "design"
+  | "layers"
   | "my-designs";
 
 export const PANEL_LABELS: Record<PanelId, string> = {
@@ -20,6 +21,7 @@ export const PANEL_LABELS: Record<PanelId, string> = {
   library: "Library",
   media: "Media",
   design: "Design",
+  layers: "Layers",
   "my-designs": "Projects",
 };
 
@@ -55,6 +57,8 @@ export const DEFAULT_TEXT_STYLES: Record<"title" | "subtitle" | "body", TextStyl
   body: { fontFamily: "Inter", fontSize: 24, fontWeight: 400, color: "#334155" },
 };
 
+export type TransitionSoundStyle = "whoosh" | "click";
+
 type SettingsState = {
   autoHidePanel: boolean;
   editorTheme: string;
@@ -62,6 +66,8 @@ type SettingsState = {
   panelDurationMs: number;
   panelStiffness: number;
   reduceMotion: boolean;
+  transitionSound: boolean;
+  transitionSoundStyle: TransitionSoundStyle;
   editorDark: boolean;
   a11yCheck: boolean;
   textStyles: Record<"title" | "subtitle" | "body", TextStyle>;
@@ -80,7 +86,9 @@ type SettingsState = {
   setEditorTheme: (v: string) => void;
   setPanelDurationMs: (v: number) => void;
   setPanelStiffness: (v: number) => void;
-  setReduceMotion: (v: boolean) => void;
+  setReduceMotion: (v: number | boolean) => void;
+  setTransitionSound: (v: boolean) => void;
+  setTransitionSoundStyle: (v: TransitionSoundStyle) => void;
   setEditorDark: (v: boolean) => void;
   setA11yCheck: (v: boolean) => void;
   setTextStyle: (role: "title" | "subtitle" | "body", patch: Partial<TextStyle>) => void;
@@ -114,6 +122,7 @@ const ALL_ON: Record<PanelId, boolean> = {
   library: true,
   media: true,
   design: true,
+  layers: true,
   "my-designs": true,
 };
 
@@ -126,6 +135,8 @@ export const useSettings = create<SettingsState>()(
       panelDurationMs: DEFAULT_PANEL_DURATION,
       panelStiffness: DEFAULT_PANEL_STIFFNESS,
       reduceMotion: true,
+      transitionSound: true,
+      transitionSoundStyle: "whoosh",
       editorDark: false,
       a11yCheck: false,
       textStyles: { ...DEFAULT_TEXT_STYLES },
@@ -151,7 +162,9 @@ export const useSettings = create<SettingsState>()(
       setEditorTheme: (editorTheme) => set({ editorTheme }),
       setPanelDurationMs: (panelDurationMs) => set({ panelDurationMs }),
       setPanelStiffness: (panelStiffness) => set({ panelStiffness }),
-      setReduceMotion: (reduceMotion) => set({ reduceMotion }),
+      setReduceMotion: (reduceMotion) => set({ reduceMotion: Boolean(reduceMotion) }),
+      setTransitionSound: (transitionSound) => set({ transitionSound }),
+      setTransitionSoundStyle: (transitionSoundStyle) => set({ transitionSoundStyle }),
       setEditorDark: (editorDark) => set({ editorDark }),
       setA11yCheck: (a11yCheck) => set({ a11yCheck }),
       setTextStyle: (role, patch) =>
@@ -172,7 +185,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 10,
+      version: 11,
       migrate: (state) => {
         const previous = state as SettingsState;
         const previousTheme = previous?.editorTheme;
@@ -185,6 +198,7 @@ export const useSettings = create<SettingsState>()(
         delete (panels as Record<string, boolean | undefined>).plugins;
         if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         if (panels.media === undefined) panels.media = true;
+        if (panels.layers === undefined) panels.layers = true;
         return {
           ...previous,
           customFonts: previous?.customFonts ?? [],
@@ -193,6 +207,8 @@ export const useSettings = create<SettingsState>()(
           // Editor chrome is intentionally light; reset removed dark and legacy values.
           editorTheme: DEFAULT_EDITOR_THEME,
           reduceMotion: true,
+          transitionSound: previous?.transitionSound ?? true,
+          transitionSoundStyle: previous?.transitionSoundStyle ?? "whoosh",
           editorDark: previous?.editorDark ?? false,
           a11yCheck: previous?.a11yCheck ?? false,
           textStyles: previous?.textStyles ?? { ...DEFAULT_TEXT_STYLES },

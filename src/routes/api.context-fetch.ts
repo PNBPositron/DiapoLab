@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { safeServerFetch, validateExternalUrl } from "@/lib/url-safety";
 
 export const Route = createFileRoute("/api/context-fetch")({
   server: {
@@ -6,22 +7,17 @@ export const Route = createFileRoute("/api/context-fetch")({
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => null)) as { url?: unknown } | null;
         const raw = typeof body?.url === "string" ? body.url.trim() : "";
-        let target: URL;
-        try {
-          target = new URL(raw);
-        } catch {
-          return Response.json({ error: "Invalid URL." }, { status: 400 });
+        const check = validateExternalUrl(raw);
+        if (!check.url) {
+          return Response.json({ error: check.error ?? "Invalid URL." }, { status: check.status ?? 400 });
         }
-        if (target.protocol !== "http:" && target.protocol !== "https:") {
-          return Response.json({ error: "Only http(s) URLs are supported." }, { status: 400 });
-        }
+        const target = check.url;
         try {
-          const response = await fetch(target.toString(), {
+          const { response, finalUrl } = await safeServerFetch(target, {
             headers: {
               "User-Agent": "Mozilla/5.0 (compatible; DiapoLab/1.0)",
               Accept: "text/html,application/xhtml+xml",
             },
-            redirect: "follow",
             signal: AbortSignal.timeout(12000),
           });
           if (!response.ok) {
@@ -52,7 +48,7 @@ export const Route = createFileRoute("/api/context-fetch")({
             .filter((line, i, arr) => line.length > 1 && line !== arr[i - 1])
             .join("\n")
             .replace(/\n{3,}/g, "\n\n");
-          return Response.json({ url: target.toString(), title, text: text.slice(0, 24000) });
+          return Response.json({ url: finalUrl.toString(), title, text: text.slice(0, 24000) });
         } catch {
           return Response.json({ error: "Could not load this page." }, { status: 502 });
         }

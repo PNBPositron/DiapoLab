@@ -3,11 +3,10 @@ import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/
 import { CanvasElement } from "./CanvasElement";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, History, WandSparkles, ChevronDown, Magnet } from "lucide-react";
+import { Minus, Plus, History, WandSparkles, ChevronDown, Magnet, Volume2, VolumeX } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
-import { LayersPanel } from "./LayersPanel";
 import {
   TRANSITION_OPTIONS,
   TRANSITION_ICONS,
@@ -16,6 +15,8 @@ import {
   formatTransitionLabel,
 } from "@/lib/motion-catalog";
 import { ThreeTransitionStage } from "./ThreeTransitionStage";
+import { useSettings } from "@/store/settings";
+import { playTransitionSound } from "@/lib/transition-sound";
 
 export function Canvas() {
   const {
@@ -40,6 +41,8 @@ export function Canvas() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const transitionSound = useSettings((s) => s.transitionSound);
+  const setTransitionSound = useSettings((s) => s.setTransitionSound);
   const activePreviewTransition = hoveredTransition ?? currentTransition;
   const isThreePreview = isThreeTransition(activePreviewTransition);
   const scale = zoom ?? fitScale;
@@ -101,7 +104,7 @@ export function Canvas() {
           st.removeSelected();
         }
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
         e.preventDefault();
         if (e.shiftKey) useEditor.getState().redo();
         else useEditor.getState().undo();
@@ -315,7 +318,26 @@ export function Canvas() {
             align="end"
             className="selector-panel space-y-3 rounded-3xl p-3.5"
           >
-            <PanelHeader title="Slide transition" />
+            <PanelHeader title="Slide transition">
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !transitionSound;
+                  setTransitionSound(next);
+                  if (next) playTransitionSound({ force: true, isThreeD: isThreePreview });
+                }}
+                aria-pressed={transitionSound}
+                title={transitionSound ? "Transition sound effects on" : "Transition sound effects off"}
+                className={`flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-medium transition ${
+                  transitionSound
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+                }`}
+              >
+                {transitionSound ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
+                <span>{transitionSound ? "Sound on" : "Muted"}</span>
+              </button>
+            </PanelHeader>
             {selectedId && (
               <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-2.5">
                 <div className="mb-1.5 flex items-center justify-between">
@@ -364,7 +386,12 @@ export function Canvas() {
               columns={3}
               label="Slide transitions"
               value={currentTransition}
-              onChange={setTransition}
+              onChange={(next) => {
+                setTransition(next);
+                if (next !== "none") {
+                  playTransitionSound({ isThreeD: isThreeTransition(next) });
+                }
+              }}
               onPreview={setHoveredTransition}
               options={TRANSITION_OPTIONS.map((value) => ({
                 value,
@@ -377,7 +404,6 @@ export function Canvas() {
 
       </div>
 
-      <LayersPanel />
       <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );

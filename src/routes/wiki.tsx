@@ -8,6 +8,7 @@ import {
   Camera,
   Image,
   Layers,
+  Layers3,
   Palette,
   WandSparkles,
   Command,
@@ -73,6 +74,7 @@ const PANELS = [
   { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
   { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets, whole-slide blocks and layout presets." },
   { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size, magic resize and speaker notes." },
+  { icon: <Layers3 className="size-4" />, name: "Layers", desc: "Select, reorder, hide, lock and multi-select elements on the current slide." },
   { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
 ];
 
@@ -254,8 +256,8 @@ function Wiki() {
               Hover the left rail to open the sidebar, or click a tool to pin it open.
               Each tool is a panel with its own job. Hide or show panels in{" "}
               <strong>Settings → Visible panels</strong>, and press{" "}
-              <Kbd>Esc</Kbd> to unpin. A floating <strong>Layers</strong> list lets
-              you toggle visibility, lock, reorder and multi-select elements.
+              <Kbd>Esc</Kbd> to unpin. Use the <strong>Layers</strong> panel under Design
+              to toggle visibility, lock, reorder and multi-select elements.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {PANELS.map((p) => (

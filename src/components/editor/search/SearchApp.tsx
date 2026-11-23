@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { TrafficLights } from "../ui/TrafficLights";
 import type { PluginApp } from "@/lib/plugins";
 import { newImage, newText, useEditor } from "@/store/editor";
+import { isSafeBrowserUrl } from "@/lib/url-safety";
 
 type Result = { title?: string; url?: string; snippet?: string; description?: string };
 type Preview = {
@@ -279,7 +280,7 @@ export function SearchAppDialog({ app, open, onOpenChange }: { app: PluginApp; o
               </button>
               <span className="min-w-0 flex-1 truncate text-xs font-bold text-slate-800">{preview.title}</span>
               <a
-                href={preview.url}
+                href={isSafeBrowserUrl(preview.url) ?? "#"}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 transition hover:bg-slate-50"

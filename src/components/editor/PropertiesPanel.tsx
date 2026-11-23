@@ -74,6 +74,7 @@ import {
 } from "lucide-react";
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
+import { isSafeBrowserUrl } from "@/lib/url-safety";
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
@@ -895,8 +896,8 @@ export function PropertiesPanel() {
       easing: sortedKfs[sortedKfs.length - 1]?.easing,
       shadow: el.shadow ? { ...el.shadow } : undefined,
       filters:
-        "filters" in el && (el as { filters?: ImageFilters }).filters
-          ? { ...(el as { filters?: ImageFilters }).filters }
+        "filters" in el && (el as { filters?: Partial<ImageFilters> }).filters
+          ? { ...DEFAULT_FILTERS, ...(el as { filters?: Partial<ImageFilters> }).filters }
           : undefined,
       effect: "effect" in el ? (el as { effect?: ElementKeyframe["effect"] }).effect : undefined,
       snapshot,
@@ -2167,7 +2168,10 @@ export function PropertiesPanel() {
                 </Field>
                 <button
                   type="button"
-                  onClick={() => window.open(el.src, "_blank", "noopener,noreferrer")}
+                  onClick={() => {
+                    const safeUrl = isSafeBrowserUrl(el.src);
+                    if (safeUrl) window.open(safeUrl, "_blank", "noopener,noreferrer");
+                  }}
                   className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
                 >
                   Ouvrir dans un nouvel onglet ↗

@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink } from "lucide-react";
-import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId } from "@/store/settings";
+import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2 } from "lucide-react";
+import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId, type TransitionSoundStyle } from "@/store/settings";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, listMyShareLinks, deleteShareLink, type PublicTemplate, type ShareLink } from "@/lib/designs";
+import { playTransitionSound } from "@/lib/transition-sound";
 
 const title = "text-[11px] font-semibold tracking-[0.04em] text-slate-700";
 const help = "mt-1 text-[10px] leading-relaxed text-slate-400";
@@ -80,7 +81,28 @@ function Switch({ on, onClick, label }: { on: boolean; onClick: () => void; labe
 }
 
 export function SettingsDialog({ onClose }: { onClose: () => void }) {
-  const { panels, togglePanel, resetPanels, panelDurationMs, setPanelDurationMs, panelStiffness, setPanelStiffness, reduceMotion, setReduceMotion, resetMotion, editorTheme, setEditorTheme, editorDark, setEditorDark, a11yCheck, setA11yCheck } = useSettings();
+  const {
+    panels,
+    togglePanel,
+    resetPanels,
+    panelDurationMs,
+    setPanelDurationMs,
+    panelStiffness,
+    setPanelStiffness,
+    reduceMotion,
+    setReduceMotion,
+    resetMotion,
+    transitionSound,
+    setTransitionSound,
+    transitionSoundStyle,
+    setTransitionSoundStyle,
+    editorTheme,
+    setEditorTheme,
+    editorDark,
+    setEditorDark,
+    a11yCheck,
+    setA11yCheck,
+  } = useSettings();
   const { user } = useAuth();
   const { pages, loadPages } = useEditor();
   const [motionOpen, setMotionOpen] = useState(false);
@@ -384,6 +406,61 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 </div>
                 <Switch on={a11yCheck} label="Accessibility checker" onClick={() => setA11yCheck(!a11yCheck)} />
               </div>
+            </div>
+          </Section>
+
+          {/* Transition audio feedback */}
+          <Section
+            icon={<Volume2 className="size-4" />}
+            label="Slide sound effects"
+            desc="Play a short, subtle audio cue whenever a slide transition begins."
+            trailing={
+              <Switch
+                on={transitionSound}
+                label="Slide sound effects"
+                onClick={() => {
+                  const next = !transitionSound;
+                  setTransitionSound(next);
+                  if (next) playTransitionSound({ force: true, style: transitionSoundStyle });
+                }}
+              />
+            }
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                {([
+                  { id: "whoosh", label: "Soft whoosh" },
+                  { id: "click", label: "Subtle click" },
+                ] as Array<{ id: TransitionSoundStyle; label: string }>).map((opt) => {
+                  const active = transitionSoundStyle === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      disabled={!transitionSound}
+                      onClick={() => {
+                        setTransitionSoundStyle(opt.id);
+                        playTransitionSound({ force: true, style: opt.id });
+                      }}
+                      className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all disabled:opacity-45 ${
+                        active
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                onClick={() => playTransitionSound({ force: true, style: transitionSoundStyle })}
+                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-300 hover:text-blue-600"
+              >
+                <Volume2 className="size-3.5" />
+                Test sound
+              </button>
             </div>
           </Section>
 

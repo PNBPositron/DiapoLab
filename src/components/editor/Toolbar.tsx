@@ -420,9 +420,9 @@ export function Toolbar() {
 
           {/* Primary CTA: Present */}
           <button
-            onClick={async () => {
-              const enteredFullscreen = await requestPresentationFullscreen();
-              if (enteredFullscreen) setPresenting(true);
+            onClick={() => {
+              void requestPresentationFullscreen();
+              setPresenting(true);
             }}
             title="Present slideshow"
             type="button"

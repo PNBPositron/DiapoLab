@@ -14,6 +14,7 @@ import {
 import type { AnyElement, Page } from "@/store/editor";
 import { backgroundStyle } from "@/lib/bg";
 import { ThreeTransitionStage } from "./ThreeTransitionStage";
+import { playTransitionSound } from "@/lib/transition-sound";
 import { Box, ChevronLeft, ChevronRight, RotateCcw, Rotate3d, X } from "lucide-react";
 
 export async function requestPresentationFullscreen(target: Element = document.documentElement) {
@@ -99,6 +100,10 @@ export function PresentationMode() {
         e.preventDefault();
         setReplayEpoch((n) => n + 1);
         setStage3dPlayTrigger((n) => n + 1);
+        const cur = useEditor.getState().pages[useEditor.getState().currentIndex];
+        if (cur?.transition && cur.transition !== "none") {
+          playTransitionSound({ isThreeD: isThreeTransition(cur.transition) });
+        }
       }
       if (e.key === "3") {
         e.preventDefault();
@@ -168,6 +173,7 @@ export function PresentationMode() {
       setBackdropIndex(null);
       setStage3dKind(incoming.transition);
       setThreeFadingOut(false);
+      playTransitionSound({ isThreeD: true });
       setThreeTransition({
         transition: incoming.transition,
         outgoingPage: prev,
@@ -179,6 +185,7 @@ export function PresentationMode() {
     if (stage3dOpen) {
       setBackdropIndex(null);
       setThreeFadingOut(false);
+      playTransitionSound({ isThreeD: true });
       setThreeTransition({
         transition: stage3dKind,
         outgoingPage: prev,
@@ -189,8 +196,14 @@ export function PresentationMode() {
     }
     setThreeTransition(null);
     if (!prev || incoming.transition === "morph" || incoming.transition === "none") {
+      if (incoming.transition === "morph") {
+        playTransitionSound({ isThreeD: false });
+      }
       setBackdropIndex(null);
       return;
+    }
+    if (incoming.transition) {
+      playTransitionSound({ isThreeD: incoming.transition === "cube" || incoming.transition === "flip" || incoming.transition === "origami" });
     }
     setBackdropIndex(prevIndex);
     const t = setTimeout(() => setBackdropIndex(null), 1000);
@@ -202,7 +215,7 @@ export function PresentationMode() {
     const t = setTimeout(() => {
       setThreeTransition(null);
       setThreeFadingOut(false);
-    }, 150);
+    }, 300);
     return () => clearTimeout(t);
   }, [threeFadingOut]);
 
@@ -316,7 +329,7 @@ export function PresentationMode() {
       </div>
       {showThreeCanvas && (
         <div
-          className={`fixed inset-0 z-30 transition-opacity duration-150 ${
+          className={`fixed inset-0 z-30 transition-opacity duration-300 ease-out ${
             threeFadingOut && !stage3dOpen ? "pointer-events-none opacity-0" : "opacity-100"
           }`}
         >
@@ -371,6 +384,7 @@ export function PresentationMode() {
                 onClick={() => {
                   setStage3dKind(kind);
                   setStage3dPlayTrigger((n) => n + 1);
+                  playTransitionSound({ isThreeD: true });
                 }}
                 className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
                   stage3dKind === kind
@@ -384,7 +398,10 @@ export function PresentationMode() {
             <span className="mx-0.5 h-4 w-px bg-white/15" />
             <button
               type="button"
-              onClick={() => setStage3dPlayTrigger((n) => n + 1)}
+              onClick={() => {
+                setStage3dPlayTrigger((n) => n + 1);
+                playTransitionSound({ isThreeD: true });
+              }}
               title="Replay 3D transition (R)"
               className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
             >
@@ -460,13 +477,13 @@ export function PresentationMode() {
 }
 
 function transitionPreset(name: string | undefined) {
-  const ease = [0.22, 1, 0.36, 1] as const;
-  if (name === "slide-left") return { initial: { x: "100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-right") return { initial: { x: "-100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-up") return { initial: { y: "100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.62, ease } };
-  if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.48, ease } };
-  if (name === "zoom") return { initial: { opacity: 0.2, scale: 0.86 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.68, ease } };
+  const ease = [0.16, 1, 0.3, 1] as const;
+  if (name === "slide-left") return { initial: { x: "100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
+  if (name === "slide-right") return { initial: { x: "-100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
+  if (name === "slide-up") return { initial: { y: "100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
+  if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
+  if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.56, ease } };
+  if (name === "zoom") return { initial: { opacity: 0.15, scale: 0.88 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.76, ease } };
   if (name === "tv") {
     return {
       // A CRT powers on from a bright horizontal line without enlarging the slide.
@@ -476,7 +493,7 @@ function transitionPreset(name: string | undefined) {
         clipPath: ["inset(49.5% 0 49.5% 0)", "inset(10% 0 10% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
         filter: ["brightness(3) saturate(1.8) contrast(1.25)", "brightness(1.6) saturate(1.35) contrast(1.1)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
       },
-      transition: { duration: 0.82, times: [0, 0.34, 0.72, 1], ease },
+      transition: { duration: 0.84, times: [0, 0.34, 0.72, 1], ease },
     };
   }
   if (name === "neon") {
@@ -495,30 +512,30 @@ function transitionPreset(name: string | undefined) {
   if (name === "prism") {
     return {
       // Refraction lock: the slide snaps into focus like light through a prism.
-      initial: { opacity: 0, filter: "blur(16px) hue-rotate(90deg) saturate(2.2) brightness(1.3)" },
+      initial: { opacity: 0, filter: "blur(14px) hue-rotate(80deg) saturate(2) brightness(1.25)" },
       animate: {
         opacity: [0, 1],
         filter: [
-          "blur(16px) hue-rotate(90deg) saturate(2.2) brightness(1.3)",
+          "blur(14px) hue-rotate(80deg) saturate(2) brightness(1.25)",
           "blur(0px) hue-rotate(0deg) saturate(1) brightness(1)",
         ],
       },
-      transition: { duration: 0.7, ease },
+      transition: { duration: 0.78, ease },
     };
   }
   if (name === "origami") {
     return {
       // Paper fold: the sheet unfolds from its top edge.
-      initial: { opacity: 0, rotateX: -55, originY: 0, transformPerspective: 1200 },
-      animate: { opacity: [0, 1, 1], rotateX: [-55, 6, 0] },
-      transition: { duration: 0.8, times: [0, 0.7, 1], ease },
+      initial: { opacity: 0, rotateX: -48, originY: 0, transformPerspective: 1400 },
+      animate: { opacity: [0, 1, 1], rotateX: [-48, 3, 0] },
+      transition: { duration: 0.88, times: [0, 0.65, 1], ease },
     };
   }
   if (name === "cube") {
     return {
-      initial: { opacity: 0, rotateY: -18, x: "2%", transformPerspective: 1200 },
-      animate: { opacity: [0, 1, 1], rotateY: [-18, 3, 0], x: ["2%", "-0.5%", "0%"], transformPerspective: 1200, originX: 0.5, originY: 0.5 },
-      transition: { duration: 0.86, times: [0, 0.72, 1], ease },
+      initial: { opacity: 0, rotateY: -16, x: "2%", transformPerspective: 1400 },
+      animate: { opacity: [0, 1, 1], rotateY: [-16, 1.5, 0], x: ["2%", "-0.25%", "0%"], transformPerspective: 1400, originX: 0.5, originY: 0.5 },
+      transition: { duration: 0.9, times: [0, 0.68, 1], ease },
     };
   }
   return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };

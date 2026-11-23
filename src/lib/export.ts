@@ -156,22 +156,25 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
     const node = document.getElementById("canvas-export");
     if (!node) continue;
     node.dataset.exporting = "true";
-    const options = {
-      width: canvasW,
-      height: canvasH,
-      pixelRatio: EXPORT_PIXEL_RATIO,
-      style: { transform: "none", left: "0", top: "0", margin: "0" },
-    };
-    // JPEG has no alpha channel, so give it a white base for any transparent areas.
-    const pageBg = pages[i].bgColor;
-    const raw =
-      format === "jpeg"
-        ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: solidFallback(pageBg) })
-        : await toPng(node, options);
-    delete node.dataset.exporting;
-    // Safety net: repaint the page background under the capture (solid or
-    // gradient) so it can never be lost by the DOM capture.
-    shots.push(await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, format));
+    try {
+      const options = {
+        width: canvasW,
+        height: canvasH,
+        pixelRatio: EXPORT_PIXEL_RATIO,
+        style: { transform: "none", left: "0", top: "0", margin: "0" },
+      };
+      // JPEG has no alpha channel, so give it a white base for any transparent areas.
+      const pageBg = pages[i].bgColor;
+      const raw =
+        format === "jpeg"
+          ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: solidFallback(pageBg) })
+          : await toPng(node, options);
+      // Safety net: repaint the page background under the capture (solid or
+      // gradient) so it can never be lost by the DOM capture.
+      shots.push(await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, format));
+    } finally {
+      delete node.dataset.exporting;
+    }
   }
   setCurrentPage(original);
   return shots;
@@ -184,19 +187,23 @@ export async function exportJPG(name: string) {
   await waitForExportReady();
   const node = document.getElementById("canvas-export");
   if (!node) return;
-  node.dataset.exporting = "true";
   const st = useEditor.getState();
   const pageBg = st.pages[st.currentIndex]?.bgColor;
-  const raw = await toJpeg(node, {
-    width: canvasW,
-    height: canvasH,
-    pixelRatio: EXPORT_PIXEL_RATIO,
-    cacheBust: true,
-    quality: JPEG_QUALITY,
-    backgroundColor: solidFallback(pageBg),
-    style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
-  });
-  delete node.dataset.exporting;
+  node.dataset.exporting = "true";
+  let raw: string;
+  try {
+    raw = await toJpeg(node, {
+      width: canvasW,
+      height: canvasH,
+      pixelRatio: EXPORT_PIXEL_RATIO,
+      cacheBust: true,
+      quality: JPEG_QUALITY,
+      backgroundColor: solidFallback(pageBg),
+      style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
+    });
+  } finally {
+    delete node.dataset.exporting;
+  }
   const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "jpeg");
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.jpg`;
@@ -211,18 +218,22 @@ export async function exportPNG(name: string) {
   await waitForExportReady();
   const node = document.getElementById("canvas-export");
   if (!node) return;
-  node.dataset.exporting = "true";
   const st = useEditor.getState();
   const pageBg = st.pages[st.currentIndex]?.bgColor;
-  const raw = await toPng(node, {
-    width: canvasW,
-    height: canvasH,
-    pixelRatio: EXPORT_PIXEL_RATIO,
-    cacheBust: true,
-    backgroundColor: solidFallback(pageBg),
-    style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
-  });
-  delete node.dataset.exporting;
+  node.dataset.exporting = "true";
+  let raw: string;
+  try {
+    raw = await toPng(node, {
+      width: canvasW,
+      height: canvasH,
+      pixelRatio: EXPORT_PIXEL_RATIO,
+      cacheBust: true,
+      backgroundColor: solidFallback(pageBg),
+      style: { transform: "none", left: "0", top: "0", margin: "0", border: "0" },
+    });
+  } finally {
+    delete node.dataset.exporting;
+  }
   const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "png");
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.png`;
@@ -609,7 +620,7 @@ export function exportMarkdown(name: string) {
       if (element.type === "text") lines.push(element.text, "");
     });
   });
-  const blob = new Blob([lines.join("\\n")], { type: "text/markdown;charset=utf-8" });
+  const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -657,7 +668,7 @@ export async function exportGIF(
   const enc = GIFEncoder();
   for (let i = 0; i < images.length; i++) {
     onProgress?.(`encoding ${i + 1}/${images.length}…`);
-    ctx.fillStyle = pages[i].bgColor;
+    ctx.fillStyle = solidFallback(pages[i].bgColor);
     ctx.fillRect(0, 0, W, H);
     ctx.drawImage(images[i], 0, 0, W, H);
     const { data } = ctx.getImageData(0, 0, W, H);

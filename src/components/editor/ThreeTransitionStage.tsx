@@ -80,7 +80,7 @@ export function ThreeTransitionStage({
     mountedRef.current = true;
     stage.setInteractive(init.interactive || init.mode === "mini");
     stage.playTransition(init.transition, {
-      duration: init.mode === "mini" ? 1.15 : 1.05,
+      duration: init.mode === "mini" ? 1.45 : 1.28,
       loop: init.mode === "mini",
     });
 
@@ -116,7 +116,7 @@ export function ThreeTransitionStage({
 
     refreshTextures();
     stage.playTransition(transition, {
-      duration: mode === "mini" ? 1.15 : 1.05,
+      duration: mode === "mini" ? 1.45 : 1.28,
       loop: mode === "mini",
     });
 

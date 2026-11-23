@@ -28,12 +28,12 @@ export function detectSoftwareWebGL(): boolean {
   }
 }
 
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
+function smootherStep(t: number): number {
+  return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function easeOutQuint(t: number): number {
+  return 1 - Math.pow(1 - t, 5);
 }
 
 function createStudioFloorTexture(theme: StageTheme, maxAnisotropy: number): THREE.CanvasTexture {
@@ -326,8 +326,10 @@ export class ThreeSlideStage {
   private rafId = 0;
   private timerId = 0;
   private lastFrameMs = 0;
+  private skipNextDt = true;
   private renderQueued = false;
   private idleSpinTime = 0;
+  private cameraDolly = 0;
 
   constructor(
     container: HTMLElement,
@@ -585,10 +587,11 @@ export class ThreeSlideStage {
     options: { duration?: number; loop?: boolean } = {},
   ) {
     this.transitionKind = kind;
-    this.animDuration = Math.max(0.4, options.duration ?? 1.05);
+    this.animDuration = Math.max(0.5, options.duration ?? 1.28);
     this.loopContinuously = !!options.loop;
     this.animElapsed = 0;
     this.completedNotified = false;
+    this.skipNextDt = true;
     this.playing = true;
     this.applyTransitionPose(0);
     this.startLoop();
@@ -613,8 +616,10 @@ export class ThreeSlideStage {
 
   private applyTransitionPose(rawProgress: number) {
     const t = Math.max(0, Math.min(1, rawProgress));
-    const e = easeInOutCubic(t);
-    const eOut = easeOutCubic(t);
+    const e = smootherStep(t);
+    const eOut = easeOutQuint(t);
+    const bell = Math.sin(e * Math.PI);
+    this.cameraDolly = bell * 0.48;
 
     // Reset both panels
     this.stageRig.position.set(0, 0, 0);
@@ -634,84 +639,86 @@ export class ThreeSlideStage {
     const halfW = w / 2;
 
     if (this.transitionKind === "3d-cube") {
-      // Two panels form a 90-degree precision prism corner rotated around center
+      // Two panels form a 90-degree precision prism corner rotated smoothly around center
       this.outgoingPanel.group.position.set(0, 0, halfW);
       this.outgoingPanel.group.rotation.set(0, 0, 0);
 
       this.incomingPanel.group.position.set(halfW, 0, 0);
       this.incomingPanel.group.rotation.set(0, Math.PI / 2, 0);
 
-      // Pivot rig back slightly during mid-swing so corner never clips camera
-      const swingZ = -Math.sin(e * Math.PI) * 0.75;
-      this.stageRig.position.set(0, 0, -halfW + swingZ);
+      this.stageRig.position.set(0, 0, -halfW - bell * 0.55);
       this.stageRig.rotation.y = -e * (Math.PI / 2);
-      this.stageRig.rotation.x = Math.sin(e * Math.PI) * 0.08;
+      this.stageRig.rotation.x = bell * 0.06;
     } else if (this.transitionKind === "3d-carousel") {
-      const radius = w * 0.92;
-      const outAngle = -e * (Math.PI * 0.65);
-      const inAngle = (1 - e) * (Math.PI * 0.65);
+      const radius = w * 0.98;
+      const outAngle = -e * (Math.PI * 0.62);
+      const inAngle = (1 - e) * (Math.PI * 0.62);
 
       this.outgoingPanel.group.position.set(
         Math.sin(outAngle) * radius,
-        Math.sin(e * Math.PI) * 0.08,
+        bell * 0.06,
         Math.cos(outAngle) * radius - radius,
       );
-      this.outgoingPanel.group.rotation.y = outAngle * 0.88;
-      this.outgoingPanel.group.scale.setScalar(1 - e * 0.16);
+      this.outgoingPanel.group.rotation.y = outAngle * 0.85;
+      this.outgoingPanel.group.scale.setScalar(1 - e * 0.14);
 
       this.incomingPanel.group.position.set(
         Math.sin(inAngle) * radius,
         0,
         Math.cos(inAngle) * radius - radius,
       );
-      this.incomingPanel.group.rotation.y = inAngle * 0.88;
-      this.incomingPanel.group.scale.setScalar(0.84 + e * 0.16);
+      this.incomingPanel.group.rotation.y = inAngle * 0.85;
+      this.incomingPanel.group.scale.setScalar(0.86 + e * 0.14);
     } else if (this.transitionKind === "3d-flip") {
-      // Double-sided turntable flip: outgoing on front (+Y rot 0..PI), incoming on back
+      // Double-sided turntable flip: both faces remain mounted back-to-back for zero pop
       const angle = e * Math.PI;
-      const pull = Math.sin(e * Math.PI) * 0.65;
-      this.stageRig.position.set(0, 0, -pull);
+      this.stageRig.position.set(0, 0, -bell * 0.42);
       this.stageRig.rotation.y = angle;
-      this.stageRig.rotation.x = Math.sin(e * Math.PI) * 0.12;
+      this.stageRig.rotation.x = bell * 0.09;
 
-      this.outgoingPanel.group.position.set(0, 0, 0.045);
+      this.outgoingPanel.group.position.set(0, 0, 0.048);
       this.outgoingPanel.group.rotation.y = 0;
-      this.outgoingPanel.group.visible = angle < Math.PI * 0.52;
 
-      this.incomingPanel.group.position.set(0, 0, -0.045);
+      this.incomingPanel.group.position.set(0, 0, -0.048);
       this.incomingPanel.group.rotation.y = Math.PI;
-      this.incomingPanel.group.visible = angle >= Math.PI * 0.48;
     } else if (this.transitionKind === "3d-fold") {
-      // Outgoing swings open like a hinged slate to the left; incoming unfolds from right depth
-      const outPivotX = -halfW;
-      const outAngle = -e * 1.95;
+      // Continuous hinged fold: outgoing glides left into depth while incoming unfolds smoothly
+      const outPivotX = -halfW - e * 0.65;
+      const outAngle = -e * (Math.PI * 0.78);
       this.outgoingPanel.group.position.set(
         outPivotX + Math.cos(outAngle) * halfW,
         0,
-        -Math.sin(outAngle) * halfW - e * 0.6,
+        -Math.sin(outAngle) * halfW - e * 1.15,
       );
       this.outgoingPanel.group.rotation.y = outAngle;
-      this.outgoingPanel.group.visible = t < 0.94;
+      this.outgoingPanel.group.scale.setScalar(1 - e * 0.18);
 
-      const inAngle = (1 - eOut) * 1.38;
+      const inAngle = (1 - eOut) * 1.15;
       this.incomingPanel.group.position.set(
         halfW - Math.cos(inAngle) * halfW,
         0,
-        -Math.sin(inAngle) * halfW - (1 - eOut) * 0.35,
+        -Math.sin(inAngle) * halfW - (1 - eOut) * 0.28,
       );
       this.incomingPanel.group.rotation.y = -inAngle;
     } else if (this.transitionKind === "3d-helix") {
-      // Helical orbital fly-by with staggered depth & tilt
-      const outRot = -e * 1.45;
-      this.outgoingPanel.group.position.set(-e * 3.1, e * 0.9, -e * 2.4);
-      this.outgoingPanel.group.rotation.set(e * 0.25, outRot, e * 0.18);
-      this.outgoingPanel.group.scale.setScalar(Math.max(0.45, 1 - e * 0.52));
-      this.outgoingPanel.group.visible = t < 0.92;
+      // Smooth continuous helical arc sweep
+      const helixT = e;
+      this.outgoingPanel.group.position.set(
+        -Math.sin(helixT * Math.PI * 0.65) * 2.8,
+        helixT * 0.72,
+        -helixT * 2.6,
+      );
+      this.outgoingPanel.group.rotation.set(helixT * 0.2, -helixT * 1.35, helixT * 0.12);
+      this.outgoingPanel.group.scale.setScalar(Math.max(0.45, 1 - helixT * 0.5));
 
       const inv = 1 - eOut;
-      this.incomingPanel.group.position.set(inv * 2.9, -inv * 0.85, -inv * 2.8);
-      this.incomingPanel.group.rotation.set(-inv * 0.32, inv * 1.65, -inv * 0.22);
-      this.incomingPanel.group.scale.setScalar(0.55 + eOut * 0.45);
+      this.incomingPanel.group.position.set(
+        Math.sin(inv * Math.PI * 0.65) * 2.7,
+        -inv * 0.68,
+        -inv * 2.8,
+      );
+      this.incomingPanel.group.rotation.set(-inv * 0.24, inv * 1.45, -inv * 0.16);
+      this.incomingPanel.group.scale.setScalar(0.58 + eOut * 0.42);
     }
   }
 
@@ -813,10 +820,10 @@ export class ThreeSlideStage {
     const vFovRad = THREE.MathUtils.degToRad(this.camera.fov);
     const halfV = this.slideH * 0.56;
     const halfH = (this.slideW * 0.56) / aspect;
-    const baseDist = Math.max(halfV / Math.tan(vFovRad / 2), halfH / Math.tan(vFovRad / 2)) * 1.18;
-    const dist = baseDist * this.orbitZoom;
+    const baseDist = Math.max(halfV / Math.tan(vFovRad / 2), halfH / Math.tan(vFovRad / 2)) * 1.12;
+    const dist = baseDist * this.orbitZoom + this.cameraDolly;
 
-    const pitchOffset = 0.08 + this.orbitPitch;
+    const pitchOffset = 0.06 + this.orbitPitch;
     _vec3A.set(
       Math.sin(this.orbitYaw) * Math.cos(pitchOffset) * dist,
       Math.sin(pitchOffset) * dist,
@@ -836,14 +843,18 @@ export class ThreeSlideStage {
     if (this.disposed) return;
 
     const now = performance.now();
-    const dt = Math.min(0.05, Math.max(0.001, (now - this.lastFrameMs) / 1000));
+    let dt = Math.min(0.033, Math.max(0.001, (now - this.lastFrameMs) / 1000));
     this.lastFrameMs = now;
+    if (this.skipNextDt) {
+      this.skipNextDt = false;
+      dt = 0.008;
+    }
 
     if (this.playing) {
       this.animElapsed += dt;
       let progress = this.animElapsed / this.animDuration;
       if (this.loopContinuously) {
-        const cycle = this.animDuration + 0.75; // brief hold between preview loops
+        const cycle = this.animDuration + 0.85;
         const mod = this.animElapsed % cycle;
         progress = Math.min(1, mod / this.animDuration);
       } else if (progress >= 1) {

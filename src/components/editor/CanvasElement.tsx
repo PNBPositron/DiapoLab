@@ -29,6 +29,7 @@ import { LUCIDE_ICONS } from "@/lib/lucide-icons";
 import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2, Play, Pause, VolumeX } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
+import { isSafeBrowserUrl } from "@/lib/url-safety";
 
 const svgFilterUrl = (inner: string) =>
   `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(
@@ -184,11 +185,18 @@ const interpFilters = (
   b: ImageFilters | undefined,
   p: number,
 ): ImageFilters => {
-  const f1 = { ...DEFAULT_FILTERS, ...(a ?? {}) } as Record<string, number>;
-  const f2 = { ...DEFAULT_FILTERS, ...(b ?? {}) } as Record<string, number>;
-  const out: Record<string, number> = {};
-  for (const key of Object.keys(f1))
-    if (typeof f1[key] === "number" && typeof f2[key] === "number") out[key] = kfLerp(f1[key], f2[key], p);
+  const f1: ImageFilters = { ...DEFAULT_FILTERS, ...(a ?? {}) };
+  const f2: ImageFilters = { ...DEFAULT_FILTERS, ...(b ?? {}) };
+  const out: Record<string, unknown> = { ...f1 };
+  for (const key of Object.keys(f1) as Array<keyof ImageFilters>) {
+    const v1 = f1[key];
+    const v2 = f2[key];
+    if (typeof v1 === "number" && typeof v2 === "number") {
+      out[key] = kfLerp(v1, v2, p);
+    } else if (v2 !== undefined) {
+      out[key] = p >= 0.5 ? v2 : v1;
+    }
+  }
   return out as unknown as ImageFilters;
 };
 
@@ -409,8 +417,9 @@ export function CanvasElement({
   // Live glitch: real interference never sits still. Every few frames the
   // SVG turbulence is re-seeded and the tear scale / RGB split offsets are
   // re-rolled, so the bands and fringes flicker continuously on the slide.
+  const glitchAmount = "filters" in element ? (element.filters?.glitch ?? 0) : 0;
   useEffect(() => {
-    const g = element.filters?.glitch ?? 0;
+    const g = glitchAmount;
     if (!g || preview) return;
     const rand = (m: number) => (Math.random() * 2 - 1) * m;
     const timer = setInterval(() => {
@@ -426,7 +435,7 @@ export function CanvasElement({
       if (bOff) bOff.setAttribute("dx", rand(g * 0.18).toFixed(1));
     }, 90);
     return () => clearInterval(timer);
-  }, [element.id, element.filters?.glitch, preview]);
+  }, [element.id, glitchAmount, preview]);
 
   // Live 3D tilt toward the cursor (presenting + hoverTilt enabled)
   const [tilt, setTilt] = useState<{ rx: number; ry: number } | null>(null);
@@ -463,7 +472,7 @@ export function CanvasElement({
   const entryDelayMs = Math.max(0, Math.min(120000, (element.animationDelay ?? 0) + cueDelayMs));
   const entryShorthand =
     element.animation && element.animation !== "none"
-      ? `el-${element.animation} 680ms cubic-bezier(0.22,1,0.36,1) ${entryDelayMs}ms both`
+      ? `el-${element.animation} 760ms cubic-bezier(0.16,1,0.3,1) ${entryDelayMs}ms both`
       : undefined;
   const entryAnimRef = useRef<Animation | null>(null);
 
@@ -744,9 +753,9 @@ export function CanvasElement({
     }
     setUseCssEntry(false);
     entryAnimRef.current = node.animate(frames, {
-      duration: 680,
+      duration: 760,
       delay: entryDelayMs,
-      easing: "cubic-bezier(0.22,1,0.36,1)",
+      easing: "cubic-bezier(0.16,1,0.3,1)",
       fill: "both",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1430,39 +1439,7 @@ export function CanvasElement({
         (!presenting && !preview && !morph ? (
           <VideoEditReader element={element} />
         ) : (
-          <video
-            src={element.src}
-            poster={element.poster}
-            muted={element.muted ?? true}
-            loop={element.loop ?? true}
-            autoPlay
-            playbackRate={element.rate ?? 1}
-            playsInline
-            controls={presenting}
-            onLoadedMetadata={(e) => {
-              // trim window: start playback at "start"
-              if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
-                e.currentTarget.currentTime = element.start;
-              }
-            }}
-            onTimeUpdate={(e) => {
-              // trim window: loop (or pause) when reaching "end"
-              const v = e.currentTarget;
-              const s = element.start ?? 0;
-              const t = element.end;
-              if (t !== undefined && t > s && v.currentTime >= t) {
-                if (v.loop) v.currentTime = s;
-                else v.pause();
-              }
-            }}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: element.fit ?? "cover",
-              display: "block",
-              borderRadius: 0,
-            }}
-          />
+          <VideoPresentPlayer element={element} presenting={presenting} />
         ))}
 
       {element.type === "audio" && (
@@ -2790,9 +2767,11 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
       case "last-slide":
         setCurrentPage(pages.length - 1);
         break;
-      case "link":
-        if (element.href) window.open(element.href, "_blank", "noopener,noreferrer");
+      case "link": {
+        const safeHref = isSafeBrowserUrl(element.href);
+        if (safeHref) window.open(safeHref, "_blank", "noopener,noreferrer");
         break;
+      }
     }
   };
   return (
@@ -2842,7 +2821,7 @@ function QrRender({ element }: { element: QrElement }) {
         level="M"
         imageSettings={
           element.centerImage
-            ? { href: element.centerImage, height: 96, width: 96, excavate: true }
+            ? { src: element.centerImage, height: 96, width: 96, excavate: true }
             : undefined
         }
         style={{ width: "94%", height: "94%" }}
@@ -2857,12 +2836,57 @@ const fmtTime = (s: number) => {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 };
 
+function VideoPresentPlayer({ element, presenting }: { element: VideoElement; presenting: boolean }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.playbackRate = element.rate ?? 1;
+  }, [element.rate]);
+  return (
+    <video
+      ref={ref}
+      src={element.src}
+      poster={element.poster}
+      muted={element.muted ?? true}
+      loop={element.loop ?? true}
+      autoPlay
+      playsInline
+      controls={presenting}
+      onLoadedMetadata={(e) => {
+        e.currentTarget.playbackRate = element.rate ?? 1;
+        if (element.start !== undefined && e.currentTarget.currentTime < element.start) {
+          e.currentTarget.currentTime = element.start;
+        }
+      }}
+      onTimeUpdate={(e) => {
+        const v = e.currentTarget;
+        const s = element.start ?? 0;
+        const t = element.end;
+        if (t !== undefined && t > s && v.currentTime >= t) {
+          if (v.loop) v.currentTime = s;
+          else v.pause();
+        }
+      }}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: element.fit ?? "cover",
+        display: "block",
+        borderRadius: 0,
+      }}
+    />
+  );
+}
+
 function VideoEditReader({ element }: { element: VideoElement }) {
   const ref = useRef<HTMLVideoElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(element.muted ?? true);
   const [time, setTime] = useState(0);
   const [dur, setDur] = useState(0);
+
+  useEffect(() => {
+    if (ref.current) ref.current.playbackRate = element.rate ?? 1;
+  }, [element.rate]);
 
   const togglePlay = () => {
     const v = ref.current;
@@ -2880,9 +2904,9 @@ function VideoEditReader({ element }: { element: VideoElement }) {
         muted={muted}
         loop={element.loop ?? true}
         autoPlay
-        playbackRate={element.rate ?? 1}
         playsInline
         onLoadedMetadata={(e) => {
+          e.currentTarget.playbackRate = element.rate ?? 1;
           setDur(e.currentTarget.duration || 0);
           // trim window: start playback at "start"
           if (element.start !== undefined && e.currentTarget.currentTime < element.start) {

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { validateExternalUrl } from "@/lib/url-safety";
 
 export const Route = createFileRoute("/api/context-shot")({
   server: {
@@ -6,15 +7,11 @@ export const Route = createFileRoute("/api/context-shot")({
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => null)) as { url?: unknown } | null;
         const raw = typeof body?.url === "string" ? body.url.trim() : "";
-        let target: URL;
-        try {
-          target = new URL(raw);
-        } catch {
-          return Response.json({ error: "Invalid URL." }, { status: 400 });
+        const check = validateExternalUrl(raw);
+        if (!check.url) {
+          return Response.json({ error: check.error ?? "Invalid URL." }, { status: check.status ?? 400 });
         }
-        if (target.protocol !== "http:" && target.protocol !== "https:") {
-          return Response.json({ error: "Only http(s) URLs are supported." }, { status: 400 });
-        }
+        const target = check.url;
         const toDataUrl = (bytes: ArrayBuffer, mime: string) =>
           `data:${mime};base64,${Buffer.from(bytes).toString("base64")}`;
 

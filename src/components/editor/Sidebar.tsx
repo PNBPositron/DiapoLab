@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Home, Type, Shapes, Layers, Palette, Folder, Library, Image } from "lucide-react";
+import { Home, Type, Shapes, Layers, Layers3, Palette, Folder, Library, Image } from "lucide-react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
@@ -10,6 +10,7 @@ import { ElementsPanel } from "./panels/ElementsPanel";
 import { LibraryPanel } from "./panels/LibraryPanel";
 import { MediaPanel } from "./panels/MediaPanel";
 import { DesignPanel } from "./panels/DesignPanel";
+import { LayersPanel } from "./panels/LayersPanel";
 import { ComponentsPanel } from "./panels/ComponentsPanel";
 import { MyDesignsDialog } from "./MyDesignsDialog";
 
@@ -21,6 +22,7 @@ const TOOLS = [
   { id: "media", label: "Media", icon: Image },
   { id: "components", label: "Presets", icon: Layers },
   { id: "design", label: "Design", icon: Palette },
+  { id: "layers", label: "Layers", icon: Layers3 },
   { id: "my-designs", label: "Projects", icon: Folder },
 ] as const;
 
@@ -126,6 +128,7 @@ export function Sidebar() {
         {tool === "media" && <MediaPanel />}
         {tool === "components" && <ComponentsPanel />}
         {tool === "design" && <DesignPanel />}
+        {tool === "layers" && <LayersPanel />}
       </div>
       {tool === "my-designs" && <MyDesignsDialog onClose={() => setTool("home")} />}
     </aside>

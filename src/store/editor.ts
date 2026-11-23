@@ -848,7 +848,7 @@ export const CANVAS_PRESETS = [
   { name: "Slide 16:9", w: 1920, h: 1080 },
 ] as const;
 
-type Tool = "home" | "text" | "elements" | "design" | "plugins" | "components" | "library" | "media" | "my-designs";
+type Tool = "home" | "text" | "elements" | "design" | "layers" | "plugins" | "components" | "library" | "media" | "my-designs";
 
 type HistorySnap = { pages: Page[]; currentIndex: number };
 export type SlideVersion = { id: string; name: string; createdAt: number; pages: Page[]; currentIndex: number };
@@ -2035,11 +2035,9 @@ export const useEditor = create<State>((set, get) => {
       const { pages } = get();
       const src = pages[index];
       const clone: Page = {
+        ...structuredClone(src),
         id: uid(),
-        bgColor: src.bgColor,
-        duration: src.duration,
-        notes: src.notes,
-        elements: src.elements.map((e) => ({ ...e, id: uid() })),
+        elements: src.elements.map((e) => ({ ...structuredClone(e), id: uid() })),
       };
       const next = [...pages.slice(0, index + 1), clone, ...pages.slice(index + 1)];
       set({ ...syncCurrent(next, index + 1), selectedId: null, selectedIds: [] });
@@ -2073,7 +2071,14 @@ export const useEditor = create<State>((set, get) => {
       const arr = [...pages];
       const [m] = arr.splice(from, 1);
       arr.splice(to, 0, m);
-      const newIdx = currentIndex === from ? to : currentIndex;
+      const newIdx =
+        currentIndex === from
+          ? to
+          : from < currentIndex && to >= currentIndex
+            ? currentIndex - 1
+            : from > currentIndex && to <= currentIndex
+              ? currentIndex + 1
+              : currentIndex;
       set(syncCurrent(arr, newIdx));
     },
     setPageDuration: (index, seconds) => {
