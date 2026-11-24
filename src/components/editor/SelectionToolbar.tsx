@@ -1,22 +1,32 @@
 import { useEditor } from "@/store/editor";
 import {
+  AlignCenterHorizontal,
+  AlignCenterVertical,
+  AlignEndHorizontal,
+  AlignEndVertical,
+  AlignHorizontalSpaceBetween,
+  AlignStartHorizontal,
+  AlignStartVertical,
+  AlignVerticalSpaceBetween,
   Bold,
   ChevronDown,
   ChevronUp,
   Copy,
+  Group,
   Lock,
   Minus,
   Plus,
   Trash2,
+  Ungroup,
   Unlock,
 } from "lucide-react";
 
 /** Grid presets: the selected elements are arranged over their bounding box. */
 const GRID_PRESETS = [
-  { label: "2×1", cols: 2, rows: 1, title: "Grille 2 colonnes × 1 ligne" },
-  { label: "1×2", cols: 1, rows: 2, title: "Grille 1 colonne × 2 lignes" },
-  { label: "2×2", cols: 2, rows: 2, title: "Grille 2 × 2" },
-  { label: "3×1", cols: 3, rows: 1, title: "Grille 3 colonnes × 1 ligne" },
+  { label: "2×1", cols: 2, rows: 1, title: "Grid 2 columns × 1 row" },
+  { label: "1×2", cols: 1, rows: 2, title: "Grid 1 column × 2 rows" },
+  { label: "2×2", cols: 2, rows: 2, title: "Grid 2 × 2" },
+  { label: "3×1", cols: 3, rows: 1, title: "Grid 3 columns × 1 row" },
 ];
 
 /* Doory-style contextual bar: the most common actions for the current
@@ -31,6 +41,9 @@ export function SelectionToolbar() {
     removeSelected,
     duplicateSelected,
     groupSelected,
+    ungroupSelected,
+    alignSelected,
+    distributeSelected,
     bringForward,
     sendBackward,
   } = useEditor();
@@ -38,6 +51,12 @@ export function SelectionToolbar() {
   if (presenting || !selectedId || selectedIds.length <= 1) return null;
   const el = elements.find((e) => e.id === selectedId);
   if (!el) return null;
+
+  const selectedElements = elements.filter((e) => selectedIds.includes(e.id));
+  const sharedGroupId = selectedElements[0]?.groupId;
+  const isGrouped = Boolean(
+    sharedGroupId && selectedElements.every((item) => item.groupId === sharedGroupId),
+  );
 
   const isText = el.type === "text" || el.type === "button";
   const text = el as { fontSize?: number; fontWeight?: number };
@@ -66,7 +85,7 @@ export function SelectionToolbar() {
   };
 
   return (
-    <div className="selection-toolbar absolute left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1.5 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
+    <div className="selection-toolbar absolute left-1/2 top-4 z-30 flex max-w-[92vw] -translate-x-1/2 flex-wrap items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1.5 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
       <span className="px-2 text-[11px] font-semibold tabular-nums text-slate-600">
         {selectedIds.length} selected
       </span>
@@ -107,6 +126,48 @@ export function SelectionToolbar() {
       )}
       {selectedIds.length > 1 && (
         <>
+          <div className="flex items-center gap-0.5">
+            <button type="button" title="Align left" onClick={() => alignSelected("left")} className={btn}>
+              <AlignStartVertical className="size-3.5" />
+            </button>
+            <button type="button" title="Align center horizontally" onClick={() => alignSelected("center-h")} className={btn}>
+              <AlignCenterVertical className="size-3.5" />
+            </button>
+            <button type="button" title="Align right" onClick={() => alignSelected("right")} className={btn}>
+              <AlignEndVertical className="size-3.5" />
+            </button>
+            <button type="button" title="Align top" onClick={() => alignSelected("top")} className={btn}>
+              <AlignStartHorizontal className="size-3.5" />
+            </button>
+            <button type="button" title="Align middle vertically" onClick={() => alignSelected("middle")} className={btn}>
+              <AlignCenterHorizontal className="size-3.5" />
+            </button>
+            <button type="button" title="Align bottom" onClick={() => alignSelected("bottom")} className={btn}>
+              <AlignEndHorizontal className="size-3.5" />
+            </button>
+          </div>
+          {selectedIds.length >= 3 && (
+            <>
+              <span className="mx-1 h-4 w-px bg-slate-200" />
+              <button
+                type="button"
+                title="Distribute horizontally"
+                onClick={() => distributeSelected("h")}
+                className={btn}
+              >
+                <AlignHorizontalSpaceBetween className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                title="Distribute vertically"
+                onClick={() => distributeSelected("v")}
+                className={btn}
+              >
+                <AlignVerticalSpaceBetween className="size-3.5" />
+              </button>
+            </>
+          )}
+          <span className="mx-1 h-4 w-px bg-slate-200" />
           <div className="flex items-center gap-0.5 rounded-full bg-slate-100/90 p-0.5">
             {GRID_PRESETS.map((g) => (
               <button
@@ -121,6 +182,14 @@ export function SelectionToolbar() {
             ))}
           </div>
           <span className="mx-1 h-4 w-px bg-slate-200" />
+          <button
+            type="button"
+            title={isGrouped ? "Ungroup selection" : "Group selection"}
+            onClick={isGrouped ? ungroupSelected : groupSelected}
+            className={`${btn} ${isGrouped ? "bg-blue-50 text-blue-600" : ""}`}
+          >
+            {isGrouped ? <Ungroup className="size-3.5" /> : <Group className="size-3.5" />}
+          </button>
         </>
       )}
       <button type="button" title="Bring forward" onClick={() => bringForward(el.id)} className={btn}>

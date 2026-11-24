@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { DEFAULT_PAGES } from "@/lib/default-deck";
+import { DEFAULT_THREE_SCENE, resolveThreeScene, type ThreeSceneConfig } from "@/lib/three-scene";
 
 /** One custom animation keyframe: the element state at time t (ms).
  *  Undefined fields inherit the first keyframe value at play time. */
@@ -102,6 +103,8 @@ export type ElementBase = {
   locked?: boolean;
   /** hidden layers are skipped on canvas render and exports (managed in the Layers panel) */
   hidden?: boolean;
+  /** hidden in Present Mode only (remains editable on canvas) */
+  hideInPresent?: boolean;
 };
 
 export type ElementAnimation =
@@ -846,10 +849,13 @@ export type Page = {
   bgFit?: BgFit;
   transition?: SlideTransition;
   transitionZoom?: number; // starting scale of the zoom transition (0.5–2)
+  threeScene?: ThreeSceneConfig;
   /** presenter notes — shown in presenter view, never on the slide */
   notes?: string;
   /** background music played while this slide is presented */
   bgMusic?: { src: string; volume?: number; loop?: boolean };
+  /** hidden slides are skipped during presentation navigation */
+  hiddenInPresent?: boolean;
 };
 
 export const DEFAULT_W = 1920;
@@ -899,8 +905,10 @@ type State = {
   clipboard: AnyElement | null;
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
+  selectAll: () => void;
   toggleSelect: (id: string) => void;
   toggleHidden: (id: string) => void;
+  toggleHideInPresent: (id: string) => void;
   removeSelected: () => void;
   duplicateSelected: () => void;
   /** arrow-key nudge on the current selection (skips locked, coalesced history) */
@@ -917,10 +925,13 @@ type State = {
   duplicate: (id: string) => void;
   bringForward: (id: string) => void;
   sendBackward: (id: string) => void;
+  bringToFront: (id: string) => void;
+  sendToBack: (id: string) => void;
   setBg: (c: string) => void;
   setBgImage: (src: string | undefined, fit?: BgFit) => void;
   setTransition: (t: SlideTransition) => void;
   setTransitionZoom: (zoom: number) => void;
+  setThreeScene: (patch: Partial<ThreeSceneConfig>) => void;
   setNotes: (notes: string) => void;
   /** set / clear the current slide's background music */
   setBgMusic: (music: { src: string; volume?: number; loop?: boolean } | undefined) => void;
@@ -969,11 +980,13 @@ type State = {
   setCurrentPage: (index: number) => void;
   movePage: (from: number, to: number) => void;
   setPageDuration: (index: number, seconds: number) => void;
+  togglePageHiddenInPresent: (index: number) => void;
   /** find & replace across every text field of the whole deck (one undo step) */
   replaceAllText: (find: string, replaceWith: string, matchCase?: boolean) => number;
   // Master style: push the current page's look to the whole deck
   applyBackgroundToDeck: () => void;
   applyTransitionToDeck: () => void;
+  applyThreeSceneToDeck: () => void;
   // cloud
   setDesignMeta: (meta: { id: string | null; name: string }) => void;
   setDesignName: (name: string) => void;
@@ -1814,6 +1827,14 @@ export const useEditor = create<State>((set, get) => {
         : [selectedId];
       set({ selectedId, selectedIds: ids });
     },
+    selectAll: () => {
+      const visible = get().elements.filter((e) => !e.hidden);
+      if (!visible.length) return;
+      set({
+        selectedId: visible[visible.length - 1].id,
+        selectedIds: visible.map((e) => e.id),
+      });
+    },
     toggleSelect: (id) => {
       const { selectedIds } = get();
       const next = selectedIds.includes(id)
@@ -1938,6 +1959,7 @@ export const useEditor = create<State>((set, get) => {
       set({ selectedId: clone.id, selectedIds: [clone.id] });
     },
     bringForward: (id) => {
+      pushHistory();
       updateCurrentPage((p) => {
         const arr = [...p.elements];
         const i = arr.findIndex((e) => e.id === id);
@@ -1947,6 +1969,7 @@ export const useEditor = create<State>((set, get) => {
       });
     },
     sendBackward: (id) => {
+      pushHistory();
       updateCurrentPage((p) => {
         const arr = [...p.elements];
         const i = arr.findIndex((e) => e.id === id);
@@ -1955,11 +1978,42 @@ export const useEditor = create<State>((set, get) => {
         return { ...p, elements: arr };
       });
     },
+    bringToFront: (id) => {
+      pushHistory();
+      updateCurrentPage((p) => {
+        const i = p.elements.findIndex((e) => e.id === id);
+        if (i < 0 || i === p.elements.length - 1) return p;
+        const arr = [...p.elements];
+        const [item] = arr.splice(i, 1);
+        arr.push(item);
+        return { ...p, elements: arr };
+      });
+    },
+    sendToBack: (id) => {
+      pushHistory();
+      updateCurrentPage((p) => {
+        const i = p.elements.findIndex((e) => e.id === id);
+        if (i <= 0) return p;
+        const arr = [...p.elements];
+        const [item] = arr.splice(i, 1);
+        arr.unshift(item);
+        return { ...p, elements: arr };
+      });
+    },
     toggleHidden: (id) => {
       pushHistory();
       updateCurrentPage((p) => ({
         ...p,
         elements: p.elements.map((e) => (e.id === id ? ({ ...e, hidden: !e.hidden } as AnyElement) : e)),
+      }));
+    },
+    toggleHideInPresent: (id) => {
+      pushHistory();
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          e.id === id ? ({ ...e, hideInPresent: !e.hideInPresent } as AnyElement) : e,
+        ),
       }));
     },
     setBg: (bgColor) => {
@@ -1978,6 +2032,13 @@ export const useEditor = create<State>((set, get) => {
       if (!Number.isFinite(zoom)) return;
       pushHistory();
       updateCurrentPage((p) => ({ ...p, transitionZoom: Math.max(0.5, Math.min(2, zoom)) }));
+    },
+    setThreeScene: (patch) => {
+      pushHistory();
+      updateCurrentPage((p) => ({
+        ...p,
+        threeScene: resolveThreeScene({ ...(p.threeScene ?? DEFAULT_THREE_SCENE), ...patch }),
+      }));
     },
     setNotes: (notes) => updateCurrentPage((p) => ({ ...p, notes })),
     setBgMusic: (music) => {
@@ -2106,6 +2167,15 @@ export const useEditor = create<State>((set, get) => {
       const next = pages.map((p, i) => (i === index ? { ...p, duration: d } : p));
       set(syncCurrent(next, currentIndex));
     },
+    togglePageHiddenInPresent: (index) => {
+      const { pages, currentIndex } = get();
+      if (index < 0 || index >= pages.length) return;
+      pushHistory();
+      const next = pages.map((p, i) =>
+        i === index ? { ...p, hiddenInPresent: !p.hiddenInPresent } : p,
+      );
+      set(syncCurrent(next, currentIndex));
+    },
 
     // ---- Find & replace: every element type that carries editable copy ----
     replaceAllText: (find, replaceWith, matchCase) => {
@@ -2176,6 +2246,17 @@ export const useEditor = create<State>((set, get) => {
         ...p,
         transition: src.transition,
         transitionZoom: src.transitionZoom,
+        threeScene: src.threeScene ? { ...src.threeScene } : undefined,
+      }));
+      set(syncCurrent(next, currentIndex));
+    },
+    applyThreeSceneToDeck: () => {
+      pushHistory();
+      const { pages, currentIndex } = get();
+      const srcScene = resolveThreeScene(pages[currentIndex]?.threeScene);
+      const next = pages.map((p) => ({
+        ...p,
+        threeScene: { ...srcScene },
       }));
       set(syncCurrent(next, currentIndex));
     },

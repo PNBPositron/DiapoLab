@@ -165,8 +165,9 @@ function paintElement(
   ctx: CanvasRenderingContext2D,
   el: AnyElement,
   onAsyncAsset?: () => void,
+  options?: { hidePresentElements?: boolean },
 ) {
-  if (el.hidden) return;
+  if (el.hidden || (options?.hidePresentElements && el.hideInPresent)) return;
   ctx.save();
   const cx = el.x + el.width / 2;
   const cy = el.y + el.height / 2;
@@ -326,6 +327,7 @@ export function renderSlideToCanvas(
   targetH = Math.max(256, Math.round((targetW * canvasH) / Math.max(1, canvasW))),
   onAsyncAsset?: () => void,
   existingCanvas?: HTMLCanvasElement,
+  options?: { hidePresentElements?: boolean },
 ): HTMLCanvasElement {
   const canvas = existingCanvas ?? document.createElement("canvas");
   if (canvas.width !== targetW) canvas.width = targetW;
@@ -342,7 +344,7 @@ export function renderSlideToCanvas(
   paintBackground(ctx, canvasW, canvasH, page?.bgColor, page?.bgImage, page?.bgFit, onAsyncAsset);
   if (page?.elements?.length) {
     for (const el of page.elements) {
-      paintElement(ctx, el, onAsyncAsset);
+      paintElement(ctx, el, onAsyncAsset, options);
     }
   }
   ctx.restore();

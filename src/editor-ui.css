@@ -378,7 +378,7 @@
   font-variant-numeric: tabular-nums;
   padding: 0.3rem 0.6rem;
 }
-.zoom-dock span {
+.zoom-dock > span {
   border-left: 1px solid #e2e8f0;
   margin-left: 0.15rem;
   padding-left: 0.6rem;
@@ -498,7 +498,8 @@
   border-radius: 0 !important;
   box-shadow: none !important;
 }
-#canvas-export[data-exporting] .editor-slide-dots {
+#canvas-export[data-exporting] .editor-slide-dots,
+#canvas-export[data-exporting] .editor-only-badge {
   display: none !important;
 }
 #canvas-export[data-exporting] iframe.embed-live {
@@ -651,7 +652,7 @@
   background: rgba(148, 163, 184, 0.12);
   color: #e2e8f0;
 }
-.editor-dark .zoom-dock span {
+.editor-dark .zoom-dock > span {
   border-left-color: rgba(148, 163, 184, 0.25);
 }
 /* Scrollbars in dark chrome. */

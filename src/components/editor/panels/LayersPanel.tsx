@@ -14,6 +14,7 @@ import {
   ListChecks,
   Lock,
   LockOpen,
+  MonitorOff,
   Play,
   Shapes,
   Smile,
@@ -73,6 +74,7 @@ export function LayersPanel() {
     select,
     toggleSelect,
     toggleHidden,
+    toggleHideInPresent,
     bringForward,
     sendBackward,
     duplicate,
@@ -112,7 +114,7 @@ export function LayersPanel() {
       </PanelHeader>
 
       {elements.length > 0 && (
-        <div className="grid grid-cols-6 gap-1 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-1.5">
+        <div className="grid grid-cols-7 gap-1 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-1.5">
           <button
             type="button"
             disabled={!activeEl || isTopmost}
@@ -146,6 +148,20 @@ export function LayersPanel() {
             }`}
           >
             {activeEl?.hidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+          </button>
+          <button
+            type="button"
+            disabled={!activeEl}
+            onClick={() => activeEl && toggleHideInPresent(activeEl.id)}
+            title={activeEl?.hideInPresent ? "Show in present mode" : "Hide in present mode"}
+            aria-label={activeEl?.hideInPresent ? "Show in present mode" : "Hide in present mode"}
+            className={`grid h-8 place-items-center rounded-xl transition disabled:pointer-events-none disabled:opacity-35 ${
+              activeEl?.hideInPresent
+                ? "bg-amber-50 text-amber-600"
+                : "text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-2xs"
+            }`}
+          >
+            <MonitorOff className="size-3.5" />
           </button>
           <button
             type="button"
@@ -247,13 +263,31 @@ export function LayersPanel() {
                   >
                     {labelFor(el)}
                   </span>
-                  <span className="block text-[10px] text-slate-400">
-                    {TYPE_LABEL[el.type] ?? el.type}
+                  <span className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                    <span>{TYPE_LABEL[el.type] ?? el.type}</span>
+                    {el.hideInPresent && (
+                      <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-semibold text-amber-700">
+                        Present off
+                      </span>
+                    )}
                   </span>
                 </span>
               </button>
 
               <div className="flex shrink-0 items-center gap-0.5">
+                <button
+                  type="button"
+                  title={el.hideInPresent ? "Show in present mode" : "Hide in present mode"}
+                  aria-label={el.hideInPresent ? "Show in present mode" : "Hide in present mode"}
+                  onClick={() => toggleHideInPresent(el.id)}
+                  className={`grid size-6 place-items-center rounded-full transition hover:bg-slate-100 ${
+                    el.hideInPresent
+                      ? "text-amber-600"
+                      : "text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                  }`}
+                >
+                  <MonitorOff className="size-3.5" />
+                </button>
                 <button
                   type="button"
                   title={hidden ? "Show layer" : "Hide layer"}

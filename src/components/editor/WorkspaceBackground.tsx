@@ -6,6 +6,7 @@ import {
   type WorkspaceBgId,
 } from "@/store/settings";
 import { prepareImage } from "@/lib/image-assets";
+import { ColorPickerPopover } from "./ColorPicker";
 
 type PresetMeta = {
   id: Exclude<WorkspaceBgId, "custom-color" | "custom-image">;
@@ -80,28 +81,13 @@ export function WorkspaceBackgroundLayer() {
       className="editor-ambient-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden transition-colors duration-300"
     >
       {imageSrc && !imgFailed ? (
-        <>
-          <img
-            key={imageSrc}
-            src={imageSrc}
-            alt=""
-            onError={() => setImgFailed(true)}
-            className="h-full w-full scale-[1.03] object-cover transition-all duration-300"
-            style={{
-              filter: editorDark
-                ? "brightness(0.45) saturate(0.92)"
-                : "brightness(1.08) saturate(0.96)",
-            }}
-          />
-          <div
-            className="absolute inset-0 transition-all duration-300"
-            style={{
-              background: editorDark
-                ? "rgba(9, 15, 30, 0.62)"
-                : "rgba(255, 255, 255, 0.22)",
-            }}
-          />
-        </>
+        <img
+          key={imageSrc}
+          src={imageSrc}
+          alt=""
+          onError={() => setImgFailed(true)}
+          className="h-full w-full object-cover"
+        />
       ) : workspaceBg === "aurora" ? (
         <>
           <div
@@ -192,6 +178,7 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
     setWorkspaceBgColor,
     setWorkspaceBgImage,
     resetWorkspaceBg,
+    editorDark,
   } = useSettings();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -248,26 +235,42 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
 
       {/* Custom color & custom image upload */}
       <div className="flex flex-wrap items-center gap-2 pt-0.5">
-        <label
-          className={`flex h-9 cursor-pointer items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
-            workspaceBg === "custom-color"
-              ? "border-blue-600 bg-blue-50/70 text-blue-700"
-              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-          }`}
+        <ColorPickerPopover
+          value={workspaceBgColor}
+          onChange={(hex) => {
+            setUploadError(null);
+            setWorkspaceBgColor(hex);
+          }}
+          swatches={[
+            "#ffffff",
+            "#f8fafc",
+            "#eef4ff",
+            "#fdf2f8",
+            "#f0fdf4",
+            "#fef9c3",
+            "#e0f2fe",
+            "#0f172a",
+          ]}
+          dark={compact && editorDark}
+          align="start"
         >
-          <input
-            type="color"
-            value={workspaceBgColor}
-            onChange={(e) => {
-              setUploadError(null);
-              setWorkspaceBgColor(e.target.value);
-            }}
+          <button
+            type="button"
             aria-label="Custom workspace background color"
-            className="h-4 w-4 cursor-pointer rounded-full border-0 bg-transparent p-0"
-          />
-          <span className="whitespace-nowrap">Color</span>
-          <span className="font-mono text-[10px] uppercase text-slate-400">{workspaceBgColor}</span>
-        </label>
+            className={`flex h-9 cursor-pointer items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors ${
+              workspaceBg === "custom-color"
+                ? "border-blue-600 bg-blue-50/70 text-blue-700"
+                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+            }`}
+          >
+            <span
+              className="size-4 shrink-0 rounded-full border border-slate-300/80 shadow-2xs"
+              style={{ backgroundColor: workspaceBgColor }}
+            />
+            <span className="whitespace-nowrap">Color</span>
+            <span className="font-mono text-[10px] uppercase text-slate-400">{workspaceBgColor}</span>
+          </button>
+        </ColorPickerPopover>
 
         <button
           type="button"

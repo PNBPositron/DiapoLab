@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TrafficLights } from "../ui/TrafficLights";
+import { ColorPickerPopover } from "../ColorPicker";
 import {
   Brush,
   Eraser,
@@ -581,21 +582,25 @@ export function PaintAppDialog({
                   style={{ background: c }}
                 />
               ))}
-              <label
-                title="Custom color"
-                className="relative grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
-                style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
+              <ColorPickerPopover
+                value={color}
+                onChange={(hex) => {
+                  setColor(hex);
+                  if (tool === "eraser") setTool("brush");
+                }}
+                swatches={colors}
+                dark={false}
+                side="top"
+                align="start"
               >
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => {
-                    setColor(e.target.value);
-                    if (tool === "eraser") setTool("brush");
-                  }}
-                  className="absolute inset-0 cursor-pointer opacity-0"
+                <button
+                  type="button"
+                  title="Custom color"
+                  aria-label="Custom color"
+                  className="grid size-6 cursor-pointer place-items-center rounded-full border-2 border-white shadow transition-transform hover:scale-110"
+                  style={{ background: "conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red)" }}
                 />
-              </label>
+              </ColorPickerPopover>
               {/* opacity */}
               <span className="ml-1.5 flex items-center gap-1 text-[10px] font-semibold text-slate-400" title="Opacity">
                 <Droplets className="size-3" />

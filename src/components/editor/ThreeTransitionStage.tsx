@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import type { Page } from "@/store/editor";
 import type { ThreeSlideTransition } from "@/lib/motion-catalog";
+import type { ThreeSceneConfig } from "@/lib/three-scene";
 import { renderMiniPreviewSlide, renderSlideToCanvas } from "@/lib/slide-texture";
-import { ThreeSlideStage, type StageTheme } from "@/lib/three-stage";
+import { ThreeSlideStage, type StageCameraPreset, type StageTheme } from "@/lib/three-stage";
 
 export function ThreeTransitionStage({
   mode,
@@ -14,6 +15,9 @@ export function ThreeTransitionStage({
   playTrigger,
   interactive = false,
   resetSignal = 0,
+  cameraPreset,
+  cameraPresetSignal = 0,
+  sceneConfig,
   onTransitionComplete,
   className = "",
 }: {
@@ -26,6 +30,9 @@ export function ThreeTransitionStage({
   playTrigger: number;
   interactive?: boolean;
   resetSignal?: number;
+  cameraPreset?: StageCameraPreset;
+  cameraPresetSignal?: number;
+  sceneConfig?: Partial<ThreeSceneConfig>;
   onTransitionComplete?: () => void;
   className?: string;
 }) {
@@ -43,6 +50,7 @@ export function ThreeTransitionStage({
     canvasW,
     canvasH,
     interactive,
+    sceneConfig,
   });
 
   useEffect(() => {
@@ -51,18 +59,37 @@ export function ThreeTransitionStage({
     const init = initialPropsRef.current;
     const theme: StageTheme = init.mode === "mini" ? "studio-light" : "studio-dark";
     const aspect = Math.max(0.5, init.canvasW / Math.max(1, init.canvasH));
-    const texW = init.mode === "mini" ? 512 : 1024;
+    const texW = init.mode === "mini" ? 512 : 1280;
     const texH = Math.max(256, Math.round(texW / aspect));
 
     let disposed = false;
     const buildCanvases = (onAsset?: () => void) => {
       const useMiniDemo = init.mode === "mini" && !init.incomingPage;
+      const texOpts = { hidePresentElements: init.mode === "present" };
       const outCanvas = useMiniDemo
         ? renderMiniPreviewSlide("outgoing", texW, texH)
-        : renderSlideToCanvas(init.outgoingPage ?? init.incomingPage, init.canvasW, init.canvasH, texW, texH, onAsset);
+        : renderSlideToCanvas(
+            init.outgoingPage ?? init.incomingPage,
+            init.canvasW,
+            init.canvasH,
+            texW,
+            texH,
+            onAsset,
+            undefined,
+            texOpts,
+          );
       const inCanvas = useMiniDemo
         ? renderMiniPreviewSlide("incoming", texW, texH)
-        : renderSlideToCanvas(init.incomingPage, init.canvasW, init.canvasH, texW, texH, onAsset);
+        : renderSlideToCanvas(
+            init.incomingPage,
+            init.canvasW,
+            init.canvasH,
+            texW,
+            texH,
+            onAsset,
+            undefined,
+            texOpts,
+          );
       return { outCanvas, inCanvas };
     };
 
@@ -73,14 +100,22 @@ export function ThreeTransitionStage({
     };
 
     const { outCanvas, inCanvas } = buildCanvases(refreshOnAsset);
-    const stage = new ThreeSlideStage(host, outCanvas, inCanvas, aspect, theme, {
-      onTransitionComplete: () => onCompleteRef.current?.(),
-    });
+    const stage = new ThreeSlideStage(
+      host,
+      outCanvas,
+      inCanvas,
+      aspect,
+      theme,
+      {
+        onTransitionComplete: () => onCompleteRef.current?.(),
+      },
+      init.sceneConfig,
+    );
     stageRef.current = stage;
     mountedRef.current = true;
     stage.setInteractive(init.interactive || init.mode === "mini");
     stage.playTransition(init.transition, {
-      duration: init.mode === "mini" ? 1.45 : 1.28,
+      duration: init.sceneConfig?.duration ?? (init.mode === "mini" ? 1.4 : 1.25),
       loop: init.mode === "mini",
     });
 
@@ -92,38 +127,68 @@ export function ThreeTransitionStage({
     };
   }, []);
 
-  // Re-rasterize slide textures and trigger transition whenever pages or playTrigger change
+  // Re-rasterize slide textures ONLY when slide content or dimensions change
   useEffect(() => {
     if (!mountedRef.current) return;
     const stage = stageRef.current;
     if (!stage) return;
     const aspect = Math.max(0.5, canvasW / Math.max(1, canvasH));
-    const texW = mode === "mini" ? 512 : 1024;
+    const texW = mode === "mini" ? 512 : stage.isSoftwareGl ? 960 : 1280;
     const texH = Math.max(256, Math.round(texW / aspect));
 
     let cancelled = false;
     const refreshTextures = () => {
       if (cancelled || !stageRef.current) return;
       const useMiniDemo = mode === "mini" && !incomingPage;
+      const texOpts = { hidePresentElements: mode === "present" };
       const outCanvas = useMiniDemo
         ? renderMiniPreviewSlide("outgoing", texW, texH)
-        : renderSlideToCanvas(outgoingPage ?? incomingPage, canvasW, canvasH, texW, texH, refreshTextures);
+        : renderSlideToCanvas(
+            outgoingPage ?? incomingPage,
+            canvasW,
+            canvasH,
+            texW,
+            texH,
+            refreshTextures,
+            undefined,
+            texOpts,
+          );
       const inCanvas = useMiniDemo
         ? renderMiniPreviewSlide("incoming", texW, texH)
-        : renderSlideToCanvas(incomingPage, canvasW, canvasH, texW, texH, refreshTextures);
+        : renderSlideToCanvas(
+            incomingPage,
+            canvasW,
+            canvasH,
+            texW,
+            texH,
+            refreshTextures,
+            undefined,
+            texOpts,
+          );
       stageRef.current.updateTextures(outCanvas, inCanvas);
     };
 
     refreshTextures();
-    stage.playTransition(transition, {
-      duration: mode === "mini" ? 1.45 : 1.28,
-      loop: mode === "mini",
-    });
-
     return () => {
       cancelled = true;
     };
-  }, [mode, transition, outgoingPage, incomingPage, canvasW, canvasH, playTrigger]);
+  }, [mode, outgoingPage, incomingPage, canvasW, canvasH]);
+
+  // Trigger transition animation without forcing canvas re-rasterization
+  const duration = sceneConfig?.duration;
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    stageRef.current?.playTransition(transition, {
+      duration: duration ?? (mode === "mini" ? 1.4 : 1.25),
+      loop: mode === "mini",
+    });
+  }, [mode, transition, playTrigger, duration]);
+
+  // Push live 3D scene preset & color changes in place (zero WebGL teardown)
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    stageRef.current?.setSceneConfig(sceneConfig, mode === "mini" && !sceneConfig);
+  }, [sceneConfig, mode]);
 
   useEffect(() => {
     stageRef.current?.setInteractive(interactive || mode === "mini");
@@ -134,6 +199,12 @@ export function ThreeTransitionStage({
       stageRef.current?.resetCamera();
     }
   }, [resetSignal]);
+
+  useEffect(() => {
+    if (cameraPresetSignal > 0 && cameraPreset) {
+      stageRef.current?.setCameraPreset(cameraPreset);
+    }
+  }, [cameraPreset, cameraPresetSignal]);
 
   return (
     <div

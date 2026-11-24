@@ -10,11 +10,13 @@ export function SlideThumbnail({
   canvasW,
   canvasH,
   className,
+  hidePresentElements = false,
 }: {
   page: Page;
   canvasW: number;
   canvasH: number;
   className?: string;
+  hidePresentElements?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.1);
@@ -66,7 +68,7 @@ export function SlideThumbnail({
     >
       <div
         key={fontTick}
-        className="absolute left-0 top-0 pointer-events-none"
+        className="pointer-events-none absolute left-0 top-0"
         style={{
           width: canvasW,
           height: canvasH,
@@ -75,9 +77,11 @@ export function SlideThumbnail({
           transformOrigin: "top left",
         }}
       >
-        {page.elements.map((el) => (
-          <CanvasElement key={el.id} element={el} scale={scale} preview />
-        ))}
+        {page.elements
+          .filter((el) => !el.hidden && !(hidePresentElements && el.hideInPresent))
+          .map((el) => (
+            <CanvasElement key={el.id} element={el} scale={scale} preview />
+          ))}
       </div>
     </div>
   );

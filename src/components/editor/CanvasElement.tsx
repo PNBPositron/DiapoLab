@@ -26,7 +26,7 @@ import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode, Lock, Volume2, Play, Pause, VolumeX } from "lucide-react";
+import { HelpCircle, Check, X as XIcon, QrCode, Lock, MonitorOff, Volume2, Play, Pause, VolumeX } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { isSafeBrowserUrl } from "@/lib/url-safety";
@@ -1192,6 +1192,7 @@ export function CanvasElement({
     <div
       ref={ref}
       data-canvas-element="true"
+      data-element-id={element.id}
       onMouseDown={onDragStart}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -1967,6 +1968,35 @@ export function CanvasElement({
             </div>
           );
         })()}
+
+      {element.hideInPresent && !preview && !presenting && (
+        <div
+          className="editor-only-badge"
+          title="Hidden in present mode — toggle in Layers or right-click menu"
+          style={{
+            position: "absolute",
+            left: -10,
+            top: -12,
+            zIndex: 6,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            height: 22,
+            padding: "0 7px",
+            borderRadius: 999,
+            background: "rgba(217, 119, 6, 0.94)",
+            color: "#ffffff",
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: "0.02em",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+            pointerEvents: "none",
+          }}
+        >
+          <MonitorOff className="size-3" />
+          <span>Hidden in present</span>
+        </div>
+      )}
 
       {element.locked && !preview && !presenting && (
         <div title="Element locked — unlock in the inspector" style={{ position: "absolute", right: -12, top: -12, zIndex: 6, display: "grid", placeItems: "center", width: 22, height: 22, borderRadius: 999, background: "#0f172a", color: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)", pointerEvents: "none" }}>
@@ -2755,12 +2785,26 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
   const onClick = () => {
     if (!interactive) return;
     switch (element.action) {
-      case "next-slide":
-        if (currentIndex < pages.length - 1) setCurrentPage(currentIndex + 1);
+      case "next-slide": {
+        const nextIdx = pages.findIndex((p, i) => i > currentIndex && !p.hiddenInPresent);
+        if (nextIdx >= 0) setCurrentPage(nextIdx);
+        else if (!pages.some((p) => !p.hiddenInPresent) && currentIndex < pages.length - 1)
+          setCurrentPage(currentIndex + 1);
         break;
-      case "prev-slide":
-        if (currentIndex > 0) setCurrentPage(currentIndex - 1);
+      }
+      case "prev-slide": {
+        let prevIdx = -1;
+        for (let i = currentIndex - 1; i >= 0; i--) {
+          if (!pages[i]?.hiddenInPresent) {
+            prevIdx = i;
+            break;
+          }
+        }
+        if (prevIdx >= 0) setCurrentPage(prevIdx);
+        else if (!pages.some((p) => !p.hiddenInPresent) && currentIndex > 0)
+          setCurrentPage(currentIndex - 1);
         break;
+      }
       case "first-slide":
         setCurrentPage(0);
         break;

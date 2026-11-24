@@ -84,7 +84,9 @@ function useClickOutside<T extends HTMLElement>(handler: () => void) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
-      if (!ref.current || ref.current.contains(event.target as Node)) return;
+      const target = event.target as Node | null;
+      if (!ref.current || !target || ref.current.contains(target)) return;
+      if (target instanceof Element && target.closest("[data-editor-color-popover]")) return;
       handler();
     };
     document.addEventListener("mousedown", listener);

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Pipette } from "lucide-react";
 
 type RGB = { r: number; g: number; b: number };
@@ -41,6 +42,21 @@ function hsvToRgb(h: number, s: number, v: number): RGB {
   return { r: (rn + m) * 255, g: (gn + m) * 255, b: (bn + m) * 255 };
 }
 
+export const DEFAULT_EDITOR_SWATCHES = [
+  "#000000",
+  "#ffffff",
+  "#0ea5e9",
+  "#6366f1",
+  "#8b5cf6",
+  "#ec4899",
+  "#f43f5e",
+  "#f97316",
+  "#eab308",
+  "#10b981",
+  "#06b6d4",
+  "#64748b",
+];
+
 /* ------- Couleurs récentes (localStorage, partagé par tous les pickers) ------- */
 const RECENT_COLORS_KEY = "diapolab.recentColors";
 const MAX_RECENT = 10;
@@ -78,12 +94,14 @@ export function ColorPicker({
   onChange,
   opacity,
   onOpacityChange,
+  dark = false,
 }: {
   value: string;
   onChange: (hex: string) => void;
   /** 0..1 — affiche le slider d'opacité si fourni */
   opacity?: number;
   onOpacityChange?: (v: number) => void;
+  dark?: boolean;
 }) {
   const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
   const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
@@ -161,10 +179,10 @@ export function ColorPicker({
   };
 
   const pickWithEyedropper = async () => {
-    const EyeDropper = (window as any).EyeDropper;
-    if (!EyeDropper) return;
+    const EyeDropperCtor = (window as unknown as { EyeDropper?: new () => { open: () => Promise<{ sRGBHex?: string }> } }).EyeDropper;
+    if (!EyeDropperCtor) return;
     try {
-      const res = await new EyeDropper().open();
+      const res = await new EyeDropperCtor().open();
       if (res?.sRGBHex) applyHex(res.sRGBHex);
     } catch {
       /* utilisateur a annulé */
@@ -172,13 +190,19 @@ export function ColorPicker({
   };
 
   const hasEyedropper = typeof window !== "undefined" && "EyeDropper" in window;
+  const borderCls = dark ? "border-slate-700" : "border-slate-200";
+  const inputBgCls = dark
+    ? "border-slate-700 bg-slate-950 text-slate-100 focus:border-sky-400"
+    : "border-slate-200 bg-white text-slate-800 focus:border-sky-500";
 
   return (
     <div className="space-y-2.5">
       {/* Couleurs récentes */}
       {recentColors.length > 0 && (
         <div className="space-y-1.5">
-          <div className="text-[10px] font-semibold tracking-wide text-slate-400">Recent colors</div>
+          <div className={`text-[10px] font-semibold tracking-wide ${dark ? "text-slate-400" : "text-slate-400"}`}>
+            Recent colors
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {recentColors.map((c) => (
               <button
@@ -187,7 +211,7 @@ export function ColorPicker({
                 onClick={() => applyHex(c)}
                 title={c}
                 aria-label={`Use recent color ${c}`}
-                className="size-6 rounded-md border border-slate-200 shadow-2xs transition hover:scale-110 hover:border-sky-400"
+                className={`size-6 rounded-md border shadow-2xs transition hover:scale-110 hover:border-sky-400 ${borderCls}`}
                 style={{ background: c }}
               />
             ))}
@@ -202,7 +226,7 @@ export function ColorPicker({
         onPointerMove={onSvMove}
         onPointerUp={onSvUp}
         onPointerCancel={onSvUp}
-        className="relative h-24 w-full cursor-crosshair touch-none rounded-xl border border-slate-200"
+        className={`relative h-24 w-full cursor-crosshair touch-none rounded-xl border ${borderCls}`}
         style={{
           background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h} 100% 50%))`,
         }}
@@ -249,7 +273,11 @@ export function ColorPicker({
             }}
             title="Opacity"
           />
-          <div className="flex items-center rounded-md border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-700 shadow-2xs">
+          <div
+            className={`flex items-center rounded-md border px-1.5 py-0.5 font-mono text-[10px] shadow-2xs ${
+              dark ? "border-slate-700 bg-slate-950 text-slate-200" : "border-slate-200 bg-white text-slate-700"
+            }`}
+          >
             <span>{Math.round((opacity ?? 1) * 100)}</span>
             <span className="ml-0.5 text-slate-400">%</span>
           </div>
@@ -259,7 +287,7 @@ export function ColorPicker({
       {/* Hex + pipette */}
       <div className="flex items-center gap-2">
         <div
-          className="size-7 shrink-0 rounded-lg border border-slate-200"
+          className={`size-7 shrink-0 rounded-lg border ${borderCls}`}
           style={{
             background: safeHex,
             opacity: showOpacity ? (opacity ?? 1) : 1,
@@ -275,18 +303,118 @@ export function ColorPicker({
           onBlur={commitRecent}
           spellCheck={false}
           placeholder="#000000"
-          className="h-7 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2 font-mono text-[11px] text-slate-800 shadow-2xs outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+          className={`h-7 min-w-0 flex-1 rounded-lg border px-2 font-mono text-[11px] shadow-2xs outline-none transition focus:ring-2 focus:ring-sky-500/20 ${inputBgCls}`}
         />
         {hasEyedropper && (
           <button
+            type="button"
             onClick={pickWithEyedropper}
             title="Pick color from screen"
-            className="grid size-7 shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-2xs transition hover:border-sky-400 hover:text-sky-600"
+            className={`grid size-7 shrink-0 place-items-center rounded-lg border shadow-2xs transition hover:border-sky-400 hover:text-sky-500 ${
+              dark
+                ? "border-slate-700 bg-slate-950 text-slate-300"
+                : "border-slate-200 bg-white text-slate-500"
+            }`}
           >
             <Pipette className="size-3.5" />
           </button>
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Popover wrapper around the editor ColorPicker + quick swatches.
+ * Portals inside the nearest [role="dialog"] when triggered inside a modal so
+ * keyboard/hex input focus stays inside Radix Dialog FocusScope.
+ */
+export function ColorPickerPopover({
+  value,
+  onChange,
+  swatches = DEFAULT_EDITOR_SWATCHES,
+  opacity,
+  onOpacityChange,
+  dark = false,
+  align = "center",
+  side = "bottom",
+  sideOffset = 6,
+  children,
+}: {
+  value: string;
+  onChange: (hex: string) => void;
+  swatches?: string[];
+  opacity?: number;
+  onOpacityChange?: (v: number) => void;
+  dark?: boolean;
+  align?: "start" | "center" | "end";
+  side?: "top" | "bottom" | "left" | "right";
+  sideOffset?: number;
+  children: ReactElement;
+}) {
+  const [dialogContainer, setDialogContainer] = useState<HTMLElement | null>(null);
+
+  const detectDialog = (el: HTMLElement | null) => {
+    const dialog = el?.closest('[role="dialog"]') as HTMLElement | null;
+    setDialogContainer(dialog);
+  };
+
+  return (
+    <PopoverPrimitive.Root>
+      <PopoverPrimitive.Trigger
+        asChild
+        onPointerDownCapture={(e) => detectDialog(e.currentTarget as HTMLElement)}
+        onClickCapture={(e) => detectDialog(e.currentTarget as HTMLElement)}
+      >
+        {children}
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal container={dialogContainer ?? undefined}>
+        <PopoverPrimitive.Content
+          data-editor-color-popover=""
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          collisionBoundary={dialogContainer ?? undefined}
+          collisionPadding={10}
+          className={`pointer-events-auto z-[120] w-60 rounded-2xl border p-3 shadow-2xl outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 ${
+            dark
+              ? "border-slate-700 bg-slate-900 text-slate-100"
+              : "border-slate-200 bg-white text-slate-900"
+          }`}
+        >
+          <ColorPicker
+            value={value}
+            onChange={onChange}
+            opacity={opacity}
+            onOpacityChange={onOpacityChange}
+            dark={dark}
+          />
+          {swatches.length > 0 && (
+            <div
+              className={`mt-2.5 flex flex-wrap gap-1.5 border-t pt-2.5 ${
+                dark ? "border-slate-800" : "border-slate-100"
+              }`}
+            >
+              {swatches.map((swatch) => {
+                const active = value.toLowerCase() === swatch.toLowerCase();
+                return (
+                  <button
+                    key={swatch}
+                    type="button"
+                    onClick={() => onChange(swatch)}
+                    title={swatch}
+                    aria-label={`Select color ${swatch}`}
+                    className={`size-5 rounded-full border transition-transform hover:scale-110 ${
+                      dark ? "border-slate-700" : "border-slate-200/80"
+                    } ${active ? "scale-110 ring-2 ring-sky-500 ring-offset-1" : ""}`}
+                    style={{ backgroundColor: swatch }}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 }

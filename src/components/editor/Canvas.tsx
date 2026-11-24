@@ -3,10 +3,43 @@ import { useEditor, type ElementAnimation, type SlideTransition } from "@/store/
 import { CanvasElement } from "./CanvasElement";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, History, WandSparkles, ChevronDown, Magnet, Volume2, VolumeX } from "lucide-react";
+import {
+  AlignCenterHorizontal,
+  AlignCenterVertical,
+  AlignEndHorizontal,
+  AlignEndVertical,
+  AlignStartHorizontal,
+  AlignStartVertical,
+  BringToFront,
+  ChevronDown,
+  ChevronUp,
+  ClipboardPaste,
+  Copy,
+  CopyPlus,
+  Grid3x3,
+  Group,
+  History,
+  Lock,
+  Magnet,
+  Minus,
+  Monitor,
+  MonitorOff,
+  Palette,
+  Plus,
+  SendToBack,
+  SlidersHorizontal,
+  StickyNote,
+  Trash2,
+  Ungroup,
+  Unlock,
+  Volume2,
+  VolumeX,
+  WandSparkles,
+} from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
+import { ThreeSceneDialog } from "./ThreeSceneDialog";
 import {
   TRANSITION_OPTIONS,
   TRANSITION_ICONS,
@@ -14,6 +47,7 @@ import {
   isThreeTransition,
   formatTransitionLabel,
 } from "@/lib/motion-catalog";
+import { resolveThreeScene } from "@/lib/three-scene";
 import { ThreeTransitionStage } from "./ThreeTransitionStage";
 import { useSettings } from "@/store/settings";
 import { playTransitionSound } from "@/lib/transition-sound";
@@ -23,16 +57,32 @@ export function Canvas() {
     elements,
     bgColor,
     select,
+    selectAll,
     guides,
     canvasW,
     canvasH,
     pages,
     currentIndex,
     selectedId,
+    selectedIds,
+    clipboard,
     update,
     setTransition,
+    setNotes,
     snapping,
     toggleSnapping,
+    copySelected,
+    paste,
+    duplicateSelected,
+    removeSelected,
+    bringForward,
+    sendBackward,
+    bringToFront,
+    sendToBack,
+    groupSelected,
+    ungroupSelected,
+    alignSelected,
+    toggleHideInPresent,
   } = useEditor();
   const page = pages[currentIndex];
   const currentTransition: SlideTransition = page.transition ?? "none";
@@ -41,12 +91,21 @@ export function Canvas() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [sceneEditorOpen, setSceneEditorOpen] = useState(false);
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; hasTarget: boolean } | null>(null);
   const transitionSound = useSettings((s) => s.transitionSound);
   const setTransitionSound = useSettings((s) => s.setTransitionSound);
+  const canvasGrid = useSettings((s) => s.canvasGrid);
+  const toggleCanvasGrid = useSettings((s) => s.toggleCanvasGrid);
+  const editorDark = useSettings((s) => s.editorDark);
   const activePreviewTransition = hoveredTransition ?? currentTransition;
+  const isThreeActive = isThreeTransition(currentTransition);
   const isThreePreview = isThreeTransition(activePreviewTransition);
+  const currentThreeScene = resolveThreeScene(page.threeScene);
   const scale = zoom ?? fitScale;
   const changeZoom = (value: number) => setZoom(Math.max(0.1, Math.min(3, value)));
+  const notesText = page.notes ?? "";
+  const notesWords = notesText.trim() ? notesText.trim().split(/\s+/).length : 0;
 
   useEffect(() => {
     void ensureFontsForPages(
@@ -120,6 +179,10 @@ export function Canvas() {
         e.preventDefault();
         useEditor.getState().paste();
       }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        useEditor.getState().selectAll();
+      }
       if ((e.metaKey || e.ctrlKey) && (e.key === "d" || e.key === "D")) {
         const st = useEditor.getState();
         if (st.selectedIds.length > 0 || st.selectedId) {
@@ -143,6 +206,24 @@ export function Canvas() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    if (!ctxMenu) return;
+    const close = () => setCtxMenu(null);
+    window.addEventListener("mousedown", close);
+    window.addEventListener("blur", close);
+    return () => {
+      window.removeEventListener("mousedown", close);
+      window.removeEventListener("blur", close);
+    };
+  }, [ctxMenu]);
+
+  const activeEl = selectedId ? elements.find((e) => e.id === selectedId) : undefined;
+  const selectedEls = elements.filter((e) => selectedIds.includes(e.id));
+  const sharedGroupId = selectedEls[0]?.groupId;
+  const isSelGrouped = Boolean(
+    selectedEls.length > 1 && sharedGroupId && selectedEls.every((e) => e.groupId === sharedGroupId),
+  );
+
   return (
     <div
       ref={wrapRef}
@@ -150,6 +231,20 @@ export function Canvas() {
       aria-label="Slide preview"
       onMouseDown={(e) => {
         if (!(e.target as HTMLElement).closest("[data-canvas-element]")) select(null);
+      }}
+      onContextMenu={(e) => {
+        if ((e.target as HTMLElement).closest('[contenteditable="true"]')) return;
+        const elNode = (e.target as HTMLElement).closest<HTMLElement>("[data-canvas-element]");
+        const elId = elNode?.dataset.elementId;
+        if (elId && !selectedIds.includes(elId)) {
+          select(elId);
+        }
+        e.preventDefault();
+        const menuW = 224;
+        const menuH = elId || selectedId ? 330 : 190;
+        const x = Math.min(e.clientX, window.innerWidth - menuW - 12);
+        const y = Math.min(e.clientY, window.innerHeight - menuH - 12);
+        setCtxMenu({ x: Math.max(12, x), y: Math.max(12, y), hasTarget: Boolean(elId || selectedId) });
       }}
     >
       <div className="absolute inset-0 overflow-auto pb-16">
@@ -245,6 +340,22 @@ export function Canvas() {
                 </div>
               )}
             </div>
+            {/* Editor-only alignment grid overlay — kept outside #canvas-export so exports stay clean */}
+            {canvasGrid && (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-0 overflow-hidden rounded-[24px]"
+                style={{
+                  width: canvasW,
+                  height: canvasH,
+                  transform: `scale(${scale})`,
+                  transformOrigin: "top left",
+                  backgroundImage:
+                    "linear-gradient(to right, rgba(37,99,235,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(37,99,235,0.14) 1px, transparent 1px), linear-gradient(to right, rgba(148,163,184,0.16) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.16) 1px, transparent 1px)",
+                  backgroundSize: "160px 160px, 160px 160px, 40px 40px, 40px 40px",
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -298,6 +409,65 @@ export function Canvas() {
         >
           <Magnet className={"size-4 " + (snapping ? "text-blue-600" : "text-slate-400")} />
         </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 rounded-full"
+          title={canvasGrid ? "Hide alignment grid" : "Show alignment grid"}
+          aria-label="Toggle alignment grid"
+          aria-pressed={canvasGrid}
+          onClick={toggleCanvasGrid}
+        >
+          <Grid3x3 className={"size-4 " + (canvasGrid ? "text-blue-600" : "text-slate-400")} />
+        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative h-7 w-7 rounded-full"
+              title="Speaker notes for this slide"
+              aria-label="Speaker notes"
+            >
+              <StickyNote className={"size-4 " + (notesText.trim() ? "text-amber-500" : "text-slate-500")} />
+              {notesText.trim() && (
+                <span className="absolute right-1 top-1 size-1.5 rounded-full bg-amber-500" />
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            side="top"
+            align="center"
+            className={`w-80 rounded-2xl border p-3.5 shadow-2xl ${
+              editorDark
+                ? "border-slate-700 bg-slate-900 text-slate-100"
+                : "border-slate-200 bg-white text-slate-900"
+            }`}
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5 text-xs font-semibold">
+                <StickyNote className="size-3.5 text-amber-500" />
+                Speaker notes · Slide #{currentIndex + 1}
+              </span>
+              <span className="font-mono text-[10px] text-slate-400">
+                {notesWords} {notesWords === 1 ? "word" : "words"}
+                {notesWords > 0 ? ` · ~${Math.max(1, Math.round(notesWords / 2.2))}s` : ""}
+              </span>
+            </div>
+            <textarea
+              rows={4}
+              value={notesText}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Write talking points shown in Presenter View (press P while presenting)..."
+              className={`w-full resize-y rounded-xl border px-3 py-2 text-xs leading-relaxed outline-none transition focus:ring-2 focus:ring-blue-500/25 ${
+                editorDark
+                  ? "border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-500"
+                  : "border-slate-200 bg-slate-50 text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white"
+              }`}
+            />
+          </PopoverContent>
+        </Popover>
         <Button
           variant="ghost"
           size="icon"
@@ -377,6 +547,7 @@ export function Canvas() {
                   canvasH={canvasH}
                   playTrigger={0}
                   interactive
+                  sceneConfig={page.threeScene}
                   className="h-full w-full"
                 />
               ) : (
@@ -391,6 +562,29 @@ export function Canvas() {
                 </div>
               )}
             </div>
+            {isThreeActive && (
+              <button
+                type="button"
+                onClick={() => setSceneEditorOpen(true)}
+                className="flex w-full items-center justify-between rounded-2xl border border-blue-200/80 bg-blue-50/75 px-3 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-100/80"
+              >
+                <span className="flex items-center gap-2">
+                  <SlidersHorizontal className="size-3.5" aria-hidden="true" />
+                  <span>Edit 3D scene &amp; colors</span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[10px] capitalize opacity-75">{currentThreeScene.scenePreset}</span>
+                  <span
+                    className="size-3 rounded-full border border-white/70 shadow-xs"
+                    style={{ backgroundColor: currentThreeScene.bgColor }}
+                  />
+                  <span
+                    className="size-3 rounded-full border border-white/70 shadow-xs"
+                    style={{ backgroundColor: currentThreeScene.accentColor }}
+                  />
+                </span>
+              </button>
+            )}
             <OptionGrid
               columns={3}
               label="Slide transitions"
@@ -410,10 +604,331 @@ export function Canvas() {
             />
           </PopoverContent>
         </Popover>
+        {isThreeActive && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setSceneEditorOpen(true)}
+            aria-label="Edit 3D scene and colors"
+            title="Edit 3D scene & colors"
+            className="h-7 gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-medium text-blue-700"
+          >
+            <Palette className="size-3.5 text-blue-600" aria-hidden="true" />
+            <span>3D Scene</span>
+            <span
+              className="size-2.5 rounded-full border border-white/70 shadow-xs"
+              style={{ backgroundColor: currentThreeScene.accentColor }}
+              aria-hidden="true"
+            />
+          </Button>
+        )}
 
       </div>
 
+      {ctxMenu && (
+        <div
+          onMouseDown={(e) => e.stopPropagation()}
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
+          className={`fixed z-[80] w-56 rounded-2xl border p-1.5 text-xs shadow-2xl ${
+            editorDark
+              ? "border-slate-700 bg-slate-900 text-slate-100"
+              : "border-slate-200 bg-white text-slate-800"
+          }`}
+        >
+          {ctxMenu.hasTarget && activeEl ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  duplicateSelected();
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <CopyPlus className="size-3.5 text-slate-400" />
+                  Duplicate
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">Ctrl+D</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  copySelected();
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Copy className="size-3.5 text-slate-400" />
+                  Copy
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">Ctrl+C</span>
+              </button>
+              {clipboard && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    paste();
+                    setCtxMenu(null);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                    editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <ClipboardPaste className="size-3.5 text-slate-400" />
+                    Paste
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400">Ctrl+V</span>
+                </button>
+              )}
+              <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
+              <div className="px-2 py-1">
+                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                  Align
+                </div>
+                <div className="grid grid-cols-6 gap-1">
+                  {[
+                    { mode: "left" as const, title: "Align left", Icon: AlignStartVertical },
+                    { mode: "center-h" as const, title: "Center horizontally", Icon: AlignCenterVertical },
+                    { mode: "right" as const, title: "Align right", Icon: AlignEndVertical },
+                    { mode: "top" as const, title: "Align top", Icon: AlignStartHorizontal },
+                    { mode: "middle" as const, title: "Center vertically", Icon: AlignCenterHorizontal },
+                    { mode: "bottom" as const, title: "Align bottom", Icon: AlignEndHorizontal },
+                  ].map(({ mode, title, Icon }) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      title={title}
+                      onClick={() => {
+                        alignSelected(mode);
+                        setCtxMenu(null);
+                      }}
+                      className={`grid size-7 place-items-center rounded-lg transition ${
+                        editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                      }`}
+                    >
+                      <Icon className="size-3.5" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
+              <button
+                type="button"
+                onClick={() => {
+                  bringToFront(activeEl.id);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <BringToFront className="size-3.5 text-slate-400" />
+                Bring to front
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  bringForward(activeEl.id);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <ChevronUp className="size-3.5 text-slate-400" />
+                Bring forward
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sendBackward(activeEl.id);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <ChevronDown className="size-3.5 text-slate-400" />
+                Send backward
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  sendToBack(activeEl.id);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <SendToBack className="size-3.5 text-slate-400" />
+                Send to back
+              </button>
+              {selectedIds.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isSelGrouped) ungroupSelected();
+                    else groupSelected();
+                    setCtxMenu(null);
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                    editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                  }`}
+                >
+                  {isSelGrouped ? (
+                    <>
+                      <Ungroup className="size-3.5 text-slate-400" />
+                      Ungroup
+                    </>
+                  ) : (
+                    <>
+                      <Group className="size-3.5 text-slate-400" />
+                      Group selection
+                    </>
+                  )}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  update(activeEl.id, { locked: !activeEl.locked } as never);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                {activeEl.locked ? (
+                  <>
+                    <Unlock className="size-3.5 text-slate-400" />
+                    Unlock element
+                  </>
+                ) : (
+                  <>
+                    <Lock className="size-3.5 text-slate-400" />
+                    Lock element
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  toggleHideInPresent(activeEl.id);
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                {activeEl.hideInPresent ? (
+                  <>
+                    <Monitor className="size-3.5 text-amber-500" />
+                    Show in present mode
+                  </>
+                ) : (
+                  <>
+                    <MonitorOff className="size-3.5 text-slate-400" />
+                    Hide in present mode
+                  </>
+                )}
+              </button>
+              <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
+              <button
+                type="button"
+                onClick={() => {
+                  removeSelected();
+                  setCtxMenu(null);
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-rose-500 transition hover:bg-rose-500/10"
+              >
+                <span className="flex items-center gap-2">
+                  <Trash2 className="size-3.5" />
+                  Delete
+                </span>
+                <span className="font-mono text-[10px] opacity-70">Del</span>
+              </button>
+            </>
+          ) : (
+            <>
+              {clipboard && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    paste();
+                    setCtxMenu(null);
+                  }}
+                  className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                    editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <ClipboardPaste className="size-3.5 text-slate-400" />
+                    Paste
+                  </span>
+                  <span className="font-mono text-[10px] text-slate-400">Ctrl+V</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  selectAll();
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Group className="size-3.5 text-slate-400" />
+                  Select all
+                </span>
+                <span className="font-mono text-[10px] text-slate-400">Ctrl+A</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  toggleCanvasGrid();
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Grid3x3 className="size-3.5 text-slate-400" />
+                  {canvasGrid ? "Hide alignment grid" : "Show alignment grid"}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  toggleSnapping();
+                  setCtxMenu(null);
+                }}
+                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Magnet className="size-3.5 text-slate-400" />
+                  {snapping ? "Disable snapping" : "Enable snapping"}
+                </span>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       <VersionHistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
+      <ThreeSceneDialog open={sceneEditorOpen} onOpenChange={setSceneEditorOpen} />
     </div>
   );
 }

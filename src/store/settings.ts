@@ -83,6 +83,12 @@ type SettingsState = {
   workspaceBgColor: string;
   workspaceBgImage: string | null;
   a11yCheck: boolean;
+  canvasGrid: boolean;
+  presentHideHud: boolean;
+  presentHide3dButton: boolean;
+  presentAutoHideHud: boolean;
+  presentHideInk: boolean;
+  presentHideSlideCounter: boolean;
   textStyles: Record<"title" | "subtitle" | "body", TextStyle>;
   brandKit: BrandKit;
   appAccent: string;
@@ -108,6 +114,13 @@ type SettingsState = {
   setWorkspaceBgImage: (dataUrl: string | null) => void;
   resetWorkspaceBg: () => void;
   setA11yCheck: (v: boolean) => void;
+  setCanvasGrid: (v: boolean) => void;
+  toggleCanvasGrid: () => void;
+  setPresentHideHud: (v: boolean) => void;
+  setPresentHide3dButton: (v: boolean) => void;
+  setPresentAutoHideHud: (v: boolean) => void;
+  setPresentHideInk: (v: boolean) => void;
+  setPresentHideSlideCounter: (v: boolean) => void;
   setTextStyle: (role: "title" | "subtitle" | "body", patch: Partial<TextStyle>) => void;
   resetMotion: () => void;
   togglePanel: (id: PanelId) => void;
@@ -159,6 +172,12 @@ export const useSettings = create<SettingsState>()(
       workspaceBgColor: "#e8eef7",
       workspaceBgImage: null,
       a11yCheck: false,
+      canvasGrid: false,
+      presentHideHud: false,
+      presentHide3dButton: false,
+      presentAutoHideHud: false,
+      presentHideInk: false,
+      presentHideSlideCounter: false,
       textStyles: { ...DEFAULT_TEXT_STYLES },
       brandKit: { ...DEFAULT_BRAND_KIT },
       appAccent: "#4f46e5",
@@ -200,6 +219,13 @@ export const useSettings = create<SettingsState>()(
         })),
       resetWorkspaceBg: () => set({ workspaceBg: DEFAULT_WORKSPACE_BG }),
       setA11yCheck: (a11yCheck) => set({ a11yCheck }),
+      setCanvasGrid: (canvasGrid) => set({ canvasGrid }),
+      toggleCanvasGrid: () => set((s) => ({ canvasGrid: !s.canvasGrid })),
+      setPresentHideHud: (presentHideHud) => set({ presentHideHud }),
+      setPresentHide3dButton: (presentHide3dButton) => set({ presentHide3dButton }),
+      setPresentAutoHideHud: (presentAutoHideHud) => set({ presentAutoHideHud }),
+      setPresentHideInk: (presentHideInk) => set({ presentHideInk }),
+      setPresentHideSlideCounter: (presentHideSlideCounter) => set({ presentHideSlideCounter }),
       setTextStyle: (role, patch) =>
         set((s) => ({ textStyles: { ...s.textStyles, [role]: { ...s.textStyles[role], ...patch } } })),
       resetMotion: () =>
@@ -218,7 +244,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 13,
+      version: 14,
       migrate: (state) => {
         const previous = state as SettingsState;
         // Unsplash + Illustrations merged into the Library panel — carry the
@@ -252,6 +278,12 @@ export const useSettings = create<SettingsState>()(
           workspaceBgColor: previous?.workspaceBgColor ?? "#e8eef7",
           workspaceBgImage: previous?.workspaceBgImage ?? null,
           a11yCheck: previous?.a11yCheck ?? false,
+          canvasGrid: previous?.canvasGrid ?? false,
+          presentHideHud: previous?.presentHideHud ?? false,
+          presentHide3dButton: previous?.presentHide3dButton ?? false,
+          presentAutoHideHud: previous?.presentAutoHideHud ?? false,
+          presentHideInk: previous?.presentHideInk ?? false,
+          presentHideSlideCounter: previous?.presentHideSlideCounter ?? false,
           textStyles: previous?.textStyles ?? { ...DEFAULT_TEXT_STYLES },
           brandKit: { ...DEFAULT_BRAND_KIT, ...(previous?.brandKit ?? {}) },
         };

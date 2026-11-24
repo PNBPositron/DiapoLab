@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2, Wallpaper } from "lucide-react";
+import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2, Wallpaper, MonitorOff } from "lucide-react";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId, type TransitionSoundStyle } from "@/store/settings";
 import { WorkspaceBackgroundPicker } from "./WorkspaceBackground";
 import { useAuth } from "@/hooks/use-auth";
@@ -103,6 +103,16 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
     setEditorDark,
     a11yCheck,
     setA11yCheck,
+    presentHideHud,
+    setPresentHideHud,
+    presentHide3dButton,
+    setPresentHide3dButton,
+    presentAutoHideHud,
+    setPresentAutoHideHud,
+    presentHideInk,
+    setPresentHideInk,
+    presentHideSlideCounter,
+    setPresentHideSlideCounter,
   } = useSettings();
   const { user } = useAuth();
   const { pages, loadPages } = useEditor();
@@ -416,6 +426,59 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 </div>
                 <Switch on={a11yCheck} label="Accessibility checker" onClick={() => setA11yCheck(!a11yCheck)} />
               </div>
+            </div>
+          </Section>
+
+          {/* Present mode display */}
+          <Section
+            icon={<MonitorOff className="size-4" />}
+            label="Present mode display"
+            desc="Control which presenter overlays appear while presenting (or press H anytime for clean screen)."
+          >
+            <div className="space-y-3">
+              {[
+                {
+                  title: "Hide presenter toolbar",
+                  desc: "Hide the bottom-left presenter controls bar (press H or hover bottom-left to reveal).",
+                  on: presentHideHud,
+                  toggle: () => setPresentHideHud(!presentHideHud),
+                },
+                {
+                  title: "Hide 3D Stage button",
+                  desc: "Hide the bottom-right 3D Stage launcher pill (still accessible with key 3).",
+                  on: presentHide3dButton,
+                  toggle: () => setPresentHide3dButton(!presentHide3dButton),
+                },
+                {
+                  title: "Hide slide number counter",
+                  desc: "Hide the 1/N slide counter inside presentation controls.",
+                  on: presentHideSlideCounter,
+                  toggle: () => setPresentHideSlideCounter(!presentHideSlideCounter),
+                },
+                {
+                  title: "Auto-hide controls when idle",
+                  desc: "Fade out presenter controls and cursor after a short pause in movement.",
+                  on: presentAutoHideHud,
+                  toggle: () => setPresentAutoHideHud(!presentAutoHideHud),
+                },
+                {
+                  title: "Hide ink annotations",
+                  desc: "Temporarily hide live ink drawings on slides without erasing them.",
+                  on: presentHideInk,
+                  toggle: () => setPresentHideInk(!presentHideInk),
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3"
+                >
+                  <div>
+                    <div className="text-[11px] font-semibold text-slate-700">{item.title}</div>
+                    <p className="mt-0.5 text-[10px] text-slate-400">{item.desc}</p>
+                  </div>
+                  <Switch on={item.on} label={item.title} onClick={item.toggle} />
+                </div>
+              ))}
             </div>
           </Section>
 

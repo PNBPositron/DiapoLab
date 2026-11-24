@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
-import { Plus, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Copy, Trash2, ChevronLeft, ChevronRight, LayoutGrid, FileText, Eye, EyeOff } from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
+import { SlideGridDialog } from "./SlideGridDialog";
 
 export function PagesBar() {
   const {
@@ -12,12 +13,14 @@ export function PagesBar() {
     duplicatePage,
     removePage,
     movePage,
+    togglePageHiddenInPresent,
     canvasW,
     canvasH,
   } = useEditor();
 
   const rowRef = useRef<HTMLDivElement>(null);
   const [rowWidth, setRowWidth] = useState(0);
+  const [gridOpen, setGridOpen] = useState(false);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -70,8 +73,24 @@ export function PagesBar() {
                   page={p}
                   canvasW={canvasW}
                   canvasH={canvasH}
-                  className="h-full w-full"
+                  className={`h-full w-full ${p.hiddenInPresent ? "opacity-45" : ""}`}
                 />
+                {p.notes?.trim() && (
+                  <span
+                    title="Has speaker notes"
+                    className="absolute left-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-amber-500/90 text-white shadow-xs"
+                  >
+                    <FileText className="size-2.5" />
+                  </span>
+                )}
+                {p.hiddenInPresent && (
+                  <span
+                    title="Hidden in present mode"
+                    className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-slate-900/80 px-1.5 py-0.5 text-[9px] font-semibold text-amber-300 shadow-xs"
+                  >
+                    <EyeOff className="size-2.5" />
+                  </span>
+                )}
                 <span className={`absolute bottom-1.5 right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-mono text-[10px] font-bold tabular-nums transition-opacity ${
                   active ? "bg-blue-600 text-white opacity-100 shadow-xs" : "bg-slate-900/75 text-white opacity-0 group-hover:opacity-100"
                 }`}>
@@ -99,6 +118,16 @@ export function PagesBar() {
                     <ChevronRight className="h-3 w-3" />
                   </button>
                 )}
+                <button
+                  onClick={() => togglePageHiddenInPresent(i)}
+                  title={p.hiddenInPresent ? "Show slide in present mode" : "Hide slide in present mode"}
+                  aria-label={p.hiddenInPresent ? `Show page ${i + 1} in present mode` : `Hide page ${i + 1} in present mode`}
+                  className={`grid h-5 w-5 place-items-center rounded-full transition ${
+                    p.hiddenInPresent ? "bg-amber-100 text-amber-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  }`}
+                >
+                  {p.hiddenInPresent ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                </button>
                 <button
                   onClick={() => duplicatePage(i)}
                   title="Duplicate"
@@ -130,7 +159,18 @@ export function PagesBar() {
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
         </button>
+        <button
+          type="button"
+          onClick={() => setGridOpen(true)}
+          title="Slide grid overview & reorder"
+          aria-label="Slide grid overview"
+          className="grid shrink-0 place-items-center rounded-[14px] border border-slate-200/90 bg-white/75 text-slate-500 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.10)] backdrop-blur-md transition-all hover:border-blue-400 hover:bg-white hover:text-blue-600"
+          style={{ height: thumbH + 2, width: Math.max(36, Math.round(thumbH * 0.72)) }}
+        >
+          <LayoutGrid className="h-4 w-4" strokeWidth={2} />
+        </button>
       </div>
+      <SlideGridDialog open={gridOpen} onOpenChange={setGridOpen} />
     </div>
   );
 }
