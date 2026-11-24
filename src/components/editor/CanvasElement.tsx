@@ -718,11 +718,13 @@ export function CanvasElement({
       return () => cancelAnimationFrame(raf);
     }
   }, [presenting, preview, morph, replayEpoch, kfPreviewEpoch, sourceElement, srcText, typeSpeed, countUp]);
-  const [useCssEntry, setUseCssEntry] = useState(
-    () =>
-      typeof window === "undefined" ||
-      !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches,
-  );
+  const [useCssEntry, setUseCssEntry] = useState(true);
+
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+      setUseCssEntry(false);
+    }
+  }, []);
 
   useEffect(() => {
     entryAnimRef.current?.cancel();
@@ -2043,10 +2045,11 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
   elRef.current = element;
   const interactiveRef = useRef(interactive);
   interactiveRef.current = interactive;
-  const pollUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/v/${element.liveKey ?? element.id}`
-      : "";
+  const [origin, setOrigin] = useState("");
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+  const pollUrl = origin ? `${origin}/v/${element.liveKey ?? element.id}` : "";
 
   // Live poll sync over supabase realtime broadcast: editor/presenter windows
   // AND the /v/$key audience page share the same channel. The presenting window

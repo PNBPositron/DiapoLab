@@ -614,7 +614,7 @@ export const usePlugins = create<PluginsState>()(
           plugins: s.plugins.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)),
         })),
     }),
-    { name: "diapolab.plugins.v1" },
+    { name: "diapolab.plugins.v1", skipHydration: true },
   ),
 );
 

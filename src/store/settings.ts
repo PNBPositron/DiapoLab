@@ -245,6 +245,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: "positron.settings",
       version: 14,
+      skipHydration: true,
       migrate: (state) => {
         const previous = state as SettingsState;
         // Unsplash + Illustrations merged into the Library panel — carry the

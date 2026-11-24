@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { DEFAULT_PAGES } from "@/lib/default-deck";
 import { DEFAULT_THREE_SCENE, resolveThreeScene, type ThreeSceneConfig } from "@/lib/three-scene";
+import { computeAutoArrange, type ArrangeOptions } from "@/lib/auto-arrange";
 
 /** One custom animation keyframe: the element state at time t (ms).
  *  Undefined fields inherit the first keyframe value at play time. */
@@ -812,8 +813,9 @@ export function saveCustomUiTheme(theme: UiTheme) {
   }
 }
 
-/** Restore the last saved custom theme (runs once at module load). */
+/** Restore the last saved custom theme (called on client mount). */
 export function loadCustomUiTheme() {
+  if (typeof localStorage === "undefined") return;
   try {
     const raw = localStorage.getItem(CUSTOM_THEME_KEY);
     if (!raw) return;
@@ -823,7 +825,6 @@ export function loadCustomUiTheme() {
     /* corrupted entry — keep the defaults */
   }
 }
-loadCustomUiTheme();
 
 export type AnyElement =
   | TextElement
@@ -906,6 +907,7 @@ type State = {
   setTool: (t: Tool) => void;
   select: (id: string | null) => void;
   selectAll: () => void;
+  selectMany: (ids: string[]) => void;
   toggleSelect: (id: string) => void;
   toggleHidden: (id: string) => void;
   toggleHideInPresent: (id: string) => void;
@@ -956,6 +958,8 @@ type State = {
   alignSelected: (mode: "left" | "center-h" | "right" | "top" | "middle" | "bottom") => void;
   /** spread 3+ selected elements evenly on one axis */
   distributeSelected: (axis: "h" | "v") => void;
+  /** auto-arrange selected or all elements without overlap */
+  autoArrangeSelected: (options?: Partial<ArrangeOptions> & { scope?: "selected" | "all" }) => number;
   /** id of the image element currently in interactive crop mode (double-click) */
   croppingId: string | null;
   setCroppingId: (id: string | null) => void;
@@ -1791,6 +1795,30 @@ export const useEditor = create<State>((set, get) => {
         ),
       }));
     },
+    autoArrangeSelected: (options) => {
+      const { elements, selectedIds, selectedId, canvasW, canvasH } = get();
+      const scope = options?.scope ?? "selected";
+      const targetIds =
+        scope === "all"
+          ? elements.filter((e) => !e.locked && !e.hidden).map((e) => e.id)
+          : selectedIds.length
+            ? selectedIds
+            : selectedId
+              ? [selectedId]
+              : [];
+      const targets = elements.filter((e) => targetIds.includes(e.id) && !e.locked && !e.hidden);
+      if (targets.length < 2) return 0;
+      const patches = computeAutoArrange(targets, canvasW, canvasH, options);
+      if (!patches.size) return 0;
+      pushHistory();
+      updateCurrentPage((p) => ({
+        ...p,
+        elements: p.elements.map((e) =>
+          patches.has(e.id) ? ({ ...e, ...patches.get(e.id) } as AnyElement) : e,
+        ),
+      }));
+      return patches.size;
+    },
     setCroppingId: (croppingId) => set({ croppingId }),
     copySelected: () => {
       const { selectedId, elements } = get();
@@ -1833,6 +1861,13 @@ export const useEditor = create<State>((set, get) => {
       set({
         selectedId: visible[visible.length - 1].id,
         selectedIds: visible.map((e) => e.id),
+      });
+    },
+    selectMany: (ids) => {
+      const valid = get().elements.filter((e) => ids.includes(e.id)).map((e) => e.id);
+      set({
+        selectedId: valid.length ? valid[valid.length - 1] : null,
+        selectedIds: valid,
       });
     },
     toggleSelect: (id) => {

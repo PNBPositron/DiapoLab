@@ -41,21 +41,21 @@
   --color-selector-border: var(--selector-border);
   --color-selector-accent: var(--selector-accent);
   --color-selector-active: var(--selector-active);
-  --font-display: "Manrope", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 :root {
   --selector-surface: #ffffff;
-  --selector-muted: #f8fafc;
+  --selector-muted: #f4f5f7;
   --selector-ink: #0f172a;
   --selector-subtle: #64748b;
   --selector-border: #e2e8f0;
   --selector-accent: #2563eb;
   --selector-active: #eff6ff;
-  --selector-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
-  --selector-panel-shadow: 0 18px 42px -12px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.04);
-  --radius: 1rem;
+  --selector-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --selector-panel-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --radius: 0.625rem;
   --ink: #ffffff;
   --paper: #ffffff;
   --surface: #ffffff;
@@ -320,21 +320,21 @@
     min-height: 100%;
     background-color: #ffffff;
     color: var(--teal);
-    font-family: "Manrope", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
   h1,
   h2,
   h3,
   h4 {
-    font-family: "Manrope", system-ui, sans-serif;
-    letter-spacing: -0.025em;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    letter-spacing: -0.02em;
     text-transform: none;
   }
   .logo-wordmark {
-    font-family: "Manrope", system-ui, sans-serif;
-    font-size: 1.16em;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-size: 1.12em;
     font-weight: 700;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     text-transform: none;
   }
   button,
@@ -961,39 +961,39 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 4px 0 12px;
+  padding: 2px 0 10px;
   border-bottom: 1px solid var(--selector-border);
   color: var(--selector-ink);
 }
 .selector-header h3 {
   margin: 0;
   font-size: 13px;
-  font-weight: 650;
-  letter-spacing: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .selector-search {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 38px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 0 10px;
   border: 1px solid var(--selector-border);
-  border-radius: 9999px;
+  border-radius: 8px;
   background: var(--selector-muted);
   color: var(--selector-subtle);
-  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 .selector-search:focus-within {
   border-color: var(--selector-accent);
   background: var(--selector-surface);
-  box-shadow: 0 0 0 3px var(--selector-active);
+  box-shadow: 0 0 0 2px var(--selector-active);
 }
 .selector-search input {
   min-width: 0;
   width: 100%;
   border: 0 !important;
   background: transparent !important;
-  padding: 8px 0;
+  padding: 6px 0;
   font-size: 12px;
   color: var(--selector-ink);
   outline: none !important;
@@ -1003,28 +1003,30 @@
   color: var(--selector-subtle);
 }
 .selector-search .selector-clear {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   padding: 2px;
+  border-radius: 4px;
   color: var(--selector-subtle);
   background: transparent;
 }
 .selector-chips {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   overflow-x: auto;
   padding: 2px 0 6px;
   scrollbar-width: thin;
 }
 .selector-chips .selector-chip {
   flex-shrink: 0;
-  height: 28px;
-  border-radius: 999px;
-  padding: 0 10px;
+  height: 26px;
+  border-radius: 6px;
+  padding: 0 9px;
   font-size: 11px;
+  font-weight: 500;
   color: var(--selector-subtle);
   background: var(--selector-muted);
-  border: 1px solid transparent;
+  border: 1px solid var(--selector-border);
 }
 .selector-chips .selector-chip[aria-pressed="true"] {
   color: var(--selector-accent);
@@ -1033,34 +1035,32 @@
 }
 .selector-grid {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 .selector-grid .selector-option {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   height: auto;
-  min-height: 78px;
-  padding: 12px 6px 9px;
+  min-height: 74px;
+  padding: 10px 6px 8px;
   border: 1px solid var(--selector-border);
-  border-radius: 16px;
+  border-radius: 8px;
   background: var(--selector-surface);
   color: var(--selector-subtle);
   white-space: normal;
   transition:
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
 }
 .selector-grid .selector-option:hover {
-  transform: translateY(-2px);
   border-color: var(--selector-accent);
-  background: var(--selector-surface);
+  background: var(--selector-muted);
   color: var(--selector-accent);
-  box-shadow: var(--selector-shadow);
 }
 .selector-grid .selector-option[aria-pressed="true"] {
   background: var(--selector-active);
@@ -1071,16 +1071,16 @@
   display: grid;
   place-items: center;
   width: 100%;
-  height: 36px;
+  height: 32px;
 }
 .selector-grid .selector-option-art > svg {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 .selector-option-label {
   font-size: 11px;
-  font-weight: 550;
-  line-height: 1.35;
+  font-weight: 500;
+  line-height: 1.3;
   overflow-wrap: anywhere;
   color: var(--selector-ink);
 }
@@ -1099,26 +1099,27 @@
 }
 .selector-segments {
   display: flex;
-  gap: 3px;
+  gap: 2px;
   padding: 3px;
-  border-radius: 9999px;
+  border-radius: 8px;
   border: 1px solid var(--selector-border);
   background: var(--selector-muted);
 }
 .selector-segments .selector-segment {
   flex: 1;
   min-width: 0;
-  height: 30px;
+  height: 28px;
   padding: 4px 8px;
   gap: 4px;
-  border-radius: 9999px;
+  border-radius: 6px;
   color: var(--selector-subtle);
   font-size: 11px;
+  font-weight: 500;
   white-space: normal;
   line-height: 1.2;
 }
 .selector-segments .selector-segment[aria-pressed="true"] {
-  color: var(--selector-accent);
+  color: var(--selector-ink);
   background: var(--selector-surface);
   box-shadow: var(--selector-shadow);
 }
@@ -1134,21 +1135,21 @@
   flex-shrink: 0;
 }
 .selector-toggles {
-  gap: 8px;
+  gap: 6px;
 }
 .selector-toggles .selector-toggle {
   display: flex;
   flex-wrap: wrap;
   min-width: 0;
   height: auto;
-  min-height: 48px;
+  min-height: 44px;
   gap: 5px;
-  padding: 8px 8px;
-  border-radius: 14px;
+  padding: 8px;
+  border-radius: 8px;
   border: 1px solid var(--selector-border);
   background: var(--selector-surface);
   color: var(--selector-subtle);
-  font-size: 10px;
+  font-size: 10.5px;
   line-height: 1.3;
   white-space: normal;
 }
@@ -1159,19 +1160,19 @@
 }
 .selector-toggle-track {
   display: block;
-  width: 22px;
-  height: 12px;
+  width: 24px;
+  height: 14px;
   padding: 2px;
-  border-radius: 20px;
+  border-radius: 999px;
   background: var(--selector-border);
 }
 .selector-toggle-track > span {
   display: block;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--selector-surface);
-  transition: transform 160ms ease;
+  transition: transform 140ms ease;
 }
 [aria-pressed="true"] .selector-toggle-track {
   background: var(--selector-accent);
@@ -1180,11 +1181,11 @@
   transform: translateX(10px);
 }
 .selector-panel {
-  width: 280px;
+  width: 288px;
   max-width: calc(100vw - 24px);
   max-height: calc(100dvh - 100px);
   overflow-y: auto;
-  border-radius: 20px;
+  border-radius: 12px;
   border-color: var(--selector-border);
   background: var(--selector-surface);
   color: var(--selector-ink);
@@ -1195,7 +1196,7 @@
   aspect-ratio: 16 / 9;
   width: 100%;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 8px;
   border: 1px solid var(--selector-border);
   background: var(--selector-muted);
 }
@@ -1207,8 +1208,9 @@
   justify-content: center;
   gap: 6px;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 6px;
   background: var(--selector-surface);
+  border: 1px solid var(--selector-border);
 }
 .transition-mini-mark {
   width: 26px;

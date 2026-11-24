@@ -106,13 +106,15 @@ export function ColorPicker({
   const safeHex = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
   const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
   const [hexDraft, setHexDraft] = useState(safeHex);
-  const [recentColors, setRecentColors] = useState<string[]>(() =>
-    typeof window === "undefined" ? [] : readRecentColors(),
-  );
+  const [recentColors, setRecentColors] = useState<string[]>([]);
   const svRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const lastEmitted = useRef(safeHex);
   const showOpacity = opacity !== undefined && !!onOpacityChange;
+
+  useEffect(() => {
+    setRecentColors(readRecentColors());
+  }, []);
 
   // Sync quand la valeur change de l'extérieur
   useEffect(() => {

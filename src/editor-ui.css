@@ -1,13 +1,14 @@
 @layer components {
-  /* Modern side-panel design system: opaque surface, soft layered shadows,
-     subtle borders, spring-like hover/press states, refined typography. */
+  /* Precision Studio design system: flat crisp surfaces, 1px hairline borders,
+     controlled geometry (6px-12px radii), zero pill/blur bloat. */
 
   .editor-side-panel {
-    font-family: Manrope, system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
   .editor-tool-rail {
-    background: rgba(255, 255, 255, 0.86);
+    background: #ffffff;
+    border-color: #e2e8f0;
   }
 
   .editor-ui {
@@ -26,24 +27,16 @@
     backdrop-filter: none;
   }
 
-  .editor-tool-rail button:hover,
-  .editor-tool-rail button:focus-visible {
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-  }
-
   .editor-side-panel {
     padding: 0.875rem;
     background: #ffffff;
     border-color: #e2e8f0;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.05),
-      0 12px 32px -6px rgba(15, 23, 42, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04);
   }
 
-  /* Thin modern scrollbar */
+  /* Thin studio scrollbar */
   .editor-side-panel::-webkit-scrollbar {
     width: 6px;
   }
@@ -61,11 +54,11 @@
   .editor-side-panel .brutal-border,
   .editor-side-panel .brutal-border-2 {
     border: 1px solid #e2e8f0;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     box-shadow: none;
     transition:
-      border-color 150ms ease,
-      background-color 150ms ease;
+      border-color 140ms ease,
+      background-color 140ms ease;
   }
 
   .editor-side-panel .brutal-border:hover,
@@ -74,11 +67,11 @@
   }
 
   .editor-side-panel .brutal-press:hover {
-    transform: translateY(-1px);
+    transform: none;
   }
 
   .editor-side-panel .brutal-press:active {
-    transform: translateY(0) scale(0.99);
+    transform: scale(0.99);
   }
 
   .editor-side-panel .bg-ink {
@@ -115,18 +108,18 @@
     border-color: #e2e8f0;
   }
 
-  /* Inputs: clean crisp pure-white field with hairline border */
+  /* Inputs: clean crisp field with 1px border */
   .editor-side-panel input:not([type="color"]),
   .editor-side-panel textarea,
   .editor-side-panel select {
     border-color: #e2e8f0;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     background: #f8fafc;
     color: #0f172a;
     transition:
-      border-color 150ms ease,
-      box-shadow 150ms ease,
-      background-color 150ms ease;
+      border-color 140ms ease,
+      box-shadow 140ms ease,
+      background-color 140ms ease;
   }
 
   .editor-side-panel input:not([type="color"]):hover,
@@ -146,16 +139,16 @@
     border-color: #2563eb;
     background: #ffffff;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
   }
 
   .editor-side-panel button {
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     transition:
-      transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 140ms ease,
+      transform 120ms ease,
       border-color 140ms ease,
-      background-color 140ms ease;
+      background-color 140ms ease,
+      color 140ms ease;
   }
 
   .editor-side-panel .font-mono {
@@ -163,13 +156,13 @@
   }
 
   .editor-side-panel .font-display {
-    font-family: "Manrope", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
   .editor-side-panel .panel-content {
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
+    gap: 0.75rem;
     min-width: 0;
     color: #0f172a;
   }
@@ -177,7 +170,7 @@
   .editor-side-panel .panel-content > :is(section, [class*="rounded"], [class*="border"]),
   .editor-side-panel > :is(section, [class*="rounded"], [class*="border"]) {
     border-color: #e2e8f0;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
   }
 
   .editor-side-panel h2,
@@ -190,7 +183,7 @@
   }
 
   .editor-side-panel button:not(:disabled):focus-visible {
-    outline: 2px solid rgba(37, 99, 235, 0.45);
+    outline: 2px solid rgba(37, 99, 235, 0.55);
     outline-offset: 2px;
   }
 
@@ -228,9 +221,8 @@
     background: #ffffff;
     box-shadow: none;
     transition:
-      border-color 150ms ease,
-      background-color 150ms ease,
-      box-shadow 150ms ease;
+      border-color 140ms ease,
+      background-color 140ms ease;
   }
 
   .editor-side-panel .panel-choice-grid > button:hover,
@@ -260,7 +252,7 @@
     color: #64748b;
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
   }
 
   .editor-side-panel .panel-section-label::after {
@@ -273,7 +265,7 @@
 
 /* Keep editor chrome readable without overriding slide element font families. */
 .editor-ui {
-  font-family: Manrope, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   background-color: transparent;
   color: #0f172a;
 }
@@ -285,18 +277,18 @@
 .editor-ui input,
 .editor-ui textarea,
 .editor-ui select {
-  font-family: Manrope, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
 /* The selector kit owns its color and interaction states. */
 .editor-side-panel {
-  width: 304px;
-  padding: 16px;
+  width: 300px;
+  padding: 14px;
   background: var(--selector-surface);
   color: var(--selector-ink);
   border-color: var(--selector-border);
-  border-radius: 1.375rem;
-  box-shadow: 0 20px 50px -14px rgba(15, 23, 42, 0.16), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
   overflow-x: hidden;
   scrollbar-gutter: stable;
 }
@@ -305,31 +297,31 @@
   padding-right: 0;
 }
 .editor-side-panel .selector-grid > .selector-option {
-  border-radius: 16px;
+  border-radius: 0.5rem;
 }
 .editor-side-panel .selector-chips > .selector-chip {
-  border-radius: 999px;
+  border-radius: 0.375rem;
 }
 .editor-side-panel .selector-grid > .selector-option-art {
   transform: none;
 }
 .editor-side-panel .selector-option-art > svg {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 .editor-inspector {
   color: var(--selector-ink);
   background: var(--selector-surface);
   border-color: var(--selector-border);
-  border-radius: 1.375rem;
-  box-shadow: 0 18px 44px -12px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.12);
 }
 .editor-inspector input:not([type="color"]):not([type="radio"]):not([type="range"]),
 .editor-inspector textarea,
 .editor-inspector select {
   min-width: 0;
   max-width: 100%;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   background: var(--selector-muted);
   border-color: var(--selector-border);
   color: var(--selector-ink);
@@ -349,34 +341,37 @@
   box-shadow: none;
 }
 
-/* Crisp pure-white canvas zoom pill dock (Apple/Google style). */
-.zoom-dock {
-  border-radius: 9999px;
-  border-color: rgba(226, 232, 240, 0.9);
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+/* Unified studio floating dock (shared by Zoom Dock, Selection Toolbar, and Present Mode HUD) */
+.zoom-dock,
+.studio-dock {
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.05);
 }
-.zoom-dock button {
-  border-radius: 9999px;
+.zoom-dock button,
+.studio-dock button {
+  border-radius: 0.375rem;
   color: #475569;
-  transition: background-color 140ms ease, color 140ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 140ms ease, color 140ms ease, transform 120ms ease;
 }
-.zoom-dock button:hover:not(:disabled) {
+.zoom-dock button:hover:not(:disabled),
+.studio-dock button:hover:not(:disabled) {
   background: #f1f5f9;
   color: #0f172a;
 }
-.zoom-dock button:active:not(:disabled) {
-  transform: scale(0.95);
+.zoom-dock button:active:not(:disabled),
+.studio-dock button:active:not(:disabled) {
+  transform: scale(0.96);
 }
 .zoom-dock output {
-  border-radius: 9999px;
-  background: #f8fafc;
+  border-radius: 0.375rem;
+  background: #f4f5f7;
   color: #0f172a;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  padding: 0.3rem 0.6rem;
+  padding: 0.25rem 0.5rem;
 }
 .zoom-dock > span {
   border-left: 1px solid #e2e8f0;
@@ -384,10 +379,10 @@
   padding-left: 0.6rem;
 }
 
-/* Frosted translucent structural chrome floating over the ambient workspace. */
+/* Studio structural header & bars */
 .editor-ui > header {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(226, 232, 240, 0.85);
+  background: #ffffff;
+  border-color: #e2e8f0;
 }
 .editor-ui .pages-bar {
   background: transparent;
@@ -395,7 +390,7 @@
   gap: 0.75rem;
 }
 .editor-ui .timeline-bar {
-  background: rgba(255, 255, 255, 0.85);
+  background: #ffffff;
   border-color: #e2e8f0;
 }
 .editor-ui main {
@@ -408,11 +403,11 @@
 .editor-ui .brutal-border,
 .editor-ui .brutal-border-2 {
   border-color: var(--border);
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   box-shadow: none;
 }
 .editor-ui button:focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline: 2px solid rgba(37, 99, 235, 0.5);
   outline-offset: 2px;
 }
 .editor-ui input:focus-visible,
@@ -461,19 +456,20 @@
   font-family: var(--font-mono);
 }
 
-/* Tool rail: floating frosted glass dock */
+/* Tool rail: architectural studio rail */
 .editor-tool-rail {
-  background: rgba(255, 255, 255, 0.85);
+  background: #ffffff;
+  border-color: #e2e8f0;
 }
 .editor-tool-rail button {
-  transition: background-color 150ms ease, color 150ms ease;
+  transition: background-color 140ms ease, color 140ms ease;
 }
 
-/* Toolbar flyouts */
+/* Toolbar flyouts & menus */
 .toolbar-flyout {
   border-color: #e2e8f0;
-  border-radius: 1.25rem;
-  box-shadow: 0 18px 44px -12px rgba(15, 23, 42, 0.16), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
 /* ── Chrome text casing ─────────────────────────────────────────────────────
@@ -486,6 +482,7 @@
 .editor-ui .pages-bar,
 .editor-ui .timeline-bar,
 .editor-ui .zoom-dock,
+.editor-ui .studio-dock,
 .editor-ui .editor-tool-rail,
 .editor-ui .editor-side-panel,
 .editor-ui .editor-inspector,
@@ -556,17 +553,17 @@
   color: #e2e8f0;
 }
 .editor-dark.editor-ui > header {
-  background: rgba(13, 21, 38, 0.84) !important;
-  border-color: rgba(148, 163, 184, 0.16) !important;
+  background: #0d1526 !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
 }
 .editor-dark .pages-bar {
   background: transparent !important;
   border-color: transparent !important;
 }
 .editor-dark .editor-tool-rail {
-  background: rgba(16, 26, 46, 0.88) !important;
-  border-color: rgba(148, 163, 184, 0.18) !important;
-  box-shadow: 0 14px 38px -12px rgba(2, 6, 23, 0.55) !important;
+  background: #101a2e !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  box-shadow: 0 10px 28px -8px rgba(2, 6, 23, 0.55) !important;
 }
 .editor-dark.editor-ui main {
   background-color: transparent !important;
@@ -574,13 +571,15 @@
 .editor-dark .editor-side-panel,
 .editor-dark .editor-inspector,
 .editor-dark .zoom-dock,
+.editor-dark .studio-dock,
 .editor-dark .toolbar-flyout,
 .editor-dark .a11y-panel,
 .editor-dark .floating-hud,
 .editor-dark .selection-toolbar {
   background: #101a2e !important;
-  border-color: rgba(148, 163, 184, 0.2) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
   color: #e2e8f0;
+  box-shadow: 0 12px 32px -8px rgba(2, 6, 23, 0.6) !important;
 }
 .editor-dark .editor-side-panel .panel-content {
   color: #e2e8f0;
@@ -636,17 +635,27 @@
 .editor-dark :is(.editor-side-panel, .editor-inspector) :is(input, textarea)::placeholder {
   color: #64748b !important;
 }
-/* Toolbar buttons: dark pills, except primary gradient/blue CTAs. */
-.editor-dark .editor-ui > header button:not([class*="bg-gradient"]):not([class*="bg-blue"]) {
-  background-color: rgba(148, 163, 184, 0.1);
-  border-color: rgba(148, 163, 184, 0.2);
+/* Toolbar buttons: flat dark controls, preserving primary blue CTAs. */
+.editor-dark .editor-ui > header button:not([class*="bg-blue"]) {
+  background-color: transparent;
+  border-color: rgba(148, 163, 184, 0.22);
   color: #cbd5e1;
+}
+.editor-dark .editor-ui > header button:not([class*="bg-blue"]):hover:not(:disabled) {
+  background-color: rgba(148, 163, 184, 0.14);
+  color: #f8fafc;
 }
 .editor-dark .pages-bar {
   color: #cbd5e1;
 }
-.editor-dark .zoom-dock button {
-  color: #94a3b8;
+.editor-dark .zoom-dock button,
+.editor-dark .studio-dock button {
+  color: #cbd5e1;
+}
+.editor-dark .zoom-dock button:hover:not(:disabled),
+.editor-dark .studio-dock button:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.14);
+  color: #f8fafc;
 }
 .editor-dark .zoom-dock output {
   background: rgba(148, 163, 184, 0.12);

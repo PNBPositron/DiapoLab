@@ -8,10 +8,14 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { useEffect } from "react";
 import appCss from "../styles.css?url";
 import { Theme } from "@astryxdesign/core/theme";
 import { neutralTheme } from "@astryxdesign/theme-neutral/built";
 import { useAuthInit } from "@/hooks/use-auth";
+import { useSettings } from "@/store/settings";
+import { usePlugins } from "@/lib/plugins";
+import { loadCustomUiTheme } from "@/store/editor";
 
 function NotFoundComponent() {
   return (
@@ -99,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=JetBrains+Mono:wght@400..800&family=Unica+One&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap",
       },
       {
         rel: "stylesheet",
@@ -160,6 +164,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useAuthInit();
+
+  useEffect(() => {
+    loadCustomUiTheme();
+    void useSettings.persist.rehydrate();
+    void usePlugins.persist.rehydrate();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

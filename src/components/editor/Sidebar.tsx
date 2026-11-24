@@ -47,7 +47,7 @@ export function Sidebar() {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--font-display", '"Manrope", system-ui, sans-serif');
+    root.style.setProperty("--font-display", '"Plus Jakarta Sans", system-ui, sans-serif');
     root.style.setProperty("--font-mono", '"JetBrains Mono", ui-monospace, monospace');
     const custom = editorTheme.startsWith(CUSTOM_THEME_PREFIX)
       ? customThemes.find((t) => `${CUSTOM_THEME_PREFIX}${t.id}` === editorTheme)
@@ -91,16 +91,16 @@ export function Sidebar() {
           setHovering(true);
         }}
         title={t.label}
-        className={`group relative flex w-full flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium transition-all ${
+        className={`group relative flex w-full flex-col items-center gap-1 rounded-lg py-2 text-[11px] font-medium transition-colors ${
           active
-            ? "bg-blue-50/90 text-blue-600 shadow-[inset_0_0_0_1px_rgba(37,99,235,0.12)]"
-            : "text-slate-600 hover:bg-slate-100/75 hover:text-slate-900"
+            ? "bg-blue-50 text-blue-600"
+            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         }`}
       >
         {active && (
-          <span aria-hidden className="absolute left-0.5 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-blue-600" />
+          <span aria-hidden className="absolute left-0 top-1/2 h-5 w-[2.5px] -translate-y-1/2 rounded-r bg-blue-600" />
         )}
-        <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.85} />
+        <Icon className="h-[17px] w-[17px]" strokeWidth={active ? 2.1 : 1.75} />
         <span className="leading-none">{t.label}</span>
       </button>
     );
@@ -108,23 +108,23 @@ export function Sidebar() {
 
   return (
     <aside
-      className="editor-ui relative z-20 flex h-full shrink-0 py-3 pl-3"
+      className="editor-ui relative z-20 flex h-full shrink-0 py-2.5 pl-2.5"
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       <nav
         aria-label="Editor tools"
-        className="editor-tool-rail flex h-full w-[76px] min-h-0 shrink-0 flex-col justify-between overflow-y-auto overscroll-contain rounded-[24px] border border-slate-200/80 bg-white/88 px-1.5 py-2.5 shadow-[0_14px_38px_-12px_rgba(15,23,42,0.10),0_4px_14px_-4px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+        className="editor-tool-rail flex h-full w-[68px] min-h-0 shrink-0 flex-col justify-between overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white px-1.5 py-2 shadow-[0_8px_24px_-6px_rgba(15,23,42,0.10)]"
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
           {primaryTools.map(renderToolBtn)}
         </div>
-        <div className="mt-2 flex flex-col gap-2 border-t border-slate-200/70 pt-2">
+        <div className="mt-2 flex flex-col gap-2 border-t border-slate-200 pt-2">
           {bottomTools.map(renderToolBtn)}
           <div
             role="group"
             aria-label="Editor color mode"
-            className="editor-theme-pill mx-auto flex items-center rounded-full border border-slate-200/80 bg-slate-100/90 p-0.5"
+            className="editor-theme-pill mx-auto flex items-center rounded-md border border-slate-200 bg-slate-100 p-0.5"
           >
             <button
               type="button"
@@ -132,9 +132,9 @@ export function Sidebar() {
               aria-pressed={!editorDark}
               title="Light mode"
               aria-label="Light mode"
-              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-full transition-all ${
+              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-[5px] transition-colors ${
                 !editorDark
-                  ? "bg-white text-amber-500 shadow-[0_1px_4px_rgba(15,23,42,0.12)]"
+                  ? "bg-white text-amber-500 shadow-xs"
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -146,9 +146,9 @@ export function Sidebar() {
               aria-pressed={editorDark}
               title="Dark mode"
               aria-label="Dark mode"
-              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-full transition-all ${
+              className={`editor-theme-btn flex h-6 w-6 items-center justify-center rounded-[5px] transition-colors ${
                 editorDark
-                  ? "bg-slate-800 text-blue-300 shadow-[0_1px_4px_rgba(15,23,42,0.3)]"
+                  ? "bg-slate-800 text-blue-300 shadow-xs"
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -160,7 +160,7 @@ export function Sidebar() {
       <div
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
-        className={`editor-side-panel absolute left-[96px] top-3 z-40 h-[calc(100%-1.5rem)] w-[304px] origin-left overflow-y-auto rounded-[24px] border border-white/90 bg-white/95 p-4 shadow-[0_24px_56px_-14px_rgba(15,23,42,0.16),0_4px_14px_-4px_rgba(37,99,235,0.08)] backdrop-blur-xl will-change-[transform,opacity] ${
+        className={`editor-side-panel absolute left-[84px] top-2.5 z-40 h-[calc(100%-1.25rem)] w-[300px] origin-left overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 will-change-[transform,opacity] ${
           panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"
         }`}
       >

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BookOpen, Terminal } from "lucide-react";
 
@@ -12,6 +13,12 @@ export const Route = createFileRoute("/mcp-guide")({
 });
 
 function McpGuide() {
+  const [mcpUrl, setMcpUrl] = useState("https://your-diapolab-domain/mcp");
+
+  useEffect(() => {
+    setMcpUrl(`${window.location.origin}/mcp`);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
@@ -62,7 +69,7 @@ function McpGuide() {
           <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-950 p-5 text-sm text-slate-100">
             <p className="mb-2 font-mono text-xs text-slate-400">MCP server URL</p>
             <code className="break-all font-mono text-xs text-blue-300 sm:text-sm">
-              {typeof window === "undefined" ? "https://your-diapolab-domain/mcp" : `${window.location.origin}/mcp`}
+              {mcpUrl}
             </code>
           </div>
 
