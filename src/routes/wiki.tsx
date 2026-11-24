@@ -474,7 +474,10 @@ function Wiki() {
                 <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph,
                 tv, neon, cube, blur, three parallax modes, reveal, shutter, swirl,
                 warp, prism and origami. Pick one per slide from the dock under the
-                canvas, with a live preview.
+                canvas, with a live preview. A short sound can accompany each
+                transition: enable <strong>Slide sound effects</strong> in Settings and
+                pick a soft whoosh or a subtle click, then use <strong>Test sound</strong>{" "}
+                to preview it.
               </li>
               <li>
                 <strong>Element animations</strong> — entrance animations per element
@@ -539,17 +542,24 @@ function Wiki() {
             title="Dark mode & accessibility"
           >
             <p>
-              Toggle <strong>dark mode</strong> with the moon/sun button in the toolbar.
-              The whole editor chrome switches to dark — panels, toolbar, zoom dock and
-              scrollbars — while the canvas keeps your slide's own colors, so what you
-              design is exactly what your audience sees.
+              Toggle <strong>dark mode</strong> with the moon/sun pill at the bottom of
+              the tool rail. The whole editor chrome switches to dark — panels, toolbar,
+              zoom dock and scrollbars — while the canvas keeps your slide's own
+              colors, so what you design is exactly what your audience sees.
             </p>
             <p>
-              The built-in <strong>accessibility checker</strong> (in Settings) reviews
-              your deck for WCAG contrast issues, fonts that are too small to read from
-              a distance, and elements that sit outside the visible canvas, so you can
-              fix them before presenting. Both dark mode and the checker toggles live in{" "}
-              <strong>Settings</strong>.
+              The built-in <strong>accessibility checker</strong> (in Settings) checks
+              the current slide for WCAG contrast issues, fonts that are too small to
+              read from a distance, and elements that sit outside the visible canvas,
+              so you can fix them before presenting.
+            </p>
+            <p>
+              Settings also gathers the rest of the comfort options: an{" "}
+              <strong>editor theme</strong> picker for the chrome, a{" "}
+              <strong>workspace background</strong> behind the canvas (a preset
+              backdrop, a solid tint or your own image), and <strong>reduced motion</strong>{" "}
+              controls with duration and spring sliders for panel animations.
+              Preferences are stored on the device.
             </p>
           </Section>
 
@@ -563,13 +573,17 @@ function Wiki() {
               <FileUp className="mr-1 inline size-3.5 text-blue-500" />
               <strong>Publish a template</strong> — from the toolbar menu, share your
               deck with the community. It appears in the Home panel and on the{" "}
-              <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>.
+              <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>,
+              and you can rename or unpublish it at any time from{" "}
+              <strong>Settings → My published templates</strong>.
             </p>
             <p className="mt-2">
               <Presentation className="mr-1 inline size-3.5 text-blue-500" />
               <strong>Share a deck</strong> — the share button copies a private share
               link. Anyone with the link opens a clean view-only page with a Present
-              button and a page counter, without ever seeing your editor.
+              button and a page counter, without ever seeing your editor. Manage your
+              links from <strong>Settings → Private share links</strong>: copy them
+              again or revoke any link, cutting off access instantly.
             </p>
             <p className="mt-2">
               <strong>Export & import</strong> — the Export menu saves the current
