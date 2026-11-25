@@ -1,10 +1,10 @@
 import { useState } from "react";
 import {
   Clapperboard,
+  Layers,
   LayoutGrid,
   Maximize2,
   Palette,
-  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { ColorPanel } from "./ColorPanel";
@@ -53,7 +53,7 @@ const SECTIONS: {
     short: "Brand",
     title: "Brand & master",
     subtitle: "Brand kit, typography & deck-wide style",
-    Icon: Sparkles,
+    Icon: Layers,
     children: <BrandAndMasterSection />,
   },
   {

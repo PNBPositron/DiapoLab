@@ -262,7 +262,7 @@ export function Canvas() {
           >
             <div
               id="canvas-export"
-              className="absolute left-0 top-0 overflow-hidden rounded-[24px] ring-1 ring-slate-200/80 shadow-[0_26px_64px_-16px_rgba(37,99,235,0.13),0_10px_28px_-8px_rgba(15,23,42,0.10)]"
+              className="absolute left-0 top-0 overflow-hidden rounded-lg ring-1 ring-slate-200/80 shadow-[0_20px_50px_-14px_rgba(15,23,42,0.12)]"
               style={{
                 width: canvasW,
                 height: canvasH,
@@ -344,7 +344,7 @@ export function Canvas() {
             {canvasGrid && (
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-0 overflow-hidden rounded-[24px]"
+                className="pointer-events-none absolute left-0 top-0 overflow-hidden rounded-lg"
                 style={{
                   width: canvasW,
                   height: canvasH,
@@ -360,11 +360,11 @@ export function Canvas() {
         </div>
       </div>
 
-      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center gap-1 rounded-full border border-white/95 bg-white/92 px-3 text-slate-700 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.15),0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-xl">
+      <div className="zoom-dock absolute bottom-4 left-1/2 z-10 flex h-9 -translate-x-1/2 items-center gap-0.5 px-2">
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-7 w-7 rounded-md"
           title="Zoom out"
           aria-label="Zoom out"
           disabled={scale <= 0.1}
@@ -377,14 +377,14 @@ export function Canvas() {
           onClick={() => setZoom(null)}
           title="Fit to screen"
           aria-label="Fit to screen"
-          className="min-w-11 whitespace-nowrap rounded-full px-2 py-1 text-center font-mono text-xs font-semibold tabular-nums text-slate-800 transition hover:bg-slate-100"
+          className="min-w-11 whitespace-nowrap rounded-md px-2 py-1 text-center font-mono text-xs font-semibold tabular-nums transition"
         >
           {Math.round(scale * 100)}%
         </button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-7 w-7 rounded-md"
           title="Zoom in"
           aria-label="Zoom in"
           disabled={scale >= 3}
@@ -392,33 +392,33 @@ export function Canvas() {
         >
           <Plus className="size-3.5" />
         </Button>
-        <span className="hidden whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
+        <span className="hidden whitespace-nowrap px-2.5 font-mono text-[11px] tabular-nums opacity-70 sm:inline">
           {canvasW}×{canvasH}
         </span>
-        <span className="whitespace-nowrap px-2.5 font-mono text-[11px] font-medium tabular-nums text-slate-600">
+        <span className="whitespace-nowrap px-2.5 font-mono text-[11px] font-medium tabular-nums">
           {currentIndex + 1} / {pages.length}
         </span>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-7 w-7 rounded-md"
           title={snapping ? "Snapping on (Alt to bypass while dragging)" : "Snapping off"}
           aria-label="Toggle snapping"
           aria-pressed={snapping}
           onClick={toggleSnapping}
         >
-          <Magnet className={"size-4 " + (snapping ? "text-blue-600" : "text-slate-400")} />
+          <Magnet className={"size-4 " + (snapping ? "text-blue-600" : "opacity-60")} />
         </Button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-7 w-7 rounded-md"
           title={canvasGrid ? "Hide alignment grid" : "Show alignment grid"}
           aria-label="Toggle alignment grid"
           aria-pressed={canvasGrid}
           onClick={toggleCanvasGrid}
         >
-          <Grid3x3 className={"size-4 " + (canvasGrid ? "text-blue-600" : "text-slate-400")} />
+          <Grid3x3 className={"size-4 " + (canvasGrid ? "text-blue-600" : "opacity-60")} />
         </Button>
         <Popover>
           <PopoverTrigger asChild>
@@ -426,20 +426,17 @@ export function Canvas() {
               type="button"
               variant="ghost"
               size="icon"
-              className="relative h-7 w-7 rounded-full"
+              className="relative h-7 w-7 rounded-md"
               title="Speaker notes for this slide"
               aria-label="Speaker notes"
             >
-              <StickyNote className={"size-4 " + (notesText.trim() ? "text-amber-500" : "text-slate-500")} />
-              {notesText.trim() && (
-                <span className="absolute right-1 top-1 size-1.5 rounded-full bg-amber-500" />
-              )}
+              <StickyNote className={"size-4 " + (notesText.trim() ? "text-amber-500" : "opacity-70")} />
             </Button>
           </PopoverTrigger>
           <PopoverContent
             side="top"
             align="center"
-            className={`w-80 rounded-2xl border p-3.5 shadow-2xl ${
+            className={`w-80 rounded-xl border p-3.5 shadow-xl ${
               editorDark
                 ? "border-slate-700 bg-slate-900 text-slate-100"
                 : "border-slate-200 bg-white text-slate-900"
@@ -450,7 +447,7 @@ export function Canvas() {
                 <StickyNote className="size-3.5 text-amber-500" />
                 Speaker notes · Slide #{currentIndex + 1}
               </span>
-              <span className="font-mono text-[10px] text-slate-400">
+              <span className="font-mono text-[10px] tabular-nums text-slate-400">
                 {notesWords} {notesWords === 1 ? "word" : "words"}
                 {notesWords > 0 ? ` · ~${Math.max(1, Math.round(notesWords / 2.2))}s` : ""}
               </span>
@@ -460,7 +457,7 @@ export function Canvas() {
               value={notesText}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Write talking points shown in Presenter View (press P while presenting)..."
-              className={`w-full resize-y rounded-xl border px-3 py-2 text-xs leading-relaxed outline-none transition focus:ring-2 focus:ring-blue-500/25 ${
+              className={`w-full resize-y rounded-md border px-3 py-2 text-xs leading-relaxed outline-none transition focus:ring-2 focus:ring-blue-500/25 ${
                 editorDark
                   ? "border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-500"
                   : "border-slate-200 bg-slate-50 text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white"
@@ -471,7 +468,7 @@ export function Canvas() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-full"
+          className="h-7 w-7 rounded-md"
           title="Slide version history"
           aria-label="Slide version history"
           onClick={() => setHistoryOpen(true)}
@@ -485,7 +482,7 @@ export function Canvas() {
               variant="ghost"
               aria-label="Slide transition"
               title="Slide transition & animations"
-              className="h-7 gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-medium text-slate-700"
+              className="h-7 gap-1.5 whitespace-nowrap rounded-md px-2 text-xs font-medium"
             >
               <WandSparkles className="size-3.5" aria-hidden="true" />
               {formatTransitionLabel(currentTransition)}
@@ -495,7 +492,7 @@ export function Canvas() {
           <PopoverContent
             side="top"
             align="end"
-            className="selector-panel space-y-3 rounded-3xl p-3.5"
+            className="selector-panel space-y-3 rounded-xl p-3.5"
           >
             <PanelHeader title="Slide transition">
               <button
@@ -507,7 +504,7 @@ export function Canvas() {
                 }}
                 aria-pressed={transitionSound}
                 title={transitionSound ? "Transition sound effects on" : "Transition sound effects off"}
-                className={`flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-medium transition ${
+                className={`flex h-7 items-center gap-1.5 rounded-md border px-2.5 text-[11px] font-medium transition ${
                   transitionSound
                     ? "border-blue-200 bg-blue-50 text-blue-700"
                     : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
@@ -518,10 +515,10 @@ export function Canvas() {
               </button>
             </PanelHeader>
             {selectedId && (
-              <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-2.5">
+              <div className="rounded-lg border border-slate-200/80 bg-slate-50/80 p-2.5">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-500">Selected object motion</span>
-                  <span className="text-[9px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                  <span className="text-[11px] font-semibold text-slate-500">Selected object motion</span>
+                  <span className="text-[10px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
                 </div>
                 <OptionGrid
                   columns={3}
@@ -566,7 +563,7 @@ export function Canvas() {
               <button
                 type="button"
                 onClick={() => setSceneEditorOpen(true)}
-                className="flex w-full items-center justify-between rounded-2xl border border-blue-200/80 bg-blue-50/75 px-3 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-100/80"
+                className="flex w-full items-center justify-between rounded-lg border border-blue-200/80 bg-blue-50/75 px-3 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-100/80"
               >
                 <span className="flex items-center gap-2">
                   <SlidersHorizontal className="size-3.5" aria-hidden="true" />
@@ -575,11 +572,11 @@ export function Canvas() {
                 <span className="flex items-center gap-1.5">
                   <span className="text-[10px] capitalize opacity-75">{currentThreeScene.scenePreset}</span>
                   <span
-                    className="size-3 rounded-full border border-white/70 shadow-xs"
+                    className="size-3 rounded-sm border border-white/70"
                     style={{ backgroundColor: currentThreeScene.bgColor }}
                   />
                   <span
-                    className="size-3 rounded-full border border-white/70 shadow-xs"
+                    className="size-3 rounded-sm border border-white/70"
                     style={{ backgroundColor: currentThreeScene.accentColor }}
                   />
                 </span>
@@ -611,12 +608,12 @@ export function Canvas() {
             onClick={() => setSceneEditorOpen(true)}
             aria-label="Edit 3D scene and colors"
             title="Edit 3D scene & colors"
-            className="h-7 gap-1.5 whitespace-nowrap rounded-full px-2.5 text-xs font-medium text-blue-700"
+            className="h-7 gap-1.5 whitespace-nowrap rounded-md px-2 text-xs font-medium text-blue-700"
           >
             <Palette className="size-3.5 text-blue-600" aria-hidden="true" />
             <span>3D Scene</span>
             <span
-              className="size-2.5 rounded-full border border-white/70 shadow-xs"
+              className="size-2.5 rounded-sm border border-white/70"
               style={{ backgroundColor: currentThreeScene.accentColor }}
               aria-hidden="true"
             />
@@ -629,7 +626,7 @@ export function Canvas() {
         <div
           onMouseDown={(e) => e.stopPropagation()}
           style={{ left: ctxMenu.x, top: ctxMenu.y }}
-          className={`fixed z-[80] w-56 rounded-2xl border p-1.5 text-xs shadow-2xl ${
+          className={`fixed z-[80] w-56 rounded-xl border p-1.5 text-xs shadow-xl ${
             editorDark
               ? "border-slate-700 bg-slate-900 text-slate-100"
               : "border-slate-200 bg-white text-slate-800"
@@ -643,7 +640,7 @@ export function Canvas() {
                   duplicateSelected();
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -659,7 +656,7 @@ export function Canvas() {
                   copySelected();
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -676,7 +673,7 @@ export function Canvas() {
                     paste();
                     setCtxMenu(null);
                   }}
-                  className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                     editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                   }`}
                 >
@@ -689,7 +686,7 @@ export function Canvas() {
               )}
               <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
               <div className="px-2 py-1">
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <div className="mb-1 text-[11px] font-semibold text-slate-400">
                   Align
                 </div>
                 <div className="grid grid-cols-6 gap-1">
@@ -709,7 +706,7 @@ export function Canvas() {
                         alignSelected(mode);
                         setCtxMenu(null);
                       }}
-                      className={`grid size-7 place-items-center rounded-lg transition ${
+                      className={`grid size-7 place-items-center rounded-md transition ${
                         editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                       }`}
                     >
@@ -725,7 +722,7 @@ export function Canvas() {
                   bringToFront(activeEl.id);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -738,7 +735,7 @@ export function Canvas() {
                   bringForward(activeEl.id);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -751,7 +748,7 @@ export function Canvas() {
                   sendBackward(activeEl.id);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -764,7 +761,7 @@ export function Canvas() {
                   sendToBack(activeEl.id);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -779,7 +776,7 @@ export function Canvas() {
                     else groupSelected();
                     setCtxMenu(null);
                   }}
-                  className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                  className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                     editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                   }`}
                 >
@@ -802,7 +799,7 @@ export function Canvas() {
                   update(activeEl.id, { locked: !activeEl.locked } as never);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -824,7 +821,7 @@ export function Canvas() {
                   toggleHideInPresent(activeEl.id);
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -847,7 +844,7 @@ export function Canvas() {
                   removeSelected();
                   setCtxMenu(null);
                 }}
-                className="flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-rose-500 transition hover:bg-rose-500/10"
+                className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-rose-500 transition hover:bg-rose-500/10"
               >
                 <span className="flex items-center gap-2">
                   <Trash2 className="size-3.5" />
@@ -865,7 +862,7 @@ export function Canvas() {
                     paste();
                     setCtxMenu(null);
                   }}
-                  className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                  className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                     editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                   }`}
                 >
@@ -882,7 +879,7 @@ export function Canvas() {
                   selectAll();
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -898,7 +895,7 @@ export function Canvas() {
                   toggleCanvasGrid();
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >
@@ -913,7 +910,7 @@ export function Canvas() {
                   toggleSnapping();
                   setCtxMenu(null);
                 }}
-                className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
                   editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
                 }`}
               >

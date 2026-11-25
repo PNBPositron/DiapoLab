@@ -1,15 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, Sparkles, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2, Wallpaper, MonitorOff } from "lucide-react";
+import { ChevronDown, Loader2, Pencil, Trash2, X, Settings as SettingsIcon, Code2, LayoutDashboard, SlidersHorizontal, Palette, Globe, Check, Link2, Copy, ExternalLink, Volume2, Wallpaper, MonitorOff } from "lucide-react";
 import { useSettings, PANEL_LABELS, EDITOR_THEMES, springEasing, type PanelId, type TransitionSoundStyle } from "@/store/settings";
 import { WorkspaceBackgroundPicker } from "./WorkspaceBackground";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, listMyShareLinks, deleteShareLink, type PublicTemplate, type ShareLink } from "@/lib/designs";
 import { playTransitionSound } from "@/lib/transition-sound";
+import { formatUtcDate } from "@/lib/date";
 
-const title = "text-[11px] font-semibold tracking-[0.04em] text-slate-700";
-const help = "mt-1 text-[10px] leading-relaxed text-slate-400";
+const title = "text-xs font-semibold text-slate-800";
+const help = "mt-0.5 text-[11px] leading-relaxed text-slate-500";
 
 /** Section card with icon + title + help text + optional trailing node. */
 function Section({
@@ -31,11 +32,11 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="group mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-blue-200/80 hover:shadow-[0_8px_24px_rgba(37,99,235,0.07)]">
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5">
+    <section className="mb-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4">
         {collapsible ? (
           <button onClick={() => setOpen((o) => !o)} className="flex min-w-0 items-center gap-3 text-left">
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
+            <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-500">
               {icon}
             </span>
             <span className="min-w-0">
@@ -48,7 +49,7 @@ function Section({
           </button>
         ) : (
           <div className="flex min-w-0 items-center gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
+            <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-500">
               {icon}
             </span>
             <div className="min-w-0">
@@ -59,7 +60,7 @@ function Section({
         )}
         {trailing}
       </div>
-      {open && children && <div className="border-t border-slate-100 p-4 sm:p-5">{children}</div>}
+      {open && children && <div className="border-t border-slate-200/80 p-4">{children}</div>}
     </section>
   );
 }
@@ -196,19 +197,17 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
   const totalPanels = Object.keys(PANEL_LABELS).length;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-xs sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/35 p-3 backdrop-blur-xs sm:p-6" onClick={onClose}>
       <div
-        className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-3xl border border-slate-200 bg-white text-slate-800 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)] sm:my-6"
+        className="relative my-3 max-h-[min(900px,calc(100vh-1.5rem))] w-full max-w-4xl overflow-y-auto overflow-x-hidden rounded-xl border border-slate-200 bg-white text-slate-800 shadow-2xl sm:my-6"
         onClick={(event) => event.stopPropagation()}
       >
         {/* Header */}
-        <header className="relative border-b border-slate-200 bg-white px-5 pb-4 pt-4 sm:px-6">
-          <div className="relative flex items-center gap-3 pr-12">
-            <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-blue-600 text-white">
-              <SettingsIcon className="size-4.5" />
-            </div>
+        <header className="relative border-b border-slate-200 bg-white px-5 py-4 sm:px-6">
+          <div className="relative flex items-center gap-2.5 pr-12">
+            <SettingsIcon className="size-4 shrink-0 text-slate-500" />
             <div className="min-w-0">
-              <h2 className="font-display text-lg font-semibold tracking-tight text-slate-900">
+              <h2 className="text-base font-semibold tracking-tight text-slate-900">
                 Settings
               </h2>
               <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -220,7 +219,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
         <button
           onClick={onClose}
           aria-label="Close settings"
-          className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800"
+          className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800"
         >
           <X className="size-4" />
         </button>
@@ -240,23 +239,23 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             }
           />
           {developerOpen && (
-            <section className="mb-4 overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 shadow-lg">
-              <div className="p-4 sm:p-5">
+            <section className="mb-4 overflow-hidden rounded-lg border border-slate-800 bg-slate-900">
+              <div className="p-4">
                 <textarea
                   value={jsonDraft}
                   onChange={(event) => { setJsonDraft(event.target.value); setJsonStatus(null); }}
                   spellCheck={false}
-                  className="h-72 w-full resize-y rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
+                  className="h-72 w-full resize-y rounded-md border border-slate-700 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-200 outline-none transition-colors focus:border-blue-500"
                 />
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className={`font-mono text-[10px] ${jsonStatus?.includes("updated") ? "text-blue-400" : "text-slate-400"}`}>
+                  <span className={`font-mono text-[11px] ${jsonStatus?.includes("updated") ? "text-blue-400" : "text-slate-400"}`}>
                     {jsonStatus ?? `${pages.length} slides loaded`}
                   </span>
                   <button
                     onClick={applyJson}
-                    className="flex items-center gap-1.5 rounded-full bg-blue-600 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-white transition-all hover:bg-blue-700 active:scale-95"
+                    className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
                   >
-                    <Check className="size-3" /> Apply changes
+                    <Check className="size-3.5" /> Apply changes
                   </button>
                 </div>
               </div>
@@ -281,14 +280,14 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   <button
                     key={id}
                     onClick={() => togglePanel(id)}
-                    className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left text-xs font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-2.5 rounded-md border px-3 py-2 text-left text-xs font-medium transition-colors ${
                       on
-                        ? "border-blue-200 bg-blue-50/70 text-blue-700 shadow-[0_2px_8px_rgba(37,99,235,0.08)]"
-                        : "border-slate-200 bg-white text-slate-400 hover:border-slate-300 hover:bg-slate-50"
+                        ? "border-blue-300 bg-blue-50/70 text-blue-700"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
                     <span
-                      className={`grid size-4.5 shrink-0 place-items-center rounded-full border transition-colors ${
+                      className={`grid size-4 shrink-0 place-items-center rounded border transition-colors ${
                         on ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 bg-white"
                       }`}
                     >
@@ -299,27 +298,27 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 );
               })}
             </div>
-            <p className="mt-3 text-right font-mono text-[9px] text-slate-400">
+            <p className="mt-2.5 text-right font-mono text-[11px] tabular-nums text-slate-400">
               {visibleCount}/{totalPanels} visible
             </p>
           </Section>
 
           {/* Panel motion */}
           <Section
-            icon={<Sparkles className="size-4" />}
+            icon={<SlidersHorizontal className="size-4" />}
             label="Panel motion"
             desc="Animation duration, spring stiffness and accessibility."
             collapsible
             defaultOpen={false}
             trailing={
-              <button onClick={resetMotion} className="shrink-0 text-[10px] font-medium text-slate-400 underline transition-colors hover:text-slate-700">
+              <button onClick={resetMotion} className="shrink-0 text-[11px] font-medium text-slate-500 underline transition-colors hover:text-slate-800">
                 Reset
               </button>
             }
           >
             <div className="space-y-4">
               <label className="block text-xs text-slate-600">
-                Duration <span className="text-slate-400">{panelDurationMs}ms</span>
+                Duration <span className="font-mono tabular-nums text-slate-400">{panelDurationMs}ms</span>
                 <input
                   type="range"
                   min={0}
@@ -332,7 +331,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 />
               </label>
               <label className="block text-xs text-slate-600">
-                Spring stiffness <span className="text-slate-400">{panelStiffness}</span>
+                Spring stiffness <span className="font-mono tabular-nums text-slate-400">{panelStiffness}</span>
                 <input
                   type="range"
                   min={0}
@@ -343,17 +342,17 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   className="mt-2 w-full accent-blue-600 disabled:opacity-40"
                 />
               </label>
-              <div className="h-8 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+              <div className="h-7 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
                 <div
                   key={`${panelDurationMs}-${panelStiffness}-${reduceMotion}`}
-                  className="h-full w-1/3 rounded-full bg-blue-500"
+                  className="h-full w-1/3 rounded-md bg-blue-600"
                   style={{ animation: reduceMotion ? undefined : `panel-motion-demo ${panelDurationMs}ms ${springEasing(panelStiffness)} both` }}
                 />
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
                 <div>
-                  <div className="text-[11px] font-semibold text-slate-700">Reduced motion</div>
-                  <p className="mt-0.5 text-[10px] text-slate-400">Disable panel animations.</p>
+                  <div className="text-xs font-medium text-slate-700">Reduced motion</div>
+                  <p className="mt-0.5 text-[11px] text-slate-500">Disable panel animations.</p>
                 </div>
                 <Switch on={reduceMotion} label="Reduced motion" onClick={() => setReduceMotion(!reduceMotion)} />
               </div>
@@ -373,19 +372,19 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   <button
                     key={theme.id}
                     onClick={() => setEditorTheme(theme.id)}
-                    className={`relative rounded-2xl border p-3.5 text-left transition-all duration-200 ${
+                    className={`relative rounded-md border p-3 text-left transition-colors ${
                       on
-                        ? "border-blue-400 bg-blue-50/70 shadow-[0_4px_16px_rgba(37,99,235,0.12)]"
+                        ? "border-blue-400 bg-blue-50/70"
                         : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
                     {on && (
-                      <span className="absolute right-2.5 top-2.5 grid size-4 place-items-center rounded-full bg-blue-600 text-white shadow">
+                      <span className="absolute right-2.5 top-2.5 grid size-4 place-items-center rounded bg-blue-600 text-white">
                         <Check className="size-2.5" strokeWidth={3} />
                       </span>
                     )}
-                    <div className={`text-xs font-semibold ${on ? "text-blue-700" : "text-slate-600"}`}>{theme.label}</div>
-                    <div className="mt-1 text-[10px] text-slate-400">{theme.hint}</div>
+                    <div className={`text-xs font-semibold ${on ? "text-blue-700" : "text-slate-700"}`}>{theme.label}</div>
+                    <div className="mt-0.5 text-[11px] text-slate-500">{theme.hint}</div>
                   </button>
                 );
               })}
@@ -407,20 +406,20 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             label="Appearance & accessibility"
             desc="Dark editor chrome and on-slide accessibility checks."
           >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
                 <div>
-                  <div className="text-[11px] font-semibold text-slate-700">Dark editor</div>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <div className="text-xs font-medium text-slate-700">Dark editor</div>
+                  <p className="mt-0.5 text-[11px] text-slate-500">
                     Dark chrome around the slides. Slide content is untouched.
                   </p>
                 </div>
                 <Switch on={editorDark} label="Dark editor" onClick={() => setEditorDark(!editorDark)} />
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+              <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
                 <div>
-                  <div className="text-[11px] font-semibold text-slate-700">Accessibility checker</div>
-                  <p className="mt-0.5 text-[10px] text-slate-400">
+                  <div className="text-xs font-medium text-slate-700">Accessibility checker</div>
+                  <p className="mt-0.5 text-[11px] text-slate-500">
                     Flags low-contrast text, small fonts and off-canvas elements on the current slide.
                   </p>
                 </div>
@@ -435,7 +434,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             label="Present mode display"
             desc="Control which presenter overlays appear while presenting (or press H anytime for clean screen)."
           >
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {[
                 {
                   title: "Hide presenter toolbar",
@@ -445,7 +444,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 },
                 {
                   title: "Hide 3D Stage button",
-                  desc: "Hide the bottom-right 3D Stage launcher pill (still accessible with key 3).",
+                  desc: "Hide the bottom-right 3D Stage launcher (still accessible with key 3).",
                   on: presentHide3dButton,
                   toggle: () => setPresentHide3dButton(!presentHide3dButton),
                 },
@@ -470,11 +469,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3"
+                  className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5"
                 >
                   <div>
-                    <div className="text-[11px] font-semibold text-slate-700">{item.title}</div>
-                    <p className="mt-0.5 text-[10px] text-slate-400">{item.desc}</p>
+                    <div className="text-xs font-medium text-slate-700">{item.title}</div>
+                    <p className="mt-0.5 text-[11px] text-slate-500">{item.desc}</p>
                   </div>
                   <Switch on={item.on} label={item.title} onClick={item.toggle} />
                 </div>
@@ -515,7 +514,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         setTransitionSoundStyle(opt.id);
                         playTransitionSound({ force: true, style: opt.id });
                       }}
-                      className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all disabled:opacity-45 ${
+                      className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-45 ${
                         active
                           ? "border-blue-600 bg-blue-50 text-blue-700"
                           : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
@@ -529,7 +528,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => playTransitionSound({ force: true, style: transitionSoundStyle })}
-                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-300 hover:text-blue-600"
+                className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
               >
                 <Volume2 className="size-3.5" />
                 Test sound
@@ -556,20 +555,20 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                   return (
                     <li
                       key={link.id}
-                      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
+                      className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-2.5 transition-colors hover:border-slate-300"
                     >
-                      <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-400">
+                      <div className="grid size-10 shrink-0 place-items-center rounded bg-slate-100 text-slate-500">
                         <Link2 className="size-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-xs font-medium text-slate-700">{link.design_name ?? "Deleted design"}</div>
+                        <div className="truncate text-xs font-medium text-slate-800">{link.design_name ?? "Deleted design"}</div>
                         <div className="truncate font-mono text-[10px] text-slate-400" title={url}>{url}</div>
-                        <div className="text-[10px] text-slate-400">Created {new Date(link.created_at).toLocaleDateString()}</div>
+                        <div className="text-[11px] tabular-nums text-slate-400">Created {formatUtcDate(link.created_at)}</div>
                       </div>
                       <button
                         onClick={() => copyShare(link)}
                         disabled={shareBusy === link.id}
-                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
+                        className="grid size-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                         aria-label={`Copy link for ${link.design_name ?? "deleted design"}`}
                         title="Copy link"
                       >
@@ -579,7 +578,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
+                        className="grid size-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                         aria-label={`Open link for ${link.design_name ?? "deleted design"}`}
                         title="Open link"
                       >
@@ -588,7 +587,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                       <button
                         onClick={() => removeShare(link)}
                         disabled={shareBusy === link.id}
-                        className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                        className="grid size-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
                         aria-label={`Revoke link for ${link.design_name ?? "deleted design"}`}
                         title="Revoke link"
                       >
@@ -619,21 +618,21 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 {templates.map((template) => (
                   <li
                     key={template.id}
-                    className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-200"
+                    className="flex items-center gap-3 rounded-md border border-slate-200 bg-white p-2.5 transition-colors hover:border-slate-300"
                   >
-                    <div className="size-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                    <div className="size-10 shrink-0 overflow-hidden rounded bg-slate-100">
                       {template.thumbnail && <img src={template.thumbnail} alt="" className="h-full w-full object-cover" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-medium text-slate-700">{template.name}</div>
-                      <div className="text-[10px] text-slate-400">
-                        {new Date(template.created_at).toLocaleDateString()} · {template.pages?.length ?? 0} slides
+                      <div className="truncate text-xs font-medium text-slate-800">{template.name}</div>
+                      <div className="text-[11px] tabular-nums text-slate-400">
+                        {formatUtcDate(template.created_at)} · {template.pages?.length ?? 0} slides
                       </div>
                     </div>
                     <button
                       onClick={() => rename(template)}
                       disabled={busy === template.id}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-slate-100"
+                      className="grid size-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                       aria-label={`Rename ${template.name}`}
                     >
                       <Pencil className="size-3.5" />
@@ -641,7 +640,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                     <button
                       onClick={() => remove(template)}
                       disabled={busy === template.id}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                      className="grid size-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
                       aria-label={`Unpublish ${template.name}`}
                     >
                       {busy === template.id ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
@@ -653,8 +652,8 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
             {error && <p className="mt-3 text-xs text-rose-600">{error}</p>}
           </Section>
 
-          {/* Footer nav — chips */}
-          <nav className="flex flex-wrap gap-2 border-t border-slate-200 pt-4 text-xs text-slate-400">
+          {/* Footer nav */}
+          <nav className="flex flex-wrap gap-4 border-t border-slate-200 pt-4 text-xs">
             {[
               { to: "/marketplace" as const, label: "Marketplace" },
               { to: "/license" as const, label: "License" },
@@ -664,7 +663,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 key={link.to}
                 to={link.to}
                 onClick={onClose}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-500 transition-all hover:border-blue-300 hover:text-blue-600"
+                className="font-medium text-slate-500 transition-colors hover:text-slate-900"
               >
                 {link.label}
               </Link>

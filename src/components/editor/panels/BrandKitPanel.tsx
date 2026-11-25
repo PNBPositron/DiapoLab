@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSettings, DEFAULT_BRAND_KIT, type BrandKit, type CustomFont } from "@/store/settings";
-import { WandSparkles, Check, Layers, RotateCcw, Upload, Trash2, Lock, LockOpen } from "lucide-react";
+import { Check, Layers, Palette, RotateCcw, SlidersHorizontal, Upload, Trash2, Lock, LockOpen } from "lucide-react";
 import { EDITOR_COLOR_PALETTE, useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
@@ -91,7 +91,7 @@ export function BrandKitPanel() {
         <button
           type="button"
           onClick={() => setBrandKit({ locked: !locked })}
-          className={`flex w-full items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-[11px] font-semibold transition ${
+          className={`flex w-full items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-[11px] font-semibold transition ${
             locked
               ? "border-amber-300 bg-amber-50 text-amber-700"
               : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
@@ -109,16 +109,16 @@ export function BrandKitPanel() {
           type="button"
           onClick={generateRandomKit}
           disabled={generating}
-          className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+          className="group flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-60"
         >
-          <WandSparkles className={`size-3.5 ${generating ? "animate-spin" : "transition-transform group-hover:rotate-12"}`} />
+          <Palette className="size-3.5" />
           {generating ? "Generating…" : "Generate random palette"}
         </button>
       </div>
 
       {/* Aperçu live du kit */}
       <div className="px-4">
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_4px_rgba(15,23,42,0.04)]">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           <div className="relative">
             <div
               className="flex h-24 items-center justify-center px-4"
@@ -154,14 +154,14 @@ export function BrandKitPanel() {
             <button
               type="button"
               onClick={() => setOpenKey(openKey === s.key ? null : s.key)}
-              className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition ${
+              className={`flex w-full items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition ${
                 openKey === s.key
                   ? "border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/10"
                   : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
               <span
-                className="size-6 shrink-0 rounded-full border border-slate-200 shadow-2xs"
+                className="size-6 shrink-0 rounded-md border border-slate-200"
                 style={{ backgroundColor: brandKit[s.key] as string }}
               />
               <span className="min-w-0 flex-1">
@@ -246,34 +246,34 @@ export function BrandKitPanel() {
         <button
           type="button"
           onClick={adaptToSlide}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100"
+          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100"
         >
-          <WandSparkles className="size-3.5" /> Adapt presets to slide look
+          <SlidersHorizontal className="size-3.5" /> Adapt presets to slide look
         </button>
         <div className="text-[10px] font-semibold tracking-wide text-slate-500">Apply brand kit</div>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={adaptToSlide}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-[11px] font-semibold text-indigo-700 shadow-2xs transition hover:border-indigo-300 hover:bg-indigo-100"
+            className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
           >
-            <WandSparkles className="size-3.5" /> Adapt to slide
+            <SlidersHorizontal className="size-3.5" /> Adapt to slide
           </button>
           <button
             onClick={() => applyBrandKit(brandKit, "slide")}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50"
+            className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
             <Check className="size-3.5 text-blue-600" /> This slide
           </button>
           <button
             onClick={() => applyBrandKit(brandKit, "deck")}
-            className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-[11px] font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition hover:bg-blue-700 active:scale-[0.98]"
+            className="col-span-2 flex items-center justify-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-blue-700"
           >
             <Layers className="size-3.5" /> Whole deck
           </button>
         </div>
         <button
           onClick={resetBrandKit}
-          className="flex w-full items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[10px] text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+          className="flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[10px] text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
         >
           <RotateCcw className="size-3" /> Reset to default ({DEFAULT_BRAND_KIT.primary})
         </button>

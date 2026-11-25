@@ -279,7 +279,7 @@ function SharedTemplate() {
   return (
     <div className="min-h-screen bg-[#fafafa] text-slate-900">
       {/* Three-zone Top Navigation Bar */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/95 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between gap-8 px-6 lg:px-10">
           <Link
             to="/"
@@ -448,7 +448,7 @@ function SharedTemplate() {
                             onClick={stepPrev}
                             disabled={activeVisiblePos === 0}
                             aria-label="Previous slide"
-                            className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-slate-200/90 bg-white/95 text-slate-900 shadow-md transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:pointer-events-none disabled:opacity-0 sm:left-5"
+                            className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-lg border border-slate-200 bg-white text-slate-900 shadow-md transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:pointer-events-none disabled:opacity-0 sm:left-5"
                           >
                             <ChevronLeft className="size-5" />
                           </button>
@@ -457,7 +457,7 @@ function SharedTemplate() {
                             onClick={stepNext}
                             disabled={activeVisiblePos >= visibleSlides.length - 1}
                             aria-label="Next slide"
-                            className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-slate-200/90 bg-white/95 text-slate-900 shadow-md transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:pointer-events-none disabled:opacity-0 sm:right-5"
+                            className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-lg border border-slate-200 bg-white text-slate-900 shadow-md transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:pointer-events-none disabled:opacity-0 sm:right-5"
                           >
                             <ChevronRight className="size-5" />
                           </button>
@@ -662,7 +662,7 @@ function SharedTemplate() {
                               className={`overflow-hidden rounded-xl border bg-white transition-all duration-150 ${
                                 selected
                                   ? "border-blue-600 ring-2 ring-blue-600/20"
-                                  : "border-slate-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                                  : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
                               }`}
                             >
                               <SlideThumbnail

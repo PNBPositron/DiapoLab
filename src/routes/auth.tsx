@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Eye, EyeOff, ArrowRight, Sparkles, Cloud, Palette, MonitorSmartphone } from "lucide-react";
+import { ArrowLeft, Loader2, Eye, EyeOff, ArrowRight, Cloud, Palette, MonitorSmartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/hooks/use-auth";
 
@@ -75,19 +75,19 @@ function AuthPage() {
       <div className="mb-4 flex w-full max-w-4xl items-center justify-between">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
+          className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
         >
           <ArrowLeft className="size-3.5" /> Back to editor
         </Link>
         <Link
           to="/wiki"
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+          className="text-xs font-medium text-slate-500 transition hover:text-slate-900 hover:underline hover:underline-offset-4"
         >
           Documentation
         </Link>
       </div>
 
-      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_56px_-20px_rgba(15,23,42,0.12)] lg:grid-cols-2">
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_16px_44px_-18px_rgba(15,23,42,0.12)] lg:grid-cols-2">
         {/* Left panel — brand & highlights */}
         <div className="hidden flex-col justify-between border-r border-slate-200 bg-slate-50/70 p-10 text-slate-900 lg:flex">
           <Link to="/" className="flex items-center gap-2.5">
@@ -184,7 +184,7 @@ function AuthPage() {
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:text-slate-700"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 transition hover:text-slate-700"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -192,7 +192,7 @@ function AuthPage() {
             </Field>
 
             {error && (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-600">
+              <div className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-600">
                 {error}
               </div>
             )}
@@ -200,13 +200,9 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-60"
+              className="group flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-60"
             >
-              {loading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Sparkles className="size-4" />
-              )}
+              {loading && <Loader2 className="size-4 animate-spin" />}
               {mode === "signin" ? "Sign in" : "Create account"}
               {!loading && <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />}
             </button>

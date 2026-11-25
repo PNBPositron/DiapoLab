@@ -270,16 +270,16 @@ export function MediaPanel() {
             </button>
           </div>
           {rec && (
-            <div className="space-y-2 rounded-2xl border border-rose-200 bg-rose-50/60 p-3">
+            <div className="space-y-2 rounded-lg border border-rose-200 bg-rose-50/60 p-3">
               <div className="flex items-center gap-2 text-[11px] font-semibold text-rose-600">
                 <span className="size-2 animate-pulse rounded-full bg-rose-500" />
                 Recording {rec.mode === "screen" ? "screen" : "webcam"}…
               </div>
-              <video src={rec.url} muted autoPlay playsInline className="w-full rounded-lg border border-rose-200 bg-black" />
+              <video src={rec.url} muted autoPlay playsInline className="w-full rounded-md border border-rose-200 bg-black" />
               <button
                 type="button"
                 onClick={stopRec}
-                className="w-full rounded-lg bg-rose-600 py-2 text-[11px] font-bold tracking-wide text-white transition hover:bg-rose-500"
+                className="w-full rounded-md bg-rose-600 py-2 text-[11px] font-semibold text-white transition hover:bg-rose-500"
               >
                 Stop & insert on slide
               </button>
@@ -290,8 +290,8 @@ export function MediaPanel() {
           <p className="text-[10px] leading-snug text-slate-400">
             Images and GIFs land on the slide right away. Videos loop while presenting; audio shows a compact player.
           </p>
-          <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-3">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Background music (this slide)</p>
+          <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-3">
+            <p className="text-[11px] font-semibold text-slate-500">Background music (this slide)</p>
             <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white py-2 text-[11px] font-semibold text-slate-700 transition hover:border-sky-300 hover:bg-sky-50">
               <Music className="size-3.5" /> {bgMusic ? "Replace music" : "Add music to this slide"}
               <input

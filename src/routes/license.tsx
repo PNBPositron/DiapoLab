@@ -52,7 +52,7 @@ function LicensePage() {
       icon={<Scale className="size-5" />}
       kicker="Documentation"
     >
-      <section className="rounded-3xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
         <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
           DiapoLab is free software for creating, remixing, exporting and sharing
           presentations. You can use the editor in personal and commercial projects
@@ -62,9 +62,9 @@ function LicensePage() {
           {PERMISSIONS.map((p) => (
             <div
               key={p.title}
-              className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
+              className="rounded-lg border border-slate-200 bg-slate-50/50 p-4 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
             >
-              <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">
+              <span className="grid size-8 place-items-center rounded-md border border-blue-100 bg-blue-50 text-blue-600">
                 {p.icon}
               </span>
               <div className="mt-3 text-xs font-semibold text-slate-900">{p.title}</div>
@@ -74,9 +74,9 @@ function LicensePage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
+          <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
             <Check className="size-4" />
           </span>
           <h2 className="font-display text-sm font-semibold text-slate-900">In short</h2>
@@ -89,9 +89,9 @@ function LicensePage() {
         </ul>
       </section>
 
-      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
+          <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
             <FileText className="size-4" />
           </span>
           <h2 className="font-display text-sm font-semibold text-slate-900">Full text</h2>
@@ -119,9 +119,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.`}</pre>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
+          <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
             <Users className="size-4" />
           </span>
           <h2 className="font-display text-sm font-semibold text-slate-900">

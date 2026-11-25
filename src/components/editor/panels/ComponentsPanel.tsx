@@ -7,16 +7,20 @@ import {
   Bookmark,
   Check,
   Chrome,
+  Clock,
   Command,
   CreditCard,
   Gauge,
   Hash,
+  Layers,
   ListChecks,
   LogIn,
   MessageSquare,
   PanelBottom,
   PanelLeft,
+  Pencil,
   Plus,
+  PlusSquare,
   Puzzle,
   Quote,
   Radio,
@@ -27,15 +31,16 @@ import {
   SlidersHorizontal,
   Smartphone,
   Square,
+  Star,
   TerminalSquare,
   Table as TableIcon,
+  Timer,
   FileCode,
   Trash2,
   ToggleRight,
   TrendingUp,
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
   User,
-  WandSparkles,
   Shuffle,
   type LucideIcon,
 } from "lucide-react";
@@ -43,6 +48,7 @@ import {
   newChart,
   newPoll,
   newTable,
+  newText,
   newQuiz,
   newUi,
   UI_STYLE_THEMES,
@@ -51,6 +57,7 @@ import {
   quizStylePatch,
   tableStylePatch,
   saveCustomUiTheme,
+  type AnyElement,
   type UiTheme,
   type UiKind,
   type UiStyle,
@@ -64,6 +71,7 @@ import { usePlugins, instantiateWidget } from "@/lib/plugins";
 import {
   loadBlocks,
   saveBlock,
+  renameBlock,
   deleteBlock,
   cloneBlockElements,
   describeBlock,
@@ -76,6 +84,7 @@ import {
 } from "@/lib/user-blocks";
 
 type PresetSection = "ui" | "blocks" | "charts";
+type UiCategory = "all" | "interactive" | "cards" | "interfaces";
 
 /* Pre-insert text customizer drafts (same pattern as the SmartArt panel). */
 type UiDraft = {
@@ -111,48 +120,70 @@ const EXTRA_LABELS: Partial<Record<UiKind, { label: string; list: boolean; defau
   taskbar: { label: "Search label", list: false, defaults: ["Search"] },
   vtabs: { label: "New tab label", list: false, defaults: ["+ New tab"] },
   login: { label: "Button label", list: false, defaults: ["Continue"] },
+  timer: { label: "Status badge", list: false, defaults: ["Countdown"] },
+  counter: { label: "Step size", list: false, defaults: ["1"] },
 };
 
-const UI_KINDS: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
-  { kind: "card", label: "Card", Icon: Square },
-  { kind: "stat", label: "Stat", Icon: TrendingUp },
-  { kind: "badge", label: "Badge", Icon: Hash },
-  { kind: "progress", label: "Progress", Icon: Gauge },
-  { kind: "alert", label: "Alert", Icon: AlertTriangle },
-  { kind: "list", label: "List", Icon: ListChecks },
-  { kind: "quote", label: "Quote", Icon: Quote },
-  { kind: "profile", label: "Profile", Icon: User },
-  { kind: "pricing", label: "Pricing", Icon: CreditCard },
-  { kind: "kbd", label: "Key", Icon: Command },
-];
-
-const INTERFACES: Array<{ kind: UiKind; label: string; Icon: LucideIcon }> = [
-  { kind: "window", label: "Window", Icon: AppWindow },
-  { kind: "browser", label: "Browser", Icon: Chrome },
-  { kind: "search", label: "Search bar", Icon: Search },
-  { kind: "terminal", label: "Terminal", Icon: TerminalSquare },
-  { kind: "code", label: "Code block", Icon: FileCode },
-  { kind: "phone", label: "Phone", Icon: Smartphone },
-  { kind: "modal", label: "Modal", Icon: MessageSquare },
-  { kind: "tabs", label: "Tabs", Icon: Rows3 },
-  { kind: "toggle", label: "Toggles", Icon: ToggleRight },
-  { kind: "login", label: "Login", Icon: LogIn },
-  { kind: "notification", label: "Toast", Icon: Bell },
-  { kind: "taskbar", label: "Taskbar", Icon: PanelBottom },
-  { kind: "vtabs", label: "Vertical tabs", Icon: PanelLeft },
-];
-
-const UI_PRESETS: Array<{
+type UiPresetItem = {
   kind: UiKind;
   label: string;
   Icon: LucideIcon;
+  category: Exclude<UiCategory, "all">;
   overrides?: Partial<ReturnType<typeof newUi>>;
-}> = [
+};
+
+const INTERACTIVE_WIDGETS: UiPresetItem[] = [
+  { kind: "clock", label: "Digital clock", Icon: Clock, category: "interactive" },
+  {
+    kind: "clock",
+    label: "Analog clock",
+    Icon: Clock,
+    category: "interactive",
+    overrides: { title: "Studio Clock", body: "Live dial", files: ["analog", "12h", "on", "Local"] },
+  },
+  { kind: "timer", label: "Countdown timer", Icon: Timer, category: "interactive" },
+  { kind: "stopwatch", label: "Stopwatch", Icon: Timer, category: "interactive" },
+  { kind: "counter", label: "Live counter", Icon: PlusSquare, category: "interactive" },
+  { kind: "rating", label: "Star rating", Icon: Star, category: "interactive" },
+];
+
+const UI_KINDS: UiPresetItem[] = [
+  { kind: "card", label: "Card", Icon: Square, category: "cards" },
+  { kind: "stat", label: "Stat", Icon: TrendingUp, category: "cards" },
+  { kind: "badge", label: "Badge", Icon: Hash, category: "cards" },
+  { kind: "progress", label: "Progress", Icon: Gauge, category: "cards" },
+  { kind: "alert", label: "Alert", Icon: AlertTriangle, category: "cards" },
+  { kind: "list", label: "Checklist", Icon: ListChecks, category: "interactive" },
+  { kind: "quote", label: "Quote", Icon: Quote, category: "cards" },
+  { kind: "profile", label: "Profile", Icon: User, category: "cards" },
+  { kind: "pricing", label: "Pricing", Icon: CreditCard, category: "cards" },
+  { kind: "kbd", label: "Key", Icon: Command, category: "cards" },
+];
+
+const INTERFACES: UiPresetItem[] = [
+  { kind: "window", label: "Window", Icon: AppWindow, category: "interfaces" },
+  { kind: "browser", label: "Browser", Icon: Chrome, category: "interfaces" },
+  { kind: "search", label: "Search bar", Icon: Search, category: "interfaces" },
+  { kind: "terminal", label: "Terminal", Icon: TerminalSquare, category: "interfaces" },
+  { kind: "code", label: "Code block", Icon: FileCode, category: "interfaces" },
+  { kind: "phone", label: "Phone", Icon: Smartphone, category: "interfaces" },
+  { kind: "modal", label: "Modal", Icon: MessageSquare, category: "interfaces" },
+  { kind: "tabs", label: "Tabs", Icon: Rows3, category: "interactive" },
+  { kind: "toggle", label: "Toggles", Icon: ToggleRight, category: "interactive" },
+  { kind: "login", label: "Login", Icon: LogIn, category: "interfaces" },
+  { kind: "notification", label: "Toast", Icon: Bell, category: "interfaces" },
+  { kind: "taskbar", label: "Taskbar", Icon: PanelBottom, category: "interfaces" },
+  { kind: "vtabs", label: "Vertical tabs", Icon: PanelLeft, category: "interfaces" },
+];
+
+const UI_PRESETS: UiPresetItem[] = [
+  ...INTERACTIVE_WIDGETS,
   ...UI_KINDS,
   {
     kind: "card",
     label: "Feature card",
     Icon: Blocks,
+    category: "cards",
     overrides: {
       title: "Featured project",
       body: "A polished content block for product highlights and case studies.",
@@ -162,6 +193,7 @@ const UI_PRESETS: Array<{
     kind: "stat",
     label: "Metric row",
     Icon: TrendingUp,
+    category: "cards",
     overrides: {
       title: "Conversion rate",
       body: "+12.4% this month",
@@ -172,6 +204,7 @@ const UI_PRESETS: Array<{
     kind: "alert",
     label: "Status banner",
     Icon: AlertTriangle,
+    category: "cards",
     overrides: {
       title: "All systems operational",
       body: "Your workspace is running normally.",
@@ -179,8 +212,9 @@ const UI_PRESETS: Array<{
   },
   {
     kind: "list",
-    label: "Checklist",
+    label: "Launch checklist",
     Icon: ListChecks,
+    category: "interactive",
     overrides: {
       title: "Launch checklist",
       items: ["Review content", "Invite collaborators", "Publish presentation"],
@@ -190,12 +224,14 @@ const UI_PRESETS: Array<{
     kind: "profile",
     label: "Team member",
     Icon: User,
+    category: "cards",
     overrides: { title: "Alex Morgan", body: "Product designer" },
   },
   {
     kind: "pricing",
     label: "Plan card",
     Icon: CreditCard,
+    category: "cards",
     overrides: {
       title: "Pro plan",
       body: "$24 / month",
@@ -206,6 +242,7 @@ const UI_PRESETS: Array<{
     kind: "quote",
     label: "Testimonial",
     Icon: Quote,
+    category: "cards",
     overrides: {
       title: "A sharper way to present ideas.",
       body: "Jordan Lee, Creative Director",
@@ -215,7 +252,158 @@ const UI_PRESETS: Array<{
     kind: "progress",
     label: "Completion",
     Icon: Gauge,
+    category: "cards",
     overrides: { title: "Project progress", body: "Design system", value: 72 },
+  },
+];
+
+type StarterBlock = {
+  id: string;
+  name: string;
+  summary: string;
+  Icon: LucideIcon;
+  build: (style: UiStyle) => AnyElement[];
+};
+
+const STARTER_BLOCKS: StarterBlock[] = [
+  {
+    id: "agenda-clock",
+    name: "Agenda + Live Clock",
+    summary: "Header + checklist + ticking clock",
+    Icon: Clock,
+    build: (style) => {
+      const theme = UI_STYLE_THEMES[style];
+      return [
+        newText({ x: 140, y: 120, width: 760, height: 96, text: "Session Agenda", fontSize: 58, color: theme.dark ? "#0f172a" : "#0f172a" }),
+        newUi("list", style, {
+          x: 140,
+          y: 250,
+          width: 640,
+          height: 440,
+          title: "Today’s Topics",
+          items: ["Opening & context", "Live product walkthrough", "Metrics & roadmap", "Q&A discussion"],
+        }),
+        newUi("clock", style, {
+          x: 820,
+          y: 250,
+          width: 520,
+          height: 260,
+          title: "Local Time",
+        }),
+      ];
+    },
+  },
+  {
+    id: "workshop-timer",
+    name: "Workshop Timer Stage",
+    summary: "Prompt card + interactive 5m timer",
+    Icon: Timer,
+    build: (style) => [
+      newUi("card", style, {
+        x: 180,
+        y: 220,
+        width: 720,
+        height: 420,
+        title: "Breakout Exercise",
+        body: "Discuss the two key user bottlenecks in your group and capture top three takeaways before the timer ends.",
+      }),
+      newUi("timer", style, {
+        x: 940,
+        y: 220,
+        width: 520,
+        height: 300,
+        title: "Breakout Timer",
+        body: "Starts immediately on click",
+        value: 300,
+      }),
+    ],
+  },
+  {
+    id: "kpi-trio",
+    name: "KPI Metric Trio",
+    summary: "3 aligned stat cards",
+    Icon: TrendingUp,
+    build: (style) => [
+      newUi("stat", style, { x: 160, y: 260, width: 420, height: 280, title: "Active Users", value: 14820, body: "+18.2% MoM" }),
+      newUi("stat", style, { x: 610, y: 260, width: 420, height: 280, title: "Retention", value: 94, body: "30-day cohort" }),
+      newUi("stat", style, { x: 1060, y: 260, width: 420, height: 280, title: "NPS Score", value: 72, body: "Top quartile" }),
+    ],
+  },
+  {
+    id: "pricing-split",
+    name: "Two-Plan Comparison",
+    summary: "Starter & Pro pricing cards",
+    Icon: CreditCard,
+    build: (style) => [
+      newUi("pricing", style, {
+        x: 280,
+        y: 180,
+        width: 520,
+        height: 540,
+        title: "Starter",
+        body: "$0 / month",
+        items: ["Up to 5 decks", "Standard exports", "Local storage"],
+      }),
+      newUi("pricing", style, {
+        x: 840,
+        y: 180,
+        width: 520,
+        height: 540,
+        title: "Pro Studio",
+        body: "$24 / month",
+        items: ["Unlimited decks", "Custom theme packs", "Private share links"],
+      }),
+    ],
+  },
+  {
+    id: "feedback-tally",
+    name: "Live Feedback & Tally",
+    summary: "Interactive rating + counter",
+    Icon: Star,
+    build: (style) => [
+      newUi("rating", style, {
+        x: 240,
+        y: 260,
+        width: 600,
+        height: 260,
+        title: "How helpful was this?",
+        body: "Tap a star while presenting",
+        value: 5,
+      }),
+      newUi("counter", style, {
+        x: 880,
+        y: 260,
+        width: 480,
+        height: 260,
+        title: "Raise of Hands",
+        body: "Tally audience responses",
+        value: 0,
+      }),
+    ],
+  },
+  {
+    id: "device-showcase",
+    name: "Browser + Mobile Frame",
+    summary: "Desktop & mobile UI pair",
+    Icon: Layers,
+    build: (style) => [
+      newUi("browser", style, {
+        x: 180,
+        y: 180,
+        width: 900,
+        height: 560,
+        title: "Product Overview",
+        body: "https://app.example.com",
+      }),
+      newUi("phone", style, {
+        x: 960,
+        y: 210,
+        width: 340,
+        height: 600,
+        title: "Mobile App",
+        body: "Synced live",
+      }),
+    ],
   },
 ];
 
@@ -534,14 +722,14 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
               onClick={() => setDraft(themeToDraft(UI_STYLE_THEMES[value]))}
               className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
             >
-              <span className="h-2.5 w-2.5 rounded-full border border-slate-300" style={{ background: UI_STYLE_THEMES[value].bg }} />
+              <span className="h-2.5 w-2.5 rounded-sm border border-slate-300" style={{ background: UI_STYLE_THEMES[value].bg }} />
               {UI_STYLE_THEMES[value].label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rounded-xl p-3" style={{ background: "linear-gradient(140deg,#c7d2fe,#fbcfe8,#fde68a)" }}>
+      <div className="rounded-lg border border-slate-200 bg-slate-100 p-3">
         <div
           className="flex flex-col gap-1.5"
           style={{
@@ -559,7 +747,7 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
           <div style={{ fontWeight: 800, fontSize: 14, textTransform: draft.uppercase ? "uppercase" : "none" }}>Custom card</div>
           <div style={{ fontSize: 10, color: theme.muted }}>Your colors, font, corners &amp; effects.</div>
           <div className="mt-1 flex items-center gap-1.5">
-            <span style={{ background: theme.accent, color: theme.onAccent, borderRadius: 999, fontSize: 9, fontWeight: 700, padding: "3px 8px" }}>Action</span>
+            <span style={{ background: theme.accent, color: theme.onAccent, borderRadius: 6, fontSize: 9, fontWeight: 700, padding: "3px 8px" }}>Action</span>
             <span style={{ background: theme.accent, width: 34, height: 5, borderRadius: 3 }} />
           </div>
         </div>
@@ -568,9 +756,9 @@ function ThemeCreator({ onApply }: { onApply: (theme: UiTheme) => void }) {
       <button
         type="button"
         onClick={() => onApply(buildCustomTheme(draft))}
-        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+        className="flex w-full items-center justify-center gap-1.5 rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
       >
-        <WandSparkles className="size-3.5" /> Apply custom theme
+        <SlidersHorizontal className="size-3.5" /> Apply custom theme
       </button>
     </div>
   );
@@ -581,10 +769,13 @@ export function ComponentsPanel() {
   const { add, addGroup, selectedId, selectedIds, elements, update } = useEditor();
   const [style, setStyle] = useState<UiStyle>("cyber");
   const [section, setSection] = useState<PresetSection>("ui");
+  const [uiCategory, setUiCategory] = useState<UiCategory>("all");
   const [search, setSearch] = useState("");
   const [blocks, setBlocks] = useState<UserBlock[]>(() => loadBlocks());
   const [blockName, setBlockName] = useState("");
   const [blockSaved, setBlockSaved] = useState(false);
+  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
+  const [editingBlockName, setEditingBlockName] = useState("");
   const [slideBlocks, setSlideBlocks] = useState<SlideBlock[]>(() => loadSlideBlocks());
   const [slideName, setSlideName] = useState("");
   const [slideSaved, setSlideSaved] = useState(false);
@@ -788,10 +979,10 @@ export function ComponentsPanel() {
       value: typeof sample.value === "number" ? sample.value : 50,
       files: Array.isArray(sample.files) && sample.files.length > 0 ? sample.files.slice() : (extra?.defaults.slice() ?? []),
       showTitle: !!sample.title,
-      showBody: !!sample.body,
+      showBody: !!sample.body || kind === "clock",
       showItems: Array.isArray(sample.items) && sample.items.length > 0,
-      showValue: kind === "stat" || kind === "progress",
-      showFiles: !!extra,
+      showValue: kind === "stat" || kind === "progress" || kind === "timer" || kind === "counter" || kind === "rating",
+      showFiles: !!extra || kind === "clock",
       filesLabel: extra?.label ?? "",
       filesList: extra?.list ?? false,
     });
@@ -804,7 +995,7 @@ export function ComponentsPanel() {
         ...(uiDraft.showTitle ? { title: uiDraft.title } : {}),
         ...(uiDraft.showBody ? { body: uiDraft.body } : {}),
         ...(uiDraft.showItems ? { items: uiDraft.items.filter((s) => s.trim() !== "") } : {}),
-        ...(uiDraft.showFiles ? { files: uiDraft.files.filter((s) => s.trim() !== "") } : {}),
+        ...(uiDraft.showFiles ? { files: uiDraft.kind === "clock" ? uiDraft.files : uiDraft.files.filter((s) => s.trim() !== "") } : {}),
         ...(uiDraft.showValue ? { value: uiDraft.value } : {}),
       }),
     );
@@ -869,20 +1060,41 @@ export function ComponentsPanel() {
   };
 
   const rawPresets = useMemo(() => {
-    // Widgets + Frames merged into a single "UI" catalog.
     if (section === "ui") return [...UI_PRESETS, ...INTERFACES];
     return [];
   }, [section]);
 
   const filteredPresets = useMemo(() => {
-    if (!search.trim()) return rawPresets;
+    const byCat = uiCategory === "all" ? rawPresets : rawPresets.filter((p) => p.category === uiCategory);
+    if (!search.trim()) return byCat;
     const query = search.toLowerCase();
-    return rawPresets.filter(
+    return byCat.filter(
       (p) =>
         p.label.toLowerCase().includes(query) ||
-        p.kind.toLowerCase().includes(query)
+        p.kind.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query),
     );
-  }, [rawPresets, search]);
+  }, [rawPresets, uiCategory, search]);
+
+  const filteredStarterBlocks = useMemo(() => {
+    if (!search.trim()) return STARTER_BLOCKS;
+    const query = search.toLowerCase();
+    return STARTER_BLOCKS.filter(
+      (b) => b.name.toLowerCase().includes(query) || b.summary.toLowerCase().includes(query),
+    );
+  }, [search]);
+
+  const filteredUserBlocks = useMemo(() => {
+    if (!search.trim()) return blocks;
+    const query = search.toLowerCase();
+    return blocks.filter((b) => b.name.toLowerCase().includes(query));
+  }, [blocks, search]);
+
+  const filteredSlideBlocks = useMemo(() => {
+    if (!search.trim()) return slideBlocks;
+    const query = search.toLowerCase();
+    return slideBlocks.filter((b) => b.name.toLowerCase().includes(query));
+  }, [slideBlocks, search]);
 
   const filteredElements = search.trim()
     ? ELEMENT_PRESETS.filter((e) => e.label.toLowerCase().includes(search.toLowerCase()))
@@ -905,12 +1117,12 @@ export function ComponentsPanel() {
               <button
                 type="button"
                 title="Create your own visual theme"
-                className="flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700 transition hover:bg-blue-100"
+                className="flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-blue-700 transition hover:bg-blue-100"
               >
-                <WandSparkles className="size-3" /> Create
+                <SlidersHorizontal className="size-3" /> Create
               </button>
             </DialogTrigger>
-            <DialogContent className="selector-panel max-h-[82vh] max-w-[320px] space-y-3 overflow-y-auto rounded-2xl p-4">
+            <DialogContent className="selector-panel max-h-[82vh] max-w-[320px] space-y-3 overflow-y-auto rounded-xl p-4">
               <DialogHeader className="space-y-1 text-left">
                 <DialogTitle className="text-sm font-semibold tracking-tight text-slate-900">Theme creator</DialogTitle>
                 <DialogDescription className="text-[10px] leading-relaxed text-slate-500">
@@ -942,7 +1154,7 @@ export function ComponentsPanel() {
           Widget packs (imported in Add-ons) are inserted from here too. */}
       {section === "blocks" && (
         <div className="flex flex-col gap-3">
-          <div className="rounded-xl border border-blue-100 bg-gradient-to-b from-blue-50/70 to-white p-3 shadow-2xs">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
             <div className="panel-section-label">Save selection as block</div>
             <div className="mt-2 flex items-center gap-2">
               <input
@@ -951,13 +1163,13 @@ export function ComponentsPanel() {
                 onKeyDown={(e) => e.key === "Enter" && handleSaveBlock()}
                 placeholder={selectedElements.length ? "Name (e.g. Header)" : "Select elements on the slide first"}
                 disabled={selectedElements.length === 0}
-                className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400"
+                className="min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-500"
               />
               <button
                 type="button"
                 onClick={handleSaveBlock}
                 disabled={selectedElements.length === 0}
-                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-40"
+                className="flex shrink-0 items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
               >
                 {blockSaved ? <Check className="size-3.5" /> : <Save className="size-3.5" />}
                 {blockSaved ? "Saved" : "Save"}
@@ -971,34 +1183,100 @@ export function ComponentsPanel() {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold tracking-wider text-slate-400">
-              Saved blocks ({blocks.length})
+            <span className="text-[11px] font-semibold text-slate-500">
+              Starter blocks ({filteredStarterBlocks.length})
+            </span>
+            <span className="text-[10px] text-slate-400">Uses active theme</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2">
+            {filteredStarterBlocks.map((sb) => (
+              <div
+                key={sb.id}
+                className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-300"
+              >
+                <div className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-blue-600">
+                  <sb.Icon className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs font-semibold text-slate-700">{sb.name}</div>
+                  <div className="truncate text-[10px] text-slate-400">{sb.summary}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => addGroup(sb.build(style))}
+                  className="flex shrink-0 items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 transition-colors hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                >
+                  <Plus className="size-3" /> Add
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-slate-500">
+              Saved blocks ({filteredUserBlocks.length})
             </span>
           </div>
 
-          {blocks.length === 0 && (
-            <div className="py-6 text-center text-xs text-slate-400">
-              No saved blocks yet — select elements on the slide, then press Save.
+          {filteredUserBlocks.length === 0 && (
+            <div className="py-4 text-center text-xs text-slate-400">
+              {blocks.length === 0
+                ? "No saved blocks yet — select elements on the slide, then press Save."
+                : "No saved blocks match your search."}
             </div>
           )}
 
-          <div className="flex flex-col gap-2 pb-6">
-            {blocks.map((block) => (
+          <div className="flex flex-col gap-2 pb-2">
+            {filteredUserBlocks.map((block) => (
               <div
                 key={block.id}
-                className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white p-2.5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-[0_12px_26px_-12px_rgba(37,99,235,0.28)]"
+                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-300"
               >
-                <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm">
-                  <Bookmark className="size-4" />
+                <div className="grid size-8 shrink-0 place-items-center rounded-md bg-blue-600 text-white">
+                  <Bookmark className="size-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs font-semibold text-slate-700">{block.name}</div>
+                  {editingBlockId === block.id ? (
+                    <input
+                      autoFocus
+                      value={editingBlockName}
+                      onChange={(e) => setEditingBlockName(e.target.value)}
+                      onBlur={() => {
+                        renameBlock(block.id, editingBlockName);
+                        setEditingBlockId(null);
+                        refreshBlocks();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          renameBlock(block.id, editingBlockName);
+                          setEditingBlockId(null);
+                          refreshBlocks();
+                        }
+                        if (e.key === "Escape") setEditingBlockId(null);
+                      }}
+                      className="w-full rounded border border-blue-400 px-1.5 py-0.5 text-xs font-semibold text-slate-800 outline-none"
+                    />
+                  ) : (
+                    <div className="truncate text-xs font-semibold text-slate-700">{block.name}</div>
+                  )}
                   <div className="truncate text-[10px] text-slate-400">{describeBlock(block)}</div>
                 </div>
                 <button
                   type="button"
+                  title="Rename block"
+                  onClick={() => {
+                    setEditingBlockId(block.id);
+                    setEditingBlockName(block.name);
+                  }}
+                  className="grid size-7 shrink-0 place-items-center rounded-md border border-slate-200 text-slate-400 transition hover:border-slate-300 hover:text-slate-700"
+                >
+                  <Pencil className="size-3" />
+                </button>
+                <button
+                  type="button"
                   onClick={() => addGroup(cloneBlockElements(block))}
-                  className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
+                  className="flex shrink-0 items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-blue-700"
                 >
                   <Plus className="size-3" /> Insert
                 </button>
@@ -1009,7 +1287,7 @@ export function ComponentsPanel() {
                     deleteBlock(block.id);
                     refreshBlocks();
                   }}
-                  className="grid size-7 shrink-0 place-items-center rounded-lg border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100"
+                  className="grid size-7 shrink-0 place-items-center rounded-md border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100"
                 >
                   <Trash2 className="size-3.5" />
                 </button>
@@ -1017,7 +1295,7 @@ export function ComponentsPanel() {
             ))}
           </div>
           {/* Whole-slide blocks — save the full page (background included) */}
-          <div className="rounded-xl border border-indigo-100 bg-gradient-to-b from-indigo-50/70 to-white p-3 shadow-2xs">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
             <div className="panel-section-label">Save whole slide</div>
             <div className="mt-2 flex items-center gap-2">
               <input
@@ -1025,12 +1303,12 @@ export function ComponentsPanel() {
                 onChange={(e) => setSlideName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveSlide()}
                 placeholder="Name (e.g. Cover, Section divider)"
-                className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-400"
+                className="min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-500"
               />
               <button
                 type="button"
                 onClick={handleSaveSlide}
-                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+                className="flex shrink-0 items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-slate-800"
               >
                 {slideSaved ? <Check className="size-3.5" /> : <Save className="size-3.5" />}
                 {slideSaved ? "Saved" : "Save slide"}
@@ -1041,24 +1319,24 @@ export function ComponentsPanel() {
             </p>
           </div>
 
-          {slideBlocks.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <span className="text-[11px] font-semibold tracking-wider text-slate-400">
-                Saved slides ({slideBlocks.length})
+          {filteredSlideBlocks.length > 0 && (
+            <div className="flex flex-col gap-2 pb-4">
+              <span className="text-[11px] font-semibold text-slate-500">
+                Saved slides ({filteredSlideBlocks.length})
               </span>
-              {slideBlocks.map((b) => (
-                <div key={b.id} className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white p-2.5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-[0_12px_26px_-12px_rgba(79,70,229,0.28)]">
-                  <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-sm">
-                    <Bookmark className="size-4" />
+              {filteredSlideBlocks.map((b) => (
+                <div key={b.id} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-2.5 transition-colors hover:border-blue-300">
+                  <div className="grid size-8 shrink-0 place-items-center rounded-md bg-slate-900 text-white">
+                    <Bookmark className="size-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-xs font-semibold text-slate-700">{b.name}</div>
                     <div className="truncate text-[10px] text-slate-400">{b.elements.length} elements · {b.canvasW}×{b.canvasH}</div>
                   </div>
-                  <button type="button" onClick={() => insertSlideBlock(b)} className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-blue-500">
+                  <button type="button" onClick={() => insertSlideBlock(b)} className="flex shrink-0 items-center gap-1 rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-slate-800">
                     <Plus className="size-3" /> Insert
                   </button>
-                  <button type="button" title="Delete slide block" onClick={() => { deleteSlideBlock(b.id); refreshSlideBlocks(); }} className="grid size-7 shrink-0 place-items-center rounded-lg border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100">
+                  <button type="button" title="Delete slide block" onClick={() => { deleteSlideBlock(b.id); refreshSlideBlocks(); }} className="grid size-7 shrink-0 place-items-center rounded-md border border-rose-200 bg-rose-50 text-rose-500 transition hover:bg-rose-100">
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
@@ -1104,10 +1382,10 @@ export function ComponentsPanel() {
             {filteredElements.map((e) => (
               <div
                 key={e.label}
-                className={`group relative flex items-center gap-2.5 rounded-xl border p-2.5 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-white ${
+                className={`group relative flex items-center gap-2.5 rounded-lg border p-2.5 text-left transition-colors ${
                   elDraft && elDraft.id === e.id
-                    ? "border-blue-400 bg-white shadow-[0_10px_24px_-10px_rgba(37,99,235,0.35)]"
-                    : "border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 hover:border-blue-300 hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.30)]"
+                    ? "border-blue-500 bg-blue-50/40"
+                    : "border-slate-200 bg-white hover:border-blue-300"
                 }`}
               >
                 <button
@@ -1115,7 +1393,7 @@ export function ComponentsPanel() {
                   onClick={() => add(e.create())}
                   className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
                 >
-                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-md bg-blue-600 text-white">
                     <e.Icon className="size-4" />
                   </span>
                   <span className="min-w-0">
@@ -1276,9 +1554,20 @@ export function ComponentsPanel() {
         </div>
       )}
 
-      {/* Grid of UI components — widgets & frames merged */}
+      {/* Grid of UI components — interactive widgets, cards & frames */}
       {section === "ui" && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
+          <ChipGroup
+            value={uiCategory}
+            onChange={setUiCategory}
+            label="Widget category"
+            options={[
+              { value: "all", label: "All" },
+              { value: "interactive", label: "Interactive" },
+              { value: "cards", label: "Cards" },
+              { value: "interfaces", label: "Interfaces" },
+            ]}
+          />
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold tracking-wider text-slate-400">
               Components ({filteredPresets.length})
@@ -1297,10 +1586,10 @@ export function ComponentsPanel() {
               return (
                 <div
                   key={`${kind}-${label}-${index}`}
-                  className={`group relative flex flex-col overflow-hidden rounded-xl border p-2 text-left shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-white ${
+                  className={`group relative flex flex-col overflow-hidden rounded-lg border p-2 text-left transition-colors ${
                     uiDraft && uiDraft.kind === kind && uiDraft.label === label
-                      ? "border-blue-400 bg-white shadow-[0_10px_24px_-10px_rgba(37,99,235,0.35)]"
-                      : "border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 hover:border-blue-300 hover:shadow-[0_14px_28px_-12px_rgba(37,99,235,0.28)]"
+                      ? "border-blue-500 bg-blue-50/40"
+                      : "border-slate-200 bg-white hover:border-blue-300"
                   }`}
                 >
                 <button
@@ -1309,14 +1598,14 @@ export function ComponentsPanel() {
                   className="flex w-full flex-col text-left"
                 >
                   {/* Miniature live canvas render preview */}
-                  <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-lg border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 p-1 shadow-inner shadow-slate-100">
+                  <div className="relative mb-2 aspect-video w-full overflow-hidden rounded-md border border-slate-100 bg-slate-50 p-1">
                     <div className="pointer-events-none scale-75 origin-top-left w-[133%] h-[133%]">
                       <UiRender element={previewElement} preview />
                     </div>
 
                     {/* Quick hover badge */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-slate-900/25 to-slate-900/5 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-1 text-[10px] font-semibold text-slate-800 shadow-md ring-1 ring-slate-200/70 transition-transform duration-200 group-hover:scale-105">
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/20 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200">
                         <Plus className="size-2.5" /> Add
                       </span>
                     </div>
@@ -1372,10 +1661,82 @@ export function ComponentsPanel() {
                   className={DRAFT_FIELD + " resize-none"}
                 />
               )}
-              {uiDraft.showValue && (
+              {uiDraft.showValue && uiDraft.kind === "progress" && (
                 <div className="flex items-center gap-2 text-[11px] text-slate-600">
                   <input type="range" min={0} max={100} value={uiDraft.value} onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) } : d))} className="h-1.5 flex-1 accent-blue-600" />
                   <span className="w-9 text-right font-mono text-[10px] text-slate-500">{uiDraft.value}%</span>
+                </div>
+              )}
+              {uiDraft.showValue && (uiDraft.kind === "stat" || uiDraft.kind === "counter") && (
+                <input
+                  type="number"
+                  value={uiDraft.value}
+                  onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) || 0 } : d))}
+                  placeholder={uiDraft.kind === "counter" ? "Starting count" : "Statistic value"}
+                  className={DRAFT_FIELD + " font-mono tabular-nums"}
+                />
+              )}
+              {uiDraft.showValue && uiDraft.kind === "timer" && (
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    min={10}
+                    max={7200}
+                    step={15}
+                    value={uiDraft.value}
+                    onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Math.max(10, Number(e.target.value) || 60) } : d))}
+                    className={DRAFT_FIELD + " w-20 font-mono tabular-nums"}
+                  />
+                  {[60, 180, 300, 600].map((sec) => (
+                    <button
+                      key={sec}
+                      type="button"
+                      onClick={() => setUiDraft((d) => (d ? { ...d, value: sec } : d))}
+                      className={`rounded-md border px-2 py-1 text-[10px] font-semibold transition ${
+                        uiDraft.value === sec ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {sec / 60}m
+                    </button>
+                  ))}
+                </div>
+              )}
+              {uiDraft.showValue && uiDraft.kind === "rating" && (
+                <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                  <input type="range" min={1} max={5} value={Math.max(1, Math.min(5, uiDraft.value || 4))} onChange={(e) => setUiDraft((d) => (d ? { ...d, value: Number(e.target.value) } : d))} className="h-1.5 flex-1 accent-blue-600" />
+                  <span className="w-9 text-right font-mono text-[10px] text-slate-500">{uiDraft.value} ★</span>
+                </div>
+              )}
+              {uiDraft.kind === "clock" && (
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setUiDraft((d) => {
+                        if (!d) return d;
+                        const next = [...(d.files.length ? d.files : ["digital", "24h", "on", "Local"])];
+                        next[0] = next[0] === "analog" ? "digital" : "analog";
+                        return { ...d, files: next };
+                      })
+                    }
+                    className="rounded-md border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold capitalize text-slate-700 hover:border-blue-300"
+                  >
+                    Mode: {uiDraft.files[0] === "analog" ? "Analog" : "Digital"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setUiDraft((d) => {
+                        if (!d) return d;
+                        const next = [...(d.files.length ? d.files : ["digital", "24h", "on", "Local"])];
+                        next[1] = next[1] === "12h" ? "24h" : "12h";
+                        return { ...d, files: next };
+                      })
+                    }
+                    className="rounded-md border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-blue-300"
+                  >
+                    Format: {uiDraft.files[1] === "12h" ? "12h" : "24h"}
+                  </button>
                 </div>
               )}
               {uiDraft.showItems && (
@@ -1398,7 +1759,7 @@ export function ComponentsPanel() {
                   </button>
                 </div>
               )}
-              {uiDraft.showFiles && !uiDraft.filesList && (
+              {uiDraft.showFiles && uiDraft.kind !== "clock" && !uiDraft.filesList && (
                 <input
                   value={uiDraft.files[0] ?? ""}
                   onChange={(e) => setUiDraft((d) => (d ? { ...d, files: [e.target.value] } : d))}

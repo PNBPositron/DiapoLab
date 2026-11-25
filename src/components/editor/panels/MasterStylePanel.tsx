@@ -10,7 +10,7 @@ export function MasterStylePanel() {
   const transition = useEditor((s) => s.pages[s.currentIndex].transition ?? "none");
 
   const btn =
-    "flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-[11px] font-semibold text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.05)] transition-all hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-700 active:scale-[0.98]";
+    "flex w-full items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-left text-[11px] font-semibold text-slate-700 transition-colors hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-700";
 
   return (
     <div className="flex flex-col gap-2">
@@ -23,14 +23,14 @@ export function MasterStylePanel() {
           <span className="min-w-0 flex-1">Use this background on all slides</span>
           <span
             aria-hidden="true"
-            className="size-3.5 shrink-0 rounded-full border border-slate-300"
+            className="size-3.5 shrink-0 rounded-sm border border-slate-300"
             style={{ background: bg.includes("gradient(") ? bg : undefined, backgroundColor: bg.includes("gradient(") ? undefined : bg }}
           />
         </button>
         <button type="button" onClick={applyTransitionToDeck} className={btn} title={`Transition: ${transition}`}>
           <Clapperboard className="size-3.5 shrink-0 text-blue-600" />
           <span className="min-w-0 flex-1">Use this transition on all slides</span>
-          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 font-mono text-[8px] tracking-wider text-slate-500">{transition}</span>
+          <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] text-slate-600">{transition}</span>
         </button>
       </div>
       <p className="flex items-center gap-1 text-[9px] text-slate-400">

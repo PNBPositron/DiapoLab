@@ -84,8 +84,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "DiapoLab" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#f5f4f1" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "alternate icon", href: "/favicon.ico", type: "image/x-icon" },
       { property: "og:title", content: "DiapoLab — Design workspace" },
       { property: "og:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
       { property: "og:site_name", content: "DiapoLab" },
@@ -98,6 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
     ],
     links: [
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "alternate icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

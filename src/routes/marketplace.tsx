@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, LayoutTemplate, Search, Sparkles, ArrowRight, ArrowUpRight, Calendar, Layers, BookOpen, Puzzle, Trash2, Check, Code2, Wand2, PackageOpen } from "lucide-react";
+import { Loader2, LayoutTemplate, Search, ArrowRight, ArrowUpRight, Calendar, Layers, BookOpen, Puzzle, Trash2, Check, Code2, Wand2, PackageOpen } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 import { useEditor, type Page } from "@/store/editor";
 import { usePlugins, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins";
 import { profileLabel } from "@/lib/profiles";
+import { formatUtcDate } from "@/lib/date";
 
 export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
@@ -89,26 +90,26 @@ function Marketplace() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* Top navigation */}
-      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
-              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-lg object-contain" />
+              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-md object-contain" />
               <span>DiapoLab</span>
             </Link>
             <span className="text-slate-300">/</span>
             <span className="text-xs font-medium text-slate-500">Marketplace</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               to="/wiki"
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               <BookOpen className="size-3.5" /> Wiki
             </Link>
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
             >
               <ArrowLeft /> Back to editor
             </Link>
@@ -118,23 +119,18 @@ function Marketplace() {
 
       {/* Header */}
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
-          <div className="flex items-center gap-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
-              <Sparkles className="size-5" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-blue-600">Community &amp; extensions</p>
-              <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Marketplace</h1>
-            </div>
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium text-slate-500">Community &amp; extensions</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Marketplace</h1>
+            <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+              Community templates and user-made add-ons. Everything is free — load it,
+              remix it, make it yours.
+            </p>
           </div>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600">
-            Community templates and user-made add-ons. Everything is free — load it,
-            remix it, make it yours.
-          </p>
 
           {/* Search bar */}
-          <div className="mt-6 flex max-w-xl items-center gap-2.5 rounded-full border border-slate-200 bg-slate-50/50 px-4 py-2.5 shadow-[0_2px_10px_rgba(15,23,42,0.04)] transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
+          <div className="mt-6 flex max-w-xl items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/15">
             <Search className="size-4 shrink-0 text-slate-400" />
             <input
               value={query}
@@ -145,12 +141,12 @@ function Marketplace() {
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium text-slate-500 transition hover:bg-slate-200/70 hover:text-slate-800"
+                className="shrink-0 rounded px-2 py-0.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
               >
                 Clear
               </button>
             )}
-            <span className="hidden shrink-0 border-l border-slate-200 pl-3 text-xs tabular-nums text-slate-400 sm:inline">
+            <span className="hidden shrink-0 border-l border-slate-200 pl-3 font-mono text-[11px] tabular-nums text-slate-400 sm:inline">
               {filteredTemplates.length + filteredPlugins.length} results
             </span>
           </div>
@@ -160,7 +156,7 @@ function Marketplace() {
       <main className="mx-auto max-w-6xl px-6 py-8">
         {/* Tabs */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1">
+          <div className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1">
             {(
               [
                 ["templates", "Templates", LayoutTemplate],
@@ -170,9 +166,9 @@ function Marketplace() {
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
                   tab === id
-                    ? "bg-white text-slate-900 shadow-xs"
+                    ? "bg-white text-slate-900 shadow-2xs"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -187,7 +183,7 @@ function Marketplace() {
           {tab === "plugins" && (
             <button
               onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
-              className="flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+              className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
             >
               <Code2 className="size-3.5" /> Import add-on code
             </button>
@@ -214,7 +210,7 @@ function Marketplace() {
               {filteredTemplates.map((t) => (
                 <div
                   key={t.id}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-blue-400 hover:shadow-[0_14px_30px_-12px_rgba(37,99,235,0.2)]"
+                  className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300"
                 >
                   <button
                     onClick={() => applyTemplate(t)}
@@ -225,11 +221,11 @@ function Marketplace() {
                         page={t.pages[0] as Page}
                         canvasW={t.canvas_w}
                         canvasH={t.canvas_h}
-                        className="h-full w-full transition-transform duration-300 group-hover:scale-[1.03]"
+                        className="h-full w-full"
                       />
                     ) : null}
-                    <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition-all duration-200 group-hover:bg-slate-950/25 group-hover:opacity-100">
-                      <span className="flex translate-y-1 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-900 shadow-sm transition-transform duration-200 group-hover:translate-y-0">
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition-opacity duration-150 group-hover:bg-slate-950/20 group-hover:opacity-100">
+                      <span className="flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-xs font-medium text-slate-900 shadow-sm">
                         Use template <ArrowUpRight className="size-3.5 text-blue-600" />
                       </span>
                     </div>
@@ -246,7 +242,7 @@ function Marketplace() {
                       <div className="mt-1 flex items-center gap-1 text-[11px] tabular-nums text-slate-500">
                         <Layers className="size-3" /> {t.pages?.length ?? 0} slides
                         <span className="mx-1">·</span>
-                        <Calendar className="size-3" /> {new Date(t.created_at).toLocaleDateString()}
+                        <Calendar className="size-3" /> {formatUtcDate(t.created_at)}
                       </div>
                       {t.creator_profile?.username && (
                         <Link
@@ -268,7 +264,7 @@ function Marketplace() {
                     <button
                       onClick={() => applyTemplate(t)}
                       aria-label={`Use template ${t.name}`}
-                      className="grid size-8 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 transition group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-blue-600"
+                      className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-white text-slate-400 transition-colors group-hover:border-slate-300 group-hover:text-blue-600"
                     >
                       <ArrowRight className="size-3.5" />
                     </button>
@@ -285,7 +281,7 @@ function Marketplace() {
             action={
               <button
                 onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
-                className="mt-1 flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                className="mt-1 flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
               >
                 <Code2 className="size-3.5" /> Import add-on code
               </button>
@@ -305,7 +301,7 @@ function Marketplace() {
         )}
 
         {/* Footer nav */}
-        <nav className="mt-14 flex flex-wrap gap-2 border-t border-slate-200 pt-6">
+        <nav className="mt-14 flex flex-wrap gap-5 border-t border-slate-200 pt-6 text-xs">
           {[
             { to: "/" as const, label: "Editor" },
             { to: "/wiki" as const, label: "Wiki" },
@@ -315,7 +311,7 @@ function Marketplace() {
             <Link
               key={link.to}
               to={link.to}
-              className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
+              className="font-medium text-slate-500 transition-colors hover:text-slate-900"
             >
               {link.label}
             </Link>
@@ -325,12 +321,10 @@ function Marketplace() {
 
       {/* Import dialog */}
       <Dialog open={importOpen} onOpenChange={setImportOpen}>
-        <DialogContent className="max-w-2xl rounded-3xl sm:rounded-3xl border border-slate-200 bg-white p-0 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)]">
-          <DialogHeader className="border-b border-slate-200 bg-white px-5 py-4">
-            <DialogTitle className="flex items-center gap-2.5 text-sm font-semibold text-slate-900">
-              <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">
-                <Code2 className="size-4" />
-              </span>
+        <DialogContent className="max-w-2xl rounded-xl sm:rounded-xl border border-slate-200 bg-white p-0 shadow-2xl">
+          <DialogHeader className="border-b border-slate-200 bg-white px-5 py-3.5">
+            <DialogTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+              <Code2 className="size-4 text-slate-500" />
               Import add-on
             </DialogTitle>
           </DialogHeader>
@@ -345,29 +339,29 @@ function Marketplace() {
               onChange={(e) => { setPluginCode(e.target.value); setImportError(null); setImportSuccess(null); }}
               spellCheck={false}
               placeholder="// Paste your add-on code here…"
-              className="h-56 w-full resize-y rounded-2xl border border-slate-200 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 outline-none transition-colors focus:border-blue-500"
+              className="h-56 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 outline-none transition-colors focus:border-blue-500"
             />
             {importError && (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-600">
+              <div className="rounded-md border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-600">
                 {importError}
               </div>
             )}
             {importSuccess && (
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-medium text-emerald-700">
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-medium text-emerald-700">
                 {importSuccess} <Link to="/" className="font-semibold underline">Open the editor →</Link>
               </div>
             )}
             <div className="flex items-center justify-between gap-3 pt-1">
               <button
                 onClick={() => setPluginCode(SAMPLE_PLUGIN_CODE)}
-                className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
+                className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
               >
                 <Wand2 className="size-3.5" /> Load sample
               </button>
               <button
                 onClick={tryImport}
                 disabled={!pluginCode.trim()}
-                className="flex items-center gap-1.5 rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40"
+                className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40"
               >
                 <Check className="size-3.5" /> Import add-on
               </button>
@@ -398,11 +392,11 @@ function PluginCard({
   onRemove: () => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-blue-400 hover:shadow-[0_14px_30px_-12px_rgba(37,99,235,0.2)]">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300">
       {/* Preview */}
-      <div className="flex h-28 items-center justify-center border-b border-slate-200 bg-slate-50/70">
-        <span className="grid size-12 place-items-center rounded-2xl border border-blue-100 bg-white text-blue-600 shadow-xs">
-          <Puzzle className="size-5" />
+      <div className="flex h-24 items-center justify-center border-b border-slate-200 bg-slate-50/70">
+        <span className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-blue-600">
+          <Puzzle className="size-4.5" />
         </span>
       </div>
       <div className="px-4 py-3.5">
@@ -411,16 +405,16 @@ function PluginCard({
             <div className="truncate text-xs font-semibold text-slate-900" title={plugin.name}>
               {plugin.name}
             </div>
-            <div className="mt-1 truncate text-[11px] text-slate-500">
+            <div className="mt-1 truncate text-[11px] tabular-nums text-slate-500">
               {plugin.author ? `by ${plugin.author}` : "Unknown author"}
               {plugin.version ? ` · v${plugin.version}` : ""} ·{" "}
-              {new Date(plugin.importedAt).toLocaleDateString()}
+              {formatUtcDate(plugin.importedAt)}
             </div>
           </div>
           <button
             onClick={onRemove}
             title="Remove add-on"
-            className="grid size-8 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+            className="grid size-7 shrink-0 place-items-center rounded-md text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
           >
             <Trash2 className="size-3.5" />
           </button>
@@ -434,7 +428,7 @@ function PluginCard({
         </p>
         <button
           onClick={onToggle}
-          className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
+          className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
             plugin.enabled
               ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100/70"
               : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
@@ -455,11 +449,11 @@ function Loading() {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div key={i} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           <div className="aspect-video w-full animate-pulse bg-slate-100" />
           <div className="space-y-2 px-4 py-3.5">
-            <div className="h-3 w-2/3 animate-pulse rounded-full bg-slate-100" />
-            <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-slate-100" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+            <div className="h-2.5 w-1/3 animate-pulse rounded bg-slate-100" />
           </div>
         </div>
       ))}
@@ -472,8 +466,8 @@ function Loading() {
 
 function Empty({ icon, title, text, action }: { icon: React.ReactNode; title: string; text: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 py-16 text-center">
-      <span className="grid size-12 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-400">{icon}</span>
+    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 py-14 text-center">
+      <span className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-400">{icon}</span>
       <div>
         <p className="text-sm font-semibold text-slate-800">{title}</p>
         <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-500">{text}</p>

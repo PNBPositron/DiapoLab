@@ -259,17 +259,17 @@ export function Toolbar() {
   };
 
   return (
-    <header className="toolbar sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between gap-3 border-b border-white/80 bg-white/70 px-5 shadow-[0_6px_26px_-12px_rgba(37,99,235,0.12)] backdrop-blur-xl">
-      {/* LEFT: Logo + project title pill */}
+    <header className="toolbar sticky top-0 z-30 flex h-12 w-full shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4">
+      {/* LEFT: Logo + project title */}
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <Link to="/" className="flex shrink-0 items-center transition-opacity hover:opacity-85" aria-label="DiapoLab home">
-          <DiapoLabLogo dark={editorDark} className="h-7 w-auto" />
+          <DiapoLabLogo dark={editorDark} className="h-6 w-auto" />
         </Link>
 
-        <div className="hidden h-6 w-px shrink-0 bg-slate-200/75 md:block" />
+        <div className="hidden h-5 w-px shrink-0 bg-slate-200 md:block" />
 
         <div className="relative hidden min-w-0 items-center gap-2 md:flex" ref={titleMenuRef}>
-          <div className="flex h-9 w-[212px] items-center rounded-full border border-slate-200/80 bg-white/90 pl-4 pr-1.5 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)] transition-all focus-within:border-blue-500/60 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 hover:border-slate-300/80">
+          <div className="flex h-8 w-[212px] items-center rounded-md border border-slate-200 bg-slate-50/70 pl-3 pr-1 transition-colors focus-within:border-blue-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-600/15 hover:border-slate-300">
             <input
               ref={titleInputRef}
               value={designName}
@@ -283,14 +283,14 @@ export function Toolbar() {
               onClick={() => setTitleMenuOpen((v) => !v)}
               aria-label="Design quick actions"
               aria-expanded={titleMenuOpen}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
             >
               <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-150 ${titleMenuOpen ? "rotate-180" : ""}`} strokeWidth={2} />
             </button>
           </div>
 
           {titleMenuOpen && (
-            <div className="toolbar-flyout absolute left-0 top-11 z-50 w-56 rounded-2xl border border-slate-200 bg-white p-1.5 animate-in fade-in zoom-in-95">
+            <div className="toolbar-flyout absolute left-0 top-10 z-50 w-56 rounded-xl border border-slate-200 bg-white p-1.5 animate-in fade-in zoom-in-95">
               <button
                 type="button"
                 onClick={() => {
@@ -298,7 +298,7 @@ export function Toolbar() {
                   titleInputRef.current?.focus();
                   titleInputRef.current?.select();
                 }}
-                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
               >
                 <Sliders className="h-3.5 w-3.5 text-slate-500" />
                 <span>Rename deck</span>
@@ -309,7 +309,7 @@ export function Toolbar() {
                   setTitleMenuOpen(false);
                   newDesign();
                 }}
-                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
               >
                 <FilePlus className="h-3.5 w-3.5 text-slate-500" />
                 <span>New blank deck</span>
@@ -320,7 +320,7 @@ export function Toolbar() {
                   setTitleMenuOpen(false);
                   importRef.current?.click();
                 }}
-                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
               >
                 <Upload className="h-3.5 w-3.5 text-slate-500" />
                 <span>Import .json / .pptx</span>
@@ -329,7 +329,7 @@ export function Toolbar() {
           )}
 
           {savedAt && (
-            <span className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 text-[11px] font-semibold text-emerald-700 animate-in fade-in">
+            <span className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 text-xs font-medium text-emerald-700 animate-in fade-in">
               <CheckCircle2 className="size-3.5" />
               Saved
             </span>
@@ -337,16 +337,16 @@ export function Toolbar() {
         </div>
       </div>
 
-      {/* RIGHT: Grouped frosted capsule clusters */}
+      {/* RIGHT: Studio action groups */}
       <div className="flex shrink-0 items-center gap-2">
-        {/* History capsule */}
-        <div className="flex items-center gap-0.5 rounded-full border border-slate-200/75 bg-white/90 p-1 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)]">
+        {/* History controls */}
+        <div className="flex items-center gap-0.5 rounded-md border border-slate-200 bg-white p-0.5">
           <button
             onClick={undo}
             disabled={history.length === 0}
             title="Undo (Ctrl+Z)"
             aria-label="Undo"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
+            className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
           >
             <Undo2 className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -355,19 +355,19 @@ export function Toolbar() {
             disabled={future.length === 0}
             title="Redo (Ctrl+Shift+Z)"
             aria-label="Redo"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
+            className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-35"
           >
             <Redo2 className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
 
-        {/* Workspace tools capsule */}
-        <div className="hidden items-center gap-0.5 rounded-full border border-slate-200/75 bg-white/90 p-1 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)] sm:flex">
+        {/* Workspace tools */}
+        <div className="hidden items-center gap-0.5 rounded-md border border-slate-200 bg-white p-0.5 sm:flex">
           <button
             onClick={() => importRef.current?.click()}
             title="Import .json design or .pptx deck"
             aria-label="Import file"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+            className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             <Upload className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -386,7 +386,7 @@ export function Toolbar() {
             onClick={() => window.dispatchEvent(new CustomEvent("diapolab:open-find"))}
             title="Find & replace (Ctrl+F)"
             aria-label="Find & replace"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+            className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             <Search className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -397,7 +397,7 @@ export function Toolbar() {
               title="Change workspace background"
               aria-label="Change workspace background"
               aria-expanded={bgOpen}
-              className={`flex h-7 w-7 items-center justify-center rounded-full transition-all ${
+              className={`flex h-7 w-7 items-center justify-center rounded transition-colors ${
                 bgOpen
                   ? "bg-blue-50 text-blue-600"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -406,10 +406,10 @@ export function Toolbar() {
               <Wallpaper className="h-4 w-4" strokeWidth={2} />
             </button>
             {bgOpen && (
-              <div className="toolbar-flyout absolute right-0 top-10 z-50 w-80 rounded-2xl border border-slate-200 bg-white p-3.5 animate-in fade-in zoom-in-95">
+              <div className="toolbar-flyout absolute right-0 top-9 z-50 w-80 rounded-xl border border-slate-200 bg-white p-3.5 animate-in fade-in zoom-in-95">
                 <div className="mb-2.5 flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-800">Workspace background</span>
-                  <span className="text-[10px] text-slate-400">Saved locally</span>
+                  <span className="text-[11px] text-slate-400">Saved locally</span>
                 </div>
                 <WorkspaceBackgroundPicker compact />
               </div>
@@ -418,13 +418,13 @@ export function Toolbar() {
         </div>
 
         {/* File & primary actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {user ? (
             <button
               onClick={handleSave}
               disabled={saving}
               title="Save design"
-              className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200/80 bg-white/92 px-4 text-[13px] font-medium text-slate-700 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)] transition-all hover:border-slate-300 hover:bg-white hover:text-slate-900 active:scale-[0.98] disabled:opacity-60"
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-60"
             >
               {saving ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" />
@@ -437,7 +437,7 @@ export function Toolbar() {
             <Link
               to="/auth"
               search={{ next: undefined }}
-              className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200/80 bg-white/92 px-4 text-[13px] font-medium text-slate-700 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)] transition-all hover:border-slate-300 hover:bg-white hover:text-slate-900 active:scale-[0.98]"
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
             >
               <UserIcon className="h-3.5 w-3.5 text-slate-600" strokeWidth={2} />
               <span>Sign in</span>
@@ -449,7 +449,7 @@ export function Toolbar() {
             <button
               onClick={() => setExportOpen((v) => !v)}
               disabled={!!exporting}
-              className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full border border-slate-200/80 bg-white/92 px-4 text-[13px] font-medium text-slate-700 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)] transition-all hover:border-slate-300 hover:bg-white hover:text-slate-900 active:scale-[0.98] disabled:opacity-60"
+              className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-60"
             >
               {exporting ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-500" strokeWidth={2} />
@@ -464,7 +464,7 @@ export function Toolbar() {
             </button>
 
             {exportOpen && (
-              <div className="toolbar-flyout absolute right-0 top-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95">
+              <div className="toolbar-flyout absolute right-0 top-10 z-50 w-60 rounded-xl border border-slate-200 bg-white p-1.5 animate-in fade-in zoom-in-95">
                 <div className="px-2.5 py-1.5 text-[11px] font-semibold text-slate-400">
                   Export format
                 </div>
@@ -472,7 +472,7 @@ export function Toolbar() {
                   <button
                     key={k}
                     onClick={() => runExport(k)}
-                    className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50"
+                    className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-100"
                   >
                     <span className="font-semibold text-slate-800">.{k.toUpperCase()}</span>
                     <span className="font-mono text-[11px] tabular-nums text-slate-400">
@@ -498,22 +498,22 @@ export function Toolbar() {
             }}
             title="Present slideshow"
             type="button"
-            className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] px-5 text-[13px] font-semibold text-white shadow-[0_8px_22px_-4px_rgba(37,99,235,0.52)] transition-all hover:brightness-105 hover:shadow-[0_10px_26px_-4px_rgba(37,99,235,0.58)] active:scale-[0.98]"
+            className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-600 px-3.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
           >
             <Play className="h-3.5 w-3.5 fill-current" />
             <span>Present</span>
           </button>
         </div>
 
-        {/* Utility & Menu capsule */}
-        <div className="flex items-center gap-0.5 rounded-full border border-slate-200/75 bg-white/90 p-1 shadow-[0_2px_10px_-3px_rgba(15,23,42,0.06)]">
+        {/* Utility & Menu */}
+        <div className="flex items-center gap-0.5 rounded-md border border-slate-200 bg-white p-0.5">
           {user && (
             <button
               onClick={handlePrivateShare}
               disabled={publishing}
               title="Copy private share link"
               aria-label="Copy private share link"
-              className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60"
+              className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60"
             >
               {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" strokeWidth={2} />}
             </button>
@@ -522,7 +522,7 @@ export function Toolbar() {
             onClick={() => setSettingsDialogOpen(true)}
             title="Settings"
             aria-label="Settings"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="flex h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             <Settings className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -530,7 +530,7 @@ export function Toolbar() {
             onClick={() => window.open("https://github.com/PNBPositron/DiapoLab", "_blank", "noopener,noreferrer")}
             title="GitHub repository"
             aria-label="GitHub repository"
-            className="hidden h-7 w-7 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:flex"
+            className="hidden h-7 w-7 items-center justify-center rounded text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 lg:flex"
           >
             <Github className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -548,7 +548,7 @@ export function Toolbar() {
 
 
       {/* Settings dialog (moved from sidebar) — portaled to body so the
-          sticky/backdrop-blur header does not become its containing block */}
+          sticky header does not become its containing block */}
       {settingsDialogOpen &&
         createPortal(<SettingsDialog onClose={() => setSettingsDialogOpen(false)} />, document.body)}
 
@@ -572,30 +572,30 @@ export function Toolbar() {
 
       {/* Published link notification */}
       {shareLink && (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.2)] animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 p-4">
+          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-xl animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-2 font-display text-sm font-semibold text-blue-600">
-              <CheckCircle2 className="size-5" /> Published successfully
+              <CheckCircle2 className="size-4" /> Published successfully
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
               Your presentation is now online. Anyone with this link can view it.
             </p>
             <input
               readOnly
               value={shareLink}
               onFocus={(e) => e.currentTarget.select()}
-              className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 font-mono text-xs text-slate-700 select-all focus:outline-none"
+              className="mt-3.5 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-700 select-all focus:border-blue-600 focus:outline-none"
             />
-            <div className="mt-5 flex gap-2.5">
+            <div className="mt-4 flex gap-2">
               <button
                 onClick={() => navigator.clipboard.writeText(shareLink).catch(() => {})}
-                className="flex-1 rounded-full bg-blue-600 px-4 py-2.5 font-display text-xs font-semibold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95"
+                className="flex-1 rounded-md bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
               >
                 Copy link
               </button>
               <button
                 onClick={() => setShareLink(null)}
-                className="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2.5 font-display text-xs font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
+                className="flex-1 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Close
               </button>
@@ -648,7 +648,7 @@ function LargeModernHamburger({
         aria-expanded={open}
         aria-label="Toggle Navigation Menu"
         title="Menu"
-        className={`group relative flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+        className={`group relative flex h-7 w-7 items-center justify-center rounded transition-colors ${
           open
             ? "bg-slate-900 text-white"
             : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
@@ -656,17 +656,17 @@ function LargeModernHamburger({
       >
         <div className="relative flex h-3 w-3.5 flex-col justify-between">
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+            className={`h-0.5 w-full rounded-sm transition-all duration-200 ${
               open ? "translate-y-[5px] rotate-45 bg-white" : "bg-current"
             }`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-150 ${
+            className={`h-0.5 w-full rounded-sm transition-all duration-150 ${
               open ? "scale-x-0 opacity-0" : "opacity-100"
             } bg-current`}
           />
           <span
-            className={`h-0.5 w-full rounded-full transition-all duration-200 ${
+            className={`h-0.5 w-full rounded-sm transition-all duration-200 ${
               open ? "-translate-y-[5px] -rotate-45 bg-white" : "bg-current"
             }`}
           />
@@ -675,7 +675,7 @@ function LargeModernHamburger({
 
       {/* Dropdown */}
       {open && (
-        <div className="toolbar-flyout absolute right-0 top-11 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95 duration-150">
+        <div className="toolbar-flyout absolute right-0 top-10 z-50 w-72 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 animate-in fade-in zoom-in-95 duration-150">
           <div className="px-2.5 pb-1 pt-1.5 text-[11px] font-semibold text-slate-400">
             Create
           </div>
@@ -785,13 +785,13 @@ function MenuCardItem({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`group flex w-full items-center justify-between rounded-2xl p-2 text-left transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 ${
-        isDestructive ? "hover:bg-red-50/70" : "hover:bg-slate-100/90"
+      className={`group flex w-full items-center justify-between rounded-md p-2 text-left transition-colors disabled:pointer-events-none disabled:opacity-50 ${
+        isDestructive ? "hover:bg-red-50/70" : "hover:bg-slate-100"
       }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`flex size-8 items-center justify-center rounded-xl transition-all duration-150 group-hover:scale-105 ${iconBg}`}
+          className={`flex size-8 items-center justify-center rounded-md transition-colors ${iconBg}`}
         >
           <Icon className={`size-4 ${iconColor}`} />
         </div>
@@ -810,7 +810,7 @@ function MenuCardItem({
       </div>
 
       {badge ? (
-        <span className="rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 shadow-sm ring-1 ring-blue-200/60">
+        <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
           {badge}
         </span>
       ) : (
@@ -840,26 +840,26 @@ function UserMenu({ email, onEditProfile }: { email: string; onEditProfile: () =
       <button
         onClick={() => setOpen((v) => !v)}
         title={email}
-        className="flex h-7 w-7 items-center justify-center rounded-full text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-95"
+        className="flex h-7 w-7 items-center justify-center rounded text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
       >
         <UserIcon className="h-4 w-4" strokeWidth={2} />
       </button>
       {open && (
-        <div className="toolbar-flyout absolute right-0 top-11 z-50 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 animate-in fade-in zoom-in-95">
+        <div className="toolbar-flyout absolute right-0 top-10 z-50 w-72 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 animate-in fade-in zoom-in-95">
           <div className="border-b border-slate-100 px-3 py-2">
             <p className="text-[11px] font-semibold text-slate-400">Active account</p>
             <p className="truncate font-mono text-xs font-medium text-slate-800">{email}</p>
           </div>
           <button
             onClick={() => { setOpen(false); onEditProfile(); }}
-            className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+            className="mt-1 flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
           >
             <UserRound className="h-4 w-4" />
             <span>Edit profile</span>
           </button>
           <button
             onClick={() => signOut()}
-            className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
+            className="mt-0.5 flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign out</span>

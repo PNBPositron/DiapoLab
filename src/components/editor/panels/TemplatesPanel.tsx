@@ -198,16 +198,16 @@ export function TemplatesPanel() {
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => useEditor.getState().newDesign()}
-          className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98]"
+          className="group flex flex-col items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/70 px-2 py-3 text-center transition-colors hover:border-blue-300 hover:bg-white"
         >
-          <span className="grid size-9 place-items-center rounded-xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+          <span className="grid size-8 place-items-center rounded-md bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <FilePlus2 className="size-4" />
           </span>
           <span className="text-[11px] font-semibold tracking-tight text-slate-700">Blank deck</span>
         </button>
 
-        <label className={`group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98] ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
-          <span className="grid size-9 place-items-center rounded-xl bg-indigo-50 text-indigo-600 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+        <label className={`group flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/70 px-2 py-3 text-center transition-colors hover:border-blue-300 hover:bg-white ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
+          <span className="grid size-8 place-items-center rounded-md bg-slate-100 text-slate-700 transition-colors group-hover:bg-slate-900 group-hover:text-white">
             {importingPptx ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
           </span>
           <span className="text-[11px] font-semibold tracking-tight text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
@@ -226,9 +226,9 @@ export function TemplatesPanel() {
 
         <button
           onClick={() => useEditor.getState().setPresenting(true)}
-          className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200/90 bg-slate-50/70 px-2 py-3.5 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-[0_10px_24px_-12px_rgba(37,99,235,0.28)] active:scale-[0.98]"
+          className="group flex flex-col items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/70 px-2 py-3 text-center transition-colors hover:border-blue-300 hover:bg-white"
         >
-          <span className="grid size-9 place-items-center rounded-xl bg-sky-50 text-sky-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+          <span className="grid size-8 place-items-center rounded-md bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <Presentation className="size-4" />
           </span>
           <span className="text-[11px] font-semibold tracking-tight text-slate-700">Present</span>
@@ -236,7 +236,7 @@ export function TemplatesPanel() {
       </div>
 
       {error && (
-        <div className="flex items-start justify-between gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
+        <div className="flex items-start justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-600">
           <span>{error}</span>
           <button
             onClick={() => setError(null)}
@@ -251,7 +251,7 @@ export function TemplatesPanel() {
       {/* Search + filters */}
       <div className="relative z-30 space-y-3">
         {/* Search */}
-        <div className="flex items-center gap-2 rounded-full border border-slate-200/90 bg-slate-50/80 px-3.5 transition-all focus-within:border-blue-500/70 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
+        <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50/80 px-3 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
           <Search className="size-3.5 shrink-0 text-slate-400" />
           <input
             value={query}
@@ -263,7 +263,7 @@ export function TemplatesPanel() {
             <button
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="grid size-5 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-200/70 hover:text-slate-700"
+              className="grid size-5 shrink-0 place-items-center rounded text-slate-400 transition-colors hover:bg-slate-200/70 hover:text-slate-700"
             >
               <X className="size-3" />
             </button>
@@ -308,10 +308,10 @@ export function TemplatesPanel() {
                 <button
                   key={o}
                   onClick={() => setCreatorFilter(o)}
-                  className={`!rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+                  className={`rounded-md border px-2 py-1 text-[11px] font-medium capitalize transition-colors ${
                     creatorFilter === o
-                      ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
-                      : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   {o}
@@ -330,10 +330,10 @@ export function TemplatesPanel() {
                 <button
                   key={o}
                   onClick={() => setLicenseFilter(o)}
-                  className={`!rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+                  className={`rounded-md border px-2 py-1 text-[11px] font-medium capitalize transition-colors ${
                     licenseFilter === o
-                      ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
-                      : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   {o}
@@ -350,7 +350,7 @@ export function TemplatesPanel() {
               setCreatorFilter("all");
               setLicenseFilter("all");
             }}
-            className="text-[11px] font-semibold text-blue-600 transition hover:text-blue-700"
+            className="text-[11px] font-semibold text-blue-600 transition-colors hover:text-blue-700"
           >
             Reset {activeFilters} filter{activeFilters > 1 ? "s" : ""}
           </button>
@@ -362,8 +362,8 @@ export function TemplatesPanel() {
         {communityLoading ? (
           <TemplateSkeleton />
         ) : community.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-12 text-center">
-            <div className="grid size-11 place-items-center rounded-2xl bg-blue-50 text-blue-500">
+          <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-200 py-12 text-center">
+            <div className="grid size-10 place-items-center rounded-lg bg-slate-100 text-slate-600">
               <LayoutGrid className="size-5" />
             </div>
             <div className="px-4">
@@ -374,7 +374,7 @@ export function TemplatesPanel() {
             </div>
           </div>
         ) : filteredCommunity.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 py-10 text-center">
+          <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-slate-200 py-10 text-center">
             <Search className="size-4 text-slate-300" />
             <p className="text-xs font-medium text-slate-500">No template matches your filters</p>
           </div>
@@ -400,7 +400,7 @@ export function TemplatesPanel() {
       <button
         onClick={() => setShowAll(true)}
         disabled={community.length === 0}
-        className="group flex w-full items-center justify-center gap-2 !rounded-full bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_-6px_rgba(37,99,235,0.45)] transition-all hover:bg-blue-700 hover:shadow-[0_10px_26px_-6px_rgba(37,99,235,0.5)] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+        className="group flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40"
       >
         <LayoutGrid className="size-3.5" />
         <span>Show all templates</span>
@@ -446,13 +446,13 @@ function StyleChip({
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-1.5 !rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize transition ${
+      className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium capitalize transition-colors ${
         active
-          ? "border-blue-600 bg-blue-600 text-white shadow-2xs"
-          : "border-slate-200/90 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+          ? "border-blue-600 bg-blue-600 text-white"
+          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
-      {dot && <span className="size-1.5 rounded-full" style={{ backgroundColor: dot }} />}
+      {dot && <span className="size-1.5 rounded-sm" style={{ backgroundColor: dot }} />}
       <span>{label}</span>
       <span className={`font-mono text-[10px] tabular-nums ${active ? "text-blue-100" : "text-slate-400"}`}>
         {count}
@@ -469,11 +469,11 @@ function TemplateSkeleton() {
   return (
     <div className="space-y-3">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="aspect-video min-h-[130px] animate-pulse bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100" />
+        <div key={i} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div className="aspect-video min-h-[130px] animate-pulse bg-slate-100" />
           <div className="space-y-1.5 px-3.5 py-3">
-            <div className="h-3 w-2/3 animate-pulse rounded-full bg-slate-100" />
-            <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-slate-100" />
+            <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+            <div className="h-2.5 w-1/3 animate-pulse rounded bg-slate-100" />
           </div>
         </div>
       ))}
@@ -508,7 +508,7 @@ function TemplateCard({
   const style = getStyle(c);
   const meta = STYLE_META[style];
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_14px_32px_-12px_rgba(15,23,42,0.16)]">
+    <div className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300">
       <button onClick={onLoad} className="block w-full !rounded-none text-left" title={`Load ${c.name}`}>
         <div className="relative w-full overflow-hidden border-b border-slate-100">
           {c.pages?.[0] ? (
@@ -516,14 +516,14 @@ function TemplateCard({
               page={c.pages[0] as Page}
               canvasW={c.canvas_w}
               canvasH={c.canvas_h}
-              className="w-full min-h-[132px] transition-transform duration-300 group-hover:scale-[1.03]"
+              className="w-full min-h-[132px]"
             />
           ) : (
             <div style={{ aspectRatio: `${c.canvas_w} / ${c.canvas_h}`, background: "#f1f5f9" }} />
           )}
           {/* Hover overlay with CTA */}
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 backdrop-blur-[1px] transition-all duration-200 group-hover:bg-slate-950/20 group-hover:opacity-100">
-            <span className="flex translate-y-1 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-[11px] font-semibold text-slate-900 shadow-lg transition-transform duration-200 group-hover:translate-y-0">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition-opacity duration-150 group-hover:bg-slate-950/25 group-hover:opacity-100">
+            <span className="flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-900 shadow-sm">
               <Download className="size-3.5 text-blue-600" /> Use template
             </span>
           </div>
@@ -538,11 +538,11 @@ function TemplateCard({
         }}
         disabled={!canLike}
         title={canLike ? (liked ? "Unlike" : "Like") : "Sign in to like"}
-        className={`absolute right-2.5 top-2.5 flex items-center gap-1 !rounded-full border px-2.5 py-1 text-[11px] font-semibold tabular-nums shadow-2xs backdrop-blur-md transition-all active:scale-95 ${
+        className={`absolute right-2 top-2 flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold tabular-nums shadow-xs transition-colors ${
           liked
-            ? "border-rose-200 bg-rose-50/95 text-rose-500"
-            : "border-white/70 bg-white/90 text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500"
-        } ${!canLike ? "opacity-70" : ""}`}
+            ? "border-rose-200 bg-rose-50 text-rose-600"
+            : "border-slate-200 bg-white/95 text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+        } ${!canLike ? "opacity-75" : ""}`}
       >
         <Heart className="size-3" fill={liked ? "currentColor" : "none"} strokeWidth={2} />
         {likeCount}
@@ -574,7 +574,7 @@ function TemplateCard({
           {c.name}
         </div>
         <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500 tabular-nums">
-          <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: meta.dot }} />
+          <span className="size-1.5 shrink-0 rounded-sm" style={{ backgroundColor: meta.dot }} />
           <span>{meta.label}</span>
           <span className="text-slate-300">·</span>
           <span>{slides} slide{slides === 1 ? "" : "s"}</span>
@@ -650,8 +650,8 @@ function AllTemplatesDialog({
   const sorted = sortTemplates(templates, likeCounts, sortBy);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden rounded-3xl border-slate-200 bg-white p-0 shadow-[0_24px_72px_-16px_rgba(15,23,42,0.2)] sm:rounded-3xl">
-        <DialogHeader className="border-b border-slate-100 bg-white px-6 py-5">
+      <DialogContent className="flex max-h-[88vh] max-w-5xl flex-col overflow-hidden rounded-xl border-slate-200 bg-white p-0 shadow-2xl sm:rounded-xl">
+        <DialogHeader className="border-b border-slate-100 bg-white px-6 py-4">
           <DialogTitle className="flex items-center gap-2 text-base font-semibold tracking-tight text-slate-900">
             <span>All templates</span>
             <span className="font-mono text-xs font-normal tabular-nums text-slate-400">
@@ -660,12 +660,12 @@ function AllTemplatesDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="flex items-center justify-between gap-2 border-b border-slate-100 bg-white px-6 py-3">
-          <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1">
+          <div className="flex items-center gap-1 rounded-md bg-slate-100 p-1">
             {(["likes", "recent"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setSortBy(s)}
-                className={`rounded-full px-3.5 py-1 text-xs font-semibold capitalize transition ${
+                className={`rounded px-3 py-1 text-xs font-semibold capitalize transition-colors ${
                   sortBy === s
                     ? "bg-white text-slate-900 shadow-2xs"
                     : "text-slate-500 hover:text-slate-800"

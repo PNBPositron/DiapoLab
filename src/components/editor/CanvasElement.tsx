@@ -1870,7 +1870,9 @@ export function CanvasElement({
       {element.type === "chart" && <ChartRender element={element} />}
       {element.type === "qr" && <QrRender element={element} />}
       {element.type === "table" && <TableRender element={element} />}
-      {element.type === "ui" && <UiRender element={element} />}
+      {element.type === "ui" && (
+        <UiRender element={element} preview={preview} interactive={presenting && !preview} />
+      )}
       {element.type === "button" &&
         (() => {
           const presenting = useEditor.getState().presenting;

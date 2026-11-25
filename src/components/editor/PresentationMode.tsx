@@ -126,6 +126,7 @@ export function PresentationMode() {
   const [idleHidden, setIdleHidden] = useState(false);
   const idleTimerRef = useRef<number | null>(null);
   const {
+    editorDark,
     presentHideHud,
     setPresentHideHud,
     presentHide3dButton,
@@ -490,13 +491,13 @@ export function PresentationMode() {
     <div
       onPointerMove={wakeHud}
       onPointerDown={wakeHud}
-      className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-ink scanlines ${
-        idleHidden && !laserOn && !drawOn ? "cursor-none" : ""
-      }`}
+      className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden font-sans ${
+        editorDark ? "editor-dark bg-[#090d16]" : "bg-[#e2e8f0]"
+      } ${idleHidden && !laserOn && !drawOn ? "cursor-none" : ""}`}
     >
       <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center">
         <div
-          className="brutal-shadow-lg relative shrink-0"
+          className="relative shrink-0 shadow-2xl"
           style={
             {
               width: canvasW * scale,
@@ -506,7 +507,7 @@ export function PresentationMode() {
           }
         >
           <div
-            className="absolute left-0 top-0 overflow-hidden border border-teal"
+            className="absolute left-0 top-0 overflow-hidden ring-1 ring-black/10"
             style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
           >
             {backdropPage && (
@@ -731,24 +732,43 @@ export function PresentationMode() {
       {gridOverviewOpen && (
         <div
           onClick={() => setGridOverviewOpen(false)}
-          className="fixed inset-0 z-[65] flex flex-col bg-slate-950/92 p-6 text-white"
+          className={`fixed inset-0 z-[65] flex flex-col p-6 ${
+            editorDark ? "bg-slate-950/85 text-slate-100" : "bg-slate-900/45 text-slate-900"
+          }`}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/95 shadow-2xl"
+            className={`mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-xl border shadow-2xl ${
+              editorDark
+                ? "border-slate-700 bg-slate-900 text-slate-100"
+                : "border-slate-200 bg-white text-slate-900"
+            }`}
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
+            <div
+              className={`flex items-center justify-between border-b px-5 py-3.5 ${
+                editorDark ? "border-slate-800" : "border-slate-200"
+              }`}
+            >
               <span className="flex items-center gap-2 text-sm font-semibold">
-                <LayoutGrid className="size-4 text-blue-400" />
+                <LayoutGrid className="size-4 text-blue-600" />
                 Jump to slide
-                <span className="font-mono text-xs text-white/50">
+                <span
+                  className={`font-mono text-xs font-normal tabular-nums ${
+                    editorDark ? "text-slate-400" : "text-slate-500"
+                  }`}
+                >
                   ({pages.length} slides)
                 </span>
               </span>
               <button
                 type="button"
                 onClick={() => setGridOverviewOpen(false)}
-                className="grid size-8 place-items-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"
+                aria-label="Close overview"
+                className={`grid size-8 place-items-center rounded-md transition ${
+                  editorDark
+                    ? "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                }`}
               >
                 <X className="size-4" />
               </button>
@@ -764,13 +784,15 @@ export function PresentationMode() {
                       setCurrentPage(idx);
                       setGridOverviewOpen(false);
                     }}
-                    className={`group relative overflow-hidden rounded-2xl border p-1.5 text-left transition ${
+                    className={`group relative overflow-hidden rounded-lg border p-1.5 text-left transition ${
                       active
-                        ? "border-blue-500 bg-blue-500/15 ring-2 ring-blue-500/40"
-                        : "border-white/10 bg-white/5 hover:border-white/30"
+                        ? "border-blue-600 bg-blue-500/10 ring-1 ring-blue-600/30"
+                        : editorDark
+                          ? "border-slate-700/80 bg-slate-800/50 hover:border-slate-600"
+                          : "border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-white"
                     }`}
                   >
-                    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-white">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-md bg-white">
                       <SlideThumbnail
                         page={p}
                         canvasW={canvasW}
@@ -778,14 +800,14 @@ export function PresentationMode() {
                         className="h-full w-full"
                       />
                       <span
-                        className={`absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                        className={`absolute left-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums ${
                           active ? "bg-blue-600 text-white" : "bg-slate-900/80 text-white"
                         }`}
                       >
                         {idx + 1}
                       </span>
                       {p.hiddenInPresent && (
-                        <span className="absolute right-1.5 top-1.5 flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-xs">
+                        <span className="absolute right-1.5 top-1.5 flex items-center gap-1 rounded bg-amber-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
                           <EyeOff className="size-2.5" />
                           Hidden
                         </span>
@@ -810,27 +832,31 @@ export function PresentationMode() {
           }}
           title="Show presenter controls (H)"
           aria-label="Show presenter controls"
-          className="fixed bottom-4 left-4 z-[55] flex h-8 items-center gap-1.5 rounded-full border border-white/15 bg-slate-950/85 px-3 text-[11px] font-medium text-white/85 opacity-0 shadow-lg transition hover:opacity-100 focus-visible:opacity-100"
+          className="studio-dock fixed bottom-4 left-4 z-[55] flex h-8 items-center gap-1.5 px-2.5 text-xs font-medium opacity-0 transition hover:opacity-100 focus-visible:opacity-100"
         >
-          <Eye className="size-3.5 text-blue-400" />
+          <Eye className="size-3.5 text-blue-600" />
           <span>Show controls</span>
         </button>
       )}
 
       {/* Compact bottom-left presenter toolkit HUD */}
       {!hudHidden && (
-        <div className="fixed bottom-4 left-4 z-[55] flex flex-wrap items-center gap-1 rounded-full border border-white/15 bg-slate-950/90 px-2.5 py-1.5 text-white shadow-xl">
+        <div className="studio-dock fixed bottom-4 left-4 z-[55] flex flex-wrap items-center gap-0.5 px-2 py-1">
           <button
             type="button"
             disabled={prevSlideIdx === null}
             onClick={() => prevSlideIdx !== null && setCurrentPage(prevSlideIdx)}
             title="Previous slide"
-            className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+            className="grid size-7 place-items-center rounded-md disabled:opacity-35"
           >
             <ChevronLeft className="size-4" />
           </button>
           {!presentHideSlideCounter && (
-            <span className="px-1 font-mono text-[11px] tabular-nums text-white/80">
+            <span
+              className={`px-1.5 font-mono text-[11px] font-medium tabular-nums ${
+                editorDark ? "text-slate-300" : "text-slate-600"
+              }`}
+            >
               {currentIndex + 1}/{pages.length}
             </span>
           )}
@@ -839,11 +865,11 @@ export function PresentationMode() {
             disabled={nextSlideIdx === null}
             onClick={() => nextSlideIdx !== null && setCurrentPage(nextSlideIdx)}
             title="Next slide"
-            className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+            className="grid size-7 place-items-center rounded-md disabled:opacity-35"
           >
             <ChevronRight className="size-4" />
           </button>
-          <span className="mx-0.5 h-4 w-px bg-white/15" />
+          <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
           <button
             type="button"
             onClick={() => {
@@ -851,8 +877,8 @@ export function PresentationMode() {
               setDrawOn(false);
             }}
             title="Laser pointer (L)"
-            className={`grid size-7 place-items-center rounded-full transition ${
-              laserOn ? "bg-rose-500 text-white" : "text-white/75 hover:bg-white/10 hover:text-white"
+            className={`grid size-7 place-items-center rounded-md ${
+              laserOn ? "!bg-rose-600 !text-white" : ""
             }`}
           >
             <Pointer className="size-3.5" />
@@ -864,8 +890,8 @@ export function PresentationMode() {
               setLaserOn(false);
             }}
             title="Draw ink on slide (D)"
-            className={`grid size-7 place-items-center rounded-full transition ${
-              drawOn ? "bg-blue-600 text-white" : "text-white/75 hover:bg-white/10 hover:text-white"
+            className={`grid size-7 place-items-center rounded-md ${
+              drawOn ? "!bg-blue-600 !text-white" : ""
             }`}
           >
             <PenTool className="size-3.5" />
@@ -876,14 +902,16 @@ export function PresentationMode() {
                 value={inkColor}
                 onChange={setInkColor}
                 swatches={["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7", "#ffffff", "#0f172a"]}
-                dark
+                dark={editorDark}
                 side="top"
                 align="center"
               >
                 <button
                   type="button"
                   title="Pen color"
-                  className="size-5 rounded-full border-2 border-white/80 transition hover:scale-110"
+                  className={`mx-0.5 size-5 rounded-md border ${
+                    editorDark ? "border-slate-500" : "border-slate-300"
+                  }`}
                   style={{ backgroundColor: inkColor }}
                 />
               </ColorPickerPopover>
@@ -896,7 +924,7 @@ export function PresentationMode() {
                   }))
                 }
                 title="Undo last stroke"
-                className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white"
+                className="grid size-7 place-items-center rounded-md"
               >
                 <Eraser className="size-3.5" />
               </button>
@@ -910,18 +938,18 @@ export function PresentationMode() {
                   })
                 }
                 title="Clear slide ink (C)"
-                className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-rose-400"
+                className="grid size-7 place-items-center rounded-md hover:!text-rose-600"
               >
                 <Trash2 className="size-3.5" />
               </button>
             </>
           )}
-          <span className="mx-0.5 h-4 w-px bg-white/15" />
+          <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
           <button
             type="button"
             onClick={() => setGridOverviewOpen(true)}
             title="Slide overview grid (G)"
-            className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white"
+            className="grid size-7 place-items-center rounded-md"
           >
             <LayoutGrid className="size-3.5" />
           </button>
@@ -929,7 +957,7 @@ export function PresentationMode() {
             type="button"
             onClick={() => setPresenterOpen(true)}
             title="Presenter notes & timer (P)"
-            className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white"
+            className="grid size-7 place-items-center rounded-md"
           >
             <FileText className="size-3.5" />
           </button>
@@ -937,12 +965,12 @@ export function PresentationMode() {
             type="button"
             onClick={() => setAutoPlay((v) => !v)}
             title={autoPlay ? "Pause auto-play" : "Start auto-play slideshow"}
-            className={`flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-medium transition ${
-              autoPlay ? "bg-emerald-600 text-white" : "text-white/75 hover:bg-white/10 hover:text-white"
+            className={`flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium ${
+              autoPlay ? "!bg-emerald-600 !text-white" : ""
             }`}
           >
             {autoPlay ? <Pause className="size-3" /> : <Play className="size-3 fill-current" />}
-            {autoPlay && <span className="font-mono text-[10px]">{autoPlaySec}s</span>}
+            {autoPlay && <span className="font-mono text-[10px] tabular-nums">{autoPlaySec}s</span>}
           </button>
           {autoPlay && (
             <>
@@ -953,7 +981,7 @@ export function PresentationMode() {
                   setAutoPlaySec(steps[(steps.indexOf(autoPlaySec) + 1) % steps.length]);
                 }}
                 title="Cycle auto-play interval"
-                className="rounded-full px-1.5 py-0.5 font-mono text-[10px] text-white/75 transition hover:bg-white/10"
+                className="rounded-md px-1.5 py-0.5 font-mono text-[11px]"
               >
                 Pace
               </button>
@@ -961,8 +989,12 @@ export function PresentationMode() {
                 type="button"
                 onClick={() => setAutoPlayLoop((v) => !v)}
                 title={autoPlayLoop ? "Loop slideshow on" : "Loop slideshow off"}
-                className={`grid size-7 place-items-center rounded-full transition ${
-                  autoPlayLoop ? "text-emerald-300" : "text-white/45"
+                className={`grid size-7 place-items-center rounded-md ${
+                  autoPlayLoop
+                    ? editorDark
+                      ? "!text-emerald-400"
+                      : "!text-emerald-600"
+                    : "opacity-50"
                 }`}
               >
                 <Repeat className="size-3.5" />
@@ -973,7 +1005,7 @@ export function PresentationMode() {
             type="button"
             onClick={() => setCurtain((c) => (c === "black" ? "none" : "black"))}
             title="Blackout screen (B)"
-            className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white"
+            className="grid size-7 place-items-center rounded-md"
           >
             <MonitorOff className="size-3.5" />
           </button>
@@ -984,25 +1016,39 @@ export function PresentationMode() {
               title="Display & hide options (H for clean screen)"
               aria-label="Display & hide options"
               aria-expanded={displayMenuOpen}
-              className={`relative grid size-7 place-items-center rounded-full transition ${
+              className={`relative grid size-7 place-items-center rounded-md ${
                 displayMenuOpen
-                  ? "bg-blue-600 text-white"
+                  ? "!bg-blue-600 !text-white"
                   : anyHideOptionOn
-                    ? "bg-white/15 text-blue-300 hover:bg-white/20"
-                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                    ? editorDark
+                      ? "!bg-blue-500/20 !text-blue-300"
+                      : "!bg-blue-50 !text-blue-700"
+                    : ""
               }`}
             >
               {anyHideOptionOn ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
             </button>
             {displayMenuOpen && (
-              <div className="absolute bottom-full left-0 z-[65] mb-2.5 w-72 rounded-2xl border border-white/15 bg-slate-950/95 p-2 text-xs text-white shadow-2xl">
+              <div
+                className={`absolute bottom-full left-0 z-[65] mb-2.5 w-72 rounded-xl border p-1.5 text-xs shadow-xl ${
+                  editorDark
+                    ? "border-slate-700 bg-slate-900 text-slate-100"
+                    : "border-slate-200 bg-white text-slate-800"
+                }`}
+              >
                 <div className="flex items-center justify-between px-2.5 py-1.5">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-white/60">
-                    Hide in Present Mode
+                  <span className="text-xs font-semibold">
+                    Hide in present mode
                   </span>
-                  <span className="font-mono text-[10px] text-white/40">H = Clean UI</span>
+                  <span
+                    className={`font-mono text-[10px] ${
+                      editorDark ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    H = Clean UI
+                  </span>
                 </div>
-                <div className="my-1 h-px bg-white/10" />
+                <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
                 {[
                   {
                     label: "Clean screen (hide all UI)",
@@ -1048,23 +1094,33 @@ export function PresentationMode() {
                     role="switch"
                     aria-checked={opt.checked}
                     onClick={opt.toggle}
-                    className="flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-left transition hover:bg-white/10"
+                    className={`flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left transition ${
+                      editorDark ? "hover:bg-slate-800" : "hover:bg-slate-100"
+                    }`}
                   >
-                    <span className="flex items-center gap-2 text-white/90">
+                    <span className="flex items-center gap-2">
                       <span>{opt.label}</span>
                       {opt.hint && (
-                        <span className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[9px] text-white/60">
+                        <span
+                          className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${
+                            editorDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
                           {opt.hint}
                         </span>
                       )}
                     </span>
                     <span
-                      className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${
-                        opt.checked ? "bg-blue-500" : "bg-white/20"
+                      className={`relative h-4 w-7 shrink-0 rounded transition-colors ${
+                        opt.checked
+                          ? "bg-blue-600"
+                          : editorDark
+                            ? "bg-slate-700"
+                            : "bg-slate-300"
                       }`}
                     >
                       <span
-                        className={`absolute left-0.5 top-0.5 size-3 rounded-full bg-white transition-transform ${
+                        className={`absolute left-0.5 top-0.5 size-3 rounded-[3px] bg-white transition-transform ${
                           opt.checked ? "translate-x-3" : ""
                         }`}
                       />
@@ -1073,8 +1129,12 @@ export function PresentationMode() {
                 ))}
                 {(hiddenSlidesCount > 0 || hiddenElsOnSlide > 0) && (
                   <>
-                    <div className="my-1 h-px bg-white/10" />
-                    <div className="px-2.5 py-1.5 text-[10px] text-amber-300/90">
+                    <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
+                    <div
+                      className={`px-2.5 py-1.5 text-[11px] ${
+                        editorDark ? "text-amber-300" : "text-amber-700"
+                      }`}
+                    >
                       Hidden from deck:{" "}
                       {[
                         hiddenSlidesCount > 0 ? `${hiddenSlidesCount} slide${hiddenSlidesCount > 1 ? "s" : ""}` : null,
@@ -1088,12 +1148,12 @@ export function PresentationMode() {
               </div>
             )}
           </div>
-          <span className="mx-0.5 h-4 w-px bg-white/15" />
+          <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
           <button
             type="button"
             onClick={() => setPresenting(false)}
             title="Exit presentation (Esc)"
-            className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-rose-500/20 hover:text-rose-300"
+            className="grid size-7 place-items-center rounded-md hover:!bg-rose-500/15 hover:!text-rose-600"
           >
             <X className="size-3.5" />
           </button>
@@ -1104,18 +1164,22 @@ export function PresentationMode() {
       {!stage3dHidden && (
         <div className="fixed bottom-4 right-4 z-[55] flex items-center gap-1.5">
         {stage3dOpen ? (
-          <div className="flex flex-wrap items-center gap-1.5 rounded-full border border-white/15 bg-slate-950/90 px-2.5 py-1.5 text-white shadow-xl">
+          <div className="studio-dock flex flex-wrap items-center gap-1 px-2 py-1">
             <button
               type="button"
               onClick={() => prevSlideIdx !== null && setCurrentPage(prevSlideIdx)}
               disabled={prevSlideIdx === null}
               aria-label="Previous slide"
-              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+              className="grid size-7 place-items-center rounded-md disabled:opacity-35"
             >
               <ChevronLeft className="size-4" />
             </button>
             {!presentHideSlideCounter && (
-              <span className="px-1 font-mono text-[11px] tabular-nums text-white/75">
+              <span
+                className={`px-1.5 font-mono text-[11px] font-medium tabular-nums ${
+                  editorDark ? "text-slate-300" : "text-slate-600"
+                }`}
+              >
                 {currentIndex + 1}/{pages.length}
               </span>
             )}
@@ -1124,11 +1188,11 @@ export function PresentationMode() {
               onClick={() => nextSlideIdx !== null && setCurrentPage(nextSlideIdx)}
               disabled={nextSlideIdx === null}
               aria-label="Next slide"
-              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10 disabled:opacity-35"
+              className="grid size-7 place-items-center rounded-md disabled:opacity-35"
             >
               <ChevronRight className="size-4" />
             </button>
-            <span className="mx-0.5 h-4 w-px bg-white/15" />
+            <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
             {THREE_TRANSITIONS.map((kind) => (
               <button
                 key={kind}
@@ -1138,16 +1202,14 @@ export function PresentationMode() {
                   setStage3dPlayTrigger((n) => n + 1);
                   playTransitionSound({ isThreeD: true });
                 }}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
-                  stage3dKind === kind
-                    ? "bg-blue-600 text-white"
-                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+                  stage3dKind === kind ? "!bg-blue-600 !text-white" : ""
                 }`}
               >
                 {formatTransitionLabel(kind)}
               </button>
             ))}
-            <span className="mx-0.5 h-4 w-px bg-white/15" />
+            <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
             <button
               type="button"
               onClick={() => {
@@ -1157,9 +1219,9 @@ export function PresentationMode() {
                 setStage3dSceneOverride(nextPreset.config);
               }}
               title="Cycle 3D scene environment"
-              className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/85 transition hover:bg-white/10"
+              className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium"
             >
-              <Palette className="size-3.5 text-blue-400" />
+              <Palette className="size-3.5 text-blue-600" />
               <span>
                 {THREE_SCENE_PRESETS.find(
                   (p) =>
@@ -1175,7 +1237,7 @@ export function PresentationMode() {
                 playTransitionSound({ isThreeD: true });
               }}
               title="Replay 3D transition (R)"
-              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
+              className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium"
             >
               <Rotate3d className="size-3.5" />
               Replay
@@ -1184,7 +1246,7 @@ export function PresentationMode() {
               type="button"
               onClick={() => setStage3dResetSignal((n) => n + 1)}
               title="Reset 3D camera"
-              className="grid size-7 place-items-center rounded-full text-white/80 transition hover:bg-white/10"
+              className="grid size-7 place-items-center rounded-md"
             >
               <RotateCcw className="size-3.5" />
             </button>
@@ -1192,7 +1254,7 @@ export function PresentationMode() {
               type="button"
               onClick={() => setStage3dOpen(false)}
               title="Exit 3D stage (3)"
-              className="grid size-7 place-items-center rounded-full text-white/75 transition hover:bg-white/10"
+              className="grid size-7 place-items-center rounded-md"
             >
               <X className="size-3.5" />
             </button>
@@ -1208,10 +1270,10 @@ export function PresentationMode() {
               setStage3dPlayTrigger((n) => n + 1);
             }}
             title="Inspect & orbit slide in Three.js 3D Stage (Press 3)"
-            className="flex h-8 items-center gap-1.5 rounded-full border border-white/15 bg-slate-950/90 px-3 text-[11px] font-medium text-white/85 shadow-lg transition hover:border-blue-400/50 hover:text-white"
+            className="studio-dock flex h-8 items-center gap-1.5 px-2.5 text-xs font-medium"
           >
-            <Box className="size-3.5 text-blue-400" />
-            3D Stage
+            <Box className="size-3.5 text-blue-600" />
+            <span>3D Stage</span>
           </button>
         )}
         </div>
@@ -1220,29 +1282,94 @@ export function PresentationMode() {
       <BgMusic page={page} />
       {presenterOpen && (
         <div
-          className={`fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] ${
-            showThreeCanvas ? "" : "backdrop-blur-md"
-          }`}
+          className={`fixed bottom-4 left-4 z-[60] flex w-[380px] max-w-[92vw] flex-col gap-3 rounded-xl border p-4 shadow-2xl ${
+            editorDark
+              ? "border-slate-700 bg-slate-900/95 text-slate-100"
+              : "border-slate-200 bg-white/95 text-slate-900"
+          } ${showThreeCanvas ? "" : "backdrop-blur-md"}`}
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">Presenter · slide {currentIndex + 1}/{pages.length}</span>
-            <span className="font-mono text-sm tabular-nums text-white/90">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setReplayEpoch((n) => n + 1)} title="Replay object animations (R)" className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Replay</button>
-              <button onClick={() => setElapsed(0)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Reset</button>
-              <button onClick={() => setPresenterOpen(false)} className="rounded-lg border border-white/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/70 transition hover:bg-white/10">Close</button>
+            <span className={`text-xs font-semibold ${editorDark ? "text-blue-400" : "text-blue-600"}`}>
+              Presenter · Slide {currentIndex + 1}/{pages.length}
+            </span>
+            <span className="font-mono text-sm font-semibold tabular-nums">
+              {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setReplayEpoch((n) => n + 1)}
+                title="Replay object animations (R)"
+                className={`rounded-md border px-2 py-1 text-xs font-medium transition ${
+                  editorDark
+                    ? "border-slate-700 text-slate-300 hover:bg-slate-800"
+                    : "border-slate-200 text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                Replay
+              </button>
+              <button
+                type="button"
+                onClick={() => setElapsed(0)}
+                className={`rounded-md border px-2 py-1 text-xs font-medium transition ${
+                  editorDark
+                    ? "border-slate-700 text-slate-300 hover:bg-slate-800"
+                    : "border-slate-200 text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={() => setPresenterOpen(false)}
+                className={`rounded-md border px-2 py-1 text-xs font-medium transition ${
+                  editorDark
+                    ? "border-slate-700 text-slate-300 hover:bg-slate-800"
+                    : "border-slate-200 text-slate-700 hover:bg-slate-100"
+                }`}
+              >
+                Close
+              </button>
             </div>
           </div>
           <div className="flex gap-3">
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Notes</span>
-              <div className="mt-1 max-h-44 overflow-auto whitespace-pre-wrap text-[13px] leading-relaxed text-white/85">
-                {page.notes?.trim() ? page.notes : <span className="italic text-white/35">No notes for this slide.</span>}
+              <span className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}>
+                Notes
+              </span>
+              <div
+                className={`mt-1 max-h-44 overflow-auto whitespace-pre-wrap text-[13px] leading-relaxed ${
+                  editorDark ? "text-slate-200" : "text-slate-700"
+                }`}
+              >
+                {page.notes?.trim() ? (
+                  page.notes
+                ) : (
+                  <span className={`italic ${editorDark ? "text-slate-500" : "text-slate-400"}`}>
+                    No notes for this slide.
+                  </span>
+                )}
               </div>
             </div>
-            {nextSlideIdx !== null && pages[nextSlideIdx] && <div className="w-40 shrink-0"><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">Next</span><SlideThumbnail page={pages[nextSlideIdx]} canvasW={canvasW} canvasH={canvasH} className="mt-1 rounded-lg border border-white/15" /></div>}
+            {nextSlideIdx !== null && pages[nextSlideIdx] && (
+              <div className="w-40 shrink-0">
+                <span className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}>
+                  Next
+                </span>
+                <SlideThumbnail
+                  page={pages[nextSlideIdx]}
+                  canvasW={canvasW}
+                  canvasH={canvasH}
+                  className={`mt-1 rounded-lg border ${
+                    editorDark ? "border-slate-700" : "border-slate-200"
+                  }`}
+                />
+              </div>
+            )}
           </div>
-          <p className="text-[10px] text-white/35">P notes · H hide UI · L laser · D draw · G grid · B blackout · 3 3D stage</p>
+          <p className={`text-[11px] ${editorDark ? "text-slate-400" : "text-slate-500"}`}>
+            P notes · H hide UI · L laser · D draw · G grid · B blackout · 3 3D stage
+          </p>
         </div>
       )}
     </div>

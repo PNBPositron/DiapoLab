@@ -9,7 +9,7 @@ import {
   Square,
   Bug,
   Command,
-  Sparkles,
+  Layers,
   Globe,
   Scissors,
   Group,
@@ -68,7 +68,7 @@ const GROUP_ICONS: Record<CommandGroup, React.ReactNode> = {
   Actions: <Zap className="size-2.5" />,
   Insert: <Plus className="size-2.5" />,
   Shortcuts: <Command className="size-2.5" />,
-  Features: <Sparkles className="size-2.5" />,
+  Features: <Layers className="size-2.5" />,
   "Add-ons": <Puzzle className="size-2.5" />,
   Links: <Link2 className="size-2.5" />,
 };
@@ -484,7 +484,7 @@ export function CommandPalette({
         label: "Live app",
         group: "Links",
         icon: <Globe className="size-4" />,
-        href: typeof window === "undefined" ? "/" : window.location.origin,
+        href: "/",
         keywords: "app live deploy site",
       },
       {
@@ -593,34 +593,30 @@ export function CommandPalette({
         aria-modal="true"
         aria-label="Command palette"
         onKeyDown={onKeyDown}
-        className="w-full max-w-[620px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_72px_-16px_rgba(15,23,42,0.22)] animate-in slide-in-from-top-3 zoom-in-95 duration-150"
+        className="w-full max-w-[600px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl animate-in slide-in-from-top-2 zoom-in-95 duration-150"
       >
         {/* Search bar */}
         <div className="border-b border-slate-200 bg-white px-4">
-          <div className="flex items-center gap-3 py-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
-              <Search className="size-4" />
-            </span>
+          <div className="flex items-center gap-2.5 py-2.5">
+            <Search className="size-4 shrink-0 text-slate-400" />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search commands, widgets, apps, features…"
-              className="h-10 min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
+              className="h-9 min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
             />
-            <kbd className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-semibold text-slate-500">
+            <kbd className="shrink-0 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-slate-500">
               ESC
             </kbd>
           </div>
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[52vh] overflow-y-auto bg-white p-2.5">
+        <div ref={listRef} className="max-h-[52vh] overflow-y-auto bg-white p-2">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-14">
-              <span className="grid size-11 place-items-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-400">
-                <Search className="size-5" />
-              </span>
+            <div className="flex flex-col items-center justify-center gap-2 py-12">
+              <Search className="size-5 text-slate-300" />
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-800">No results for “{query}”</p>
                 <p className="mt-1 text-xs text-slate-500">Try “insert”, “paint”, “add-ons”, “present”…</p>
@@ -634,8 +630,8 @@ export function CommandPalette({
               return (
                 <div key={c.id}>
                   {showHeader && (
-                    <div className="flex items-center gap-1.5 px-3 pb-1.5 pt-3 text-[11px] font-semibold text-slate-400">
-                      <span className="text-blue-600">{GROUP_ICONS[c.group]}</span>
+                    <div className="flex items-center gap-1.5 px-2.5 pb-1 pt-2.5 text-[11px] font-medium text-slate-400">
+                      <span className="text-slate-400">{GROUP_ICONS[c.group]}</span>
                       {c.group}
                     </div>
                   )}
@@ -643,21 +639,21 @@ export function CommandPalette({
                     type="button"
                     onMouseEnter={() => setActiveIndex(i)}
                     onClick={() => runCommand(c)}
-                    className={`flex w-full items-center gap-3 rounded-2xl px-2.5 py-2 text-left transition-colors ${
-                      active ? "bg-blue-50/80 ring-1 ring-inset ring-blue-200" : "text-slate-700 hover:bg-slate-50"
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors ${
+                      active ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <span
-                      className={`grid size-8 shrink-0 place-items-center rounded-xl border transition-colors ${
+                      className={`grid size-7 shrink-0 place-items-center rounded-md border transition-colors ${
                         active
                           ? "border-blue-600 bg-blue-600 text-white"
-                          : "border-slate-200 bg-slate-50 text-slate-500"
+                          : "border-slate-200 bg-white text-slate-500"
                       }`}
                     >
                       {c.icon}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className={`block truncate text-xs font-semibold ${active ? "text-slate-900" : "text-slate-800"}`}>
+                      <span className={`block truncate text-xs font-medium ${active ? "text-slate-900" : "text-slate-800"}`}>
                         {highlightLabel(c.label, query)}
                       </span>
                       {c.hint && (
@@ -676,9 +672,9 @@ export function CommandPalette({
                         {c.shortcut.map((k) => (
                           <kbd
                             key={k}
-                            className={`rounded-lg border px-1.5 py-0.5 font-mono text-[10px] font-medium ${
+                            className={`rounded border px-1.5 py-0.5 font-mono text-[10px] font-medium ${
                               active
-                                ? "border-blue-200 bg-white text-blue-700"
+                                ? "border-slate-300 bg-white text-slate-700"
                                 : "border-slate-200 bg-slate-50 text-slate-500"
                             }`}
                           >

@@ -92,12 +92,12 @@ export function WelcomeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) skip(); }}>
-      <DialogContent className="max-w-xl rounded-3xl sm:rounded-3xl border-slate-200 bg-white p-0">
+      <DialogContent className="max-w-xl rounded-xl sm:rounded-xl border-slate-200 bg-white p-0 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 rounded-t-3xl border-b border-slate-200 bg-white px-6 py-5">
+        <div className="flex items-center justify-between gap-3 rounded-t-xl border-b border-slate-200 bg-white px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-2xl bg-blue-600 text-white">
-              <MonitorPlay className="size-5" />
+            <span className="grid size-9 place-items-center rounded-lg bg-blue-600 text-white">
+              <MonitorPlay className="size-4.5" />
             </span>
             <div>
               <p className="text-xs font-medium text-blue-600">Welcome to DiapoLab</p>
@@ -108,7 +108,7 @@ export function WelcomeDialog() {
           </div>
           <div className="flex items-center gap-1.5">
             {[0, 1, 2].map((i) => (
-              <span key={i} className={`h-1.5 rounded-full transition-all ${i === step ? "w-5 bg-blue-600" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200"}`} />
+              <span key={i} className={`h-1.5 rounded-sm transition-all ${i === step ? "w-5 bg-blue-600" : i < step ? "w-1.5 bg-blue-300" : "w-1.5 bg-slate-200"}`} />
             ))}
           </div>
         </div>
@@ -125,23 +125,23 @@ export function WelcomeDialog() {
                     <button
                       key={p.name}
                       onClick={() => setFormat({ name: p.name, w: p.w, h: p.h })}
-                      className={`relative flex flex-col items-center gap-2 rounded-2xl border px-2 py-3.5 transition-all active:scale-[0.97] ${
+                      className={`relative flex flex-col items-center gap-2 rounded-lg border px-2 py-3.5 transition-colors ${
                         active
-                          ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
-                          : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40"
+                          ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600/20"
+                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                       }`}
                     >
                       {active && (
-                        <span className="absolute right-2 top-2 grid size-4 place-items-center rounded-full bg-blue-600 text-white">
+                        <span className="absolute right-2 top-2 grid size-4 place-items-center rounded bg-blue-600 text-white">
                           <Check className="size-2.5" strokeWidth={3} />
                         </span>
                       )}
                       <span
-                        className={`block rounded-[5px] border-2 ${active ? "border-blue-400 bg-blue-100" : "border-slate-300 bg-slate-100"}`}
+                        className={`block rounded-[4px] border-2 ${active ? "border-blue-500 bg-blue-100" : "border-slate-300 bg-slate-100"}`}
                         style={{ width: p.w >= p.h ? 34 : Math.round(34 * (p.w / p.h)), height: p.w >= p.h ? Math.round(26 * (p.h / p.w)) || 16 : 26 }}
                       />
                       <span className="text-[11px] font-semibold text-slate-800">{p.name}</span>
-                      <span className="font-mono text-[9px] text-slate-400">{p.w}×{p.h}</span>
+                      <span className="font-mono text-[9px] tabular-nums text-slate-400">{p.w}×{p.h}</span>
                     </button>
                   );
                 })}
@@ -154,11 +154,11 @@ export function WelcomeDialog() {
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   onClick={() => { setUseTemplate(false); setPickedTemplate(null); }}
-                  className={`flex items-start gap-2.5 rounded-2xl border px-3.5 py-3 text-left transition ${
-                    !useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                  className={`flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-left transition-colors ${
+                    !useTemplate ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600/20" : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-xl ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-md ${!useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
                     <LayoutGrid className="size-3.5" />
                   </span>
                   <span>
@@ -168,16 +168,16 @@ export function WelcomeDialog() {
                 </button>
                 <button
                   onClick={() => setUseTemplate(true)}
-                  className={`flex items-start gap-2.5 rounded-2xl border px-3.5 py-3 text-left transition ${
-                    useTemplate ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                  className={`flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-left transition-colors ${
+                    useTemplate ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600/20" : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
-                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-xl ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-md ${useTemplate ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>
                     <Layers className="size-3.5" />
                   </span>
                   <span>
                     <span className="block text-xs font-semibold text-slate-800">Use a public template</span>
-                    <span className="mt-0.5 block text-[10px] text-slate-400">Community & built-in decks.</span>
+                    <span className="mt-0.5 block text-[10px] text-slate-400">Community &amp; built-in decks.</span>
                   </span>
                 </button>
               </div>
@@ -185,13 +185,13 @@ export function WelcomeDialog() {
               {useTemplate && (
                 <div className="mt-3.5">
                   {templatesLoading ? (
-                    <div className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 py-10 text-[11px] text-slate-400">
+                    <div className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-slate-200 py-10 text-[11px] text-slate-400">
                       <Loader2 className="size-3.5 animate-spin text-blue-500" /> Loading templates…
                     </div>
                   ) : templatesError ? (
-                    <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">{templatesError}</div>
+                    <div className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-3 text-[11px] text-rose-600">{templatesError}</div>
                   ) : templates.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-200 px-3.5 py-8 text-center text-[11px] text-slate-400">
+                    <div className="rounded-lg border border-dashed border-slate-200 px-3.5 py-8 text-center text-[11px] text-slate-400">
                       No public templates yet — start blank for now.
                     </div>
                   ) : (
@@ -202,8 +202,8 @@ export function WelcomeDialog() {
                           <button
                             key={t.id}
                             onClick={() => setPickedTemplate(t)}
-                            className={`group relative overflow-hidden rounded-2xl border text-left transition-all ${
-                              active ? "border-blue-600 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-blue-300"
+                            className={`group relative overflow-hidden rounded-lg border text-left transition-colors ${
+                              active ? "border-blue-600 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-slate-300"
                             }`}
                           >
                             {t.pages?.[0] ? (
@@ -215,7 +215,7 @@ export function WelcomeDialog() {
                               {t.name}
                             </span>
                             {active && (
-                              <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-blue-600 text-white shadow">
+                              <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded bg-blue-600 text-white shadow">
                                 <Check className="size-2.5" strokeWidth={3} />
                               </span>
                             )}
@@ -239,11 +239,11 @@ export function WelcomeDialog() {
                     <button
                       key={id}
                       onClick={() => setPanel(id)}
-                      className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition ${
-                        active ? "border-blue-600 bg-blue-50/70 shadow-[0_8px_20px_rgba(37,99,235,0.15)]" : "border-slate-200 bg-white hover:border-blue-300"
+                      className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                        active ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600/20" : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
-                      <span className={`grid size-8 shrink-0 place-items-center rounded-xl ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}>
+                      <span className={`grid size-8 shrink-0 place-items-center rounded-md ${active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"}`}>
                         <Icon className="size-4" />
                       </span>
                       <span className="min-w-0">
@@ -259,15 +259,15 @@ export function WelcomeDialog() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 rounded-b-3xl border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <button onClick={skip} className="text-[11px] font-medium text-slate-400 transition hover:text-slate-600">
+        <div className="flex items-center justify-between gap-3 rounded-b-xl border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <button onClick={skip} className="text-[11px] font-medium text-slate-400 transition-colors hover:text-slate-600">
             Skip
           </button>
           <div className="flex items-center gap-2">
             {step > 0 && (
               <button
                 onClick={() => setStep((s) => (s - 1) as Step)}
-                className="rounded-full border border-slate-200 bg-white px-4.5 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 active:scale-[0.97]"
+                className="rounded-md border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
               >
                 Back
               </button>
@@ -276,14 +276,14 @@ export function WelcomeDialog() {
               <button
                 onClick={() => setStep((s) => (s + 1) as Step)}
                 disabled={nextDisabled}
-                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40"
+                className="rounded-md bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:pointer-events-none disabled:opacity-40"
               >
                 Continue
               </button>
             ) : (
               <button
                 onClick={finish}
-                className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(37,99,235,0.25)] transition-all hover:bg-blue-700 active:scale-[0.97]"
+                className="rounded-md bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
               >
                 Start creating
               </button>

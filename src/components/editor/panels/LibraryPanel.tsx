@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Camera, Sparkles } from "lucide-react";
+import { Camera, Shapes } from "lucide-react";
 import { PanelHeader, SegmentedControl } from "../ui/selectors";
 import { UnsplashPanel } from "./UnsplashPanel";
 import { IllustrationsPanel } from "./IllustrationsPanel";
@@ -30,7 +30,7 @@ export function LibraryPanel() {
           onChange={setTab}
           options={[
             { value: "photos", label: "Photos", icon: Camera, title: "Unsplash photos" },
-            { value: "illus", label: "Illus.", icon: Sparkles, title: "Highlights, characters & 3D icons" },
+            { value: "illus", label: "Illus.", icon: Shapes, title: "Highlights, characters & 3D icons" },
           ]}
         />
       </div>

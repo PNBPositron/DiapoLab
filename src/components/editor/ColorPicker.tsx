@@ -107,6 +107,7 @@ export function ColorPicker({
   const [hsv, setHsv] = useState(() => rgbToHsv(hexToRgb(safeHex)));
   const [hexDraft, setHexDraft] = useState(safeHex);
   const [recentColors, setRecentColors] = useState<string[]>([]);
+  const [hasEyedropper, setHasEyedropper] = useState(false);
   const svRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const lastEmitted = useRef(safeHex);
@@ -114,6 +115,7 @@ export function ColorPicker({
 
   useEffect(() => {
     setRecentColors(readRecentColors());
+    setHasEyedropper("EyeDropper" in window);
   }, []);
 
   // Sync quand la valeur change de l'extérieur
@@ -191,7 +193,6 @@ export function ColorPicker({
     }
   };
 
-  const hasEyedropper = typeof window !== "undefined" && "EyeDropper" in window;
   const borderCls = dark ? "border-slate-700" : "border-slate-200";
   const inputBgCls = dark
     ? "border-slate-700 bg-slate-950 text-slate-100 focus:border-sky-400"
@@ -213,7 +214,7 @@ export function ColorPicker({
                 onClick={() => applyHex(c)}
                 title={c}
                 aria-label={`Use recent color ${c}`}
-                className={`size-6 rounded-md border shadow-2xs transition hover:scale-110 hover:border-sky-400 ${borderCls}`}
+                className={`size-6 rounded-md border shadow-2xs transition hover:border-sky-400 ${borderCls}`}
                 style={{ background: c }}
               />
             ))}
@@ -228,7 +229,7 @@ export function ColorPicker({
         onPointerMove={onSvMove}
         onPointerUp={onSvUp}
         onPointerCancel={onSvUp}
-        className={`relative h-24 w-full cursor-crosshair touch-none rounded-xl border ${borderCls}`}
+        className={`relative h-24 w-full cursor-crosshair touch-none rounded-lg border ${borderCls}`}
         style={{
           background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h} 100% 50%))`,
         }}
@@ -378,7 +379,7 @@ export function ColorPickerPopover({
           sideOffset={sideOffset}
           collisionBoundary={dialogContainer ?? undefined}
           collisionPadding={10}
-          className={`pointer-events-auto z-[120] w-60 rounded-2xl border p-3 shadow-2xl outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 ${
+          className={`pointer-events-auto z-[120] w-60 rounded-xl border p-3 shadow-xl outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 ${
             dark
               ? "border-slate-700 bg-slate-900 text-slate-100"
               : "border-slate-200 bg-white text-slate-900"
@@ -406,9 +407,9 @@ export function ColorPickerPopover({
                     onClick={() => onChange(swatch)}
                     title={swatch}
                     aria-label={`Select color ${swatch}`}
-                    className={`size-5 rounded-full border transition-transform hover:scale-110 ${
+                    className={`size-5 rounded-full border transition ${
                       dark ? "border-slate-700" : "border-slate-200/80"
-                    } ${active ? "scale-110 ring-2 ring-sky-500 ring-offset-1" : ""}`}
+                    } ${active ? "ring-2 ring-sky-500 ring-offset-1" : "hover:border-slate-400"}`}
                     style={{ backgroundColor: swatch }}
                   />
                 );

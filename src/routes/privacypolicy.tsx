@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, BookOpen, User, HardDrive, CloudCog, Sparkles, Globe2, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, ShieldCheck, BookOpen, User, HardDrive, CloudCog, Cpu, Globe2, SlidersHorizontal } from "lucide-react";
 
 export const Route = createFileRoute("/privacypolicy")({
   component: PrivacyPolicy,
@@ -29,7 +29,7 @@ const PP_SECTIONS = [
   { icon: <CloudCog className="size-3.5" />, id: "what-we-store" },
   { icon: <User className="size-3.5" />, id: "account-data" },
   { icon: <HardDrive className="size-3.5" />, id: "device-preferences" },
-  { icon: <Sparkles className="size-3.5" />, id: "ai-features" },
+  { icon: <Cpu className="size-3.5" />, id: "ai-features" },
   { icon: <Globe2 className="size-3.5" />, id: "public-content" },
   { icon: <SlidersHorizontal className="size-3.5" />, id: "your-choices" },
 ];
@@ -55,7 +55,7 @@ function PrivacyPolicy() {
           locally in your browser and never leave your device unless you publish them.
         </p>
       </Section>
-      <Section title="AI features" icon={<Sparkles className="size-4" />}>
+      <Section title="AI features" icon={<Cpu className="size-4" />}>
         <p>
           When you use the deck generator, chat edit, redesign, translate or import, the relevant
           slide content and your prompt are sent to the selected AI model provider to produce a
@@ -95,26 +95,26 @@ export function LegalShell({
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* Top navigation */}
-      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+      <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-4xl items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
-              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-lg object-contain" />
+              <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-md object-contain" />
               <span>DiapoLab</span>
             </Link>
             <span className="text-slate-300">/</span>
             <span className="text-xs font-medium text-slate-500">{title}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Link
               to="/wiki"
-              className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 transition hover:text-slate-900 hover:underline hover:underline-offset-4"
             >
               <BookOpen className="size-3.5" /> Wiki
             </Link>
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
             >
               <ArrowLeft className="size-3.5" /> Back to editor
             </Link>
@@ -126,7 +126,7 @@ export function LegalShell({
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <div className="flex items-center gap-4">
-            <span className="grid size-12 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
+            <span className="grid size-11 shrink-0 place-items-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600">
               {icon ?? <ShieldCheck className="size-5" />}
             </span>
             <div>
@@ -150,7 +150,7 @@ export function LegalShell({
             <Link
               key={link.to}
               to={link.to}
-              className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
+              className="rounded-md border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600"
             >
               {link.label}
             </Link>
@@ -171,10 +171,10 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-5 py-3.5">
         {icon && (
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700">
+          <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
             {icon}
           </span>
         )}

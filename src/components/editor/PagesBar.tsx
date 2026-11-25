@@ -62,10 +62,10 @@ export function PagesBar() {
             <div key={p.id} className="group relative shrink-0">
               <button
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-[14px] bg-white transition-all duration-150 ${
+                className={`relative overflow-hidden rounded-lg bg-white transition-colors duration-150 ${
                   active
-                    ? "border-2 border-blue-600 ring-4 ring-blue-500/15 shadow-[0_12px_28px_-8px_rgba(37,99,235,0.34)]"
-                    : "border border-slate-200/90 opacity-90 shadow-[0_8px_22px_-8px_rgba(15,23,42,0.12)] hover:-translate-y-0.5 hover:border-slate-300 hover:opacity-100"
+                    ? "border-2 border-blue-600 ring-2 ring-blue-600/20 shadow-md"
+                    : "border border-slate-200/90 opacity-90 shadow-sm hover:border-slate-300 hover:opacity-100"
                 }`}
                 style={{ width: thumbW + 2, height: thumbH + 2 }}
               >
@@ -78,7 +78,7 @@ export function PagesBar() {
                 {p.notes?.trim() && (
                   <span
                     title="Has speaker notes"
-                    className="absolute left-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-amber-500/90 text-white shadow-xs"
+                    className="absolute left-1.5 top-1.5 grid size-4 place-items-center rounded bg-amber-600 text-white"
                   >
                     <FileText className="size-2.5" />
                   </span>
@@ -86,24 +86,24 @@ export function PagesBar() {
                 {p.hiddenInPresent && (
                   <span
                     title="Hidden in present mode"
-                    className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-slate-900/80 px-1.5 py-0.5 text-[9px] font-semibold text-amber-300 shadow-xs"
+                    className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded bg-slate-900/85 px-1.5 py-0.5 text-[9px] font-semibold text-amber-300"
                   >
                     <EyeOff className="size-2.5" />
                   </span>
                 )}
-                <span className={`absolute bottom-1.5 right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-mono text-[10px] font-bold tabular-nums transition-opacity ${
-                  active ? "bg-blue-600 text-white opacity-100 shadow-xs" : "bg-slate-900/75 text-white opacity-0 group-hover:opacity-100"
+                <span className={`absolute bottom-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded px-1 font-mono text-[10px] font-semibold tabular-nums transition-opacity ${
+                  active ? "bg-blue-600 text-white opacity-100" : "bg-slate-900/80 text-white opacity-0 group-hover:opacity-100"
                 }`}>
                   {i + 1}
                 </span>
               </button>
-              <div className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 gap-0.5 rounded-full border border-slate-200 bg-white/95 p-1 opacity-0 shadow-md backdrop-blur-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <div className="studio-dock absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 gap-0.5 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 {i > 0 && (
                   <button
                     onClick={() => movePage(i, i - 1)}
                     title="Move page left"
                     aria-label={`Move page ${i + 1} left`}
-                    className="grid h-5 w-5 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    className="grid h-5 w-5 place-items-center rounded"
                   >
                     <ChevronLeft className="h-3 w-3" />
                   </button>
@@ -113,7 +113,7 @@ export function PagesBar() {
                     onClick={() => movePage(i, i + 1)}
                     title="Move page right"
                     aria-label={`Move page ${i + 1} right`}
-                    className="grid h-5 w-5 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    className="grid h-5 w-5 place-items-center rounded"
                   >
                     <ChevronRight className="h-3 w-3" />
                   </button>
@@ -122,8 +122,8 @@ export function PagesBar() {
                   onClick={() => togglePageHiddenInPresent(i)}
                   title={p.hiddenInPresent ? "Show slide in present mode" : "Hide slide in present mode"}
                   aria-label={p.hiddenInPresent ? `Show page ${i + 1} in present mode` : `Hide page ${i + 1} in present mode`}
-                  className={`grid h-5 w-5 place-items-center rounded-full transition ${
-                    p.hiddenInPresent ? "bg-amber-100 text-amber-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  className={`grid h-5 w-5 place-items-center rounded ${
+                    p.hiddenInPresent ? "!bg-amber-100 !text-amber-700" : ""
                   }`}
                 >
                   {p.hiddenInPresent ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -132,7 +132,7 @@ export function PagesBar() {
                   onClick={() => duplicatePage(i)}
                   title="Duplicate"
                   aria-label={`Duplicate page ${i + 1}`}
-                  className="grid h-5 w-5 place-items-center rounded-full text-blue-600 transition hover:bg-blue-50"
+                  className="grid h-5 w-5 place-items-center rounded text-blue-600"
                 >
                   <Copy className="h-3 w-3" />
                 </button>
@@ -141,7 +141,7 @@ export function PagesBar() {
                     onClick={() => removePage(i)}
                     title="Delete"
                     aria-label={`Delete page ${i + 1}`}
-                    className="grid h-5 w-5 place-items-center rounded-full text-rose-600 transition hover:bg-rose-50"
+                    className="grid h-5 w-5 place-items-center rounded text-rose-600 hover:!bg-rose-50 hover:!text-rose-600"
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
@@ -154,7 +154,7 @@ export function PagesBar() {
           onClick={addPage}
           title="Add page"
           aria-label="Add page"
-          className="grid shrink-0 place-items-center rounded-[14px] border border-dashed border-slate-300/90 bg-white/60 text-slate-500 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.10)] backdrop-blur-md transition-all hover:border-blue-400 hover:bg-white/90 hover:text-blue-600"
+          className="grid shrink-0 place-items-center rounded-lg border border-dashed border-slate-300 bg-white text-slate-500 transition-colors hover:border-blue-500 hover:text-blue-600"
           style={{ height: thumbH + 2, width: Math.max(36, Math.round(thumbH * 0.72)) }}
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
@@ -164,7 +164,7 @@ export function PagesBar() {
           onClick={() => setGridOpen(true)}
           title="Slide grid overview & reorder"
           aria-label="Slide grid overview"
-          className="grid shrink-0 place-items-center rounded-[14px] border border-slate-200/90 bg-white/75 text-slate-500 shadow-[0_6px_18px_-8px_rgba(15,23,42,0.10)] backdrop-blur-md transition-all hover:border-blue-400 hover:bg-white hover:text-blue-600"
+          className="grid shrink-0 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-xs transition-colors hover:border-blue-500 hover:text-blue-600"
           style={{ height: thumbH + 2, width: Math.max(36, Math.round(thumbH * 0.72)) }}
         >
           <LayoutGrid className="h-4 w-4" strokeWidth={2} />

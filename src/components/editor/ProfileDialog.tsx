@@ -32,14 +32,14 @@ export function ProfileDialog({ onClose }: { onClose: () => void }) {
 
   if (!user) return null;
 
-  const inputCls = "mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15";
+  const inputCls = "mt-1.5 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15";
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6" onClick={onClose}>
-      <div className="relative my-3 w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)] sm:my-6" onClick={(event) => event.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-950/35 p-3 sm:p-6" onClick={onClose}>
+      <div className="relative my-3 w-full max-w-lg overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-2xl sm:my-6" onClick={(event) => event.stopPropagation()}>
         <header className="relative border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3 pr-12">
-            <div className="grid size-10 shrink-0 place-items-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
+            <div className="grid size-9 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
               <UserRound className="size-4.5" />
             </div>
             <div className="min-w-0">
@@ -47,7 +47,7 @@ export function ProfileDialog({ onClose }: { onClose: () => void }) {
               <p className="mt-0.5 truncate text-xs text-slate-500">Choose how your published work appears to the community.</p>
             </div>
           </div>
-          <button onClick={onClose} aria-label="Close profile" className="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900">
+          <button onClick={onClose} aria-label="Close profile" className="absolute right-4 top-4 grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900">
             <X className="size-4" />
           </button>
         </header>
@@ -60,7 +60,7 @@ export function ProfileDialog({ onClose }: { onClose: () => void }) {
           ) : (
             <>
               {profile.avatar_url && (
-                <div className="mb-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-3">
+                <div className="mb-5 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
                   <img src={profile.avatar_url} alt="" className="size-12 shrink-0 rounded-full border border-slate-200 bg-white object-cover" />
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-slate-900">{profile.display_name || user.email}</div>
@@ -75,7 +75,7 @@ export function ProfileDialog({ onClose }: { onClose: () => void }) {
                 <label className="text-xs font-semibold text-slate-700">Profile photo URL<input value={profile.avatar_url ?? ""} onChange={(e) => update("avatar_url", e.target.value)} className={inputCls} placeholder="https://…" /></label>
               </div>
               <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
-                <button onClick={save} disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
+                <button onClick={save} disabled={busy} className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50">
                   {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />} Save profile
                 </button>
                 {saved && <span className="text-xs font-medium text-emerald-600">Saved</span>}

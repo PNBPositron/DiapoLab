@@ -50,7 +50,7 @@ export function SlideGridDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`flex max-h-[90vh] max-w-5xl flex-col overflow-hidden rounded-3xl p-0 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.28)] sm:rounded-3xl ${
+        className={`flex max-h-[90vh] max-w-5xl flex-col overflow-hidden rounded-xl p-0 shadow-2xl sm:rounded-xl ${
           editorDark
             ? "border-slate-700/80 bg-slate-900 text-slate-100"
             : "border-slate-200 bg-white text-slate-900"
@@ -64,10 +64,10 @@ export function SlideGridDialog({
           <DialogTitle className="flex items-center justify-between gap-3 pr-8 text-sm font-semibold">
             <span className="flex items-center gap-2.5">
               <span
-                className={`grid size-8 place-items-center rounded-xl border ${
+                className={`grid size-8 place-items-center rounded-lg border ${
                   editorDark
-                    ? "border-blue-500/30 bg-blue-500/15 text-blue-300"
-                    : "border-blue-200 bg-blue-50 text-blue-600"
+                    ? "border-slate-700 bg-slate-800 text-slate-200"
+                    : "border-slate-200 bg-slate-50 text-slate-700"
                 }`}
               >
                 <LayoutGrid className="size-4" />
@@ -75,7 +75,7 @@ export function SlideGridDialog({
               <span>
                 Slide Overview
                 <span
-                  className={`ml-2 font-mono text-xs font-normal ${
+                  className={`ml-2 font-mono text-xs font-normal tabular-nums ${
                     editorDark ? "text-slate-400" : "text-slate-500"
                   }`}
                 >
@@ -87,7 +87,7 @@ export function SlideGridDialog({
               <button
                 type="button"
                 onClick={addPage}
-                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
                   editorDark
                     ? "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
                     : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
@@ -102,7 +102,7 @@ export function SlideGridDialog({
                   onOpenChange(false);
                   setPresenting(true);
                 }}
-                className="flex items-center gap-1.5 rounded-full bg-blue-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
+                className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700"
               >
                 <Play className="size-3.5 fill-current" />
                 <span>Present from #{currentIndex + 1}</span>
@@ -149,7 +149,7 @@ export function SlideGridDialog({
                     setDragFrom(null);
                     setDragOver(null);
                   }}
-                  className={`group relative flex flex-col overflow-hidden rounded-2xl border p-2.5 transition ${
+                  className={`group relative flex flex-col overflow-hidden rounded-lg border p-2.5 transition-colors ${
                     active
                       ? editorDark
                         ? "border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30"
@@ -168,7 +168,7 @@ export function SlideGridDialog({
                       setCurrentPage(idx);
                       onOpenChange(false);
                     }}
-                    className={`relative aspect-video w-full overflow-hidden rounded-xl border text-left ${
+                    className={`relative aspect-video w-full overflow-hidden rounded-md border text-left ${
                       editorDark ? "border-slate-700 bg-slate-950" : "border-slate-200 bg-white"
                     }`}
                   >
@@ -179,7 +179,7 @@ export function SlideGridDialog({
                       className={`h-full w-full ${p.hiddenInPresent ? "opacity-45" : ""}`}
                     />
                     <span
-                      className={`absolute left-2 top-2 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums shadow-xs ${
+                      className={`absolute left-2 top-2 rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tabular-nums shadow-xs ${
                         active
                           ? "bg-blue-600 text-white"
                           : "bg-slate-900/75 text-white"
@@ -188,13 +188,13 @@ export function SlideGridDialog({
                       {idx + 1}
                     </span>
                     {p.hiddenInPresent && (
-                      <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-amber-500/95 px-2 py-0.5 text-[10px] font-semibold text-white shadow-xs">
+                      <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded bg-amber-600/95 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-xs">
                         <EyeOff className="size-2.5" />
                         Hidden in present
                       </span>
                     )}
                     {transLabel && (
-                      <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-slate-900/75 px-2 py-0.5 text-[10px] font-medium text-white">
+                      <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-slate-900/75 px-1.5 py-0.5 text-[10px] font-medium text-white">
                         <WandSparkles className="size-2.5 text-blue-300" />
                         {transLabel}
                       </span>
@@ -202,7 +202,7 @@ export function SlideGridDialog({
                     {hasNotes && (
                       <span
                         title="Has speaker notes"
-                        className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-xs"
+                        className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-amber-600/90 px-1.5 py-0.5 text-[10px] font-medium text-white shadow-xs"
                       >
                         <FileText className="size-2.5" />
                         Notes
@@ -324,7 +324,7 @@ export function SlideGridDialog({
             value={notesText}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Write talking points for presenter mode (press P while presenting to view)..."
-            className={`w-full resize-none rounded-xl border px-3 py-2 text-xs outline-none transition focus:ring-2 focus:ring-blue-500/25 ${
+            className={`w-full resize-none rounded-md border px-3 py-2 text-xs outline-none transition focus:ring-2 focus:ring-blue-500/25 ${
               editorDark
                 ? "border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-blue-500"
                 : "border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:border-blue-500"

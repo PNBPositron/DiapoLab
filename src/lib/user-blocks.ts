@@ -51,6 +51,12 @@ export function saveBlock(name: string, elements: AnyElement[]): UserBlock | nul
   return block;
 }
 
+export function renameBlock(id: string, name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  persist(loadBlocks().map((b) => (b.id === id ? { ...b, name: trimmed } : b)));
+}
+
 export function deleteBlock(id: string) {
   persist(loadBlocks().filter((b) => b.id !== id));
 }
@@ -77,7 +83,7 @@ export function describeBlock(block: UserBlock): string {
     .sort((a, b) => b[1] - a[1])
     .map(([type, n]) => (n > 1 ? `${type}×${n}` : type));
   const label = parts.slice(0, 3).join(" + ");
-  return `${block.elements.length} élément${block.elements.length > 1 ? "s" : ""} · ${label}${parts.length > 3 ? "…" : ""}`;
+  return `${block.elements.length} element${block.elements.length > 1 ? "s" : ""} · ${label}${parts.length > 3 ? "…" : ""}`;
 }
 
 // ---- Whole-slide blocks: save a full page (background + elements) and

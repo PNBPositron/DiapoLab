@@ -42,7 +42,6 @@ import {
   MoreHorizontal,
   Palette,
   Play,
-  WandSparkles,
   ChevronDown,
   Minus,
   AlignLeft,
@@ -52,7 +51,6 @@ import {
   Underline,
   Bold,
   List,
-  Sparkles,
   Link2,
   Sliders,
   Type,
@@ -405,7 +403,7 @@ const FONT_FAMILIES: string[] = Array.from(
 /** UI kinds whose "items" list carries editable text (tabs, sidebar entries, lines…). */
 const UI_ITEMS_KINDS = new Set([
   "list", "pricing", "window", "browser", "terminal", "phone", "modal",
-  "tabs", "toggle", "login", "taskbar", "vtabs", "timeline",
+  "tabs", "toggle", "login", "taskbar", "vtabs", "timeline", "rating",
 ]);
 /** Single chrome captions per UI kind (search pill, new-tab button, submit button). */
 const UI_CAPTION_DEFAULTS: Partial<Record<UiKind, string>> = {
@@ -776,10 +774,10 @@ function ModernColorPicker({
                 key={swatch}
                 type="button"
                 onClick={() => onChange(swatch)}
-                className={`size-5 rounded-full border border-slate-200/80 transition-transform hover:scale-115 ${
+                className={`size-5 rounded-md border border-slate-200/80 transition ${
                   value.toLowerCase() === swatch.toLowerCase()
-                    ? "scale-110 ring-2 ring-sky-500 ring-offset-1"
-                    : ""
+                    ? "ring-2 ring-blue-600 ring-offset-1"
+                    : "hover:border-slate-400"
                 }`}
                 style={{ backgroundColor: swatch }}
               />
@@ -915,10 +913,10 @@ export function PropertiesPanel() {
   };
   // Quick Bar (floating, contextual & immediate)
   const floatingHUD = (
-    <div className="pointer-events-none fixed left-1/2 top-[4.25rem] z-30 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
-      <div className="floating-hud pointer-events-auto flex items-center gap-1 rounded-full border border-slate-200/90 bg-white/95 px-2 py-1 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.14)] backdrop-blur-md">
+    <div className="pointer-events-none fixed left-1/2 top-[3.75rem] z-30 -translate-x-1/2 animate-in slide-in-from-top-2 duration-200">
+      <div className="floating-hud studio-dock pointer-events-auto flex items-center gap-1 px-2 py-1">
         {/* Type tag */}
-        <span className="px-2 py-0.5 text-[11px] font-semibold capitalize text-slate-600">
+        <span className="px-2 py-0.5 text-xs font-semibold capitalize text-slate-600">
           {el.type}
         </span>
 
@@ -929,18 +927,18 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => setColorPaletteOpen(!colorPaletteOpen)}
-                className={`grid size-8 place-items-center rounded-full transition hover:bg-slate-100 ${
-                  colorPaletteOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""
+                className={`grid size-7 place-items-center rounded-md transition ${
+                  colorPaletteOpen ? "!bg-slate-100 ring-2 ring-blue-600/20" : ""
                 }`}
                 title="Text color"
               >
                 <div
-                  className="size-4 rounded-full border border-slate-300 shadow-xs"
+                  className="size-4 rounded border border-slate-300"
                   style={{ backgroundColor: el.color, opacity: el.opacity ?? 1 }}
                 />
               </button>
               {colorPaletteOpen && (
-                <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl animate-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-xl animate-in slide-in-from-top-2 duration-150">
                   <ModernColorPicker
                     value={el.color}
                     onChange={(c) => update(el.id, { color: c })}
@@ -952,12 +950,12 @@ export function PropertiesPanel() {
             </div>
 
             {/* Bold / Italic */}
-            <div className="flex h-8 items-center gap-0.5 rounded-full bg-slate-100/80 p-0.5">
+            <div className="flex h-7 items-center gap-0.5 rounded-md bg-slate-100 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { fontWeight: (el.fontWeight ?? 400) >= 700 ? 400 : 700 })}
-                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
-                  (el.fontWeight ?? 400) >= 700 ? "bg-white text-slate-900 shadow-sm" : ""
+                className={`grid size-6 place-items-center rounded text-slate-500 transition hover:text-slate-900 ${
+                  (el.fontWeight ?? 400) >= 700 ? "bg-white text-slate-900 shadow-2xs" : ""
                 }`}
                 title="Bold"
               >
@@ -966,8 +964,8 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { italic: !el.italic })}
-                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
-                  el.italic ? "bg-white text-slate-900 shadow-sm" : ""
+                className={`grid size-6 place-items-center rounded text-slate-500 transition hover:text-slate-900 ${
+                  el.italic ? "bg-white text-slate-900 shadow-2xs" : ""
                 }`}
                 title="Italic"
               >
@@ -976,12 +974,12 @@ export function PropertiesPanel() {
             </div>
 
             {/* Align */}
-            <div className="flex h-8 items-center gap-0.5 rounded-full bg-slate-100/80 p-0.5">
+            <div className="flex h-7 items-center gap-0.5 rounded-md bg-slate-100 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "left" })}
-                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
-                  (el.align ?? "left") === "left" ? "bg-white text-slate-900 shadow-sm" : ""
+                className={`grid size-6 place-items-center rounded text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "left" ? "bg-white text-slate-900 shadow-2xs" : ""
                 }`}
                 title="Align left"
               >
@@ -990,8 +988,8 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "center" })}
-                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
-                  (el.align ?? "left") === "center" ? "bg-white text-slate-900 shadow-sm" : ""
+                className={`grid size-6 place-items-center rounded text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "center" ? "bg-white text-slate-900 shadow-2xs" : ""
                 }`}
                 title="Align center"
               >
@@ -1000,8 +998,8 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { align: "right" })}
-                className={`grid size-7 place-items-center rounded-full text-slate-500 transition hover:text-slate-900 ${
-                  (el.align ?? "left") === "right" ? "bg-white text-slate-900 shadow-sm" : ""
+                className={`grid size-6 place-items-center rounded text-slate-500 transition hover:text-slate-900 ${
+                  (el.align ?? "left") === "right" ? "bg-white text-slate-900 shadow-2xs" : ""
                 }`}
                 title="Align right"
               >
@@ -1010,11 +1008,11 @@ export function PropertiesPanel() {
             </div>
 
             {/* Font size stepper */}
-            <div className="flex h-8 items-center rounded-full bg-slate-100/80 p-0.5">
+            <div className="flex h-7 items-center rounded-md bg-slate-100 p-0.5">
               <button
                 type="button"
                 onClick={() => update(el.id, { fontSize: Math.max(12, el.fontSize - 1) })}
-                className="grid size-6 place-items-center rounded-full text-slate-500 hover:bg-white hover:text-slate-900"
+                className="grid size-6 place-items-center rounded text-slate-500 hover:bg-white hover:text-slate-900"
               >
                 <Minus className="size-3" />
               </button>
@@ -1032,7 +1030,7 @@ export function PropertiesPanel() {
               <button
                 type="button"
                 onClick={() => update(el.id, { fontSize: Math.min(240, el.fontSize + 1) })}
-                className="grid size-6 place-items-center rounded-full text-slate-500 hover:bg-white hover:text-slate-900"
+                className="grid size-6 place-items-center rounded text-slate-500 hover:bg-white hover:text-slate-900"
               >
                 <Plus className="size-3" />
               </button>
@@ -1042,19 +1040,19 @@ export function PropertiesPanel() {
 
         {el.type === "shape" && (
           <div className="relative">
-            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-full transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Shape color">
-              <div className="size-4 rounded-full border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
+            <button type="button" onClick={() => setColorPaletteOpen(!colorPaletteOpen)} className={`grid size-8 place-items-center rounded-md transition hover:bg-slate-100 ${colorPaletteOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Shape color">
+              <div className="size-4 rounded-sm border border-slate-300 shadow-xs" style={{ backgroundColor: el.fill ?? "#0ea5e9", opacity: el.opacity ?? 1 }} />
             </button>
-            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
+            {colorPaletteOpen && <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-xl"><ModernColorPicker value={el.fill ?? "#0ea5e9"} onChange={(color) => update(el.id, { fill: color })} opacity={el.opacity ?? 1} onOpacityChange={(opacity) => update(el.id, { opacity })} /></div>}
           </div>
         )}
 
         {el.type === "image" && (
           <>
-            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-blue-100 text-blue-700 ring-2 ring-blue-500/30" : ""}`} title="Crop image (double-clic : mode recadrage)"><Crop className="size-3.5" /></button>
+            <button type="button" onClick={() => useEditor.getState().setCroppingId(croppingId === el.id ? null : el.id)} className={`grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${croppingId === el.id ? "bg-blue-100 text-blue-700 ring-2 ring-blue-500/30" : ""}`} title="Crop image (double-click to enter crop mode)"><Crop className="size-3.5" /></button>
             <div className="relative">
-              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
-              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-xl border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-blue-300 hover:bg-blue-50">{preset.name}</button>)}</div>}
+              <button type="button" onClick={() => setImageFilterOpen(!imageFilterOpen)} className={`grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${imageFilterOpen ? "bg-slate-100 ring-2 ring-blue-500/20" : ""}`} title="Image filter"><SlidersHorizontal className="size-3.5" /></button>
+              {imageFilterOpen && <div className="absolute left-1/2 top-full z-50 mt-2 grid w-44 -translate-x-1/2 grid-cols-2 gap-1.5 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">{IMAGE_FILTER_PRESETS.map((preset) => <button key={preset.name} type="button" onClick={() => { update(el.id, { filters: { ...DEFAULT_FILTERS, ...preset.filters } }); setImageFilterOpen(false); }} className="rounded-md border border-slate-100 px-2 py-1.5 text-left text-[10px] text-slate-600 hover:border-blue-300 hover:bg-blue-50">{preset.name}</button>)}</div>}
             </div>
           </>
         )}
@@ -1063,14 +1061,14 @@ export function PropertiesPanel() {
         {/* Layer order */}
         <button
           onClick={() => bringForward(el.id)}
-          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           title="Bring forward"
         >
           <ArrowUp className="size-3.5" />
         </button>
         <button
           onClick={() => sendBackward(el.id)}
-          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           title="Send backward"
         >
           <ArrowDown className="size-3.5" />
@@ -1078,7 +1076,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => duplicate(el.id)}
-          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           title="Duplicate"
         >
           <Copy className="size-3.5" />
@@ -1086,7 +1084,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => update(el.id, { rotation: (el.rotation + 90) % 360 })}
-          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 active:scale-90"
+          className="grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           title="Rotate 90°"
         >
           <RotateCcw className="size-3.5" />
@@ -1094,7 +1092,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => update(el.id, { locked: !el.locked } as never)}
-          className={`grid size-8 place-items-center rounded-full transition active:scale-90 ${
+          className={`grid size-8 place-items-center rounded-md transition ${
             el.locked
               ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
               : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -1106,7 +1104,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => remove(el.id)}
-          className="grid size-8 place-items-center rounded-full text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 active:scale-90"
+          className="grid size-8 place-items-center rounded-md text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
           title="Delete"
         >
           <Trash2 className="size-3.5" />
@@ -1116,7 +1114,7 @@ export function PropertiesPanel() {
 
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
-          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition active:scale-95 ${
+          className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
             advancedOpen
               ? "bg-slate-900 text-white hover:bg-slate-800"
               : "bg-blue-600 text-white hover:bg-blue-700"
@@ -1134,7 +1132,7 @@ export function PropertiesPanel() {
       {floatingHUD}
 
       {advancedOpen && (
-        <aside className="editor-inspector fixed right-3 top-[4.75rem] bottom-3 z-40 flex w-[280px] flex-col overflow-hidden rounded-[24px] border border-white/90 bg-white/95 shadow-[0_24px_56px_-14px_rgba(15,23,42,0.16),0_4px_14px_-4px_rgba(37,99,235,0.08)] backdrop-blur-xl transition-all duration-200">
+        <aside className="editor-inspector fixed right-3 top-[4.75rem] bottom-3 z-40 flex w-[280px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_40px_-14px_rgba(15,23,42,0.16)] transition-all duration-200">
           <div className="px-3 pt-3">
             <PanelHeader
               title={
@@ -1147,7 +1145,7 @@ export function PropertiesPanel() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="size-7 rounded-full text-selector-subtle"
+                className="size-7 rounded-md text-selector-subtle"
                 aria-label="Close inspector"
                 title="Close inspector"
                 onClick={() => setAdvancedOpen(false)}
@@ -1330,13 +1328,182 @@ export function PropertiesPanel() {
                     />
                   </Field>
                 )}
-                {(el.kind === "progress" || el.kind === "stat") && (
+                {el.kind === "progress" && (
                   <SliderWithInput
-                    label={el.kind === "progress" ? "Progress Value" : "Statistic"}
+                    label="Progress Value"
                     min={0}
                     max={100}
                     value={el.value}
-                    unit={el.kind === "progress" ? "%" : ""}
+                    unit="%"
+                    onChange={(val) => update(el.id, { value: val })}
+                  />
+                )}
+                {el.kind === "stat" && (
+                  <Field label="Statistic value">
+                    <input
+                      type="number"
+                      value={el.value}
+                      onChange={(e) => update(el.id, { value: Number(e.target.value) || 0 })}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs tabular-nums focus:border-sky-500 focus:outline-none"
+                    />
+                  </Field>
+                )}
+                {el.kind === "clock" && (
+                  <>
+                    <Field label="Clock display">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {(["digital", "analog"] as const).map((mode) => {
+                          const active = (el.files?.[0] === "analog" ? "analog" : "digital") === mode;
+                          return (
+                            <button
+                              key={mode}
+                              type="button"
+                              onClick={() => {
+                                const next = [...(el.files ?? ["digital", "24h", "on", "Local"])];
+                                next[0] = mode;
+                                update(el.id, { files: next } as never);
+                              }}
+                              className={`rounded-lg border px-2 py-1.5 text-[11px] font-semibold capitalize transition ${
+                                active
+                                  ? "border-sky-500 bg-sky-50/50 text-sky-700"
+                                  : "border-slate-200 text-slate-600 hover:border-slate-300"
+                              }`}
+                            >
+                              {mode}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </Field>
+                    <Field label="Time format & seconds">
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {(["24h", "12h"] as const).map((fmt) => {
+                          const active = (el.files?.[1] === "12h" ? "12h" : "24h") === fmt;
+                          return (
+                            <button
+                              key={fmt}
+                              type="button"
+                              onClick={() => {
+                                const next = [...(el.files ?? ["digital", "24h", "on", "Local"])];
+                                next[1] = fmt;
+                                update(el.id, { files: next } as never);
+                              }}
+                              className={`rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition ${
+                                active
+                                  ? "border-sky-500 bg-sky-50/50 text-sky-700"
+                                  : "border-slate-200 text-slate-600 hover:border-slate-300"
+                              }`}
+                            >
+                              {fmt}
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = [...(el.files ?? ["digital", "24h", "on", "Local"])];
+                            next[2] = next[2] === "off" ? "on" : "off";
+                            update(el.id, { files: next } as never);
+                          }}
+                          className={`rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition ${
+                            el.files?.[2] !== "off"
+                              ? "border-sky-500 bg-sky-50/50 text-sky-700"
+                              : "border-slate-200 text-slate-600 hover:border-slate-300"
+                          }`}
+                        >
+                          {el.files?.[2] !== "off" ? "Sec on" : "Sec off"}
+                        </button>
+                      </div>
+                    </Field>
+                    <Field label="Timezone">
+                      <select
+                        value={el.files?.[3] || "Local"}
+                        onChange={(e) => {
+                          const next = [...(el.files ?? ["digital", "24h", "on", "Local"])];
+                          next[3] = e.target.value;
+                          update(el.id, { files: next } as never);
+                        }}
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs focus:border-sky-500 focus:outline-none"
+                      >
+                        <option value="Local">Local browser time</option>
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">New York (ET)</option>
+                        <option value="America/Los_Angeles">Los Angeles (PT)</option>
+                        <option value="Europe/London">London (GMT/BST)</option>
+                        <option value="Europe/Paris">Paris (CET)</option>
+                        <option value="Asia/Tokyo">Tokyo (JST)</option>
+                        <option value="Australia/Sydney">Sydney (AEST)</option>
+                      </select>
+                    </Field>
+                  </>
+                )}
+                {el.kind === "timer" && (
+                  <Field label="Countdown duration (seconds)">
+                    <div className="space-y-1.5">
+                      <input
+                        type="number"
+                        min={10}
+                        max={7200}
+                        step={15}
+                        value={el.value}
+                        onChange={(e) => update(el.id, { value: Math.max(10, Number(e.target.value) || 60) })}
+                        className="w-full rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs tabular-nums focus:border-sky-500 focus:outline-none"
+                      />
+                      <div className="grid grid-cols-5 gap-1">
+                        {[
+                          { label: "1m", sec: 60 },
+                          { label: "3m", sec: 180 },
+                          { label: "5m", sec: 300 },
+                          { label: "10m", sec: 600 },
+                          { label: "15m", sec: 900 },
+                        ].map((preset) => (
+                          <button
+                            key={preset.sec}
+                            type="button"
+                            onClick={() => update(el.id, { value: preset.sec })}
+                            className={`rounded-md border py-1 text-[10px] font-semibold transition ${
+                              el.value === preset.sec
+                                ? "border-sky-500 bg-sky-50/50 text-sky-700"
+                                : "border-slate-200 text-slate-600 hover:border-slate-300"
+                            }`}
+                          >
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </Field>
+                )}
+                {el.kind === "counter" && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Initial count">
+                      <input
+                        type="number"
+                        value={el.value}
+                        onChange={(e) => update(el.id, { value: Number(e.target.value) || 0 })}
+                        className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 font-mono text-xs tabular-nums focus:border-sky-500 focus:outline-none"
+                      />
+                    </Field>
+                    <Field label="Step">
+                      <input
+                        type="number"
+                        min={1}
+                        value={Number(el.files?.[0]) || 1}
+                        onChange={(e) =>
+                          update(el.id, { files: [String(Math.max(1, Number(e.target.value) || 1))] } as never)
+                        }
+                        className="w-full rounded-lg border border-slate-200 px-2.5 py-1.5 font-mono text-xs tabular-nums focus:border-sky-500 focus:outline-none"
+                      />
+                    </Field>
+                  </div>
+                )}
+                {el.kind === "rating" && (
+                  <SliderWithInput
+                    label="Default rating"
+                    min={1}
+                    max={5}
+                    value={Math.max(1, Math.min(5, Math.round(el.value || 4)))}
+                    unit=" ★"
                     onChange={(val) => update(el.id, { value: val })}
                   />
                 )}
@@ -1458,7 +1625,7 @@ export function PropertiesPanel() {
                       {ch.data.map((d, i) => (
                         <div key={i} className="flex items-center gap-1">
                           <span
-                            className="size-3 shrink-0 rounded-full border border-slate-200"
+                            className="size-3 shrink-0 rounded-sm border border-slate-200"
                             style={{ background: ch.colors[i % ch.colors.length] }}
                           />
                           <input
@@ -3007,16 +3174,16 @@ export function PropertiesPanel() {
 {/* ALIGN & DISTRIBUTE */}
             <Section title="Align & Distribute">
               <div className="grid grid-cols-6 gap-1.5">
-                <button type="button" title="Align left" aria-label="Align left" onClick={() => alignSelected("left")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartHorizontal className="size-4" /></button>
-                <button type="button" title="Align horizontal center" aria-label="Align horizontal center" onClick={() => alignSelected("center-h")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterHorizontal className="size-4" /></button>
-                <button type="button" title="Align right" aria-label="Align right" onClick={() => alignSelected("right")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndHorizontal className="size-4" /></button>
-                <button type="button" title="Align top" aria-label="Align top" onClick={() => alignSelected("top")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartVertical className="size-4" /></button>
-                <button type="button" title="Align vertical center" aria-label="Align vertical center" onClick={() => alignSelected("middle")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterVertical className="size-4" /></button>
-                <button type="button" title="Align bottom" aria-label="Align bottom" onClick={() => alignSelected("bottom")} className="grid aspect-square place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndVertical className="size-4" /></button>
+                <button type="button" title="Align left" aria-label="Align left" onClick={() => alignSelected("left")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartHorizontal className="size-4" /></button>
+                <button type="button" title="Align horizontal center" aria-label="Align horizontal center" onClick={() => alignSelected("center-h")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterHorizontal className="size-4" /></button>
+                <button type="button" title="Align right" aria-label="Align right" onClick={() => alignSelected("right")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndHorizontal className="size-4" /></button>
+                <button type="button" title="Align top" aria-label="Align top" onClick={() => alignSelected("top")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignStartVertical className="size-4" /></button>
+                <button type="button" title="Align vertical center" aria-label="Align vertical center" onClick={() => alignSelected("middle")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignCenterVertical className="size-4" /></button>
+                <button type="button" title="Align bottom" aria-label="Align bottom" onClick={() => alignSelected("bottom")} className="grid aspect-square place-items-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignEndVertical className="size-4" /></button>
               </div>
               <div className="grid grid-cols-2 gap-1.5">
-                <button type="button" title="Distribute horizontally (3+ objects)" aria-label="Distribute horizontally" onClick={() => distributeSelected("h")} className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignHorizontalDistributeCenter className="size-4" /> Horizontal</button>
-                <button type="button" title="Distribute vertically (3+ objects)" aria-label="Distribute vertically" onClick={() => distributeSelected("v")} className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignVerticalDistributeCenter className="size-4" /> Vertical</button>
+                <button type="button" title="Distribute horizontally (3+ objects)" aria-label="Distribute horizontally" onClick={() => distributeSelected("h")} className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignHorizontalDistributeCenter className="size-4" /> Horizontal</button>
+                <button type="button" title="Distribute vertically (3+ objects)" aria-label="Distribute vertically" onClick={() => distributeSelected("v")} className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white py-1.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><AlignVerticalDistributeCenter className="size-4" /> Vertical</button>
               </div>
               <p className="text-[10px] text-slate-400">
                 One object aligns to the slide. Select several (Shift+click) to align to the selection or distribute evenly.
@@ -3029,28 +3196,28 @@ export function PropertiesPanel() {
                 <button
                   type="button"
                   onClick={() => bringForward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   <ArrowUp className="size-3.5" /> Forward
                 </button>
                 <button
                   type="button"
                   onClick={() => sendBackward(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   <ArrowDown className="size-3.5" /> Backward
                 </button>
                 <button
                   type="button"
                   onClick={() => duplicate(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50"
+                  className="flex items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   <Copy className="size-3.5" /> Duplicate
                 </button>
                 <button
                   type="button"
                   onClick={() => remove(el.id)}
-                  className="flex items-center justify-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 shadow-2xs hover:bg-rose-100"
+                  className="flex items-center justify-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 py-2 text-xs font-medium text-rose-600 hover:bg-rose-100"
                 >
                   <Trash2 className="size-3.5" /> Delete
                 </button>
@@ -3077,7 +3244,7 @@ export function PropertiesPanel() {
                 }}
                 spellCheck={false}
                 aria-label="Selected element JSON"
-                className="min-h-48 w-full resize-y rounded-xl border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="min-h-48 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
               {jsonError && <p className="text-[10px] font-medium text-rose-500">{jsonError}</p>}
               <div className="flex items-center gap-1.5">
@@ -3085,14 +3252,14 @@ export function PropertiesPanel() {
                   type="button"
                   onClick={applyJson}
                   disabled={!jsonDirty}
-                  className="flex-1 rounded-full bg-blue-600 py-1.5 text-[10px] font-bold tracking-wider text-white transition hover:bg-blue-700 disabled:opacity-40"
+                  className="flex-1 rounded-md bg-blue-600 py-1.5 text-[11px] font-semibold text-white transition hover:bg-blue-700 disabled:opacity-40"
                 >
                   Apply
                 </button>
                 <button
                   type="button"
                   onClick={formatJson}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50"
+                  className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-600 transition hover:bg-slate-50"
                 >
                   Format
                 </button>
@@ -3100,7 +3267,7 @@ export function PropertiesPanel() {
                   type="button"
                   onClick={resetJson}
                   disabled={!jsonDirty}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
                 >
                   Reset
                 </button>

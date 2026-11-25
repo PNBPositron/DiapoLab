@@ -69,7 +69,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
       className={
         embedded
           ? "flex min-h-full flex-col bg-white"
-          : "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/30 p-3 backdrop-blur-sm sm:p-6"
+          : "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/35 p-3 sm:p-6"
       }
       onClick={onClose}
     >
@@ -77,14 +77,14 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
         className={
           embedded
             ? "w-full overflow-hidden bg-white"
-            : "relative my-3 flex max-h-[min(860px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.18)] sm:my-6"
+            : "relative my-3 flex max-h-[min(860px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-2xl sm:my-6"
         }
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
+            <div className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
               <FolderOpen className="size-4.5" />
             </div>
             <div>
@@ -101,7 +101,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
 
           <div className="flex items-center gap-2">
             {items && items.length > 0 && !embedded && (
-              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/60 px-3.5 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
+              <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50/70 px-3 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
                 <Search className="size-3.5 shrink-0 text-slate-400" />
                 <input
                   value={query}
@@ -115,7 +115,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               <button
                 onClick={onClose}
                 aria-label="Close projects"
-                className="grid size-9 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                className="grid size-8 place-items-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <X className="size-4" />
               </button>
@@ -126,7 +126,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
         {/* Content */}
         <div className={embedded ? "max-h-full overflow-y-auto bg-white p-3 sm:p-4" : "flex-1 overflow-y-auto bg-white p-4 sm:p-6"}>
           {embedded && items && items.length > 0 && (
-            <div className="mb-3 flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50/60 px-3.5 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
+            <div className="mb-3 flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50/70 px-3 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
               <Search className="size-3.5 shrink-0 text-slate-400" />
               <input
                 value={query}
@@ -176,7 +176,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               {filtered.map((d) => (
                 <div
                   key={d.id}
-                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200 hover:border-blue-400 hover:shadow-[0_12px_28px_-12px_rgba(37,99,235,0.22)]"
+                  className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-blue-400"
                 >
                   <button
                     onClick={() => handleOpen(d)}
@@ -192,8 +192,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                     ) : (
                       <div className="aspect-[16/10] w-full bg-slate-50" />
                     )}
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/25 opacity-0 backdrop-blur-[1px] transition-opacity duration-200 group-hover:opacity-100">
-                      <span className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-900 shadow-sm">
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/25 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                      <span className="flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 shadow-sm">
                         <Layers className="size-3.5 text-blue-600" /> Open design
                       </span>
                     </div>
@@ -212,7 +212,7 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                       title="Delete design"
                       aria-label={`Delete design ${d.name}`}
                       disabled={deletingId === d.id}
-                      className={`grid size-8 shrink-0 place-items-center rounded-full border transition-colors ${
+                      className={`grid size-8 shrink-0 place-items-center rounded-md border transition-colors ${
                         deletingId === d.id
                           ? "border-rose-200 bg-rose-50 text-rose-500"
                           : "border-transparent text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"

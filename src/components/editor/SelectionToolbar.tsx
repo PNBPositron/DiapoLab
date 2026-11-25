@@ -61,7 +61,7 @@ export function SelectionToolbar() {
   const isText = el.type === "text" || el.type === "button";
   const text = el as { fontSize?: number; fontWeight?: number };
   const btn =
-    "grid size-8 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 active:scale-95";
+    "grid size-7 place-items-center rounded-md transition";
   const clampFont = (v: number) => Math.max(8, Math.min(400, Math.round(v)));
 
   // Arrange the multi-selection into a photo grid over its bounding box,
@@ -85,8 +85,8 @@ export function SelectionToolbar() {
   };
 
   return (
-    <div className="selection-toolbar absolute left-1/2 top-4 z-30 flex max-w-[92vw] -translate-x-1/2 flex-wrap items-center gap-0.5 rounded-full border border-slate-200/90 bg-white/95 px-3 py-1.5 shadow-[0_14px_34px_-10px_rgba(15,23,42,0.14)] backdrop-blur-md">
-      <span className="px-2 text-[11px] font-semibold tabular-nums text-slate-600">
+    <div className="selection-toolbar studio-dock absolute left-1/2 top-4 z-30 flex max-w-[92vw] -translate-x-1/2 flex-wrap items-center gap-0.5 px-2 py-1">
+      <span className="px-2 text-xs font-semibold tabular-nums text-slate-600">
         {selectedIds.length} selected
       </span>
       <span className="mx-1 h-4 w-px bg-slate-200" />
@@ -98,7 +98,7 @@ export function SelectionToolbar() {
             onClick={() =>
               update(el.id, { fontWeight: (text.fontWeight ?? 500) >= 700 ? 500 : 700 } as never)
             }
-            className={`${btn} ${(text.fontWeight ?? 500) >= 700 ? "bg-slate-900 text-white hover:bg-slate-700 hover:text-white" : ""}`}
+            className={`${btn} ${(text.fontWeight ?? 500) >= 700 ? "!bg-slate-900 !text-white" : ""}`}
           >
             <Bold className="size-3.5" />
           </button>
@@ -168,14 +168,14 @@ export function SelectionToolbar() {
             </>
           )}
           <span className="mx-1 h-4 w-px bg-slate-200" />
-          <div className="flex items-center gap-0.5 rounded-full bg-slate-100/90 p-0.5">
+          <div className="flex items-center gap-0.5 rounded-md bg-slate-100 p-0.5">
             {GRID_PRESETS.map((g) => (
               <button
                 key={g.label}
                 type="button"
                 title={g.title}
                 onClick={() => applyGrid(g.cols, g.rows)}
-                className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+                className="rounded px-2 py-1 text-[11px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"
               >
                 {g.label}
               </button>
@@ -186,7 +186,7 @@ export function SelectionToolbar() {
             type="button"
             title={isGrouped ? "Ungroup selection" : "Group selection"}
             onClick={isGrouped ? ungroupSelected : groupSelected}
-            className={`${btn} ${isGrouped ? "bg-blue-50 text-blue-600" : ""}`}
+            className={`${btn} ${isGrouped ? "!bg-blue-50 !text-blue-600" : ""}`}
           >
             {isGrouped ? <Ungroup className="size-3.5" /> : <Group className="size-3.5" />}
           </button>
@@ -214,7 +214,7 @@ export function SelectionToolbar() {
         type="button"
         title="Delete"
         onClick={removeSelected}
-        className="grid size-8 place-items-center rounded-full text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+        className="grid size-7 place-items-center rounded-md text-slate-600 transition hover:!bg-rose-50 hover:!text-rose-600"
       >
         <Trash2 className="size-3.5" />
       </button>

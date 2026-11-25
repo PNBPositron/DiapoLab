@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Check, Layers, Rotate3d, RotateCcw, Shuffle, Sparkles } from "lucide-react";
+import { Box, Check, Layers, Rotate3d, RotateCcw, Shapes, Shuffle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEditor } from "@/store/editor";
 import { useSettings } from "@/store/settings";
@@ -87,7 +87,7 @@ export function ThreeSceneDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`max-w-4xl overflow-hidden rounded-3xl p-0 shadow-[0_24px_64px_-16px_rgba(15,23,42,0.28)] sm:rounded-3xl ${surfaceClass}`}
+        className={`max-w-4xl overflow-hidden rounded-xl p-0 shadow-2xl sm:rounded-xl ${surfaceClass}`}
       >
         <DialogHeader
           className={`border-b px-5 py-4 ${
@@ -97,10 +97,10 @@ export function ThreeSceneDialog({
           <DialogTitle className="flex items-center justify-between gap-3 text-sm font-semibold">
             <span className="flex items-center gap-2.5">
               <span
-                className={`grid size-8 place-items-center rounded-xl border ${
+                className={`grid size-8 place-items-center rounded-lg border ${
                   editorDark
-                    ? "border-blue-500/30 bg-blue-500/15 text-blue-400"
-                    : "border-blue-100 bg-blue-50 text-blue-600"
+                    ? "border-slate-700 bg-slate-800 text-slate-200"
+                    : "border-slate-200 bg-slate-50 text-slate-700"
                 }`}
               >
                 <Box className="size-4" />
@@ -119,7 +119,7 @@ export function ThreeSceneDialog({
         <div className="grid max-h-[80vh] gap-5 overflow-y-auto p-5 md:grid-cols-[1.06fr_1fr]">
           {/* Left column: live interactive 3D preview & transition selector */}
           <div className="flex flex-col gap-3">
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-950 shadow-inner">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-slate-700/40 bg-slate-950 shadow-inner">
               <ThreeTransitionStage
                 mode="mini"
                 transition={activeTransition}
@@ -134,12 +134,12 @@ export function ThreeSceneDialog({
                 sceneConfig={scene}
                 className="h-full w-full"
               />
-              <div className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-slate-950/75 px-2.5 py-1 text-[10px] font-medium text-white/80">
+              <div className="pointer-events-none absolute left-2.5 top-2.5 rounded-md bg-slate-950/75 px-2.5 py-1 text-[10px] font-medium text-white/80">
                 Drag to orbit · Scroll to zoom · Double-click to reset
               </div>
 
-              {/* Camera angle inspection pills */}
-              <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-slate-950/80 p-1 backdrop-blur-none">
+              {/* Camera angle inspection controls */}
+              <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-slate-950/85 p-1 backdrop-blur-none">
                 {(
                   [
                     { id: "front", label: "Front" },
@@ -151,7 +151,7 @@ export function ThreeSceneDialog({
                     key={cam.id}
                     type="button"
                     onClick={() => handleCameraPreset(cam.id)}
-                    className={`rounded-full px-2.5 py-1 text-[10px] font-medium transition ${
+                    className={`rounded px-2.5 py-1 text-[10px] font-medium transition-colors ${
                       cameraPreset === cam.id
                         ? "bg-white/20 text-white"
                         : "text-white/70 hover:text-white"
@@ -168,7 +168,7 @@ export function ThreeSceneDialog({
                   setReplayCount((n) => n + 1);
                   playTransitionSound({ isThreeD: true });
                 }}
-                className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full bg-slate-950/85 px-3 py-1.5 text-[11px] font-medium text-white shadow-md transition hover:bg-blue-600"
+                className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-md bg-slate-950/85 px-3 py-1.5 text-[11px] font-medium text-white shadow-md transition-colors hover:bg-blue-600"
               >
                 <Rotate3d className="size-3.5" />
                 Replay
@@ -176,7 +176,7 @@ export function ThreeSceneDialog({
             </div>
 
             {/* 3D Transition style quick switcher */}
-            <div className={`rounded-2xl border p-3 ${subSurfaceClass}`}>
+            <div className={`rounded-lg border p-3 ${subSurfaceClass}`}>
               <div className="mb-2 flex items-center justify-between">
                 <span className={`text-[11px] font-semibold ${labelText}`}>3D Motion Style</span>
                 <span className={`text-[10px] tabular-nums ${mutedText}`}>
@@ -196,7 +196,7 @@ export function ThreeSceneDialog({
                         setReplayCount((n) => n + 1);
                         playTransitionSound({ isThreeD: true });
                       }}
-                      className={`rounded-xl border px-1.5 py-1.5 text-[10px] font-medium capitalize transition ${
+                      className={`rounded-md border px-1.5 py-1.5 text-[10px] font-medium capitalize transition-colors ${
                         active
                           ? "border-blue-500 bg-blue-600 text-white shadow-xs"
                           : editorDark
@@ -235,7 +235,7 @@ export function ThreeSceneDialog({
                 type="button"
                 aria-pressed={scene.showFloor}
                 onClick={() => setThreeScene({ showFloor: !scene.showFloor })}
-                className={`flex items-center justify-between rounded-2xl border px-3 py-2.5 text-xs font-medium transition ${
+                className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors ${
                   scene.showFloor
                     ? editorDark
                       ? "border-blue-500/60 bg-blue-500/15 text-blue-300"
@@ -254,7 +254,7 @@ export function ThreeSceneDialog({
                 type="button"
                 aria-pressed={scene.showParticles}
                 onClick={() => setThreeScene({ showParticles: !scene.showParticles })}
-                className={`flex items-center justify-between rounded-2xl border px-3 py-2.5 text-xs font-medium transition ${
+                className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-xs font-medium transition-colors ${
                   scene.showParticles
                     ? editorDark
                       ? "border-blue-500/60 bg-blue-500/15 text-blue-300"
@@ -263,7 +263,7 @@ export function ThreeSceneDialog({
                 }`}
               >
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="size-3.5" />
+                  <Shapes className="size-3.5" />
                   Floating prisms
                 </span>
                 <span className="text-[10px] opacity-80">
@@ -290,7 +290,7 @@ export function ThreeSceneDialog({
                       type="button"
                       aria-pressed={active}
                       onClick={() => applyPreset(preset.id)}
-                      className={`flex items-center gap-2 rounded-2xl border p-2 text-left transition ${
+                      className={`flex items-center gap-2 rounded-lg border p-2 text-left transition-colors ${
                         active
                           ? editorDark
                             ? "border-blue-500 bg-blue-500/15 ring-1 ring-blue-500/30"
@@ -301,14 +301,14 @@ export function ThreeSceneDialog({
                       }`}
                     >
                       <span
-                        className="relative grid size-7 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/20 shadow-xs"
+                        className="relative grid size-7 shrink-0 place-items-center overflow-hidden rounded-md border border-white/20 shadow-xs"
                         style={{
                           background: `linear-gradient(160deg, ${preset.config.bgColor} 55%, ${preset.config.floorColor} 100%)`,
                         }}
                         aria-hidden="true"
                       >
                         <span
-                          className="size-2.5 rounded-full ring-2 ring-white/45"
+                          className="size-2.5 rounded-sm ring-2 ring-white/45"
                           style={{ background: preset.config.accentColor }}
                         />
                       </span>
@@ -327,13 +327,13 @@ export function ThreeSceneDialog({
             </div>
 
             {/* Color controls */}
-            <div className={`space-y-2.5 rounded-2xl border p-3.5 ${subSurfaceClass}`}>
+            <div className={`space-y-2.5 rounded-lg border p-3.5 ${subSurfaceClass}`}>
               <div className="flex items-center justify-between">
                 <span className={`text-[11px] font-semibold ${labelText}`}>Scene colors</span>
                 <button
                   type="button"
                   onClick={shufflePalette}
-                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition ${
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium transition-colors ${
                     editorDark
                       ? "border-slate-600 bg-slate-800 text-slate-200 hover:border-blue-400"
                       : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-600"
@@ -386,7 +386,7 @@ export function ThreeSceneDialog({
             <button
               type="button"
               onClick={() => setThreeScene(DEFAULT_THREE_SCENE)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
                 editorDark
                   ? "border-slate-700 text-slate-300 hover:bg-slate-800"
                   : "border-slate-200 bg-white text-slate-600 hover:bg-slate-100"
@@ -399,7 +399,7 @@ export function ThreeSceneDialog({
               <button
                 type="button"
                 onClick={handleApplyToDeck}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
                   appliedDeckNotice
                     ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-600"
                     : editorDark
@@ -415,7 +415,7 @@ export function ThreeSceneDialog({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-full bg-blue-600 px-5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            className="rounded-md bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
           >
             Done
           </button>
@@ -459,10 +459,10 @@ function ColorField({
                 aria-label={`${label} color ${hex}`}
                 title={hex}
                 onClick={() => onChange(hex)}
-                className={`size-4 rounded-full border transition ${
+                className={`size-4 rounded border transition-colors ${
                   active
-                    ? "scale-110 border-blue-500 ring-2 ring-blue-500/35"
-                    : "border-slate-400/40 hover:scale-110"
+                    ? "border-blue-500 ring-2 ring-blue-500/35"
+                    : "border-slate-400/40 hover:border-slate-500"
                 }`}
                 style={{ backgroundColor: hex }}
               />
@@ -480,7 +480,7 @@ function ColorField({
             type="button"
             title={`Custom ${label.toLowerCase()} color`}
             aria-label={`Custom ${label} color`}
-            className={`ml-1 grid size-6 cursor-pointer place-items-center rounded-full border transition hover:scale-105 ${
+            className={`ml-1 grid size-6 cursor-pointer place-items-center rounded-md border transition-colors ${
               editorDark ? "border-slate-600" : "border-slate-300"
             }`}
             style={{ backgroundColor: value }}

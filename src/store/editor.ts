@@ -546,7 +546,12 @@ export type UiKind =
   | "taskbar"
   | "vtabs"
   | "timeline"
-  | "code";
+  | "code"
+  | "clock"
+  | "timer"
+  | "stopwatch"
+  | "counter"
+  | "rating";
 
 export type UiElement = ElementBase & {
   type: "ui";
@@ -1558,6 +1563,49 @@ const UI_DEFAULTS: Record<
     value: 0,
     items: ["Dashboard", "Editor", "Templates", "Settings"],
   },
+  clock: {
+    w: 460,
+    h: 240,
+    title: "Local Time",
+    body: "Live clock",
+    value: 0,
+    items: [],
+    files: ["digital", "24h", "on", "Local"],
+  },
+  timer: {
+    w: 460,
+    h: 260,
+    title: "Break Timer",
+    body: "Session resumes soon",
+    value: 300,
+    items: [],
+    files: ["Countdown"],
+  },
+  stopwatch: {
+    w: 460,
+    h: 260,
+    title: "Stopwatch",
+    body: "Elapsed time",
+    value: 0,
+    items: [],
+  },
+  counter: {
+    w: 420,
+    h: 240,
+    title: "Live Score",
+    body: "Click − / + while presenting",
+    value: 0,
+    items: [],
+    files: ["1"],
+  },
+  rating: {
+    w: 480,
+    h: 220,
+    title: "Rate this session",
+    body: "Click a star to vote",
+    value: 4,
+    items: ["Poor", "Fair", "Good", "Great", "Loved it"],
+  },
 };
 
 export const newUi = (
@@ -1565,7 +1613,7 @@ export const newUi = (
   uiStyle: UiStyle = "cyber",
   overrides: Partial<UiElement> = {},
 ): UiElement => {
-  const d = UI_DEFAULTS[kind];
+  const d = UI_DEFAULTS[kind] ?? UI_DEFAULTS.card;
   return {
     id: uid(),
     type: "ui",

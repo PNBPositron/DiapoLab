@@ -108,20 +108,20 @@ export function LayersPanel() {
         description="Select, reorder, hide, or lock objects on this slide."
         icon={Layers3}
       >
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-slate-500">
+        <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-slate-500">
           {elements.length}
         </span>
       </PanelHeader>
 
       {elements.length > 0 && (
-        <div className="grid grid-cols-7 gap-1 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-1.5">
+        <div className="grid grid-cols-7 gap-1 rounded-lg border border-slate-200/90 bg-slate-50/70 p-1">
           <button
             type="button"
             disabled={!activeEl || isTopmost}
             onClick={() => activeEl && bringForward(activeEl.id)}
             title="Bring forward"
             aria-label="Bring selected layer forward"
-            className="grid h-8 place-items-center rounded-xl text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
+            className="grid h-8 place-items-center rounded-md text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
           >
             <ChevronUp className="size-4" />
           </button>
@@ -131,7 +131,7 @@ export function LayersPanel() {
             onClick={() => activeEl && sendBackward(activeEl.id)}
             title="Send backward"
             aria-label="Send selected layer backward"
-            className="grid h-8 place-items-center rounded-xl text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
+            className="grid h-8 place-items-center rounded-md text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
           >
             <ChevronDown className="size-4" />
           </button>
@@ -141,7 +141,7 @@ export function LayersPanel() {
             onClick={() => activeEl && toggleHidden(activeEl.id)}
             title={activeEl?.hidden ? "Show selected layer" : "Hide selected layer"}
             aria-label={activeEl?.hidden ? "Show selected layer" : "Hide selected layer"}
-            className={`grid h-8 place-items-center rounded-xl transition disabled:pointer-events-none disabled:opacity-35 ${
+            className={`grid h-8 place-items-center rounded-md transition disabled:pointer-events-none disabled:opacity-35 ${
               activeEl?.hidden
                 ? "bg-blue-50 text-blue-600"
                 : "text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-2xs"
@@ -155,7 +155,7 @@ export function LayersPanel() {
             onClick={() => activeEl && toggleHideInPresent(activeEl.id)}
             title={activeEl?.hideInPresent ? "Show in present mode" : "Hide in present mode"}
             aria-label={activeEl?.hideInPresent ? "Show in present mode" : "Hide in present mode"}
-            className={`grid h-8 place-items-center rounded-xl transition disabled:pointer-events-none disabled:opacity-35 ${
+            className={`grid h-8 place-items-center rounded-md transition disabled:pointer-events-none disabled:opacity-35 ${
               activeEl?.hideInPresent
                 ? "bg-amber-50 text-amber-600"
                 : "text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-2xs"
@@ -169,7 +169,7 @@ export function LayersPanel() {
             onClick={() => activeEl && update(activeEl.id, { locked: !activeEl.locked } as never)}
             title={activeEl?.locked ? "Unlock selected layer" : "Lock selected layer"}
             aria-label={activeEl?.locked ? "Unlock selected layer" : "Lock selected layer"}
-            className={`grid h-8 place-items-center rounded-xl transition disabled:pointer-events-none disabled:opacity-35 ${
+            className={`grid h-8 place-items-center rounded-md transition disabled:pointer-events-none disabled:opacity-35 ${
               activeEl?.locked
                 ? "bg-amber-50 text-amber-600"
                 : "text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-2xs"
@@ -183,7 +183,7 @@ export function LayersPanel() {
             onClick={() => activeEl && duplicate(activeEl.id)}
             title="Duplicate selected layer"
             aria-label="Duplicate selected layer"
-            className="grid h-8 place-items-center rounded-xl text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
+            className="grid h-8 place-items-center rounded-md text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-2xs disabled:pointer-events-none disabled:opacity-35"
           >
             <Copy className="size-3.5" />
           </button>
@@ -193,7 +193,7 @@ export function LayersPanel() {
             onClick={() => activeEl && remove(activeEl.id)}
             title="Delete selected layer"
             aria-label="Delete selected layer"
-            className="grid h-8 place-items-center rounded-xl text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 disabled:pointer-events-none disabled:opacity-35"
+            className="grid h-8 place-items-center rounded-md text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 disabled:pointer-events-none disabled:opacity-35"
           >
             <Trash2 className="size-3.5" />
           </button>
@@ -206,7 +206,7 @@ export function LayersPanel() {
 
       <div className="space-y-1.5">
         {layers.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-10 text-center">
+          <div className="rounded-lg border border-dashed border-slate-200 px-4 py-10 text-center">
             <Layers3 className="mx-auto size-5 text-slate-300" />
             <p className="mt-2 text-xs font-medium text-slate-500">No objects on this slide yet</p>
             <p className="mt-1 text-[11px] text-slate-400">
@@ -216,7 +216,7 @@ export function LayersPanel() {
         )}
 
         {layers.length > 0 && filtered.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
+          <div className="rounded-lg border border-dashed border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
             No layers match "{query}".
           </div>
         )}
@@ -231,9 +231,9 @@ export function LayersPanel() {
           return (
             <div
               key={el.id}
-              className={`group flex items-center gap-2 rounded-2xl border px-2.5 py-2 transition-all ${
+              className={`group flex items-center gap-2 rounded-lg border px-2.5 py-2 transition-colors ${
                 selected
-                  ? "border-blue-200 bg-blue-50/75 text-blue-900 shadow-[0_2px_10px_rgba(37,99,235,0.08)]"
+                  ? "border-blue-300 bg-blue-50/75 text-blue-900"
                   : "border-slate-200/80 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/70"
               }`}
             >
@@ -247,7 +247,7 @@ export function LayersPanel() {
                 }}
               >
                 <span
-                  className={`grid size-7 shrink-0 place-items-center rounded-xl border transition-colors ${
+                  className={`grid size-7 shrink-0 place-items-center rounded-md border transition-colors ${
                     selected
                       ? "border-blue-200 bg-white text-blue-600"
                       : "border-slate-200/80 bg-slate-50 text-slate-500"
@@ -266,7 +266,7 @@ export function LayersPanel() {
                   <span className="flex items-center gap-1.5 text-[10px] text-slate-400">
                     <span>{TYPE_LABEL[el.type] ?? el.type}</span>
                     {el.hideInPresent && (
-                      <span className="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-semibold text-amber-700">
+                      <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700">
                         Present off
                       </span>
                     )}
@@ -280,7 +280,7 @@ export function LayersPanel() {
                   title={el.hideInPresent ? "Show in present mode" : "Hide in present mode"}
                   aria-label={el.hideInPresent ? "Show in present mode" : "Hide in present mode"}
                   onClick={() => toggleHideInPresent(el.id)}
-                  className={`grid size-6 place-items-center rounded-full transition hover:bg-slate-100 ${
+                  className={`grid size-6 place-items-center rounded transition hover:bg-slate-100 ${
                     el.hideInPresent
                       ? "text-amber-600"
                       : "text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100"
@@ -293,7 +293,7 @@ export function LayersPanel() {
                   title={hidden ? "Show layer" : "Hide layer"}
                   aria-label={hidden ? "Show layer" : "Hide layer"}
                   onClick={() => toggleHidden(el.id)}
-                  className={`grid size-6 place-items-center rounded-full transition hover:bg-slate-100 ${
+                  className={`grid size-6 place-items-center rounded transition hover:bg-slate-100 ${
                     hidden
                       ? "text-slate-500"
                       : "text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100"
@@ -306,7 +306,7 @@ export function LayersPanel() {
                   title={el.locked ? "Unlock layer" : "Lock layer"}
                   aria-label={el.locked ? "Unlock layer" : "Lock layer"}
                   onClick={() => update(el.id, { locked: !el.locked } as never)}
-                  className={`grid size-6 place-items-center rounded-full transition hover:bg-slate-100 ${
+                  className={`grid size-6 place-items-center rounded transition hover:bg-slate-100 ${
                     el.locked
                       ? "text-amber-500"
                       : "text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100"
@@ -320,7 +320,7 @@ export function LayersPanel() {
                   aria-label="Bring forward"
                   disabled={topmost}
                   onClick={() => bringForward(el.id)}
-                  className="grid size-6 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:pointer-events-none disabled:opacity-25"
+                  className="grid size-6 place-items-center rounded text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:pointer-events-none disabled:opacity-25"
                 >
                   <ChevronUp className="size-3.5" />
                 </button>
@@ -330,7 +330,7 @@ export function LayersPanel() {
                   aria-label="Send backward"
                   disabled={bottommost}
                   onClick={() => sendBackward(el.id)}
-                  className="grid size-6 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:pointer-events-none disabled:opacity-25"
+                  className="grid size-6 place-items-center rounded text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:pointer-events-none disabled:opacity-25"
                 >
                   <ChevronDown className="size-3.5" />
                 </button>

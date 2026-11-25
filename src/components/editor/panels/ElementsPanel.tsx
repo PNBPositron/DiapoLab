@@ -7,7 +7,6 @@ import {
   Search,
   UploadCloud,
   Loader2,
-  Sparkles,
   Youtube,
   Music2,
   QrCode,
@@ -138,7 +137,7 @@ export function ElementsPanel() {
 
   return (
     <div className="panel-content">
-      <PanelHeader kicker="Elements" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Sparkles} />
+      <PanelHeader kicker="Elements" title="Building blocks" description="Drop images, shapes and icons onto your slide." icon={Shapes} />
 
       {/* Upload zone */}
       <label className="group flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/30">
@@ -214,12 +213,12 @@ export function ElementsPanel() {
 
       {/* SmartArt-like diagrams — inserted as native editable shapes + texts */}
       {section === "diagrams" && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
               <Network className="size-4 text-blue-600" /> Diagrams
             </div>
-            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">editable</span>
+            <span className="text-[11px] font-medium text-slate-500">Editable</span>
           </div>
           <p className="text-[10px] leading-relaxed text-slate-500">
             Click a card to insert with defaults, or open the sliders to set the step count and labels first.
@@ -333,10 +332,10 @@ export function ElementsPanel() {
 
       {/* Web embeds — YouTube, Spotify, Maps, Figma… as live iframes on the slide */}
       {section === "embeds" && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-blue-100 bg-blue-50/40 p-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-800"><Youtube className="size-4 text-blue-600" /> Web embeds</div>
-            <span className="rounded-full bg-blue-600/10 px-2 py-0.5 text-[9px] font-bold text-blue-600">live iframes</span>
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-800"><Youtube className="size-4 text-blue-600" /> Web embeds</div>
+            <span className="text-[11px] font-medium text-slate-500">Live frames</span>
           </div>
           <p className="text-[10px] leading-relaxed text-slate-500">Paste a link — YouTube, Spotify, SoundCloud, Google Maps, Figma, Vimeo… It plays live on the slide.</p>
           <label className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-400 transition-all duration-200 focus-within:border-blue-400 focus-within:bg-white">

@@ -78,7 +78,7 @@ function VotePage() {
           </span>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_16px_48px_-16px_rgba(15,23,42,0.12)]">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.12)]">
           <h1 className="font-display text-xl font-semibold leading-snug tracking-tight text-slate-900">{question}</h1>
 
           {options.length === 0 ? (
@@ -96,7 +96,7 @@ function VotePage() {
                     key={opt.id}
                     disabled={!!picked}
                     onClick={() => cast(opt.id)}
-                    className={`relative overflow-hidden rounded-2xl border px-4 py-3 text-left transition disabled:cursor-default ${
+                    className={`relative overflow-hidden rounded-lg border px-4 py-3 text-left transition disabled:cursor-default ${
                       mine
                         ? "border-blue-500 bg-blue-50/40"
                         : "border-slate-200 bg-white hover:border-blue-300"
@@ -112,7 +112,7 @@ function VotePage() {
                     <span className="relative flex items-center justify-between gap-3">
                       <span className="flex items-center gap-3 text-sm font-semibold text-slate-900">
                         <span
-                          className={`grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                          className={`grid size-6 shrink-0 place-items-center rounded-md text-xs font-semibold ${
                             mine ? "bg-blue-600 text-white" : "border border-slate-200 bg-slate-50 text-slate-700"
                           }`}
                         >
