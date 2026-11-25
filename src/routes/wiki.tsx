@@ -37,7 +37,7 @@ export const Route = createFileRoute("/wiki")({
       {
         name: "description",
         content:
-          "Learn DiapoLab: formats, panels, elements, plugins and widget packs, motion paths, audio, rotoscope, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
+          "Learn DiapoLab: formats, panels, elements, plugins and widget packs, motion paths, 3D scene transitions, audio, rotoscope, auto-arrange, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
       },
       { property: "og:title", content: "Wiki — DiapoLab documentation" },
       { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
@@ -80,7 +80,7 @@ const PANELS = [
 
 const ELEMENTS: Array<[string, string]> = [
   ["Text", "Inline-editable titles and paragraphs, with fonts, transforms, typewriter and count-up animations, masks."],
-  ["Shapes", "Fifty-plus shapes with fills, gradients, strokes and visual effects."],
+  ["Shapes", "Seventy-six vector shapes in six searchable categories (Basics, Arrows & Flow, Callouts, Stars & Nature, Cyber and Decorative), with five insert styles, plus fills, gradients, strokes and visual effects."],
   ["Icons", "A searchable icon library, recolorable per element, with animated icons."],
   ["Images", "Crop, shape masks, one-click remove background and rotoscope cutouts, plus filters including glitch, pixelate and posterize."],
   ["Photo grids", "Photo and illustration grids where any cell can be swapped for a video."],
@@ -221,7 +221,20 @@ function Wiki() {
               <strong>Speaker notes</strong> section of the Design panel. They are
               saved with the slide, never rendered on the canvas, and show up in{" "}
               <strong>presenter view</strong> next to the timer and a preview of the
-              next slide.
+              next slide, and each slide thumbnail can show a badge when it carries
+              notes, so nothing gets lost while you rehearse.
+            </p>
+            <p>
+              Two more helpers live in the pages bar: the <strong>slide grid</strong>{" "}
+              button opens an overview of every slide, so you can jump anywhere or
+              reorder the deck at a glance, and the <strong>eye</strong> toggle on any
+              slide hides it from the presentation — the deck keeps it while editing,
+              but the audience never sees it during Present.
+            </p>
+            <p>
+              Individual <strong>elements</strong> can be hidden from the presentation
+              too, using the same <strong>Hide in presentation</strong> action from the
+              element menu: handy for off-slide staging areas or helper notes.
             </p>
           </Section>
 
@@ -288,7 +301,12 @@ function Wiki() {
               command palette, then style each one in the inspector on the right.
               Align and distribute actions work on a single element or a multi-selection,
               and smart snapping keeps everything on the grid (hold <Kbd>Alt</Kbd> to
-              bypass it while dragging).
+              bypass it while dragging). To tidy a crowded slide, use{" "}
+              <strong>Auto-arrange</strong> in the Design panel: <strong>Smart
+              auto</strong>, <strong>Balanced grid</strong>, <strong>Row flow</strong>{" "}
+              or <strong>Column flow</strong> places your selection (or every unlocked
+              element on the slide) without overlaps, with an auto-fit for oversized
+              items.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {ELEMENTS.map(([name, desc]) => (
@@ -473,16 +491,27 @@ function Wiki() {
               <li>
                 <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph,
                 tv, neon, cube, blur, three parallax modes, reveal, shutter, swirl,
-                warp, prism and origami. Pick one per slide from the dock under the
-                canvas, with a live preview. A short sound can accompany each
-                transition: enable <strong>Slide sound effects</strong> in Settings and
-                pick a soft whoosh or a subtle click, then use <strong>Test sound</strong>{" "}
-                to preview it.
+                warp, prism and origami, plus five true 3D scene transitions rendered
+                in WebGL: <strong>cube, carousel, flip, fold and helix</strong>. Pick
+                one per slide from the dock under the canvas, with a live preview. A
+                short sound can accompany each transition: enable{" "}
+                <strong>Slide sound effects</strong> in Settings and pick a soft whoosh
+                or a subtle click, then use <strong>Test sound</strong> to preview it.
+              </li>
+              <li>
+                <strong>3D scenes</strong> — with a 3D transition selected, the{" "}
+                <strong>3D Scene &amp; Colors</strong> dialog gives your slides a real
+                Three.js stage: ten scene environments, a draggable live preview with
+                front, hero and low camera angles, a duration slider (0.6–2.2 s),
+                stage floor and floating prisms toggles, and per-part color pickers
+                (backdrop, accent &amp; glow, frame, floor) with a palette shuffle.
+                Apply the scene to all slides in one click.
               </li>
               <li>
                 <strong>Element animations</strong> — entrance animations per element
-                (pop, fade-up, glitch, bounce, spin, blur-in and more), with a delay
-                to stagger objects.
+                (pop, fade-up, glitch, bounce, spin, blur-in and more, including 3D
+                entrances like flip, tumble, orbit or depth pop), with a delay to
+                stagger objects.
               </li>
               <li>
                 <strong>Typewriter & count-up</strong> — animate text typing itself
