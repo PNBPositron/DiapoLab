@@ -30,6 +30,7 @@ import { HelpCircle, Check, X as XIcon, QrCode, Lock, MonitorOff, Volume2, Play,
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { isSafeBrowserUrl } from "@/lib/url-safety";
+import { ensureFontFamily } from "@/lib/fontLoader";
 
 const svgFilterUrl = (inner: string) =>
   `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(
@@ -762,6 +763,13 @@ export function CanvasElement({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenting, preview, morph, element.animation, replayEpoch]);
+
+  const elementFontFamily = "fontFamily" in element ? element.fontFamily : undefined;
+  useEffect(() => {
+    if (elementFontFamily) {
+      void ensureFontFamily(elementFontFamily);
+    }
+  }, [elementFontFamily]);
 
   const interaction = element.interaction;
   const activateInteraction = () => {
@@ -2434,7 +2442,14 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
 /** Per-pack chart recipes — how the plot frame and grid "sound" like the pack. */
 const CHART_STYLE_RECIPES: Partial<Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>> = {
   sketch: { dashGrid: true },
+  blueprint: { dashGrid: true, radius: 4 },
   swiss: { flat: true, radius: 0 },
+  editorial: { flat: true, radius: 2 },
+  monochrome: { flat: true, radius: 8 },
+  nordic: { radius: 10 },
+  aurora: { radius: 14 },
+  emerald: { radius: 12 },
+  obsidian: { glow: true, radius: 12 },
   cyber: { glow: true },
   matrix: { glow: true },
   vapor: { glow: true },

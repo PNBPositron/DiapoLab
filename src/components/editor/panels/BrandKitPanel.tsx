@@ -5,7 +5,7 @@ import { EDITOR_COLOR_PALETTE, useEditor } from "@/store/editor";
 import { PanelHeader, FONTS } from "./TextPanel";
 import { ColorPicker } from "../ColorPicker";
 import { Dropdown } from "../ui/Dropdown";
-import { registerCustomFont, unregisterCustomFont } from "@/lib/fontLoader";
+import { ensureFontFamily, registerCustomFont, unregisterCustomFont } from "@/lib/fontLoader";
 
 const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
   { key: "primary", label: "Primary", hint: "Main brand color — buttons, highlights" },
@@ -13,6 +13,49 @@ const SWATCHES: Array<{ key: keyof BrandKit; label: string; hint: string }> = [
   { key: "accent", label: "Accent", hint: "Pop color — emphasis, links" },
   { key: "bg", label: "Background", hint: "Slide background tint" },
   { key: "text", label: "Text", hint: "Default text color" },
+];
+
+const CURATED_BRAND_KITS: Array<{ name: string; kit: Omit<BrandKit, "locked"> }> = [
+  {
+    name: "Swiss Editorial",
+    kit: { primary: "#e2231a", secondary: "#141414", accent: "#0057b7", bg: "#faf9f6", text: "#141414", headingFont: "Playfair Display", bodyFont: "Inter" },
+  },
+  {
+    name: "Midnight Tech",
+    kit: { primary: "#3b82f6", secondary: "#22d3ee", accent: "#818cf8", bg: "#0b1120", text: "#f8fafc", headingFont: "Space Grotesk", bodyFont: "Inter" },
+  },
+  {
+    name: "Aurora SaaS",
+    kit: { primary: "#6366f1", secondary: "#06b6d4", accent: "#ec4899", bg: "#f5f7ff", text: "#0f172a", headingFont: "Plus Jakarta Sans", bodyFont: "Inter" },
+  },
+  {
+    name: "Botanical Sage",
+    kit: { primary: "#10b981", secondary: "#34d399", accent: "#fbbf24", bg: "#06221b", text: "#ecfdf5", headingFont: "Plus Jakarta Sans", bodyFont: "Inter" },
+  },
+  {
+    name: "Obsidian Gold",
+    kit: { primary: "#f59e0b", secondary: "#fde68a", accent: "#fb923c", bg: "#09090b", text: "#fafaf9", headingFont: "Playfair Display", bodyFont: "Inter" },
+  },
+  {
+    name: "Nordic Birch",
+    kit: { primary: "#0f766e", secondary: "#0284c7", accent: "#d97706", bg: "#f4f6f8", text: "#1e293b", headingFont: "Inter", bodyFont: "Inter" },
+  },
+  {
+    name: "Sunset Coral",
+    kit: { primary: "#ea580c", secondary: "#fb7185", accent: "#f59e0b", bg: "#fff5ed", text: "#2a140d", headingFont: "Playfair Display", bodyFont: "Plus Jakarta Sans" },
+  },
+  {
+    name: "Neo Brutal",
+    kit: { primary: "#ff0080", secondary: "#2b6bff", accent: "#00c853", bg: "#fff3d0", text: "#0f0f0f", headingFont: "Archivo Black", bodyFont: "Inter" },
+  },
+  {
+    name: "Cobalt Blueprint",
+    kit: { primary: "#38bdf8", secondary: "#7dd3fc", accent: "#facc15", bg: "#0b2550", text: "#e0f2fe", headingFont: "JetBrains Mono", bodyFont: "Inter" },
+  },
+  {
+    name: "Monochrome Ink",
+    kit: { primary: "#fafafa", secondary: "#a1a1aa", accent: "#52525b", bg: "#18181b", text: "#fafafa", headingFont: "Inter", bodyFont: "Inter" },
+  },
 ];
 
 export function BrandKitPanel() {
@@ -103,8 +146,8 @@ export function BrandKitPanel() {
       </div>
 
       <div className={locked ? "pointer-events-none opacity-60" : ""}>
-      {/* Générateur */}
-      <div className="px-4">
+      {/* Générateur & curated palettes */}
+      <div className="space-y-3 px-4">
         <button
           type="button"
           onClick={generateRandomKit}
@@ -114,6 +157,47 @@ export function BrandKitPanel() {
           <Palette className="size-3.5" />
           {generating ? "Generating…" : "Generate random palette"}
         </button>
+
+        <div>
+          <div className="mb-1.5 text-[10px] font-semibold tracking-wide text-slate-500">
+            Curated deck palettes
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {CURATED_BRAND_KITS.map((preset) => {
+              const active =
+                brandKit.primary === preset.kit.primary &&
+                brandKit.bg === preset.kit.bg &&
+                brandKit.headingFont === preset.kit.headingFont;
+              return (
+                <button
+                  key={preset.name}
+                  type="button"
+                  onClick={() => setBrandKit(preset.kit)}
+                  className={`flex flex-col gap-1.5 rounded-lg border px-2.5 py-2 text-left transition ${
+                    active
+                      ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600/20"
+                      : "border-slate-200 bg-white hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-1">
+                    {[preset.kit.bg, preset.kit.primary, preset.kit.secondary, preset.kit.accent].map(
+                      (c, i) => (
+                        <span
+                          key={i}
+                          className="h-3 flex-1 rounded-sm border border-black/10"
+                          style={{ background: c }}
+                        />
+                      ),
+                    )}
+                  </div>
+                  <div className="truncate text-[10px] font-semibold text-slate-700">
+                    {preset.name}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Aperçu live du kit */}
@@ -194,7 +278,10 @@ export function BrandKitPanel() {
             <Dropdown
               value={brandKit[key]}
               options={[...FONTS.map((f) => f.family), ...customFonts.map((f) => f.name)]}
-              onChange={(v) => setBrandKit({ [key]: v })}
+              onChange={(v) => {
+                void ensureFontFamily(v);
+                setBrandKit({ [key]: v });
+              }}
               className="text-[11px]"
             />
           </label>

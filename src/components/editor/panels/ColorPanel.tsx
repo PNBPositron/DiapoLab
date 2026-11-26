@@ -7,6 +7,19 @@ import { prepareImage } from "@/lib/image-assets";
 
 type GradientStop = { color: string; pos: number };
 
+const SLIDE_BG_PRESETS: Array<{ label: string; value: string }> = [
+  { label: "Pure White", value: "#ffffff" },
+  { label: "Warm Ivory", value: "#faf9f6" },
+  { label: "Deep Navy", value: "#0b1120" },
+  { label: "Midnight Tech", value: "linear-gradient(135deg, #0b132b 0%, #162447 55%, #1f4068 100%)" },
+  { label: "Aurora Sky", value: "linear-gradient(135deg, #e0f2fe 0%, #ede9fe 52%, #fce7f3 100%)" },
+  { label: "Emerald Dark", value: "linear-gradient(155deg, #041d17 0%, #093529 100%)" },
+  { label: "Sunset Peach", value: "linear-gradient(135deg, #fff1e6 0%, #ffe0cc 55%, #ffd6e0 100%)" },
+  { label: "Obsidian Noir", value: "linear-gradient(160deg, #09090b 0%, #18181b 100%)" },
+  { label: "Cobalt Grid", value: "linear-gradient(160deg, #091d42 0%, #0e3168 100%)" },
+  { label: "Vapor Violet", value: "linear-gradient(155deg, #1b103a 0%, #3a2376 55%, #7c3aed 100%)" },
+];
+
 export function ColorPanel() {
   const { bgColor, setBg, pages, currentIndex, setBgImage } = useEditor();
   const page = pages[currentIndex];
@@ -129,6 +142,34 @@ export function ColorPanel() {
             <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
           </div>
         )}
+      </div>
+
+      {/* ------- Backdrop presets ------- */}
+      <div className="space-y-2 px-4">
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Backdrop presets</div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {SLIDE_BG_PRESETS.map((p) => {
+            const active = bgColor === p.value && !bgImage;
+            return (
+              <button
+                key={p.label}
+                type="button"
+                title={p.label}
+                aria-label={p.label}
+                onClick={() => {
+                  setBgImage(undefined);
+                  setBg(p.value);
+                }}
+                className={`h-8 rounded-lg border transition ${
+                  active
+                    ? "border-blue-600 ring-2 ring-blue-500/30"
+                    : "border-slate-200 hover:border-slate-400"
+                }`}
+                style={{ background: p.value }}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {/* ------- Dégradé custom ------- */}

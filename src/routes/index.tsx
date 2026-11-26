@@ -14,6 +14,7 @@ import { A11yPanel } from "@/components/editor/A11yPanel";
 import { WorkspaceBackgroundLayer } from "@/components/editor/WorkspaceBackground";
 import { useSettings } from "@/store/settings";
 import { registerCustomFont } from "@/lib/fontLoader";
+import { getBarChromeProps } from "@/lib/bar-appearance";
 
 export const Route = createFileRoute("/")({
   component: Editor,
@@ -37,7 +38,10 @@ function Editor() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const customFonts = useSettings((s) => s.customFonts);
   const editorDark = useSettings((s) => s.editorDark);
+  const barColor = useSettings((s) => s.barColor);
+  const barLiquidGlass = useSettings((s) => s.barLiquidGlass);
   const a11yCheck = useSettings((s) => s.a11yCheck);
+  const barChrome = getBarChromeProps(barColor, editorDark, barLiquidGlass);
 
   // Re-register user-uploaded fonts (from the Brand Kit) on every load.
   useEffect(() => {
@@ -57,7 +61,12 @@ function Editor() {
   }, []);
 
   return (
-    <div className={`editor-ui relative flex h-screen flex-col overflow-hidden text-slate-900 ${editorDark ? "editor-dark" : ""}`}>
+    <div
+      style={barChrome.style}
+      className={`editor-ui relative flex h-screen flex-col overflow-hidden text-slate-900 ${
+        editorDark ? "editor-dark" : ""
+      } ${barChrome.className}`}
+    >
       <WorkspaceBackgroundLayer />
 
       <h1 className="sr-only">DiapoLab — NextGen Open Source Presentation Editor</h1>

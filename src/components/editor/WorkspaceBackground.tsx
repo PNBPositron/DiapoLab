@@ -65,6 +65,7 @@ export function WorkspaceBackgroundLayer() {
   const workspaceBg = useSettings((s) => s.workspaceBg);
   const workspaceBgColor = useSettings((s) => s.workspaceBgColor);
   const workspaceBgImage = useSettings((s) => s.workspaceBgImage);
+  const workspaceBgOpacity = useSettings((s) => s.workspaceBgOpacity);
   const editorDark = useSettings((s) => s.editorDark);
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -75,11 +76,27 @@ export function WorkspaceBackgroundLayer() {
     setImgFailed(false);
   }, [imageSrc]);
 
+  const opacityFraction = Math.max(0, Math.min(100, workspaceBgOpacity)) / 100;
+
   return (
     <div
       aria-hidden="true"
       className="editor-ambient-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden transition-colors duration-300"
     >
+      {opacityFraction < 1 && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: editorDark ? "#080c15" : "#f8fafc",
+            backgroundImage: editorDark
+              ? "linear-gradient(45deg, rgba(255,255,255,0.035) 25%, transparent 25%), linear-gradient(-45deg, rgba(255,255,255,0.035) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.035) 75%), linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.035) 75%)"
+              : "linear-gradient(45deg, rgba(15,23,42,0.04) 25%, transparent 25%), linear-gradient(-45deg, rgba(15,23,42,0.04) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(15,23,42,0.04) 75%), linear-gradient(-45deg, transparent 75%, rgba(15,23,42,0.04) 75%)",
+            backgroundSize: "24px 24px",
+            backgroundPosition: "0 0, 0 12px, 12px -12px, -12px 0",
+          }}
+        />
+      )}
+      <div className="absolute inset-0 transition-opacity duration-150" style={{ opacity: opacityFraction }}>
       {imageSrc && !imgFailed ? (
         <img
           key={imageSrc}
@@ -162,6 +179,7 @@ export function WorkspaceBackgroundLayer() {
           }}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -174,9 +192,11 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
     workspaceBg,
     workspaceBgColor,
     workspaceBgImage,
+    workspaceBgOpacity,
     setWorkspaceBg,
     setWorkspaceBgColor,
     setWorkspaceBgImage,
+    setWorkspaceBgOpacity,
     resetWorkspaceBg,
     editorDark,
   } = useSettings();
@@ -298,7 +318,7 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
           }}
         />
 
-        {workspaceBg !== DEFAULT_WORKSPACE_BG && (
+        {(workspaceBg !== DEFAULT_WORKSPACE_BG || workspaceBgOpacity !== 100) && (
           <button
             type="button"
             onClick={() => {
@@ -312,6 +332,24 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
           </button>
         )}
       </div>
+
+      {/* Background transparency slider */}
+      <label className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-700">
+        <span className="shrink-0 font-medium">Background transparency</span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={workspaceBgOpacity}
+          onChange={(e) => setWorkspaceBgOpacity(+e.target.value)}
+          aria-label="Workspace background opacity"
+          className="h-1.5 min-w-0 flex-1 cursor-pointer accent-blue-600"
+        />
+        <span className="w-10 shrink-0 text-right font-mono text-[11px] tabular-nums text-slate-500">
+          {workspaceBgOpacity}%
+        </span>
+      </label>
 
       {workspaceBgImage && (
         <div

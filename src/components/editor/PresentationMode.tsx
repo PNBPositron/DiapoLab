@@ -18,6 +18,7 @@ import { playTransitionSound } from "@/lib/transition-sound";
 import { THREE_SCENE_PRESETS, resolveThreeScene, type ThreeSceneConfig } from "@/lib/three-scene";
 import { ColorPickerPopover } from "./ColorPicker";
 import { useSettings } from "@/store/settings";
+import { getBarChromeProps } from "@/lib/bar-appearance";
 import {
   Box,
   ChevronLeft,
@@ -127,6 +128,8 @@ export function PresentationMode() {
   const idleTimerRef = useRef<number | null>(null);
   const {
     editorDark,
+    barColor,
+    barLiquidGlass,
     presentHideHud,
     setPresentHideHud,
     presentHide3dButton,
@@ -140,6 +143,8 @@ export function PresentationMode() {
   } = useSettings();
   // key -> geometry of the element on the OUTGOING slide
   const prevGeomRef = useRef<Map<string, MorphGeometry>>(new Map());
+  const uiStateRef = useRef({ curtain, displayMenuOpen, gridOverviewOpen, zenMode });
+  uiStateRef.current = { curtain, displayMenuOpen, gridOverviewOpen, zenMode };
 
   const page = pages[currentIndex];
 
@@ -156,6 +161,8 @@ export function PresentationMode() {
       : new Map();
   }), []);
 
+  // Viewport scaling, body scroll lock, and fullscreen teardown — must NOT depend on HUD menu/modal flags
+  // so clicking Display, Overview, Blackout, or Hide HUD never tears down fullscreen and exits Present Mode.
   useEffect(() => {
     if (!presenting) return;
     const fit = () => {
@@ -167,25 +174,49 @@ export function PresentationMode() {
     const obs = new ResizeObserver(fit);
     if (wrapRef.current) obs.observe(wrapRef.current);
 
-    // Keep presentation inside the app overlay. Requesting fullscreen from an
-    // effect is rejected by browsers because it is no longer user-initiated,
-    // which can leave the preview on a blank/error document.
+    // Leaving browser fullscreen (Escape / F11) must also leave presentation —
+    // the Escape keydown is consumed by the browser and never reaches the
+    // page, so the overlay would otherwise keep playing as an in-window copy.
+    const onFsChange = () => {
+      if (!document.fullscreenElement && useEditor.getState().presenting) {
+        setPresenting(false);
+      }
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      obs.disconnect();
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.body.style.overflow = prev;
+      if (!useEditor.getState().presenting && document.fullscreenElement) {
+        void document.exitFullscreen().catch(() => undefined);
+      }
+    };
+  }, [presenting, canvasW, canvasH, setPresenting]);
+
+  // Keyboard shortcuts during presentation (reads latest overlay flags from uiStateRef)
+  useEffect(() => {
+    if (!presenting) return;
     const onKey = (e: KeyboardEvent) => {
       setIdleHidden(false);
+      const ui = uiStateRef.current;
       if (e.key === "Escape") {
-        if (curtain !== "none") {
+        if (ui.curtain !== "none") {
           setCurtain("none");
           return;
         }
-        if (displayMenuOpen) {
+        if (ui.displayMenuOpen) {
           setDisplayMenuOpen(false);
           return;
         }
-        if (gridOverviewOpen) {
+        if (ui.gridOverviewOpen) {
           setGridOverviewOpen(false);
           return;
         }
-        if (zenMode) {
+        if (ui.zenMode) {
           setZenMode(false);
           return;
         }
@@ -268,29 +299,8 @@ export function PresentationMode() {
       }
     };
     window.addEventListener("keydown", onKey);
-
-    // Leaving browser fullscreen (Escape / F11) must also leave presentation —
-    // the Escape keydown is consumed by the browser and never reaches the
-    // page, so the overlay would otherwise keep playing as an in-window copy.
-    const onFsChange = () => {
-      if (!document.fullscreenElement && useEditor.getState().presenting) {
-        setPresenting(false);
-      }
-    };
-    document.addEventListener("fullscreenchange", onFsChange);
-
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      obs.disconnect();
-      window.removeEventListener("keydown", onKey);
-      document.removeEventListener("fullscreenchange", onFsChange);
-      document.body.style.overflow = prev;
-      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [presenting, canvasW, canvasH, curtain, gridOverviewOpen, displayMenuOpen, zenMode]);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [presenting, setCurrentPage, setPresenting]);
   // Presenter view: reset timer & panel when (re)entering presentation.
   useEffect(() => {
     if (presenting) {
@@ -487,13 +497,16 @@ export function PresentationMode() {
     }
   };
 
+  const barChrome = getBarChromeProps(barColor, editorDark, barLiquidGlass && !showThreeCanvas);
+
   return (
     <div
       onPointerMove={wakeHud}
       onPointerDown={wakeHud}
+      style={barChrome.style}
       className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden font-sans ${
         editorDark ? "editor-dark bg-[#090d16]" : "bg-[#e2e8f0]"
-      } ${idleHidden && !laserOn && !drawOn ? "cursor-none" : ""}`}
+      } ${barChrome.className} ${idleHidden && !laserOn && !drawOn ? "cursor-none" : ""}`}
     >
       <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center">
         <div

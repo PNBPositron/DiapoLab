@@ -8,6 +8,7 @@ import { useEditor, type Page } from "@/store/editor";
 import { usePlugins, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins";
 import { profileLabel } from "@/lib/profiles";
 import { formatUtcDate } from "@/lib/date";
+import { BUILTIN_TEMPLATES } from "@/lib/builtin-templates";
 
 export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
@@ -53,8 +54,13 @@ function Marketplace() {
 
   useEffect(() => {
     listPublicTemplates()
-      .then(setTemplates)
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load templates"));
+      .then((remote) => {
+        setTemplates([
+          ...BUILTIN_TEMPLATES,
+          ...remote.filter((r) => !BUILTIN_TEMPLATES.some((b) => b.id === r.id)),
+        ]);
+      })
+      .catch(() => setTemplates(BUILTIN_TEMPLATES));
   }, []);
 
   const applyTemplate = (t: PublicTemplate) => {
@@ -257,7 +263,7 @@ function Marketplace() {
                               profileLabel(t.creator_profile).slice(0, 1).toUpperCase()
                             )}
                           </span>
-                          <span className="truncate">by {profileLabel(t.creator_profile as any)}</span>
+                          <span className="truncate">by {profileLabel(t.creator_profile)}</span>
                         </Link>
                       )}
                     </div>

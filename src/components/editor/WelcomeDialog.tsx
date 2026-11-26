@@ -5,6 +5,7 @@ import { useEditor, CANVAS_PRESETS, type Page } from "@/store/editor";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { ensureFontsForPages } from "@/lib/fontLoader";
+import { BUILTIN_TEMPLATES } from "@/lib/builtin-templates";
 
 const STORAGE_KEY = "diapolab.welcome.v1";
 
@@ -51,12 +52,17 @@ export function WelcomeDialog() {
   useEffect(() => {
     if (!open || !useTemplate || templates.length > 0 || templatesLoading) return;
     setTemplatesLoading(true);
+    BUILTIN_TEMPLATES.forEach((t) => ensureFontsForPages(t.pages as never));
     listPublicTemplates()
       .then((tpls) => {
-        setTemplates(tpls);
+        const merged = [
+          ...BUILTIN_TEMPLATES,
+          ...tpls.filter((r) => !BUILTIN_TEMPLATES.some((b) => b.id === r.id)),
+        ];
+        setTemplates(merged);
         tpls.forEach((t) => ensureFontsForPages(t.pages as never));
       })
-      .catch(() => setTemplatesError("Couldn't load templates — you can start from a blank canvas."))
+      .catch(() => setTemplates(BUILTIN_TEMPLATES))
       .finally(() => setTemplatesLoading(false));
   }, [open, useTemplate, templates.length, templatesLoading]);
 

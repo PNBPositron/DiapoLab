@@ -41,10 +41,16 @@ import {
   TrendingUp,
   ChartColumn, ChartLine, ChartArea, ChartPie, Circle,
   User,
+  Users,
   Shuffle,
+  LayoutTemplate,
+  Columns2,
+  GitBranch,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import {
+  newButton,
   newChart,
   newPoll,
   newTable,
@@ -63,10 +69,12 @@ import {
   type UiStyle,
 } from "@/store/editor";
 import { UiRender } from "../UiRender";
+import { SlideThumbnail } from "../SlideThumbnail";
 import { PanelHeader, SearchField, ChipGroup, SegmentedControl, OptionGrid } from "../ui/selectors";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ColorPicker } from "../ColorPicker";
 import { FONTS } from "./TextPanel";
+import { SLIDE_LAYOUT_PRESETS } from "@/lib/builtin-templates";
 import { usePlugins, instantiateWidget } from "@/lib/plugins";
 import {
   loadBlocks,
@@ -83,7 +91,7 @@ import {
   type SlideBlock,
 } from "@/lib/user-blocks";
 
-type PresetSection = "ui" | "blocks" | "charts";
+type PresetSection = "ui" | "charts" | "layouts" | "blocks";
 type UiCategory = "all" | "interactive" | "cards" | "interfaces";
 
 /* Pre-insert text customizer drafts (same pattern as the SmartArt panel). */
@@ -405,6 +413,130 @@ const STARTER_BLOCKS: StarterBlock[] = [
       }),
     ],
   },
+  {
+    id: "hero-header",
+    name: "Executive Hero Header",
+    summary: "Badge + headline + subtitle + CTA button",
+    Icon: Sparkles,
+    build: (style) => {
+      const theme = UI_STYLE_THEMES[style] ?? UI_STYLE_THEMES.cyber;
+      const textColor = theme.dark ? "#f8fafc" : "#0f172a";
+      const mutedColor = theme.dark ? "#cbd5e1" : "#475569";
+      return [
+        newUi("badge", style, { x: 140, y: 180, width: 320, height: 74, title: "KEYNOTE · 2026" }),
+        newText({ x: 140, y: 280, width: 1240, height: 190, text: "Designing products people remember", fontSize: 82, color: textColor }),
+        newText({ x: 140, y: 490, width: 1020, height: 96, text: "A clear narrative structure for customer outcomes, live telemetry, and roadmap velocity.", fontSize: 30, fontWeight: 400, color: mutedColor }),
+        newButton({ x: 140, y: 630, width: 290, height: 74, text: "Get started →", bgColor: theme.accent, fgColor: theme.onAccent ?? "#ffffff" }),
+      ];
+    },
+  },
+  {
+    id: "roadmap-timeline",
+    name: "Roadmap Timeline",
+    summary: "Section title + 3-phase milestone timeline",
+    Icon: GitBranch,
+    build: (style) => {
+      const theme = UI_STYLE_THEMES[style] ?? UI_STYLE_THEMES.cyber;
+      return [
+        newText({ x: 140, y: 110, width: 920, height: 88, text: "Delivery Roadmap", fontSize: 56, color: theme.dark ? "#f8fafc" : "#0f172a" }),
+        newUi("timeline", style, {
+          x: 140,
+          y: 230,
+          width: 1620,
+          height: 540,
+          title: "2026 Release Cadence",
+          body: "Foundation · Adoption · Scale",
+          value: 66,
+          items: ["Q1 Core Platform", "Q2 Multiplayer Sync", "Q3 Enterprise Governance"],
+        }),
+      ];
+    },
+  },
+  {
+    id: "bento-2x2",
+    name: "Feature 2×2 Bento Grid",
+    summary: "4 balanced product highlight cards",
+    Icon: Layers,
+    build: (style) => [
+      newUi("card", style, { x: 160, y: 160, width: 760, height: 320, title: "Instant Collaboration", body: "Edit slides, widgets, and charts together with deterministic sync." }),
+      newUi("card", style, { x: 960, y: 160, width: 760, height: 320, title: "Interactive Widgets", body: "Run live polls, countdowns, and clocks directly inside Present Mode." }),
+      newUi("card", style, { x: 160, y: 520, width: 760, height: 320, title: "Theme Consistency", body: "Switch visual style packs and brand tokens across every slide in one click." }),
+      newUi("card", style, { x: 960, y: 520, width: 760, height: 320, title: "Clean PPTX Round-Trip", body: "Import and export native PowerPoint decks with fonts, tables, and charts." }),
+    ],
+  },
+  {
+    id: "metrics-chart-split",
+    name: "Metrics + Chart Split",
+    summary: "Bar chart alongside 2 live KPI cards",
+    Icon: ChartColumn,
+    build: (style) => [
+      newChart("bar", { ...chartStylePatch(style), x: 140, y: 190, width: 1020, height: 640, title: "Quarterly Revenue Growth" }),
+      newUi("stat", style, { x: 1200, y: 190, width: 580, height: 300, title: "Net Retention", value: 128, body: "+14 pts vs prior year" }),
+      newUi("stat", style, { x: 1200, y: 530, width: 580, height: 300, title: "Active Teams", value: 4850, body: "Enterprise & mid-market" }),
+    ],
+  },
+  {
+    id: "before-after",
+    name: "Before vs After Comparison",
+    summary: "Side-by-side legacy & target checklists",
+    Icon: Columns2,
+    build: (style) => [
+      newUi("list", style, {
+        x: 160,
+        y: 200,
+        width: 760,
+        height: 600,
+        title: "Before: Fragmented Docs",
+        items: ["Static screenshots go stale", "Manual copy-paste formatting", "Slow approval handoffs", "Inconsistent brand styling"],
+      }),
+      newUi("list", style, {
+        x: 960,
+        y: 200,
+        width: 760,
+        height: 600,
+        title: "After: Unified Studio",
+        items: ["Live charts & widgets stay fresh", "Reusable styled slide layouts", "Interactive audience check-ins", "1-click deck-wide brand kit"],
+      }),
+    ],
+  },
+  {
+    id: "team-bio-row",
+    name: "Team Bio Row",
+    summary: "3 aligned speaker / leadership cards",
+    Icon: Users,
+    build: (style) => [
+      newUi("profile", style, { x: 160, y: 260, width: 500, height: 320, title: "Elena Vance", body: "Chief Executive Officer · Strategy" }),
+      newUi("profile", style, { x: 700, y: 260, width: 500, height: 320, title: "Marcus Chen", body: "VP Engineering · Infrastructure" }),
+      newUi("profile", style, { x: 1240, y: 260, width: 500, height: 320, title: "Priya Nair", body: "Head of Design · Systems" }),
+    ],
+  },
+  {
+    id: "quote-spotlight",
+    name: "Quote + Author Spotlight",
+    summary: "Pull-quote panel paired with speaker bio",
+    Icon: Quote,
+    build: (style) => [
+      newUi("quote", style, {
+        x: 180,
+        y: 180,
+        width: 1520,
+        height: 440,
+        title: "Clarity comes from removing everything that does not serve the audience’s next decision.",
+        body: "Customer Advisory Keynote",
+      }),
+      newUi("profile", style, { x: 180, y: 660, width: 680, height: 210, title: "Jordan Rivera", body: "Creative Director · Guest Speaker" }),
+    ],
+  },
+  {
+    id: "code-terminal-split",
+    name: "Code + Terminal Split",
+    summary: "Side-by-side snippet and CLI output",
+    Icon: TerminalSquare,
+    build: (style) => [
+      newUi("code", style, { x: 160, y: 200, width: 780, height: 580, title: "sdk.config.ts" }),
+      newUi("terminal", style, { x: 980, y: 200, width: 780, height: 580, title: "deploy — production" }),
+    ],
+  },
 ];
 
 const STYLES = Object.keys(UI_STYLE_THEMES) as UiStyle[];
@@ -426,6 +558,14 @@ const TEMPLATE_STYLES: UiStyle[] = [
   "material",
   "matrix",
   "swiss",
+  "editorial",
+  "aurora",
+  "emerald",
+  "sunset",
+  "monochrome",
+  "blueprint",
+  "obsidian",
+  "nordic",
 ];
 
 const SHADOW_PRESETS = [
@@ -1096,19 +1236,33 @@ export function ComponentsPanel() {
     return slideBlocks.filter((b) => b.name.toLowerCase().includes(query));
   }, [slideBlocks, search]);
 
+  const filteredLayouts = useMemo(() => {
+    if (!search.trim()) return SLIDE_LAYOUT_PRESETS;
+    const query = search.toLowerCase();
+    return SLIDE_LAYOUT_PRESETS.filter(
+      (p) => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query),
+    );
+  }, [search]);
+
+  const layoutPreviews = useMemo(
+    () => filteredLayouts.map((preset) => ({ preset, previewPage: preset.build(style) })),
+    [filteredLayouts, style],
+  );
+
   const filteredElements = search.trim()
     ? ELEMENT_PRESETS.filter((e) => e.label.toLowerCase().includes(search.toLowerCase()))
     : ELEMENT_PRESETS;
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 text-slate-800">
-      <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets and charts onto the slide." icon={Blocks} />
+      <PanelHeader kicker="Components" title="Presets & widgets" description="Drop ready-made UI mockups, widgets, charts and slide layouts." icon={Blocks} />
       <SegmentedControl value={section} onChange={setSection} label="Component category" options={[
         { value: "ui", label: "UI", icon: Blocks },
         { value: "charts", label: "Charts", icon: ChartColumn },
-        { value: "blocks", label: "My blocks", icon: Bookmark },
+        { value: "layouts", label: "Slides", icon: LayoutTemplate },
+        { value: "blocks", label: "Blocks", icon: Bookmark },
       ]} />
-      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : "blocks"}...`} />
+      <SearchField value={search} onChange={setSearch} placeholder={`Search ${section === "ui" ? "components" : section === "charts" ? "charts" : section === "layouts" ? "slide layouts" : "blocks"}...`} />
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs text-selector-subtle">Visual theme</span>
@@ -1369,6 +1523,44 @@ export function ComponentsPanel() {
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* Styled single-slide layout presets */}
+      {section === "layouts" && (
+        <div className="flex flex-col gap-2.5 pb-6">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-blue-600">
+              <LayoutTemplate className="size-3" /> Slide layouts ({filteredLayouts.length})
+            </span>
+            <span className="text-[10px] text-slate-400">Uses {UI_STYLE_THEMES[style].label}</span>
+          </div>
+          <div className="grid grid-cols-1 gap-2.5">
+            {layoutPreviews.map(({ preset, previewPage }) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => useEditor.getState().insertPageAfter(preset.build(style))}
+                className="group overflow-hidden rounded-lg border border-slate-200 bg-white text-left transition-colors hover:border-blue-400"
+              >
+                <div className="relative w-full overflow-hidden border-b border-slate-100 bg-slate-50">
+                  <SlideThumbnail page={previewPage} canvasW={1920} canvasH={1080} className="w-full" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-slate-950/0 opacity-0 transition-opacity duration-150 group-hover:bg-slate-950/20 group-hover:opacity-100">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow-sm">
+                      <Plus className="size-3 text-blue-600" /> Insert slide
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2 px-3 py-2">
+                  <span className="truncate text-xs font-semibold text-slate-800">{preset.name}</span>
+                  <span className="shrink-0 text-[10px] font-medium text-slate-400">{preset.category}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+          {filteredLayouts.length === 0 && (
+            <div className="py-8 text-center text-xs text-slate-400">No slide layout matches your search.</div>
+          )}
         </div>
       )}
 

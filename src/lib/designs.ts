@@ -207,8 +207,9 @@ export async function deletePublicTemplate(id: string): Promise<void> {
 export async function listTemplateLikeCounts(
   templateIds: string[],
 ): Promise<Record<string, number>> {
-  if (templateIds.length === 0) return {};
-  const { data, error } = await (supabase as any).rpc("get_template_like_counts", { _ids: templateIds });
+  const remoteIds = templateIds.filter((id) => !id.startsWith("builtin-"));
+  if (remoteIds.length === 0) return {};
+  const { data, error } = await (supabase as any).rpc("get_template_like_counts", { _ids: remoteIds });
   if (error) throw error;
   const counts: Record<string, number> = {};
   for (const row of (data ?? []) as Array<{ template_id: string; like_count: number }>) {

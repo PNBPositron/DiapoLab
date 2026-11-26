@@ -16,6 +16,25 @@ import { SlideThumbnail } from "../SlideThumbnail";
 import { useAuth } from "@/hooks/use-auth";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 import { importPPTXFile } from "@/lib/import-pptx";
+import { BUILTIN_TEMPLATES } from "@/lib/builtin-templates";
+
+const BUILTIN_LIKES_KEY = "diapolab.builtin-likes";
+function readBuiltinLikes(): Set<string> {
+  try {
+    const raw = localStorage.getItem(BUILTIN_LIKES_KEY);
+    const arr = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(arr) ? new Set(arr.filter((x): x is string => typeof x === "string")) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+function writeBuiltinLikes(ids: Set<string>) {
+  try {
+    localStorage.setItem(BUILTIN_LIKES_KEY, JSON.stringify([...ids]));
+  } catch {
+    /* ignore */
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /* Style definitions                                                    */
@@ -83,7 +102,7 @@ function getStyle(template: PublicTemplate): TemplateStyle {
 
 export function TemplatesPanel() {
   const [error, setError] = useState<string | null>(null);
-  const [community, setCommunity] = useState<PublicTemplate[]>([]);
+  const [community, setCommunity] = useState<PublicTemplate[]>(BUILTIN_TEMPLATES);
   const [communityLoading, setCommunityLoading] = useState(false);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -99,28 +118,34 @@ export function TemplatesPanel() {
   useEffect(() => {
     setCommunityLoading(true);
     setError(null);
+    const localLiked = readBuiltinLikes();
+    BUILTIN_TEMPLATES.forEach((t) => ensureFontsForPages(t.pages as never));
     listPublicTemplates()
-      .then(async (tpls) => {
-        setCommunity(tpls);
+      .then(async (remote) => {
+        const merged = [
+          ...BUILTIN_TEMPLATES,
+          ...remote.filter((r) => !BUILTIN_TEMPLATES.some((b) => b.id === r.id)),
+        ];
+        setCommunity(merged);
         // Preload every font family referenced by the templates' slides so
         // thumbnails render with the correct fonts instead of fallbacks.
-        tpls.forEach((t) => ensureFontsForPages(t.pages as never));
-        const ids = tpls.map((t) => t.id);
+        remote.forEach((t) => ensureFontsForPages(t.pages as never));
+        const ids = remote.map((t) => t.id);
         const [counts, mine] = await Promise.all([
           listTemplateLikeCounts(ids).catch(() => ({} as Record<string, number>)),
           listMyLikedTemplateIds().catch(() => new Set<string>()),
         ]);
-        setLikeCounts(counts);
-        setLikedIds(mine);
+        const builtinCounts: Record<string, number> = {};
+        for (const id of localLiked) builtinCounts[id] = 1;
+        setLikeCounts({ ...builtinCounts, ...counts });
+        setLikedIds(new Set([...mine, ...localLiked]));
       })
-      .catch((e) => {
-        const msg =
-          e instanceof Error
-            ? e.message
-            : typeof (e as { message?: unknown })?.message === "string"
-              ? (e as { message: string }).message
-              : "Failed to load templates";
-        setError(msg);
+      .catch(() => {
+        const builtinCounts: Record<string, number> = {};
+        for (const id of localLiked) builtinCounts[id] = 1;
+        setLikeCounts(builtinCounts);
+        setLikedIds(localLiked);
+        setCommunity(BUILTIN_TEMPLATES);
       })
       .finally(() => setCommunityLoading(false));
   }, [user?.id]);
@@ -150,8 +175,26 @@ export function TemplatesPanel() {
   });
 
   const toggleLike = async (id: string) => {
+    if (id.startsWith("builtin-")) {
+      const local = readBuiltinLikes();
+      const wasLiked = local.has(id);
+      if (wasLiked) local.delete(id);
+      else local.add(id);
+      writeBuiltinLikes(local);
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (wasLiked) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+      setLikeCounts((prev) => ({
+        ...prev,
+        [id]: Math.max(0, (prev[id] ?? 0) + (wasLiked ? -1 : 1)),
+      }));
+      return;
+    }
     if (!user) {
-      setError("Sign in to like templates");
+      setError("Sign in to like community templates");
       return;
     }
     const isLiked = likedIds.has(id);
@@ -359,6 +402,23 @@ export function TemplatesPanel() {
 
       {/* Template list */}
       <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2 text-[11px]">
+          <span className="font-semibold text-slate-500">Ranked by {sortBy === "likes" ? "likes · date" : "newest · likes"}</span>
+          <div className="inline-flex rounded-md border border-slate-200 bg-slate-50 p-0.5">
+            {(["likes", "recent"] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSortBy(s)}
+                className={`rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                  sortBy === s ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                {s === "likes" ? "Most liked" : "Recent"}
+              </button>
+            ))}
+          </div>
+        </div>
         {communityLoading ? (
           <TemplateSkeleton />
         ) : community.length === 0 ? (
@@ -380,7 +440,7 @@ export function TemplatesPanel() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3">
-            {sortTemplates(filteredCommunity, likeCounts, "likes")
+            {sortTemplates(filteredCommunity, likeCounts, sortBy)
               .slice(0, 8)
               .map((c) => (
                 <TemplateCard
@@ -388,7 +448,7 @@ export function TemplatesPanel() {
                   template={c}
                   likeCount={likeCounts[c.id] ?? 0}
                   liked={likedIds.has(c.id)}
-                  canLike={!!user}
+                  canLike={!!user || c.id.startsWith("builtin-")}
                   onLike={() => toggleLike(c.id)}
                   onLoad={() => loadTemplate(c)}
                 />
@@ -507,6 +567,7 @@ function TemplateCard({
   const slides = c.pages?.length ?? 0;
   const style = getStyle(c);
   const meta = STYLE_META[style];
+  const allowLike = canLike || c.id.startsWith("builtin-");
   return (
     <div className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300">
       <button onClick={onLoad} className="block w-full !rounded-none text-left" title={`Load ${c.name}`}>
@@ -536,13 +597,13 @@ function TemplateCard({
           e.stopPropagation();
           onLike();
         }}
-        disabled={!canLike}
-        title={canLike ? (liked ? "Unlike" : "Like") : "Sign in to like"}
+        disabled={!allowLike}
+        title={allowLike ? (liked ? "Unlike" : "Like") : "Sign in to like"}
         className={`absolute right-2 top-2 flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-semibold tabular-nums shadow-xs transition-colors ${
           liked
             ? "border-rose-200 bg-rose-50 text-rose-600"
             : "border-slate-200 bg-white/95 text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
-        } ${!canLike ? "opacity-75" : ""}`}
+        } ${!allowLike ? "opacity-75" : ""}`}
       >
         <Heart className="size-3" fill={liked ? "currentColor" : "none"} strokeWidth={2} />
         {likeCount}
@@ -612,11 +673,14 @@ function sortTemplates(
   sortBy: "likes" | "recent",
 ): PublicTemplate[] {
   const arr = [...tpls];
-  if (sortBy === "likes") {
-    arr.sort((a, b) => (likes[b.id] ?? 0) - (likes[a.id] ?? 0));
-  } else {
-    arr.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
-  }
+  arr.sort((a, b) => {
+    const likeDiff = (likes[b.id] ?? 0) - (likes[a.id] ?? 0);
+    const dateDiff = (+new Date(b.created_at) || 0) - (+new Date(a.created_at) || 0);
+    if (sortBy === "likes") {
+      return likeDiff !== 0 ? likeDiff : dateDiff;
+    }
+    return dateDiff !== 0 ? dateDiff : likeDiff;
+  });
   return arr;
 }
 

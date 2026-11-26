@@ -82,6 +82,9 @@ type SettingsState = {
   workspaceBg: WorkspaceBgId;
   workspaceBgColor: string;
   workspaceBgImage: string | null;
+  workspaceBgOpacity: number;
+  barColor: string | null;
+  barLiquidGlass: boolean;
   a11yCheck: boolean;
   canvasGrid: boolean;
   presentHideHud: boolean;
@@ -112,7 +115,11 @@ type SettingsState = {
   setWorkspaceBg: (id: WorkspaceBgId) => void;
   setWorkspaceBgColor: (color: string) => void;
   setWorkspaceBgImage: (dataUrl: string | null) => void;
+  setWorkspaceBgOpacity: (opacity: number) => void;
   resetWorkspaceBg: () => void;
+  setBarColor: (color: string | null) => void;
+  setBarLiquidGlass: (v: boolean) => void;
+  resetBarAppearance: () => void;
   setA11yCheck: (v: boolean) => void;
   setCanvasGrid: (v: boolean) => void;
   toggleCanvasGrid: () => void;
@@ -171,6 +178,9 @@ export const useSettings = create<SettingsState>()(
       workspaceBg: DEFAULT_WORKSPACE_BG,
       workspaceBgColor: "#e8eef7",
       workspaceBgImage: null,
+      workspaceBgOpacity: 100,
+      barColor: null,
+      barLiquidGlass: false,
       a11yCheck: false,
       canvasGrid: false,
       presentHideHud: false,
@@ -217,7 +227,12 @@ export const useSettings = create<SettingsState>()(
               ? DEFAULT_WORKSPACE_BG
               : s.workspaceBg,
         })),
-      resetWorkspaceBg: () => set({ workspaceBg: DEFAULT_WORKSPACE_BG }),
+      setWorkspaceBgOpacity: (workspaceBgOpacity) =>
+        set({ workspaceBgOpacity: Math.max(0, Math.min(100, Math.round(workspaceBgOpacity))) }),
+      resetWorkspaceBg: () => set({ workspaceBg: DEFAULT_WORKSPACE_BG, workspaceBgOpacity: 100 }),
+      setBarColor: (barColor) => set({ barColor }),
+      setBarLiquidGlass: (barLiquidGlass) => set({ barLiquidGlass }),
+      resetBarAppearance: () => set({ barColor: null, barLiquidGlass: false }),
       setA11yCheck: (a11yCheck) => set({ a11yCheck }),
       setCanvasGrid: (canvasGrid) => set({ canvasGrid }),
       toggleCanvasGrid: () => set((s) => ({ canvasGrid: !s.canvasGrid })),
@@ -244,7 +259,7 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "positron.settings",
-      version: 14,
+      version: 15,
       skipHydration: true,
       migrate: (state) => {
         const previous = state as SettingsState;
@@ -278,6 +293,10 @@ export const useSettings = create<SettingsState>()(
           workspaceBg,
           workspaceBgColor: previous?.workspaceBgColor ?? "#e8eef7",
           workspaceBgImage: previous?.workspaceBgImage ?? null,
+          workspaceBgOpacity:
+            typeof previous?.workspaceBgOpacity === "number" ? previous.workspaceBgOpacity : 100,
+          barColor: previous?.barColor ?? null,
+          barLiquidGlass: previous?.barLiquidGlass ?? false,
           a11yCheck: previous?.a11yCheck ?? false,
           canvasGrid: previous?.canvasGrid ?? false,
           presentHideHud: previous?.presentHideHud ?? false,

@@ -788,3 +788,145 @@ aside.editor-ui {
 @keyframes diapolab-icon-spin { to { transform: rotate(360deg); } }
 @keyframes diapolab-icon-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8%); } }
 @keyframes diapolab-icon-draw { 0% { stroke-dashoffset: 640; } 55%, 100% { stroke-dashoffset: 0; } }
+
+/* ── Custom bar color & Liquid Glass chrome (Settings > Appearance) ───────── */
+.editor-bar-tinted > header,
+.editor-bar-tinted .editor-tool-rail,
+.editor-bar-tinted .timeline-bar {
+  background: var(--editor-bar-bg) !important;
+  border-color: var(--editor-bar-border) !important;
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-bar-tinted .editor-side-panel,
+.editor-bar-tinted .editor-inspector,
+.editor-bar-tinted .zoom-dock,
+.editor-bar-tinted .studio-dock,
+.editor-bar-tinted .floating-hud,
+.editor-bar-tinted .toolbar-flyout,
+.editor-bar-tinted .selection-toolbar,
+.editor-bar-tinted .a11y-panel {
+  background: var(--editor-bar-bg) !important;
+  border-color: var(--editor-bar-border) !important;
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-liquid-glass > header,
+.editor-liquid-glass .editor-tool-rail,
+.editor-liquid-glass .timeline-bar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--editor-bar-glass-bg) 92%, rgba(255, 255, 255, 0.28)) 0%,
+    var(--editor-bar-glass-bg) 100%
+  ) !important;
+  border-color: var(--editor-bar-border) !important;
+  backdrop-filter: blur(22px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(185%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 28px -10px rgba(15, 23, 42, 0.18) !important;
+}
+
+.editor-liquid-glass .editor-side-panel,
+.editor-liquid-glass .editor-inspector,
+.editor-liquid-glass .zoom-dock,
+.editor-liquid-glass .studio-dock,
+.editor-liquid-glass .floating-hud,
+.editor-liquid-glass .toolbar-flyout,
+.editor-liquid-glass .selection-toolbar,
+.editor-liquid-glass .a11y-panel {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--editor-bar-panel-glass-bg) 90%, rgba(255, 255, 255, 0.34)) 0%,
+    var(--editor-bar-panel-glass-bg) 100%
+  ) !important;
+  border-color: var(--editor-bar-border) !important;
+  backdrop-filter: blur(22px) saturate(185%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(185%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 16px 38px -12px rgba(15, 23, 42, 0.24) !important;
+}
+
+.editor-bar-dark.editor-liquid-glass > header,
+.editor-bar-dark.editor-liquid-glass .editor-tool-rail,
+.editor-bar-dark.editor-liquid-glass .timeline-bar,
+.editor-bar-dark.editor-liquid-glass .editor-side-panel,
+.editor-bar-dark.editor-liquid-glass .editor-inspector,
+.editor-bar-dark.editor-liquid-glass .zoom-dock,
+.editor-bar-dark.editor-liquid-glass .studio-dock,
+.editor-bar-dark.editor-liquid-glass .floating-hud,
+.editor-bar-dark.editor-liquid-glass .toolbar-flyout,
+.editor-bar-dark.editor-liquid-glass .selection-toolbar,
+.editor-bar-dark.editor-liquid-glass .a11y-panel {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 18px 42px -12px rgba(2, 6, 23, 0.62) !important;
+}
+
+/* Contrast synchronization when custom bar colors are light or dark */
+.editor-bar-tinted.editor-bar-dark > header button:not([class*="bg-blue"]),
+.editor-bar-tinted.editor-bar-dark .editor-tool-rail button:not(.editor-theme-btn),
+.editor-bar-tinted.editor-bar-dark .zoom-dock button,
+.editor-bar-tinted.editor-bar-dark .studio-dock button {
+  color: var(--editor-bar-muted) !important;
+  border-color: var(--editor-bar-border) !important;
+}
+
+.editor-bar-tinted.editor-bar-dark > header button:not([class*="bg-blue"]):hover:not(:disabled),
+.editor-bar-tinted.editor-bar-dark .editor-tool-rail button:not(.editor-theme-btn):hover,
+.editor-bar-tinted.editor-bar-dark .zoom-dock button:hover:not(:disabled),
+.editor-bar-tinted.editor-bar-dark .studio-dock button:hover:not(:disabled) {
+  background-color: var(--editor-bar-hover) !important;
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-bar-tinted.editor-bar-dark > header input,
+.editor-bar-tinted.editor-bar-dark .zoom-dock output,
+.editor-bar-tinted.editor-bar-dark :is(.editor-side-panel, .editor-inspector) :is(h2, h3, h4, label, span, p, output):not([class*="text-blue"]):not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-white"]):not([style*="color"]) {
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-bar-tinted.editor-bar-dark > header :is(div, span):not([class*="bg-blue"]):not([style*="background"]) {
+  border-color: var(--editor-bar-border) !important;
+}
+
+.editor-bar-tinted.editor-bar-dark > header [class*="bg-slate-50"],
+.editor-bar-tinted.editor-bar-dark .zoom-dock output {
+  background-color: var(--editor-bar-input-bg) !important;
+}
+
+.editor-bar-tinted:not(.editor-bar-dark) > header button:not([class*="bg-blue"]),
+.editor-bar-tinted:not(.editor-bar-dark) .editor-tool-rail button:not(.editor-theme-btn),
+.editor-bar-tinted:not(.editor-bar-dark) .zoom-dock button,
+.editor-bar-tinted:not(.editor-bar-dark) .studio-dock button {
+  color: var(--editor-bar-muted) !important;
+  border-color: var(--editor-bar-border) !important;
+}
+
+.editor-bar-tinted:not(.editor-bar-dark) > header button:not([class*="bg-blue"]):hover:not(:disabled),
+.editor-bar-tinted:not(.editor-bar-dark) .editor-tool-rail button:not(.editor-theme-btn):hover,
+.editor-bar-tinted:not(.editor-bar-dark) .zoom-dock button:hover:not(:disabled),
+.editor-bar-tinted:not(.editor-bar-dark) .studio-dock button:hover:not(:disabled) {
+  background-color: var(--editor-bar-hover) !important;
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-bar-tinted:not(.editor-bar-dark) > header input,
+.editor-bar-tinted:not(.editor-bar-dark) .zoom-dock output,
+.editor-bar-tinted:not(.editor-bar-dark) :is(.editor-side-panel, .editor-inspector) :is(h2, h3, h4, label, span, p, output):not([class*="text-blue"]):not([class*="text-rose"]):not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-white"]):not([style*="color"]) {
+  color: var(--editor-bar-fg) !important;
+}
+
+.editor-bar-tinted:not(.editor-bar-dark) > header [class*="bg-slate-50"],
+.editor-bar-tinted:not(.editor-bar-dark) .zoom-dock output {
+  background-color: var(--editor-bar-input-bg) !important;
+}
+
+.editor-liquid-glass .editor-side-panel :is(button, input, textarea, select, [class*="bg-white"], [class*="bg-slate-50"]):not([class*="bg-blue"]):not([style*="background"]) {
+  backdrop-filter: blur(8px);
+}
+

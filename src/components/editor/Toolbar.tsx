@@ -38,6 +38,7 @@ import { ProfileDialog } from "./ProfileDialog";
 import { WorkspaceBackgroundPicker } from "./WorkspaceBackground";
 import { requestPresentationFullscreen } from "./PresentationMode";
 import { importPPTXFile } from "@/lib/import-pptx";
+import { getBarChromeProps } from "@/lib/bar-appearance";
 import {
   exportPNG,
   exportJPG,
@@ -122,6 +123,9 @@ export function Toolbar() {
 
   const { user } = useAuth();
   const editorDark = useSettings((s) => s.editorDark);
+  const barColor = useSettings((s) => s.barColor);
+  const barLiquidGlass = useSettings((s) => s.barLiquidGlass);
+  const { isBarDark } = getBarChromeProps(barColor, editorDark, barLiquidGlass);
   const navigate = useNavigate();
 
   const [saving, setSaving] = useState(false);
@@ -263,7 +267,7 @@ export function Toolbar() {
       {/* LEFT: Logo + project title */}
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <Link to="/" className="flex shrink-0 items-center transition-opacity hover:opacity-85" aria-label="DiapoLab home">
-          <DiapoLabLogo dark={editorDark} className="h-6 w-auto" />
+          <DiapoLabLogo dark={isBarDark} className="h-6 w-auto" />
         </Link>
 
         <div className="hidden h-5 w-px shrink-0 bg-slate-200 md:block" />

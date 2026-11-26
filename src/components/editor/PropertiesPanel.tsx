@@ -73,6 +73,7 @@ import {
 import { FONTS } from "./panels/TextPanel";
 import { OptionGrid, SegmentedControl, ToggleGrid, PanelHeader } from "./ui/selectors";
 import { isSafeBrowserUrl } from "@/lib/url-safety";
+import { ensureFontFamily } from "@/lib/fontLoader";
 import { Button } from "@/components/ui/button";
 import { pathFor } from "./ShapeRender";
 
@@ -1962,7 +1963,10 @@ export function PropertiesPanel() {
                     <Dropdown
                       value={el.fontFamily}
                       options={FONT_FAMILIES}
-                      onChange={(v) => update(el.id, { fontFamily: v })}
+                      onChange={(v) => {
+                        void ensureFontFamily(v);
+                        update(el.id, { fontFamily: v });
+                      }}
                     />
                   </Field>
                   <SliderWithInput

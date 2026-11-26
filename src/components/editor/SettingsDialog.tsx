@@ -8,6 +8,7 @@ import { useEditor } from "@/store/editor";
 import { listMyPublicTemplates, renamePublicTemplate, deletePublicTemplate, listMyShareLinks, deleteShareLink, type PublicTemplate, type ShareLink } from "@/lib/designs";
 import { playTransitionSound } from "@/lib/transition-sound";
 import { formatUtcDate } from "@/lib/date";
+import { BAR_COLOR_PRESETS } from "@/lib/bar-appearance";
 
 const title = "text-xs font-semibold text-slate-800";
 const help = "mt-0.5 text-[11px] leading-relaxed text-slate-500";
@@ -102,6 +103,11 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
     setEditorTheme,
     editorDark,
     setEditorDark,
+    barColor,
+    setBarColor,
+    barLiquidGlass,
+    setBarLiquidGlass,
+    resetBarAppearance,
     a11yCheck,
     setA11yCheck,
     presentHideHud,
@@ -404,7 +410,7 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
           <Section
             icon={<Palette className="size-4" />}
             label="Appearance & accessibility"
-            desc="Dark editor chrome and on-slide accessibility checks."
+            desc="Dark editor chrome, bar colors, liquid glass surfaces, and accessibility checks."
           >
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
@@ -416,6 +422,88 @@ export function SettingsDialog({ onClose }: { onClose: () => void }) {
                 </div>
                 <Switch on={editorDark} label="Dark editor" onClick={() => setEditorDark(!editorDark)} />
               </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
+                <div>
+                  <div className="text-xs font-medium text-slate-700">Liquid glass for bars</div>
+                  <p className="mt-0.5 text-[11px] text-slate-500">
+                    Translucent frosted glass look with soft blur and specular highlights on toolbars, rails, and docks.
+                  </p>
+                </div>
+                <Switch
+                  on={barLiquidGlass}
+                  label="Liquid glass for bars"
+                  onClick={() => setBarLiquidGlass(!barLiquidGlass)}
+                />
+              </div>
+
+              <div className="rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="text-xs font-medium text-slate-700">Bar color</div>
+                    <p className="mt-0.5 text-[11px] text-slate-500">
+                      Customize the surface tint of top, side, and floating editor bars.
+                    </p>
+                  </div>
+                  {(barColor !== null || barLiquidGlass) && (
+                    <button
+                      type="button"
+                      onClick={resetBarAppearance}
+                      className="text-[11px] font-medium text-slate-500 underline transition-colors hover:text-slate-800"
+                    >
+                      Reset bars
+                    </button>
+                  )}
+                </div>
+                <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                  {BAR_COLOR_PRESETS.map((preset) => {
+                    const active = barColor === preset.value;
+                    return (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setBarColor(preset.value)}
+                        title={preset.label}
+                        aria-label={`Bar color: ${preset.label}`}
+                        aria-pressed={active}
+                        className={`flex h-7 items-center gap-1.5 rounded-md border px-2 text-[11px] font-medium transition-colors ${
+                          active
+                            ? "border-blue-600 bg-blue-50 text-blue-700 ring-1 ring-blue-600/20"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                        }`}
+                      >
+                        <span
+                          className="size-3.5 shrink-0 rounded border border-slate-300"
+                          style={{
+                            background:
+                              preset.value ??
+                              (editorDark
+                                ? "linear-gradient(135deg,#101a2e 50%,#ffffff 50%)"
+                                : "linear-gradient(135deg,#ffffff 50%,#e2e8f0 50%)"),
+                          }}
+                        />
+                        {preset.value === null && <span>Auto</span>}
+                      </button>
+                    );
+                  })}
+                  <label
+                    className="flex h-7 cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-600 transition-colors hover:border-slate-300"
+                    title="Pick custom bar color"
+                  >
+                    <input
+                      type="color"
+                      value={barColor ?? (editorDark ? "#101a2e" : "#ffffff")}
+                      onChange={(e) => setBarColor(e.target.value)}
+                      aria-label="Custom bar color"
+                      className="size-4 cursor-pointer rounded border-0 bg-transparent p-0"
+                    />
+                    <span className="font-mono text-[10px] uppercase text-slate-500">
+                      {barColor ?? "Custom"}
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50/70 px-3.5 py-2.5">
                 <div>
                   <div className="text-xs font-medium text-slate-700">Accessibility checker</div>
