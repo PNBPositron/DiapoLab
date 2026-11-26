@@ -479,6 +479,24 @@ function Wiki() {
               slide), <Kbd>R</Kbd> replays the slide animations, and <Kbd>Esc</Kbd>{" "}
               leaves the presentation.
             </p>
+            <p className="mt-3">
+              <strong>Presenter toolkit:</strong> the presentation HUD doubles as a live
+              annotation layer. <Kbd>L</Kbd> turns the cursor into a{" "}
+              <strong>laser pointer</strong> with a glowing trail, <Kbd>D</Kbd> lets you{" "}
+              <strong>draw ink</strong> directly on the slide (pick a pen color from the
+              palette, and press <Kbd>C</Kbd> to wipe it clean), <Kbd>B</Kbd> /{" "}
+              <Kbd>W</Kbd> drop a <strong>black or white curtain</strong> over the stage
+              so you can pause the projection, and <Kbd>G</Kbd> opens the full{" "}
+              <strong>slide overview grid</strong>, just like in the editor.
+            </p>
+            <p className="mt-3">
+              The same HUD can <strong>auto-play</strong> the deck: set the interval in
+              seconds, toggle looping, and the presentation advances on its own while
+              respecting hidden slides. Settings gathers the matching display options:
+              auto-hide the controls and cursor after inactivity, hide the ink
+              annotations, the 3D stage button or the slide counter, for a cleaner
+              broadcast.
+            </p>
           </Section>
 
           <Section
@@ -584,7 +602,13 @@ function Wiki() {
             </p>
             <p>
               Settings also gathers the rest of the comfort options: an{" "}
-              <strong>editor theme</strong> picker for the chrome, a{" "}
+              <strong>editor theme</strong> picker for the chrome, with a{" "}
+              <strong>Theme Studio</strong> to build a custom theme from color tokens
+              and save it on this device or publish it to the marketplace, plus{" "}
+              <strong>toolbar &amp; sidebar tints</strong> (a preset palette from Pure
+              White and Frost Slate to Obsidian and Midnight Blue) with a{" "}
+              <strong>Liquid Glass</strong> option for a translucent chrome, a{" "}
+              <strong>canvas grid</strong> toggle, a{" "}
               <strong>workspace background</strong> behind the canvas (a preset
               backdrop, a solid tint or your own image), and <strong>reduced motion</strong>{" "}
               controls with duration and spring sliders for panel animations.
