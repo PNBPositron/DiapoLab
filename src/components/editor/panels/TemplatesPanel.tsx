@@ -570,7 +570,19 @@ function TemplateCard({
   const allowLike = canLike || c.id.startsWith("builtin-");
   return (
     <div className="group relative overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300">
-      <button onClick={onLoad} className="block w-full !rounded-none text-left" title={`Load ${c.name}`}>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onLoad}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onLoad();
+          }
+        }}
+        className="block w-full cursor-pointer !rounded-none text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+        title={`Load ${c.name}`}
+      >
         <div className="relative w-full overflow-hidden border-b border-slate-100">
           {c.pages?.[0] ? (
             <SlideThumbnail
@@ -589,7 +601,7 @@ function TemplateCard({
             </span>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Like — top-right */}
       <button

@@ -1537,11 +1537,18 @@ export function ComponentsPanel() {
           </div>
           <div className="grid grid-cols-1 gap-2.5">
             {layoutPreviews.map(({ preset, previewPage }) => (
-              <button
+              <div
                 key={preset.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => useEditor.getState().insertPageAfter(preset.build(style))}
-                className="group overflow-hidden rounded-lg border border-slate-200 bg-white text-left transition-colors hover:border-blue-400"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    useEditor.getState().insertPageAfter(preset.build(style));
+                  }
+                }}
+                className="group cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white text-left transition-colors hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 <div className="relative w-full overflow-hidden border-b border-slate-100 bg-slate-50">
                   <SlideThumbnail page={previewPage} canvasW={1920} canvasH={1080} className="w-full" />
@@ -1555,7 +1562,7 @@ export function ComponentsPanel() {
                   <span className="truncate text-xs font-semibold text-slate-800">{preset.name}</span>
                   <span className="shrink-0 text-[10px] font-medium text-slate-400">{preset.category}</span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
           {filteredLayouts.length === 0 && (

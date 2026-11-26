@@ -1289,7 +1289,7 @@ export function CanvasElement({
                   .map((l) => (l.trim() ? `• ${l}` : l))
                   .join("\n")
               : element.text;
-          const isLink = !!element.href && presenting;
+          const isLink = !!element.href && presenting && !preview;
           // Slide-bg knockout: text becomes a window on the page background.
           // Disabled while editing so the caret and typed text stay visible.
           const knockout = useSlideBg && !editing;
@@ -1487,7 +1487,7 @@ export function CanvasElement({
           <audio
             src={element.src}
             loop={element.loop ?? true}
-            controls
+            controls={!preview}
             style={{ width: "100%" }}
           />
         </div>
@@ -1869,11 +1869,9 @@ export function CanvasElement({
             />
           );
         })()}
-      {element.type === "quiz" &&
-        (() => {
-          const presenting = useEditor.getState().presenting;
-          return <QuizRender element={element} interactive={presenting} />;
-        })()}
+      {element.type === "quiz" && (
+        <QuizRender element={element} interactive={presenting && !preview} />
+      )}
 
       {element.type === "chart" && <ChartRender element={element} />}
       {element.type === "qr" && <QrRender element={element} />}
@@ -1881,11 +1879,9 @@ export function CanvasElement({
       {element.type === "ui" && (
         <UiRender element={element} preview={preview} interactive={presenting && !preview} />
       )}
-      {element.type === "button" &&
-        (() => {
-          const presenting = useEditor.getState().presenting;
-          return <ButtonRender element={element} interactive={presenting} />;
-        })()}
+      {element.type === "button" && (
+        <ButtonRender element={element} interactive={presenting && !preview} />
+      )}
       {element.type === "embed" &&
         (() => {
           const presenting = useEditor.getState().presenting;
@@ -2242,34 +2238,30 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             const count = votes[opt.id] ?? 0;
             const pct = total ? Math.round((count / total) * 100) : 0;
             const mine = picked === opt.id;
-            return (
-              <button
-                key={opt.id}
-                disabled={!interactive || !!picked}
-                onClick={() => castVote(opt.id)}
-                style={{
-                  position: "relative",
-                  flex: 1,
-                  overflow: "hidden",
-                  background: mine ? accent : optBg,
-                  color: mine ? onAccent : element.fgColor,
-                  border: optBorderWidth + "px solid " + (mine ? accent : optBorder),
-                  borderRadius: optRadius,
-                  padding: "0 16px",
-                  fontFamily: font,
-                  letterSpacing: tracking,
-                  textTransform: uppercaseText,
-                  fontSize: "max(15px, 3%)",
-                  fontWeight: 600,
-                  textAlign: "left",
-                  cursor: interactive && !picked ? "pointer" : "default",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  ...optFlair,
-                }}
-              >
+            const optionStyle: React.CSSProperties = {
+              position: "relative",
+              flex: 1,
+              overflow: "hidden",
+              background: mine ? accent : optBg,
+              color: mine ? onAccent : element.fgColor,
+              border: optBorderWidth + "px solid " + (mine ? accent : optBorder),
+              borderRadius: optRadius,
+              padding: "0 16px",
+              fontFamily: font,
+              letterSpacing: tracking,
+              textTransform: uppercaseText,
+              fontSize: "max(15px, 3%)",
+              fontWeight: 600,
+              textAlign: "left",
+              cursor: interactive && !picked ? "pointer" : "default",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+              ...optFlair,
+            };
+            const optionInner = (
+              <>
                 {!mine && (
                   <span
                     style={{
@@ -2297,7 +2289,22 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
                 <span style={{ position: "relative", fontVariantNumeric: "tabular-nums" }}>
                   {pct}% · {count}
                 </span>
+              </>
+            );
+            return interactive ? (
+              <button
+                key={opt.id}
+                type="button"
+                disabled={!!picked}
+                onClick={() => castVote(opt.id)}
+                style={optionStyle}
+              >
+                {optionInner}
               </button>
+            ) : (
+              <div key={opt.id} style={optionStyle}>
+                {optionInner}
+              </div>
             );
           })}
           <div
@@ -2345,43 +2352,54 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
             const showResult = picked !== null;
             const isCorrect = showResult && opt.id === element.correctId;
             const marked = showResult && (isCorrect || isPicked);
-            return (
-              <button
-                key={opt.id}
-                disabled={!interactive || showResult}
-                onClick={() => interactive && setPicked(opt.id)}
-                style={{
-                  background: isCorrect ? accent : isPicked ? "#dc2626" : optBg,
-                  color: isCorrect ? onAccent : isPicked ? "#ffffff" : element.fgColor,
-                  border:
-                    optBorderWidth +
-                    "px solid " +
-                    (isCorrect ? accent : isPicked ? "#dc2626" : optBorder),
-                  borderRadius: optRadius,
-                  padding: "0 16px",
-                  fontFamily: font,
-                  letterSpacing: tracking,
-                  textTransform: uppercaseText,
-                  fontSize: "max(15px, 3.2%)",
-                  fontWeight: 600,
-                  textAlign: "left",
-                  opacity: showResult && !marked ? 0.55 : 1,
-                  cursor: interactive && !showResult ? "pointer" : "default",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  transition: "all 0.25s",
-                  ...optFlair,
-                }}
-              >
+            const optionStyle: React.CSSProperties = {
+              background: isCorrect ? accent : isPicked ? "#dc2626" : optBg,
+              color: isCorrect ? onAccent : isPicked ? "#ffffff" : element.fgColor,
+              border:
+                optBorderWidth +
+                "px solid " +
+                (isCorrect ? accent : isPicked ? "#dc2626" : optBorder),
+              borderRadius: optRadius,
+              padding: "0 16px",
+              fontFamily: font,
+              letterSpacing: tracking,
+              textTransform: uppercaseText,
+              fontSize: "max(15px, 3.2%)",
+              fontWeight: 600,
+              textAlign: "left",
+              opacity: showResult && !marked ? 0.55 : 1,
+              cursor: interactive && !showResult ? "pointer" : "default",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+              transition: "all 0.25s",
+              ...optFlair,
+            };
+            const optionInner = (
+              <>
                 <span style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                   <LetterChip i={i} solid={isCorrect} />
                   <span>{opt.text}</span>
                 </span>
                 {showResult && isCorrect && <Check size={20} strokeWidth={3} color={onAccent} />}
                 {showResult && isPicked && !isCorrect && <XIcon size={20} strokeWidth={3} />}
+              </>
+            );
+            return interactive ? (
+              <button
+                key={opt.id}
+                type="button"
+                disabled={showResult}
+                onClick={() => setPicked(opt.id)}
+                style={optionStyle}
+              >
+                {optionInner}
               </button>
+            ) : (
+              <div key={opt.id} style={optionStyle}>
+                {optionInner}
+              </div>
             );
           })}
         </div>
@@ -2418,6 +2436,7 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
               {pollUrl}
             </div>
             <button
+              type="button"
               onClick={() => setQrOpen(false)}
               style={{
                 marginTop: 12,
@@ -2838,30 +2857,39 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
       }
     }
   };
+  const btnStyle: React.CSSProperties = {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    background: element.bgColor,
+    color: element.fgColor,
+    border: `${element.borderWidth}px solid ${element.borderColor}`,
+    borderRadius: element.cornerRadius,
+    fontFamily: element.fontFamily,
+    fontWeight: element.fontWeight,
+    fontSize: element.fontSize,
+    cursor: interactive ? "pointer" : "move",
+    padding: 0,
+    boxShadow: element.shadow
+      ? `${element.shadow.x}px ${element.shadow.y}px ${element.shadow.blur}px ${element.shadow.color}`
+      : undefined,
+    transition: "transform 0.1s",
+  };
+  if (!interactive) {
+    return <div style={btnStyle}>{element.text}</div>;
+  }
   return (
     <button
-      onMouseDown={(e) => interactive && e.stopPropagation()}
+      type="button"
+      onMouseDown={(e) => e.stopPropagation()}
       onClick={(event) => {
-        if (interactive) event.stopPropagation();
+        event.stopPropagation();
         onClick();
       }}
-      style={{
-        width: "100%",
-        height: "100%",
-        background: element.bgColor,
-        color: element.fgColor,
-        border: `${element.borderWidth}px solid ${element.borderColor}`,
-        borderRadius: element.cornerRadius,
-        fontFamily: element.fontFamily,
-        fontWeight: element.fontWeight,
-        fontSize: element.fontSize,
-        cursor: interactive ? "pointer" : "move",
-        padding: 0,
-        boxShadow: element.shadow
-          ? `${element.shadow.x}px ${element.shadow.y}px ${element.shadow.blur}px ${element.shadow.color}`
-          : undefined,
-        transition: "transform 0.1s",
-      }}
+      style={btnStyle}
     >
       {element.text}
     </button>

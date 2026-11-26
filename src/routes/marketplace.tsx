@@ -218,9 +218,17 @@ function Marketplace() {
                   key={t.id}
                   className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-slate-300"
                 >
-                  <button
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => applyTemplate(t)}
-                    className="relative block aspect-video w-full overflow-hidden border-b border-slate-200 bg-slate-50 text-left"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        applyTemplate(t);
+                      }
+                    }}
+                    className="relative block aspect-video w-full cursor-pointer overflow-hidden border-b border-slate-200 bg-slate-50 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                   >
                     {t.pages?.[0] ? (
                       <SlideThumbnail
@@ -235,7 +243,7 @@ function Marketplace() {
                         Use template <ArrowUpRight className="size-3.5 text-blue-600" />
                       </span>
                     </div>
-                  </button>
+                  </div>
                   <div className="flex flex-1 items-center justify-between gap-3 px-4 py-3">
                     <div className="min-w-0">
                       <button

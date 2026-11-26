@@ -45,6 +45,37 @@ function interactiveHandlers(interactive: boolean, onActivate?: () => void) {
   };
 }
 
+function WidgetControl({
+  interactive,
+  style,
+  onActivate,
+  onMouseEnter,
+  onMouseLeave,
+  children,
+}: {
+  interactive: boolean;
+  style: CSSProperties;
+  onActivate?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  children: ReactNode;
+}) {
+  if (!interactive) {
+    return <div style={style}>{children}</div>;
+  }
+  return (
+    <button
+      type="button"
+      style={style}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      {...interactiveHandlers(true, onActivate)}
+    >
+      {children}
+    </button>
+  );
+}
+
 function getTimeParts(now: Date | null, tz: string): {
   hours24: number;
   minutes: number;
@@ -350,6 +381,10 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
   const pct = Math.max(0, Math.min(100, (remaining / Math.max(1, initialSec)) * 100));
 
   const ctrlBtn = (primary = false): CSSProperties => ({
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
     padding: `${6 * s}px ${12 * s}px`,
     fontSize: 13 * s,
     fontWeight: 700,
@@ -413,40 +448,40 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 * s }}>
-        <button
-          type="button"
+        <WidgetControl
+          interactive={interactive}
           style={ctrlBtn(true)}
-          {...interactiveHandlers(interactive, () => {
+          onActivate={() => {
             if (remaining === 0) setRemaining(initialSec);
             setRunning((r) => !r);
-          })}
+          }}
         >
           {running ? "Pause" : remaining === 0 ? "Restart" : "Start"}
-        </button>
-        <button
-          type="button"
+        </WidgetControl>
+        <WidgetControl
+          interactive={interactive}
           style={ctrlBtn(false)}
-          {...interactiveHandlers(interactive, () => {
+          onActivate={() => {
             setRunning(false);
             setRemaining(initialSec);
-          })}
+          }}
         >
           Reset
-        </button>
-        <button
-          type="button"
+        </WidgetControl>
+        <WidgetControl
+          interactive={interactive}
           style={{ ...ctrlBtn(false), marginLeft: "auto" }}
-          {...interactiveHandlers(interactive, () => setRemaining((r) => Math.max(0, r - 60)))}
+          onActivate={() => setRemaining((r) => Math.max(0, r - 60))}
         >
           −1m
-        </button>
-        <button
-          type="button"
+        </WidgetControl>
+        <WidgetControl
+          interactive={interactive}
           style={ctrlBtn(false)}
-          {...interactiveHandlers(interactive, () => setRemaining((r) => r + 60))}
+          onActivate={() => setRemaining((r) => r + 60)}
         >
           +1m
-        </button>
+        </WidgetControl>
       </div>
     </div>
   );
@@ -476,6 +511,10 @@ function StopwatchWidget({ ctx }: { ctx: WidgetCtx }) {
   };
 
   const ctrlBtn = (primary = false): CSSProperties => ({
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
     padding: `${6 * s}px ${12 * s}px`,
     fontSize: 13 * s,
     fontWeight: 700,
@@ -524,33 +563,33 @@ function StopwatchWidget({ ctx }: { ctx: WidgetCtx }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 * s }}>
-        <button
-          type="button"
+        <WidgetControl
+          interactive={interactive}
           style={ctrlBtn(true)}
-          {...interactiveHandlers(interactive, () => setRunning((r) => !r))}
+          onActivate={() => setRunning((r) => !r)}
         >
           {running ? "Pause" : "Start"}
-        </button>
-        <button
-          type="button"
+        </WidgetControl>
+        <WidgetControl
+          interactive={interactive}
           style={ctrlBtn(false)}
-          {...interactiveHandlers(interactive, () => {
+          onActivate={() => {
             if (elapsedMs > 0) setLaps((prev) => [elapsedMs, ...prev].slice(0, 5));
-          })}
+          }}
         >
           Lap
-        </button>
-        <button
-          type="button"
+        </WidgetControl>
+        <WidgetControl
+          interactive={interactive}
           style={{ ...ctrlBtn(false), marginLeft: "auto" }}
-          {...interactiveHandlers(interactive, () => {
+          onActivate={() => {
             setRunning(false);
             setElapsedMs(0);
             setLaps([]);
-          })}
+          }}
         >
           Reset
-        </button>
+        </WidgetControl>
       </div>
     </div>
   );
@@ -607,23 +646,23 @@ function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 * s }}>
-        <button
-          type="button"
+        <WidgetControl
+          interactive={interactive}
           style={btnStyle(false)}
-          {...interactiveHandlers(interactive, () => setCount((c) => c - step))}
+          onActivate={() => setCount((c) => c - step)}
         >
           −
-        </button>
+        </WidgetControl>
         <span style={{ ...titleStyle, fontSize: 60 * s, lineHeight: 1, fontVariantNumeric: "tabular-nums", color: accent }}>
           {count.toLocaleString("en-US")}
         </span>
-        <button
-          type="button"
+        <WidgetControl
+          interactive={interactive}
           style={btnStyle(true)}
-          {...interactiveHandlers(interactive, () => setCount((c) => c + step))}
+          onActivate={() => setCount((c) => c + step)}
         >
           +
-        </button>
+        </WidgetControl>
       </div>
 
       <div style={{ ...bodyStyle, fontSize: 14 * s, textAlign: "center" }}>{element.body}</div>
@@ -670,12 +709,15 @@ function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
         {[1, 2, 3, 4, 5].map((n) => {
           const filled = n <= active;
           return (
-            <button
+            <WidgetControl
               key={n}
-              type="button"
-              onMouseEnter={() => interactive && setHovered(n)}
-              onMouseLeave={() => interactive && setHovered(null)}
+              interactive={interactive}
+              onMouseEnter={() => setHovered(n)}
+              onMouseLeave={() => setHovered(null)}
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "transparent",
                 border: "none",
                 padding: 2 * s,
@@ -684,12 +726,12 @@ function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
                 transform: interactive && hovered === n ? "scale(1.12)" : "scale(1)",
                 transition: "transform 120ms ease",
               }}
-              {...interactiveHandlers(interactive, () => setScore(n))}
+              onActivate={() => setScore(n)}
             >
               <svg width={34 * s} height={34 * s} viewBox="0 0 24 24" fill={filled ? accent : "none"} stroke={filled ? accent : t.muted} strokeWidth="2" strokeLinejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
-            </button>
+            </WidgetControl>
           );
         })}
         <span style={{ ...bodyStyle, fontSize: 16 * s, fontWeight: 700, color: t.fg, marginLeft: 4 * s }}>
@@ -720,10 +762,13 @@ function InteractiveTabsWidget({ ctx }: { ctx: WidgetCtx }) {
         {element.items.map((it, i) => {
           const isAct = i === idx;
           return (
-            <button
+            <WidgetControl
               key={i}
-              type="button"
+              interactive={interactive}
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
                 padding: `${12 * s}px ${18 * s}px`,
                 fontSize: 16 * s,
                 fontWeight: 700,
@@ -734,10 +779,10 @@ function InteractiveTabsWidget({ ctx }: { ctx: WidgetCtx }) {
                 cursor: interactive ? "pointer" : "default",
                 pointerEvents: interactive ? "auto" : "none",
               }}
-              {...interactiveHandlers(interactive, () => setActiveTab(i))}
+              onActivate={() => setActiveTab(i)}
             >
               {it}
-            </button>
+            </WidgetControl>
           );
         })}
       </div>
@@ -766,9 +811,9 @@ function InteractiveToggleWidget({ ctx }: { ctx: WidgetCtx }) {
         {element.items.map((it, i) => {
           const on = states[i] ?? i % 2 === 0;
           return (
-            <button
+            <WidgetControl
               key={i}
-              type="button"
+              interactive={interactive}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -783,9 +828,9 @@ function InteractiveToggleWidget({ ctx }: { ctx: WidgetCtx }) {
                 cursor: interactive ? "pointer" : "default",
                 pointerEvents: interactive ? "auto" : "none",
               }}
-              {...interactiveHandlers(interactive, () =>
-                setStates((prev) => element.items.map((_, j) => (j === i ? !on : prev[j] ?? j % 2 === 0))),
-              )}
+              onActivate={() =>
+                setStates((prev) => element.items.map((_, j) => (j === i ? !on : prev[j] ?? j % 2 === 0)))
+              }
             >
               <span>{it}</span>
               <span
@@ -805,7 +850,7 @@ function InteractiveToggleWidget({ ctx }: { ctx: WidgetCtx }) {
               >
                 <span style={{ width: 22 * s, height: 22 * s, borderRadius: sharp ? 0 : "50%", background: "#fff" }} />
               </span>
-            </button>
+            </WidgetControl>
           );
         })}
       </div>
@@ -832,9 +877,9 @@ function InteractiveListWidget({ ctx }: { ctx: WidgetCtx }) {
         {element.items.map((it, i) => {
           const isChecked = element.kind === "list" && interactive ? !!checked[i] : false;
           return (
-            <button
+            <WidgetControl
               key={i}
-              type="button"
+              interactive={interactive && element.kind === "list"}
               style={{
                 ...bodyStyle,
                 display: "flex",
@@ -849,15 +894,15 @@ function InteractiveListWidget({ ctx }: { ctx: WidgetCtx }) {
                 cursor: interactive && element.kind === "list" ? "pointer" : "default",
                 pointerEvents: interactive && element.kind === "list" ? "auto" : "none",
               }}
-              {...interactiveHandlers(interactive && element.kind === "list", () =>
-                setChecked((prev) => element.items.map((_, j) => (j === i ? !prev[j] : !!prev[j]))),
-              )}
+              onActivate={() =>
+                setChecked((prev) => element.items.map((_, j) => (j === i ? !prev[j] : !!prev[j])))
+              }
             >
               <span style={{ color: accent, fontWeight: 800 }}>
                 {isChecked ? "☑" : element.uiStyle === "cyber" ? "▸" : "✓"}
               </span>
               {it}
-            </button>
+            </WidgetControl>
           );
         })}
       </div>

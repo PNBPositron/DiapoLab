@@ -790,14 +790,22 @@ export function PresentationMode() {
               {pages.map((p, idx) => {
                 const active = idx === currentIndex;
                 return (
-                  <button
+                  <div
                     key={p.id}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       setCurrentPage(idx);
                       setGridOverviewOpen(false);
                     }}
-                    className={`group relative overflow-hidden rounded-lg border p-1.5 text-left transition ${
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setCurrentPage(idx);
+                        setGridOverviewOpen(false);
+                      }
+                    }}
+                    className={`group relative cursor-pointer overflow-hidden rounded-lg border p-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                       active
                         ? "border-blue-600 bg-blue-500/10 ring-1 ring-blue-600/30"
                         : editorDark
@@ -826,7 +834,7 @@ export function PresentationMode() {
                         </span>
                       )}
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

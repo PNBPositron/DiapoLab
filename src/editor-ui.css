@@ -269,6 +269,11 @@
   background-color: transparent;
   color: #0f172a;
 }
+div.editor-ui {
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
 .editor-ui > header,
 .editor-ui > nav,
 .editor-ui > aside,
@@ -752,7 +757,7 @@
   color: #ffffff !important;
 }
 /* Thumbnails: the black border disappears on the dark backdrop — lighten it. */
-.editor-dark .pages-bar .group > button {
+.editor-dark .pages-bar .group > :is(button, [role="button"]) {
   border-color: rgba(148, 163, 184, 0.45) !important;
 }
 

@@ -60,9 +60,19 @@ export function PagesBar() {
           const active = i === currentIndex;
           return (
             <div key={p.id} className="group relative shrink-0">
-              <button
+              <div
+                role="button"
+                tabIndex={0}
+                aria-label={`Select slide ${i + 1}`}
+                aria-current={active ? "page" : undefined}
                 onClick={() => setCurrentPage(i)}
-                className={`relative overflow-hidden rounded-lg bg-white transition-colors duration-150 ${
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setCurrentPage(i);
+                  }
+                }}
+                className={`relative cursor-pointer overflow-hidden rounded-lg bg-white transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                   active
                     ? "border-2 border-blue-600 ring-2 ring-blue-600/20 shadow-md"
                     : "border border-slate-200/90 opacity-90 shadow-sm hover:border-slate-300 hover:opacity-100"
@@ -96,7 +106,7 @@ export function PagesBar() {
                 }`}>
                   {i + 1}
                 </span>
-              </button>
+              </div>
               <div className="studio-dock absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 gap-0.5 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 {i > 0 && (
                   <button

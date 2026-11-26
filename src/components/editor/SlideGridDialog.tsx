@@ -161,14 +161,21 @@ export function SlideGridDialog({
                           : "border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-white"
                   }`}
                 >
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setCurrentPage(idx)}
                     onDoubleClick={() => {
                       setCurrentPage(idx);
                       onOpenChange(false);
                     }}
-                    className={`relative aspect-video w-full overflow-hidden rounded-md border text-left ${
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setCurrentPage(idx);
+                      }
+                    }}
+                    className={`relative aspect-video w-full cursor-pointer overflow-hidden rounded-md border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                       editorDark ? "border-slate-700 bg-slate-950" : "border-slate-200 bg-white"
                     }`}
                   >
@@ -208,7 +215,7 @@ export function SlideGridDialog({
                         Notes
                       </span>
                     )}
-                  </button>
+                  </div>
 
                   <div className="mt-2 flex items-center justify-between gap-2 px-0.5">
                     <span

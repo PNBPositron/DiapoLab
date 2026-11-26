@@ -205,10 +205,18 @@ export function WelcomeDialog() {
                       {templates.slice(0, 12).map((t) => {
                         const active = pickedTemplate?.id === t.id;
                         return (
-                          <button
+                          <div
                             key={t.id}
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setPickedTemplate(t)}
-                            className={`group relative overflow-hidden rounded-lg border text-left transition-colors ${
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setPickedTemplate(t);
+                              }
+                            }}
+                            className={`group relative cursor-pointer overflow-hidden rounded-lg border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                               active ? "border-blue-600 ring-2 ring-blue-500/25" : "border-slate-200 hover:border-slate-300"
                             }`}
                           >
@@ -225,7 +233,7 @@ export function WelcomeDialog() {
                                 <Check className="size-2.5" strokeWidth={3} />
                               </span>
                             )}
-                          </button>
+                          </div>
                         );
                       })}
                     </div>

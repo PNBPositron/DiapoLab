@@ -576,14 +576,21 @@ function SharedTemplate() {
                           {visibleSlides.map(({ page, index }, visIdx) => {
                             const selected = index === activeEntry.index;
                             return (
-                              <button
+                              <div
                                 key={page.id}
-                                type="button"
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => setCurrentPage(index)}
                                 onDoubleClick={() => startPresentation(index)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    setCurrentPage(index);
+                                  }
+                                }}
                                 aria-label={`Go to slide ${visIdx + 1}`}
                                 aria-current={selected ? "true" : undefined}
-                                className="group shrink-0 text-left focus-visible:outline-none"
+                                className="group shrink-0 cursor-pointer text-left focus-visible:outline-none"
                               >
                                 <div
                                   className={`w-36 overflow-hidden rounded-xl border bg-white transition-all sm:w-40 ${
@@ -610,7 +617,7 @@ function SharedTemplate() {
                                     </span>
                                   )}
                                 </div>
-                              </button>
+                              </div>
                             );
                           })}
                         </div>
@@ -648,15 +655,23 @@ function SharedTemplate() {
                       {visibleSlides.map(({ page, index }, visIdx) => {
                         const selected = index === activeEntry?.index;
                         return (
-                          <button
+                          <div
                             key={page.id}
-                            type="button"
+                            role="button"
+                            tabIndex={0}
                             onClick={() => {
                               setCurrentPage(index);
                               setViewMode("stage");
                             }}
                             onDoubleClick={() => startPresentation(index)}
-                            className="group text-left focus-visible:outline-none"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setCurrentPage(index);
+                                setViewMode("stage");
+                              }
+                            }}
+                            className="group cursor-pointer text-left focus-visible:outline-none"
                           >
                             <div
                               className={`overflow-hidden rounded-xl border bg-white transition-all duration-150 ${
@@ -683,7 +698,7 @@ function SharedTemplate() {
                                   : "Standard"}
                               </span>
                             </div>
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
