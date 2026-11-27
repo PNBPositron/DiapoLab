@@ -11,13 +11,22 @@ const SLIDE_BG_PRESETS: Array<{ label: string; value: string }> = [
   { label: "Pure White", value: "#ffffff" },
   { label: "Warm Ivory", value: "#faf9f6" },
   { label: "Deep Navy", value: "#0b1120" },
-  { label: "Midnight Tech", value: "linear-gradient(135deg, #0b132b 0%, #162447 55%, #1f4068 100%)" },
+  {
+    label: "Midnight Tech",
+    value: "linear-gradient(135deg, #0b132b 0%, #162447 55%, #1f4068 100%)",
+  },
   { label: "Aurora Sky", value: "linear-gradient(135deg, #e0f2fe 0%, #ede9fe 52%, #fce7f3 100%)" },
   { label: "Emerald Dark", value: "linear-gradient(155deg, #041d17 0%, #093529 100%)" },
-  { label: "Sunset Peach", value: "linear-gradient(135deg, #fff1e6 0%, #ffe0cc 55%, #ffd6e0 100%)" },
+  {
+    label: "Sunset Peach",
+    value: "linear-gradient(135deg, #fff1e6 0%, #ffe0cc 55%, #ffd6e0 100%)",
+  },
   { label: "Obsidian Noir", value: "linear-gradient(160deg, #09090b 0%, #18181b 100%)" },
   { label: "Cobalt Grid", value: "linear-gradient(160deg, #091d42 0%, #0e3168 100%)" },
-  { label: "Vapor Violet", value: "linear-gradient(155deg, #1b103a 0%, #3a2376 55%, #7c3aed 100%)" },
+  {
+    label: "Vapor Violet",
+    value: "linear-gradient(155deg, #1b103a 0%, #3a2376 55%, #7c3aed 100%)",
+  },
 ];
 
 export function ColorPanel() {
@@ -38,9 +47,10 @@ export function ColorPanel() {
 
   const sortedStops = [...stops].sort((a, b) => a.pos - b.pos);
   const stopsCss = sortedStops.map((s) => `${s.color} ${s.pos}%`).join(", ");
-  const customGradient = gradientType === "radial"
-    ? `radial-gradient(circle at center, ${stopsCss})`
-    : `linear-gradient(${gradientAngle}deg, ${stopsCss})`;
+  const customGradient =
+    gradientType === "radial"
+      ? `radial-gradient(circle at center, ${stopsCss})`
+      : `linear-gradient(${gradientAngle}deg, ${stopsCss})`;
 
   const onPickImage = async (file: File) => {
     setUploading(true);
@@ -60,7 +70,9 @@ export function ColorPanel() {
 
       {/* ------- Image de fond ------- */}
       <div className="space-y-2.5 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] mx-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Background image</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">
+          Background image
+        </div>
 
         {bgImage ? (
           <div className="relative">
@@ -96,7 +108,11 @@ export function ColorPanel() {
             e.target.value = "";
           }}
         />
-        {uploadError && <p role="alert" className="text-xs text-destructive">{uploadError}</p>}
+        {uploadError && (
+          <p role="alert" className="text-xs text-destructive">
+            {uploadError}
+          </p>
+        )}
         <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 transition focus-within:border-blue-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
           <Link2 className="size-3.5 shrink-0 text-slate-400" />
           <input
@@ -111,13 +127,23 @@ export function ColorPanel() {
           />
         </div>
         {bgImage && (
-          <SegmentedControl label="Background image fit" value={bgFit} onChange={fit => setBgImage(bgImage, fit)} options={[{ value: "cover", label: "Cover" }, { value: "contain", label: "Contain" }]} />
+          <SegmentedControl
+            label="Background image fit"
+            value={bgFit}
+            onChange={(fit) => setBgImage(bgImage, fit)}
+            options={[
+              { value: "cover", label: "Cover" },
+              { value: "contain", label: "Contain" },
+            ]}
+          />
         )}
       </div>
 
       {/* ------- Couleur de fond (palette) ------- */}
       <div className="space-y-2.5 px-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Background color</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">
+          Background color
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => setOpenPicker(openPicker === "bg" ? null : "bg")}
@@ -139,14 +165,19 @@ export function ColorPanel() {
         </div>
         {openPicker === "bg" && (
           <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-            <ColorPicker value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"} onChange={(hex) => setBg(hex)} />
+            <ColorPicker
+              value={bgColor.startsWith("#") ? bgColor : "#0a0f1f"}
+              onChange={(hex) => setBg(hex)}
+            />
           </div>
         )}
       </div>
 
       {/* ------- Backdrop presets ------- */}
       <div className="space-y-2 px-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Backdrop presets</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">
+          Backdrop presets
+        </div>
         <div className="grid grid-cols-5 gap-1.5">
           {SLIDE_BG_PRESETS.map((p) => {
             const active = bgColor === p.value && !bgImage;
@@ -174,11 +205,16 @@ export function ColorPanel() {
 
       {/* ------- Dégradé custom ------- */}
       <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] mx-4">
-        <div className="text-[10px] font-semibold tracking-wide text-slate-500">Custom gradient</div>
+        <div className="text-[10px] font-semibold tracking-wide text-slate-500">
+          Custom gradient
+        </div>
         <button
           className="h-16 w-full rounded-xl border border-slate-200 transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_20px_rgba(37,99,235,0.15)]"
           style={{ background: customGradient }}
-          onClick={() => { setBgImage(undefined); setBg(customGradient); }}
+          onClick={() => {
+            setBgImage(undefined);
+            setBg(customGradient);
+          }}
           aria-label="Apply custom gradient"
         />
         <div className="space-y-1.5">
@@ -188,23 +224,34 @@ export function ColorPanel() {
                 onClick={() => setOpenPicker(openPicker === k ? null : k)}
                 title="Edit stop color"
                 className={`grid size-7 shrink-0 place-items-center rounded-lg border transition ${
-                  openPicker === k ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200 hover:border-blue-300"
+                  openPicker === k
+                    ? "border-blue-500 ring-2 ring-blue-500/20"
+                    : "border-slate-200 hover:border-blue-300"
                 }`}
               >
-                <span className="size-4 rounded-full border border-slate-200" style={{ background: stop.color }} />
+                <span
+                  className="size-4 rounded-full border border-slate-200"
+                  style={{ background: stop.color }}
+                />
               </button>
               <input
                 type="range"
                 min={0}
                 max={100}
                 value={stop.pos}
-                onChange={(e) => setStops(stops.map((s, j) => (j === k ? { ...s, pos: +e.target.value } : s)))}
+                onChange={(e) =>
+                  setStops(stops.map((s, j) => (j === k ? { ...s, pos: +e.target.value } : s)))
+                }
                 className="h-1 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-600 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:shadow"
                 aria-label={`Stop ${k + 1} position`}
               />
-              <span className="w-7 shrink-0 text-right font-mono text-[9px] text-slate-500">{stop.pos}%</span>
+              <span className="w-7 shrink-0 text-right font-mono text-[9px] text-slate-500">
+                {stop.pos}%
+              </span>
               <button
-                onClick={() => { if (stops.length > 2) setStops(stops.filter((_, j) => j !== k)); }}
+                onClick={() => {
+                  if (stops.length > 2) setStops(stops.filter((_, j) => j !== k));
+                }}
                 disabled={stops.length <= 2}
                 title="Remove stop"
                 className="grid size-7 shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-rose-300 hover:text-rose-500 disabled:pointer-events-none disabled:opacity-30"
@@ -217,7 +264,9 @@ export function ColorPanel() {
             <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
               <ColorPicker
                 value={stops[openPicker].color}
-                onChange={(hex) => setStops(stops.map((s, j) => (j === openPicker ? { ...s, color: hex } : s)))}
+                onChange={(hex) =>
+                  setStops(stops.map((s, j) => (j === openPicker ? { ...s, color: hex } : s)))
+                }
               />
             </div>
           )}
@@ -230,7 +279,15 @@ export function ColorPanel() {
           </button>
         </div>
 
-        <SegmentedControl label="Gradient type" value={gradientType} onChange={setGradientType} options={[{ value: "linear", label: "Linear" }, { value: "radial", label: "Radial" }]} />
+        <SegmentedControl
+          label="Gradient type"
+          value={gradientType}
+          onChange={setGradientType}
+          options={[
+            { value: "linear", label: "Linear" },
+            { value: "radial", label: "Radial" },
+          ]}
+        />
         {gradientType === "linear" && (
           <label className="flex items-center gap-2 text-[10px] tracking-wide text-slate-500">
             Angle
@@ -245,9 +302,10 @@ export function ColorPanel() {
             <span className="w-8 text-right font-mono text-slate-600">{gradientAngle}°</span>
           </label>
         )}
-        <p className="text-[10px] text-slate-400">Click the preview above to apply it to this slide.</p>
+        <p className="text-[10px] text-slate-400">
+          Click the preview above to apply it to this slide.
+        </p>
       </div>
     </div>
   );
 }
-

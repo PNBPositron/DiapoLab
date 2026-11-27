@@ -61,7 +61,10 @@ const newId = () => crypto.randomUUID();
 
 export async function listMedia(): Promise<MediaLibraryItem[]> {
   try {
-    const all = await withStore<MediaLibraryItem[]>("readonly", (s) => s.getAll() as IDBRequest<MediaLibraryItem[]>);
+    const all = await withStore<MediaLibraryItem[]>(
+      "readonly",
+      (s) => s.getAll() as IDBRequest<MediaLibraryItem[]>,
+    );
     return all.sort((a, b) => b.createdAt - a.createdAt);
   } catch {
     // IndexedDB blocked or unavailable: the panel just shows an empty library.

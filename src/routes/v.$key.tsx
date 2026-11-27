@@ -73,13 +73,19 @@ function VotePage() {
             <Radio className="size-3.5" /> Live poll
           </span>
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            {connected ? <Wifi className="size-3.5 text-emerald-600" /> : <WifiOff className="size-3.5 text-slate-400" />}
+            {connected ? (
+              <Wifi className="size-3.5 text-emerald-600" />
+            ) : (
+              <WifiOff className="size-3.5 text-slate-400" />
+            )}
             {connected ? "Connected" : "Connecting…"}
           </span>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_12px_32px_-16px_rgba(15,23,42,0.12)]">
-          <h1 className="font-display text-xl font-semibold leading-snug tracking-tight text-slate-900">{question}</h1>
+          <h1 className="font-display text-xl font-semibold leading-snug tracking-tight text-slate-900">
+            {question}
+          </h1>
 
           {options.length === 0 ? (
             <p className="mt-5 text-sm text-slate-500">
@@ -106,14 +112,19 @@ function VotePage() {
                       <span
                         aria-hidden
                         className="absolute inset-y-0 left-0 bg-blue-500/12"
-                        style={{ width: pct + "%", transition: "width 420ms cubic-bezier(0.16,1,0.3,1)" }}
+                        style={{
+                          width: pct + "%",
+                          transition: "width 420ms cubic-bezier(0.16,1,0.3,1)",
+                        }}
                       />
                     )}
                     <span className="relative flex items-center justify-between gap-3">
                       <span className="flex items-center gap-3 text-sm font-semibold text-slate-900">
                         <span
                           className={`grid size-6 shrink-0 place-items-center rounded-md text-xs font-semibold ${
-                            mine ? "bg-blue-600 text-white" : "border border-slate-200 bg-slate-50 text-slate-700"
+                            mine
+                              ? "bg-blue-600 text-white"
+                              : "border border-slate-200 bg-slate-50 text-slate-700"
                           }`}
                         >
                           {String.fromCharCode(65 + i)}
@@ -137,9 +148,7 @@ function VotePage() {
             <p className="mt-4 text-xs text-slate-500">Vote sent — thanks! Results update live.</p>
           )}
         </div>
-        <p className="mt-6 text-center text-xs text-slate-400">
-          Made with DiapoLab
-        </p>
+        <p className="mt-6 text-center text-xs text-slate-400">Made with DiapoLab</p>
       </div>
     </div>
   );

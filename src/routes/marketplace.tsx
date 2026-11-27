@@ -1,6 +1,21 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2, LayoutTemplate, Search, ArrowRight, ArrowUpRight, Calendar, Layers, BookOpen, Puzzle, Trash2, Check, Code2, Wand2, PackageOpen } from "lucide-react";
+import {
+  Loader2,
+  LayoutTemplate,
+  Search,
+  ArrowRight,
+  ArrowUpRight,
+  Calendar,
+  Layers,
+  BookOpen,
+  Puzzle,
+  Trash2,
+  Check,
+  Code2,
+  Wand2,
+  PackageOpen,
+} from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { listPublicTemplates, type PublicTemplate } from "@/lib/designs";
@@ -9,29 +24,30 @@ import { usePlugins, SAMPLE_PLUGIN_CODE, type EditorPlugin } from "@/lib/plugins
 import { profileLabel } from "@/lib/profiles";
 import { formatUtcDate } from "@/lib/date";
 import { BUILTIN_TEMPLATES } from "@/lib/builtin-templates";
+import { buildBreadcrumbJsonLd, buildPageHead, absoluteUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/marketplace")({
   component: Marketplace,
-  head: () => ({
-    meta: [
-      { title: "Marketplace — Templates & Add-ons" },
-      {
-        name: "description",
-        content:
-          "Browse community presentation templates and import user-made add-ons for DiapoLab, then load them straight into the editor.",
-      },
-      { property: "og:title", content: "Marketplace — Templates & Add-ons" },
-      {
-        property: "og:description",
-        content: "Browse community templates and import add-ons for the DiapoLab editor.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/marketplace" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "DiapoLab Marketplace – Slide Templates & Add-ons",
+      description:
+        "Browse community presentation templates and user-made add-ons for DiapoLab. Preview slide decks and load them directly into the browser editor.",
+      path: "/marketplace",
+      jsonLd: [
+        {
+          "@type": "CollectionPage",
+          name: "DiapoLab Marketplace – Slide Templates & Add-ons",
+          description:
+            "Browse community presentation templates and user-made add-ons for DiapoLab.",
+          url: absoluteUrl("/marketplace"),
+        },
+        buildBreadcrumbJsonLd([
+          { name: "DiapoLab", path: "/" },
+          { name: "Marketplace", path: "/marketplace" },
+        ]),
+      ],
+    }),
 });
 
 type Tab = "templates" | "plugins";
@@ -73,7 +89,9 @@ function Marketplace() {
     setImportSuccess(null);
     try {
       const plugin = usePlugins.getState().importPlugin(pluginCode);
-      setImportSuccess(`✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`);
+      setImportSuccess(
+        `✓ Imported "${plugin.name}" — ${plugin.widgets.length} widget${plugin.widgets.length === 1 ? "" : "s"}`,
+      );
       setPluginCode("");
     } catch (e) {
       setImportError(e instanceof Error ? e.message : "Import failed");
@@ -81,9 +99,7 @@ function Marketplace() {
   };
 
   const q = query.trim().toLowerCase();
-  const filteredTemplates = (templates ?? []).filter(
-    (t) => !q || t.name.toLowerCase().includes(q),
-  );
+  const filteredTemplates = (templates ?? []).filter((t) => !q || t.name.toLowerCase().includes(q));
   const filteredPlugins = plugins.filter(
     (p) => !q || p.name.toLowerCase().includes(q) || (p.author ?? "").toLowerCase().includes(q),
   );
@@ -99,7 +115,10 @@ function Marketplace() {
       <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900"
+            >
               <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-md object-contain" />
               <span>DiapoLab</span>
             </Link>
@@ -128,10 +147,12 @@ function Marketplace() {
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="max-w-2xl">
             <p className="text-xs font-medium text-slate-500">Community &amp; extensions</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Marketplace</h1>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+              Marketplace
+            </h1>
             <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
-              Community templates and user-made add-ons. Everything is free — load it,
-              remix it, make it yours.
+              Community templates and user-made add-ons. Everything is free — load it, remix it,
+              make it yours.
             </p>
           </div>
 
@@ -188,7 +209,11 @@ function Marketplace() {
           </div>
           {tab === "plugins" && (
             <button
-              onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
+              onClick={() => {
+                setImportOpen(true);
+                setImportError(null);
+                setImportSuccess(null);
+              }}
               className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
             >
               <Code2 className="size-3.5" /> Import add-on code
@@ -209,7 +234,11 @@ function Marketplace() {
             <Empty
               icon={<LayoutTemplate className="size-5" />}
               title="No templates found"
-              text={templates.length === 0 ? "Nothing published yet — be the first to share a deck from the editor toolbar." : `No template matches “${query}”.`}
+              text={
+                templates.length === 0
+                  ? "Nothing published yet — be the first to share a deck from the editor toolbar."
+                  : `No template matches “${query}”.`
+              }
             />
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,7 +295,11 @@ function Marketplace() {
                         >
                           <span className="grid size-4 shrink-0 place-items-center overflow-hidden rounded-full bg-blue-50 text-[8px] font-semibold text-blue-600">
                             {t.creator_profile.avatar_url ? (
-                              <img src={t.creator_profile.avatar_url} alt="" className="size-full object-cover" />
+                              <img
+                                src={t.creator_profile.avatar_url}
+                                alt=""
+                                className="size-full object-cover"
+                              />
                             ) : (
                               profileLabel(t.creator_profile).slice(0, 1).toUpperCase()
                             )}
@@ -291,10 +324,18 @@ function Marketplace() {
           <Empty
             icon={<PackageOpen className="size-5" />}
             title={plugins.length === 0 ? "No add-ons yet" : "No add-on matches your search"}
-            text={plugins.length === 0 ? "Import add-on code to add custom widget presets — they appear in the editor's Presets panel." : `No add-on matches “${query}”.`}
+            text={
+              plugins.length === 0
+                ? "Import add-on code to add custom widget presets — they appear in the editor's Presets panel."
+                : `No add-on matches “${query}”.`
+            }
             action={
               <button
-                onClick={() => { setImportOpen(true); setImportError(null); setImportSuccess(null); }}
+                onClick={() => {
+                  setImportOpen(true);
+                  setImportError(null);
+                  setImportSuccess(null);
+                }}
                 className="mt-1 flex items-center gap-1.5 rounded-md bg-blue-600 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
               >
                 <Code2 className="size-3.5" /> Import add-on code
@@ -344,13 +385,20 @@ function Marketplace() {
           </DialogHeader>
           <div className="space-y-3 p-5">
             <p className="text-xs leading-relaxed text-slate-600">
-              Paste add-on code below. Call <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-blue-700">diapolabPlugin(&#123; name, widgets: [...] &#125;)</code>{" "}
-              with an array of widgets — each widget is a named set of canvas elements
-              that will appear in the editor's <strong>Presets → Blocks</strong> section.
+              Paste add-on code below. Call{" "}
+              <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[11px] text-blue-700">
+                diapolabPlugin(&#123; name, widgets: [...] &#125;)
+              </code>{" "}
+              with an array of widgets — each widget is a named set of canvas elements that will
+              appear in the editor's <strong>Presets → Blocks</strong> section.
             </p>
             <textarea
               value={pluginCode}
-              onChange={(e) => { setPluginCode(e.target.value); setImportError(null); setImportSuccess(null); }}
+              onChange={(e) => {
+                setPluginCode(e.target.value);
+                setImportError(null);
+                setImportSuccess(null);
+              }}
               spellCheck={false}
               placeholder="// Paste your add-on code here…"
               className="h-56 w-full resize-y rounded-lg border border-slate-200 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 outline-none transition-colors focus:border-blue-500"
@@ -362,7 +410,10 @@ function Marketplace() {
             )}
             {importSuccess && (
               <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-medium text-emerald-700">
-                {importSuccess} <Link to="/" className="font-semibold underline">Open the editor →</Link>
+                {importSuccess}{" "}
+                <Link to="/" className="font-semibold underline">
+                  Open the editor →
+                </Link>
               </div>
             )}
             <div className="flex items-center justify-between gap-3 pt-1">
@@ -389,7 +440,15 @@ function Marketplace() {
 
 function ArrowLeft() {
   return (
-    <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className="size-3.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M19 12H5" />
       <path d="m12 19-7-7 7-7" />
     </svg>
@@ -421,8 +480,7 @@ function PluginCard({
             </div>
             <div className="mt-1 truncate text-[11px] tabular-nums text-slate-500">
               {plugin.author ? `by ${plugin.author}` : "Unknown author"}
-              {plugin.version ? ` · v${plugin.version}` : ""} ·{" "}
-              {formatUtcDate(plugin.importedAt)}
+              {plugin.version ? ` · v${plugin.version}` : ""} · {formatUtcDate(plugin.importedAt)}
             </div>
           </div>
           <button
@@ -434,10 +492,15 @@ function PluginCard({
           </button>
         </div>
         {plugin.description && (
-          <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-600">{plugin.description}</p>
+          <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-slate-600">
+            {plugin.description}
+          </p>
         )}
         <p className="mt-2.5 truncate text-[11px] text-slate-500">
-          {plugin.widgets.slice(0, 4).map((w) => w.name).join(" · ")}
+          {plugin.widgets
+            .slice(0, 4)
+            .map((w) => w.name)
+            .join(" · ")}
           {plugin.widgets.length > 4 ? ` · +${plugin.widgets.length - 4} more` : ""}
         </p>
         <button
@@ -448,11 +511,7 @@ function PluginCard({
               : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
           }`}
         >
-          {plugin.enabled ? (
-            <>✓ Enabled — widgets in Presets</>
-          ) : (
-            <>Disabled</>
-          )}
+          {plugin.enabled ? <>✓ Enabled — widgets in Presets</> : <>Disabled</>}
         </button>
       </div>
     </div>
@@ -478,10 +537,22 @@ function Loading() {
   );
 }
 
-function Empty({ icon, title, text, action }: { icon: React.ReactNode; title: string; text: string; action?: React.ReactNode }) {
+function Empty({
+  icon,
+  title,
+  text,
+  action,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 py-14 text-center">
-      <span className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-400">{icon}</span>
+      <span className="grid size-10 place-items-center rounded-md border border-slate-200 bg-white text-slate-400">
+        {icon}
+      </span>
       <div>
         <p className="text-sm font-semibold text-slate-800">{title}</p>
         <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-slate-500">{text}</p>

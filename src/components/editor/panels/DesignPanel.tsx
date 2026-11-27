@@ -113,9 +113,7 @@ export function DesignPanel() {
         <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-slate-700">
           <ActiveIcon className="size-3.5 text-blue-600" />
           <span>{active.title}</span>
-          <span className="font-normal text-slate-400">
-            · {active.subtitle}
-          </span>
+          <span className="font-normal text-slate-400">· {active.subtitle}</span>
         </div>
         <div className="animate-in fade-in-50 duration-150">{active.children}</div>
       </div>

@@ -32,13 +32,16 @@ import {
   Cuboid,
   GalleryHorizontalEnd,
   BookOpen,
+  SplitSquareHorizontal,
+  Tv,
+  ScanLine,
 } from "lucide-react";
 import type { ElementAnimation, SlideTransition } from "@/store/editor";
 
 /**
  * Single source of truth for slide transitions and element entrance
- * animations. Every picker (PagesBar popover, PropertiesPanel dropdown)
- * imports from here, so a new motion only has to be added once.
+ * animations. Every picker (Canvas popover, 3D dialog) imports from here,
+ * so a new motion only has to be added once.
  */
 
 export type ThreeSlideTransition = "3d-cube" | "3d-carousel" | "3d-flip" | "3d-fold" | "3d-helix";
@@ -53,14 +56,100 @@ export const THREE_TRANSITIONS: ThreeSlideTransition[] = [
 
 const THREE_TRANSITION_SET = new Set<string>(THREE_TRANSITIONS);
 
-export function isThreeTransition(transition?: SlideTransition): transition is ThreeSlideTransition {
+export function isThreeTransition(
+  transition?: SlideTransition,
+): transition is ThreeSlideTransition {
   return !!transition && THREE_TRANSITION_SET.has(transition);
+}
+
+export const GLITCH_TRANSITIONS: SlideTransition[] = [
+  "glitch",
+  "glitch-rgb",
+  "glitch-slice",
+  "glitch-vhs",
+  "tv",
+  "neon",
+];
+
+const GLITCH_TRANSITION_SET = new Set<string>(GLITCH_TRANSITIONS);
+
+export function isGlitchTransition(transition?: SlideTransition): boolean {
+  return !!transition && GLITCH_TRANSITION_SET.has(transition);
+}
+
+export type TransitionCategory = "all" | "classic" | "glitch" | "cinema" | "3d";
+
+export const TRANSITION_CATEGORIES: Array<{ id: TransitionCategory; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "classic", label: "Classic" },
+  { id: "glitch", label: "Glitch" },
+  { id: "cinema", label: "Cinema" },
+  { id: "3d", label: "3D" },
+];
+
+export function getTransitionCategory(
+  transition: SlideTransition,
+): Exclude<TransitionCategory, "all"> {
+  if (isThreeTransition(transition)) return "3d";
+  if (isGlitchTransition(transition)) return "glitch";
+  if (
+    transition === "parallax-left" ||
+    transition === "parallax-up" ||
+    transition === "parallax-depth" ||
+    transition === "reveal" ||
+    transition === "shutter" ||
+    transition === "swirl" ||
+    transition === "warp" ||
+    transition === "prism" ||
+    transition === "origami" ||
+    transition === "cube"
+  ) {
+    return "cinema";
+  }
+  return "classic";
+}
+
+export function getDefaultTransitionDurationMs(transition?: SlideTransition): number {
+  switch (transition) {
+    case "none":
+      return 0;
+    case "fade":
+      return 560;
+    case "glitch":
+    case "glitch-rgb":
+    case "glitch-slice":
+      return 640;
+    case "glitch-vhs":
+      return 740;
+    case "tv":
+    case "neon":
+      return 780;
+    case "morph":
+      return 640;
+    case "parallax-left":
+    case "parallax-up":
+    case "parallax-depth":
+    case "swirl":
+      return 860;
+    case "3d-cube":
+    case "3d-carousel":
+    case "3d-flip":
+    case "3d-fold":
+    case "3d-helix":
+      return 1250;
+    default:
+      return 740;
+  }
 }
 
 export function formatTransitionLabel(transition: SlideTransition): string {
   if (transition.startsWith("3d-")) {
     return `3D ${transition.slice(3).replaceAll("-", " ")}`;
   }
+  if (transition === "tv") return "TV";
+  if (transition === "glitch-rgb") return "RGB glitch";
+  if (transition === "glitch-vhs") return "VHS glitch";
+  if (transition === "glitch-slice") return "Slice glitch";
   return transition.replaceAll("-", " ");
 }
 
@@ -71,6 +160,10 @@ export const TRANSITION_OPTIONS: SlideTransition[] = [
   "zoom",
   "flip",
   "morph",
+  "glitch",
+  "glitch-rgb",
+  "glitch-slice",
+  "glitch-vhs",
   "tv",
   "neon",
   "cube",
@@ -98,8 +191,12 @@ export const TRANSITION_ICONS: Record<SlideTransition, LucideIcon> = {
   zoom: ZoomIn,
   flip: FlipHorizontal,
   morph: Shapes,
+  glitch: Zap,
+  "glitch-rgb": SplitSquareHorizontal,
+  "glitch-slice": ScanLine,
+  "glitch-vhs": Tv,
   tv: MonitorPlay,
-  neon: Zap,
+  neon: Sparkles,
   cube: Box,
   blur: Cloudy,
   "parallax-left": MoveLeft,
@@ -150,6 +247,7 @@ export const ELEMENT_ANIMATION_OPTIONS: Array<{
 ];
 
 /** label/value pairs for the PropertiesPanel Dropdown. */
-export const ELEMENT_ANIMATION_LABELS = ELEMENT_ANIMATION_OPTIONS.map(
-  ({ value, label }) => ({ value, label }),
-);
+export const ELEMENT_ANIMATION_LABELS = ELEMENT_ANIMATION_OPTIONS.map(({ value, label }) => ({
+  value,
+  label,
+}));

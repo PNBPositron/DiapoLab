@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /auth/callback
+Disallow: /.lovable/
+Disallow: /v/
 
 Sitemap: https://diapolab.vercel.app/sitemap.xml

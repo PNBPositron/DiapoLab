@@ -13,7 +13,10 @@ export function Timeline() {
 
   const total = pages.reduce((s, p) => s + p.duration, 0);
   const offsets: number[] = [];
-  pages.reduce((acc, p, i) => { offsets[i] = acc; return acc + p.duration; }, 0);
+  pages.reduce((acc, p, i) => {
+    offsets[i] = acc;
+    return acc + p.duration;
+  }, 0);
 
   // map elapsed -> page index
   const indexAt = (elapsed: number) => {
@@ -42,7 +45,9 @@ export function Timeline() {
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [playing, total]);
 
   // sync current page to elapsed time
@@ -70,13 +75,22 @@ export function Timeline() {
     setT(ratio * total);
   };
 
-  const fmt = (s: number) => `${Math.floor(s).toString().padStart(2, "0")}:${Math.floor((s % 1) * 100).toString().padStart(2, "0")}`;
+  const fmt = (s: number) =>
+    `${Math.floor(s).toString().padStart(2, "0")}:${Math.floor((s % 1) * 100)
+      .toString()
+      .padStart(2, "0")}`;
 
   return (
     <div className="timeline-bar flex items-center gap-3 border-t border-teal/30 bg-transparent px-3 py-2">
       <span className="font-display text-[10px] tracking-[0.2em] text-teal/70">Video</span>
       <div className="flex items-center gap-1">
-        <IconBtn onClick={() => { setT(0); setCurrentPage(0); }} title="Restart">
+        <IconBtn
+          onClick={() => {
+            setT(0);
+            setCurrentPage(0);
+          }}
+          title="Restart"
+        >
           <SkipBack className="h-3.5 w-3.5" strokeWidth={3} />
         </IconBtn>
         <button
@@ -84,10 +98,18 @@ export function Timeline() {
           title={playing ? "Pause" : "Play"}
           className="brutal-border-2 brutal-press grid h-8 w-8 place-items-center bg-teal text-ink hover:bg-teal/90"
         >
-          {playing ? <Pause className="h-4 w-4 fill-ink" strokeWidth={3} /> : <Play className="h-4 w-4 fill-ink" strokeWidth={3} />}
+          {playing ? (
+            <Pause className="h-4 w-4 fill-ink" strokeWidth={3} />
+          ) : (
+            <Play className="h-4 w-4 fill-ink" strokeWidth={3} />
+          )}
         </button>
         <IconBtn
-          onClick={() => { setPlaying(false); setT(0); setCurrentPage(0); }}
+          onClick={() => {
+            setPlaying(false);
+            setT(0);
+            setCurrentPage(0);
+          }}
           title="Stop"
         >
           <RotateCcw className="h-3.5 w-3.5" strokeWidth={3} />
@@ -122,9 +144,7 @@ export function Timeline() {
         />
       </div>
 
-      <span className="font-mono text-[10px] text-teal/70 tabular-nums w-14">
-        {fmt(total)}
-      </span>
+      <span className="font-mono text-[10px] text-teal/70 tabular-nums w-14">{fmt(total)}</span>
 
       {/* per-page duration */}
       <div className="flex items-center gap-1">
@@ -166,7 +186,9 @@ export function Timeline() {
                     className="brutal-border max-w-[96px] bg-surface px-1 py-0.5 font-mono text-[9px] text-teal focus:outline-none"
                   >
                     {ELEMENT_ANIMATION_LABELS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
                     ))}
                   </select>
                   <input
@@ -177,7 +199,10 @@ export function Timeline() {
                     value={el.animationDelay ?? 0}
                     onChange={(e) =>
                       update(el.id, {
-                        animationDelay: Math.max(0, Math.min(10000, parseFloat(e.target.value) || 0)),
+                        animationDelay: Math.max(
+                          0,
+                          Math.min(10000, parseFloat(e.target.value) || 0),
+                        ),
                       } as never)
                     }
                     title="Delay before the entrance animation (ms)"
@@ -187,7 +212,9 @@ export function Timeline() {
                 </div>
               ))}
               {(pages[currentIndex]?.elements ?? []).length === 0 && (
-                <p className="px-1 py-2 font-mono text-[9px] text-teal/50">No objects on this slide.</p>
+                <p className="px-1 py-2 font-mono text-[9px] text-teal/50">
+                  No objects on this slide.
+                </p>
               )}
             </div>
           </div>
@@ -197,7 +224,15 @@ export function Timeline() {
   );
 }
 
-function IconBtn({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string }) {
+function IconBtn({
+  children,
+  onClick,
+  title,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  title: string;
+}) {
   return (
     <button
       onClick={onClick}
@@ -208,4 +243,3 @@ function IconBtn({ children, onClick, title }: { children: React.ReactNode; onCl
     </button>
   );
 }
-

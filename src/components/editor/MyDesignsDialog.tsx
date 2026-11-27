@@ -5,7 +5,13 @@ import { useEditor } from "@/store/editor";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { ensureFontsForPages } from "@/lib/fontLoader";
 
-export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => void; embedded?: boolean }) {
+export function MyDesignsDialog({
+  onClose,
+  embedded = false,
+}: {
+  onClose: () => void;
+  embedded?: boolean;
+}) {
   const { loadDesign } = useEditor();
   const [items, setItems] = useState<SavedDesign[] | null>(null);
   const [query, setQuery] = useState("");
@@ -93,7 +99,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
               </h2>
               {items && (
                 <p className="mt-0.5 text-xs tabular-nums text-slate-500">
-                  {items.length} saved {items.length === 1 ? "design" : "designs"} · newest edits first
+                  {items.length} saved {items.length === 1 ? "design" : "designs"} · newest edits
+                  first
                 </p>
               )}
             </div>
@@ -124,7 +131,13 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
         </div>
 
         {/* Content */}
-        <div className={embedded ? "max-h-full overflow-y-auto bg-white p-3 sm:p-4" : "flex-1 overflow-y-auto bg-white p-4 sm:p-6"}>
+        <div
+          className={
+            embedded
+              ? "max-h-full overflow-y-auto bg-white p-3 sm:p-4"
+              : "flex-1 overflow-y-auto bg-white p-4 sm:p-6"
+          }
+        >
           {embedded && items && items.length > 0 && (
             <div className="mb-3 flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50/70 px-3 py-1.5 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
               <Search className="size-3.5 shrink-0 text-slate-400" />
@@ -172,7 +185,13 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
           )}
 
           {filtered && filtered.length > 0 && (
-            <div className={embedded ? "grid grid-cols-1 gap-3" : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"}>
+            <div
+              className={
+                embedded
+                  ? "grid grid-cols-1 gap-3"
+                  : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              }
+            >
               {filtered.map((d) => (
                 <div
                   key={d.id}
@@ -212,7 +231,8 @@ export function MyDesignsDialog({ onClose, embedded = false }: { onClose: () => 
                         {d.name}
                       </div>
                       <div className="mt-0.5 text-[11px] tabular-nums text-slate-500">
-                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0} page{(d.pages?.length ?? 0) === 1 ? "" : "s"}
+                        {d.canvas_w}×{d.canvas_h} · {d.pages?.length ?? 0} page
+                        {(d.pages?.length ?? 0) === 1 ? "" : "s"}
                       </div>
                     </div>
                     <button

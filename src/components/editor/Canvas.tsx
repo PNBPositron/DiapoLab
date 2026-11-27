@@ -37,15 +37,20 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { OptionGrid, PanelHeader } from "./ui/selectors";
+import { ChipGroup, OptionGrid, PanelHeader } from "./ui/selectors";
 import { VersionHistoryDialog } from "./VersionHistoryDialog";
 import { ThreeSceneDialog } from "./ThreeSceneDialog";
 import {
   TRANSITION_OPTIONS,
   TRANSITION_ICONS,
+  TRANSITION_CATEGORIES,
   ELEMENT_ANIMATION_OPTIONS,
+  getDefaultTransitionDurationMs,
+  getTransitionCategory,
+  isGlitchTransition,
   isThreeTransition,
   formatTransitionLabel,
+  type TransitionCategory,
 } from "@/lib/motion-catalog";
 import { resolveThreeScene } from "@/lib/three-scene";
 import { ThreeTransitionStage } from "./ThreeTransitionStage";
@@ -68,6 +73,9 @@ export function Canvas() {
     clipboard,
     update,
     setTransition,
+    setTransitionZoom,
+    setTransitionDuration,
+    applyTransitionToDeck,
     setNotes,
     snapping,
     toggleSnapping,
@@ -90,6 +98,8 @@ export function Canvas() {
   const [fitScale, setFitScale] = useState(0.5);
   const [zoom, setZoom] = useState<number | null>(null);
   const [hoveredTransition, setHoveredTransition] = useState<SlideTransition | null>(null);
+  const [transitionCategory, setTransitionCategory] = useState<TransitionCategory>("all");
+  const [appliedDeckNotice, setAppliedDeckNotice] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [sceneEditorOpen, setSceneEditorOpen] = useState(false);
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; hasTarget: boolean } | null>(null);
@@ -221,7 +231,9 @@ export function Canvas() {
   const selectedEls = elements.filter((e) => selectedIds.includes(e.id));
   const sharedGroupId = selectedEls[0]?.groupId;
   const isSelGrouped = Boolean(
-    selectedEls.length > 1 && sharedGroupId && selectedEls.every((e) => e.groupId === sharedGroupId),
+    selectedEls.length > 1 &&
+    sharedGroupId &&
+    selectedEls.every((e) => e.groupId === sharedGroupId),
   );
 
   return (
@@ -244,7 +256,11 @@ export function Canvas() {
         const menuH = elId || selectedId ? 330 : 190;
         const x = Math.min(e.clientX, window.innerWidth - menuW - 12);
         const y = Math.min(e.clientY, window.innerHeight - menuH - 12);
-        setCtxMenu({ x: Math.max(12, x), y: Math.max(12, y), hasTarget: Boolean(elId || selectedId) });
+        setCtxMenu({
+          x: Math.max(12, x),
+          y: Math.max(12, y),
+          hasTarget: Boolean(elId || selectedId),
+        });
       }}
     >
       <div className="absolute inset-0 overflow-auto pb-16">
@@ -295,7 +311,8 @@ export function Canvas() {
                   aria-hidden="true"
                   className="editor-slide-dots pointer-events-none absolute inset-0 z-0"
                   style={{
-                    backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.28) 1.5px, transparent 1.5px)",
+                    backgroundImage:
+                      "radial-gradient(rgba(148, 163, 184, 0.28) 1.5px, transparent 1.5px)",
                     backgroundSize: "28px 28px",
                   }}
                 />
@@ -430,7 +447,9 @@ export function Canvas() {
               title="Speaker notes for this slide"
               aria-label="Speaker notes"
             >
-              <StickyNote className={"size-4 " + (notesText.trim() ? "text-amber-500" : "opacity-70")} />
+              <StickyNote
+                className={"size-4 " + (notesText.trim() ? "text-amber-500" : "opacity-70")}
+              />
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -495,37 +514,79 @@ export function Canvas() {
             className="selector-panel space-y-3 rounded-xl p-3.5"
           >
             <PanelHeader title="Slide transition">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !transitionSound;
-                  setTransitionSound(next);
-                  if (next) playTransitionSound({ force: true, isThreeD: isThreePreview });
-                }}
-                aria-pressed={transitionSound}
-                title={transitionSound ? "Transition sound effects on" : "Transition sound effects off"}
-                className={`flex h-7 items-center gap-1.5 rounded-md border px-2.5 text-[11px] font-medium transition ${
-                  transitionSound
-                    ? "border-blue-200 bg-blue-50 text-blue-700"
-                    : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
-                }`}
-              >
-                {transitionSound ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
-                <span>{transitionSound ? "Sound on" : "Muted"}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {pages.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      applyTransitionToDeck();
+                      setAppliedDeckNotice(true);
+                      window.setTimeout(() => setAppliedDeckNotice(false), 1600);
+                    }}
+                    title="Apply current slide transition to all slides"
+                    className={`flex h-7 items-center rounded-md border px-2 text-[11px] font-medium transition ${
+                      appliedDeckNotice
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                        : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    {appliedDeckNotice ? "Applied" : "Apply all"}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !transitionSound;
+                    setTransitionSound(next);
+                    if (next) {
+                      playTransitionSound({
+                        force: true,
+                        isThreeD: isThreePreview,
+                        isGlitch: isGlitchTransition(activePreviewTransition),
+                      });
+                    }
+                  }}
+                  aria-pressed={transitionSound}
+                  title={
+                    transitionSound ? "Transition sound effects on" : "Transition sound effects off"
+                  }
+                  className={`flex h-7 items-center gap-1.5 rounded-md border px-2.5 text-[11px] font-medium transition ${
+                    transitionSound
+                      ? "border-blue-200 bg-blue-50 text-blue-700"
+                      : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+                  }`}
+                >
+                  {transitionSound ? (
+                    <Volume2 className="size-3.5" />
+                  ) : (
+                    <VolumeX className="size-3.5" />
+                  )}
+                  <span>{transitionSound ? "Sound on" : "Muted"}</span>
+                </button>
+              </div>
             </PanelHeader>
             {selectedId && (
               <div className="rounded-lg border border-slate-200/80 bg-slate-50/80 p-2.5">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-slate-500">Selected object motion</span>
-                  <span className="text-[10px] text-slate-400">{elements.find((element) => element.id === selectedId)?.type ?? "object"}</span>
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    Selected object motion
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {elements.find((element) => element.id === selectedId)?.type ?? "object"}
+                  </span>
                 </div>
                 <OptionGrid
                   columns={3}
                   label="Object animations"
                   value={elements.find((element) => element.id === selectedId)?.animation ?? "none"}
-                  onChange={(animation) => update(selectedId, { animation: animation as ElementAnimation })}
-                  options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({ value, label: short, icon }))}
+                  onChange={(animation) =>
+                    update(selectedId, { animation: animation as ElementAnimation })
+                  }
+                  options={ELEMENT_ANIMATION_OPTIONS.map(({ value, short, icon }) => ({
+                    value,
+                    label: short,
+                    icon,
+                  }))}
                 />
               </div>
             )}
@@ -538,7 +599,9 @@ export function Canvas() {
                 <ThreeTransitionStage
                   mode="mini"
                   transition={activePreviewTransition}
-                  outgoingPage={pages.length > 1 ? pages[currentIndex > 0 ? currentIndex - 1 : 1] : undefined}
+                  outgoingPage={
+                    pages.length > 1 ? pages[currentIndex > 0 ? currentIndex - 1 : 1] : undefined
+                  }
                   incomingPage={pages.length > 1 ? page : undefined}
                   canvasW={canvasW}
                   canvasH={canvasH}
@@ -559,6 +622,55 @@ export function Canvas() {
                 </div>
               )}
             </div>
+            {currentTransition !== "none" && (
+              <div className="space-y-2 rounded-lg border border-slate-200/80 bg-slate-50/75 px-3 py-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-16 shrink-0 text-[11px] font-medium text-slate-600">
+                    Duration
+                  </span>
+                  <input
+                    type="range"
+                    min={0.25}
+                    max={2.0}
+                    step={0.05}
+                    value={
+                      page.transitionDuration ??
+                      getDefaultTransitionDurationMs(currentTransition) / 1000
+                    }
+                    onChange={(e) => setTransitionDuration(Number(e.target.value))}
+                    aria-label="Slide transition duration"
+                    className="h-1.5 flex-1 cursor-pointer accent-blue-600"
+                  />
+                  <span className="w-10 text-right font-mono text-[11px] tabular-nums text-slate-500">
+                    {(
+                      page.transitionDuration ??
+                      getDefaultTransitionDurationMs(currentTransition) / 1000
+                    ).toFixed(2)}
+                    s
+                  </span>
+                </div>
+                {currentTransition === "zoom" && (
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-16 shrink-0 text-[11px] font-medium text-slate-600">
+                      Start zoom
+                    </span>
+                    <input
+                      type="range"
+                      min={0.5}
+                      max={1.8}
+                      step={0.05}
+                      value={page.transitionZoom ?? 0.5}
+                      onChange={(e) => setTransitionZoom(Number(e.target.value))}
+                      aria-label="Zoom transition start scale"
+                      className="h-1.5 flex-1 cursor-pointer accent-blue-600"
+                    />
+                    <span className="w-10 text-right font-mono text-[11px] tabular-nums text-slate-500">
+                      {Math.round((page.transitionZoom ?? 0.5) * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
             {isThreeActive && (
               <button
                 type="button"
@@ -570,7 +682,9 @@ export function Canvas() {
                   <span>Edit 3D scene &amp; colors</span>
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="text-[10px] capitalize opacity-75">{currentThreeScene.scenePreset}</span>
+                  <span className="text-[10px] capitalize opacity-75">
+                    {currentThreeScene.scenePreset}
+                  </span>
                   <span
                     className="size-3 rounded-sm border border-white/70"
                     style={{ backgroundColor: currentThreeScene.bgColor }}
@@ -582,6 +696,12 @@ export function Canvas() {
                 </span>
               </button>
             )}
+            <ChipGroup
+              value={transitionCategory}
+              onChange={setTransitionCategory}
+              label="Transition categories"
+              options={TRANSITION_CATEGORIES.map((c) => ({ value: c.id, label: c.label }))}
+            />
             <OptionGrid
               columns={3}
               label="Slide transitions"
@@ -589,11 +709,18 @@ export function Canvas() {
               onChange={(next) => {
                 setTransition(next);
                 if (next !== "none") {
-                  playTransitionSound({ isThreeD: isThreeTransition(next) });
+                  playTransitionSound({
+                    isThreeD: isThreeTransition(next),
+                    isGlitch: isGlitchTransition(next),
+                  });
                 }
               }}
               onPreview={setHoveredTransition}
-              options={TRANSITION_OPTIONS.map((value) => ({
+              options={TRANSITION_OPTIONS.filter(
+                (value) =>
+                  transitionCategory === "all" ||
+                  getTransitionCategory(value) === transitionCategory,
+              ).map((value) => ({
                 value,
                 label: formatTransitionLabel(value),
                 icon: TRANSITION_ICONS[value],
@@ -619,7 +746,6 @@ export function Canvas() {
             />
           </Button>
         )}
-
       </div>
 
       {ctxMenu && (
@@ -686,16 +812,22 @@ export function Canvas() {
               )}
               <div className={`my-1 h-px ${editorDark ? "bg-slate-800" : "bg-slate-100"}`} />
               <div className="px-2 py-1">
-                <div className="mb-1 text-[11px] font-semibold text-slate-400">
-                  Align
-                </div>
+                <div className="mb-1 text-[11px] font-semibold text-slate-400">Align</div>
                 <div className="grid grid-cols-6 gap-1">
                   {[
                     { mode: "left" as const, title: "Align left", Icon: AlignStartVertical },
-                    { mode: "center-h" as const, title: "Center horizontally", Icon: AlignCenterVertical },
+                    {
+                      mode: "center-h" as const,
+                      title: "Center horizontally",
+                      Icon: AlignCenterVertical,
+                    },
                     { mode: "right" as const, title: "Align right", Icon: AlignEndVertical },
                     { mode: "top" as const, title: "Align top", Icon: AlignStartHorizontal },
-                    { mode: "middle" as const, title: "Center vertically", Icon: AlignCenterHorizontal },
+                    {
+                      mode: "middle" as const,
+                      title: "Center vertically",
+                      Icon: AlignCenterHorizontal,
+                    },
                     { mode: "bottom" as const, title: "Align bottom", Icon: AlignEndHorizontal },
                   ].map(({ mode, title, Icon }) => (
                     <button
@@ -929,4 +1061,3 @@ export function Canvas() {
     </div>
   );
 }
-

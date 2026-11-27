@@ -31,7 +31,12 @@ export async function getProfileByUsername(username: string): Promise<Profile | 
 export async function saveProfile(input: Omit<Profile, "id">) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to edit your profile");
-  const username = input.username?.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, "").slice(0, 32) || null;
+  const username =
+    input.username
+      ?.trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_.-]/g, "")
+      .slice(0, 32) || null;
   const { data, error } = await (supabase as any)
     .from("profiles")
     .upsert({ id: auth.user.id, ...input, username, updated_at: new Date().toISOString() })
@@ -72,6 +77,9 @@ export async function toggleSubscription(creatorId: string, subscribed: boolean)
   }
 }
 
-export function profileLabel(profile: Pick<Profile, "display_name"> & { username?: string | null } | null | undefined, fallback = "Creator") {
+export function profileLabel(
+  profile: (Pick<Profile, "display_name"> & { username?: string | null }) | null | undefined,
+  fallback = "Creator",
+) {
   return profile?.display_name?.trim() || (profile?.username ? `@${profile.username}` : fallback);
 }

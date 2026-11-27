@@ -98,15 +98,25 @@ function pyramid(items: string[]): AnyElement[] {
     const y = y0 + i * (lh + gap);
     els.push(
       plate({
-        x: 960 - w / 2, y, w, h: lh,
-        grad: gradFor(i, n - 1), shape: "trapezoid",
+        x: 960 - w / 2,
+        y,
+        w,
+        h: lh,
+        grad: gradFor(i, n - 1),
+        shape: "trapezoid",
         shadow: SOFT_SHADOW,
       }),
     );
     els.push(
       label({
-        x: 960 - w / 2, y: y + lh / 2 - 26, w, h: 52,
-        text: item, size: 38, color: "#ffffff", weight: 800,
+        x: 960 - w / 2,
+        y: y + lh / 2 - 26,
+        w,
+        h: 52,
+        text: item,
+        size: 38,
+        color: "#ffffff",
+        weight: 800,
         shadow: TEXT_ON_GRAD,
       }),
     );
@@ -123,9 +133,14 @@ function cycle(items: string[]): AnyElement[] {
   const size = n <= 4 ? 32 : 24;
   els.push(
     plate({
-      x: 910, y: 490, w: 100, h: 100,
-      fill: "#ffffff", shape: "circle",
-      stroke: "#e2e8f0", strokeWidth: 2,
+      x: 910,
+      y: 490,
+      w: 100,
+      h: 100,
+      fill: "#ffffff",
+      shape: "circle",
+      stroke: "#e2e8f0",
+      strokeWidth: 2,
       shadow: CARD_SHADOW,
     }),
   );
@@ -135,15 +150,25 @@ function cycle(items: string[]): AnyElement[] {
     const cy = 540 + R * Math.sin(angle);
     els.push(
       plate({
-        x: cx - d / 2, y: cy - d / 2, w: d, h: d,
-        grad: gradFor(i, n - 1), shape: "circle",
+        x: cx - d / 2,
+        y: cy - d / 2,
+        w: d,
+        h: d,
+        grad: gradFor(i, n - 1),
+        shape: "circle",
         shadow: SOFT_SHADOW,
       }),
     );
     els.push(
       label({
-        x: cx - d / 2 + 10, y: cy - d / 2 + (d - size * 1.6) / 2, w: d - 20, h: size * 1.6,
-        text: i + 1 + ". " + item, size, color: "#ffffff", weight: 800,
+        x: cx - d / 2 + 10,
+        y: cy - d / 2 + (d - size * 1.6) / 2,
+        w: d - 20,
+        h: size * 1.6,
+        text: i + 1 + ". " + item,
+        size,
+        color: "#ffffff",
+        weight: 800,
         shadow: TEXT_ON_GRAD,
       }),
     );
@@ -157,7 +182,10 @@ function timeline(items: string[]): AnyElement[] {
   const els: AnyElement[] = [];
   els.push(
     plate({
-      x: 260, y: 534, w: 1400, h: 10,
+      x: 260,
+      y: 534,
+      w: 1400,
+      h: 10,
       grad: { from: "#64748b", to: "#38bdf8", angle: 90 },
     }),
   );
@@ -167,23 +195,37 @@ function timeline(items: string[]): AnyElement[] {
     const cx = n === 1 ? (x0 + x1) / 2 : x0 + (i * (x1 - x0)) / (n - 1);
     els.push(
       plate({
-        x: cx - 27, y: 512, w: 54, h: 54,
-        fill: "#ffffff", shape: "circle",
-        stroke: "#e2e8f0", strokeWidth: 2,
+        x: cx - 27,
+        y: 512,
+        w: 54,
+        h: 54,
+        fill: "#ffffff",
+        shape: "circle",
+        stroke: "#e2e8f0",
+        strokeWidth: 2,
         shadow: CARD_SHADOW,
       }),
     );
     els.push(
       plate({
-        x: cx - 17, y: 522, w: 34, h: 34,
-        grad: gradFor(i, n - 1), shape: "circle",
+        x: cx - 17,
+        y: 522,
+        w: 34,
+        h: 34,
+        grad: gradFor(i, n - 1),
+        shape: "circle",
       }),
     );
     const above = i % 2 === 0;
     els.push(
       label({
-        x: cx - 170, y: above ? 390 : 620, w: 340, h: 90,
-        text: item, size: n <= 4 ? 34 : 28, weight: 800,
+        x: cx - 170,
+        y: above ? 390 : 620,
+        w: 340,
+        h: 90,
+        text: item,
+        size: n <= 4 ? 34 : 28,
+        weight: 800,
       }),
     );
   });
@@ -197,15 +239,25 @@ function orgchart(items: string[]): AnyElement[] {
   const els: AnyElement[] = [];
   els.push(
     plate({
-      x: 780, y: 200, w: 360, h: 110,
-      grad: GRADS[0], radius: 14,
+      x: 780,
+      y: 200,
+      w: 360,
+      h: 110,
+      grad: GRADS[0],
+      radius: 14,
       shadow: SOFT_SHADOW,
     }),
   );
   els.push(
     label({
-      x: 780, y: 236, w: 360, h: 48,
-      text: items[0] ?? "Root", size: 38, color: "#ffffff", weight: 800,
+      x: 780,
+      y: 236,
+      w: 360,
+      h: 48,
+      text: items[0] ?? "Root",
+      size: 38,
+      color: "#ffffff",
+      weight: 800,
       shadow: TEXT_ON_GRAD,
     }),
   );
@@ -221,9 +273,14 @@ function orgchart(items: string[]): AnyElement[] {
     els.push(plate({ x: cx - 3, y: 402, w: 6, h: 118, fill: "#94a3b8" }));
     els.push(
       plate({
-        x, y: 520, w: cw, h: 100,
-        fill: "#ffffff", radius: 14,
-        stroke: "#e2e8f0", strokeWidth: 2,
+        x,
+        y: 520,
+        w: cw,
+        h: 100,
+        fill: "#ffffff",
+        radius: 14,
+        stroke: "#e2e8f0",
+        strokeWidth: 2,
         shadow: CARD_SHADOW,
       }),
     );
@@ -245,15 +302,25 @@ function process(items: string[]): AnyElement[] {
     const x = x0 + i * step;
     els.push(
       plate({
-        x, y: 460, w: aw, h: ah,
-        grad: gradFor(i, n - 1), shape: "arrow",
+        x,
+        y: 460,
+        w: aw,
+        h: ah,
+        grad: gradFor(i, n - 1),
+        shape: "arrow",
         shadow: SOFT_SHADOW,
       }),
     );
     els.push(
       label({
-        x: x + 50, y: 512, w: 200, h: 56,
-        text: i + 1 + ". " + item, size: 30, color: "#ffffff", weight: 800,
+        x: x + 50,
+        y: 512,
+        w: 200,
+        h: 56,
+        text: i + 1 + ". " + item,
+        size: 30,
+        color: "#ffffff",
+        weight: 800,
         shadow: TEXT_ON_GRAD,
       }),
     );
@@ -274,15 +341,25 @@ function funnel(items: string[]): AnyElement[] {
     const y = y0 + i * (lh + gap);
     els.push(
       plate({
-        x: 700 - w / 2, y, w, h: lh,
-        grad: gradFor(i, n - 1), shape: "trapezoid",
+        x: 700 - w / 2,
+        y,
+        w,
+        h: lh,
+        grad: gradFor(i, n - 1),
+        shape: "trapezoid",
         shadow: SOFT_SHADOW,
       }),
     );
     els.push(
       label({
-        x: 1210, y: y + lh / 2 - 26, w: 560, h: 52,
-        text: i + 1 + ". " + item, size: 34, align: "left", weight: 800,
+        x: 1210,
+        y: y + lh / 2 - 26,
+        w: 560,
+        h: 52,
+        text: i + 1 + ". " + item,
+        size: 34,
+        align: "left",
+        weight: 800,
       }),
     );
   });

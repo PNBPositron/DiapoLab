@@ -25,10 +25,7 @@ export const Route = createFileRoute("/api/context-proxy")({
           // Read-only preview: strip scripts and upstream CSP so the page renders
           // stably inside the dialog while script execution stays blocked via CSP.
           html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
-          html = html.replace(
-            /<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi,
-            "",
-          );
+          html = html.replace(/<meta[^>]+http-equiv=["']?content-security-policy["']?[^>]*>/gi, "");
           // Resolve relative assets against the final resolved page URL.
           const base = `<base href="${escapeHtmlAttr(finalUrl.toString())}">`;
           if (/<head[^>]*>/i.test(html)) {
@@ -40,7 +37,8 @@ export const Route = createFileRoute("/api/context-proxy")({
             headers: {
               "Content-Type": "text/html; charset=utf-8",
               "Cache-Control": "no-store",
-              "Content-Security-Policy": "script-src 'none'; object-src 'none'; base-uri http: https:;",
+              "Content-Security-Policy":
+                "script-src 'none'; object-src 'none'; base-uri http: https:;",
               "X-Content-Type-Options": "nosniff",
             },
           });

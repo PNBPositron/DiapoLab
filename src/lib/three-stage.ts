@@ -460,6 +460,7 @@ export class ThreeSlideStage {
   private resizeObserver: ResizeObserver;
 
   private transitionKind: ThreeSlideTransition = "3d-cube";
+  private transitionDir: 1 | -1 = 1;
   private slideAspect = 16 / 9;
   private slideW = 3.55;
   private slideH = 2.0;
@@ -813,7 +814,7 @@ export class ThreeSlideStage {
     this.pylonCapMesh.frustumCulled = false;
 
     for (let i = 0; i < count; i++) {
-      const angle = Math.PI + ((i / (count - 1)) - 0.5) * Math.PI * 1.15;
+      const angle = Math.PI + (i / (count - 1) - 0.5) * Math.PI * 1.15;
       const radius = 4.35 + (i % 2) * 0.65;
       const scaleH = 0.65 + (i % 3) * 0.38;
       const x = Math.sin(angle) * radius;
@@ -994,7 +995,7 @@ export class ThreeSlideStage {
 
     const count = 10;
     for (let i = 0; i < count; i++) {
-      const angle = Math.PI + ((i / (count - 1)) - 0.5) * Math.PI * 1.1;
+      const angle = Math.PI + (i / (count - 1) - 0.5) * Math.PI * 1.1;
       const r = 3.55 + (i % 3) * 0.55;
       const shard = new THREE.Mesh(crystalGeo, this.crystalMat);
       shard.position.set(Math.sin(angle) * r, ((i % 4) - 1.5) * 0.42, Math.cos(angle) * r - 0.7);
@@ -1086,9 +1087,7 @@ export class ThreeSlideStage {
     this.floorTex.needsUpdate = true;
     this.shadowMat.opacity = isLight ? 0.34 : 0.78;
 
-    this.plinthMat.color
-      .set(next.floorColor)
-      .offsetHSL(0, 0, isLight ? -0.05 : 0.06);
+    this.plinthMat.color.set(next.floorColor).offsetHSL(0, 0, isLight ? -0.05 : 0.06);
     this.ringMat.color.set(next.accentColor);
     this.ringMat.emissive.set(next.accentColor);
     this.ringMat.emissiveIntensity = isLight ? 0.28 : 0.55;
@@ -1178,9 +1177,10 @@ export class ThreeSlideStage {
 
   playTransition(
     kind: ThreeSlideTransition,
-    options: { duration?: number; loop?: boolean } = {},
+    options: { duration?: number; loop?: boolean; direction?: 1 | -1 } = {},
   ) {
     this.transitionKind = kind;
+    this.transitionDir = options.direction === -1 ? -1 : 1;
     this.animDuration = Math.max(0.5, options.duration ?? this.sceneConfig.duration ?? 1.25);
     this.loopContinuously = !!options.loop;
     this.animElapsed = 0;
@@ -1210,8 +1210,7 @@ export class ThreeSlideStage {
     if (this.crystalsGroup.visible) {
       this.crystalShards.forEach((shard, idx) => {
         shard.rotation.y = timeSec * (0.28 + (idx % 3) * 0.08) * (idx % 2 === 0 ? 1 : -1);
-        shard.position.y =
-          ((idx % 4) - 1.5) * 0.42 + Math.sin(timeSec * 1.1 + idx * 0.9) * 0.09;
+        shard.position.y = ((idx % 4) - 1.5) * 0.42 + Math.sin(timeSec * 1.1 + idx * 0.9) * 0.09;
       });
     }
   }
@@ -1256,22 +1255,23 @@ export class ThreeSlideStage {
 
     const w = this.slideW;
     const halfW = w / 2;
+    const dir = this.transitionDir;
 
     if (this.transitionKind === "3d-cube") {
       this.outgoingPanel.group.position.set(0, 0, halfW);
       this.outgoingPanel.group.rotation.set(0, 0, 0);
 
-      this.incomingPanel.group.position.set(halfW, 0, 0);
-      this.incomingPanel.group.rotation.set(0, Math.PI / 2, 0);
+      this.incomingPanel.group.position.set(dir * halfW, 0, 0);
+      this.incomingPanel.group.rotation.set(0, (dir * Math.PI) / 2, 0);
 
       this.stageRig.position.set(0, bell * 0.04, -halfW - bell * 0.52);
-      this.stageRig.rotation.y = -e * (Math.PI / 2);
+      this.stageRig.rotation.y = -dir * e * (Math.PI / 2);
       this.stageRig.rotation.x = bell * 0.055;
     } else if (this.transitionKind === "3d-carousel") {
       const radius = w * 1.16;
       const span = Math.PI * 0.58;
-      const outAngle = -e * span;
-      const inAngle = (1 - e) * span;
+      const outAngle = -dir * e * span;
+      const inAngle = dir * (1 - e) * span;
 
       this.outgoingPanel.group.position.set(
         Math.sin(outAngle) * radius,
@@ -1289,7 +1289,7 @@ export class ThreeSlideStage {
       this.incomingPanel.group.rotation.y = inAngle * 0.88;
       this.incomingPanel.group.scale.setScalar(0.84 + e * 0.16);
     } else if (this.transitionKind === "3d-flip") {
-      const angle = e * Math.PI;
+      const angle = dir * e * Math.PI;
       this.stageRig.position.set(0, bell * 0.05, -bell * 0.44);
       this.stageRig.rotation.y = angle;
       this.stageRig.rotation.x = bell * 0.085;
@@ -1300,12 +1300,12 @@ export class ThreeSlideStage {
       this.incomingPanel.group.position.set(0, 0, -0.048);
       this.incomingPanel.group.rotation.y = Math.PI;
     } else if (this.transitionKind === "3d-fold") {
-      const outAngle = -e * (Math.PI * 0.76);
-      const outPivotX = -halfW - e * 0.78;
+      const outAngle = -dir * e * (Math.PI * 0.76);
+      const outPivotX = -dir * (halfW + e * 0.78);
       this.outgoingPanel.group.position.set(
-        outPivotX + Math.cos(outAngle) * halfW,
+        outPivotX + dir * Math.cos(outAngle) * halfW,
         0,
-        Math.sin(outAngle) * halfW * 0.35 - e * 1.25,
+        Math.sin(Math.abs(outAngle)) * -halfW * 0.35 - e * 1.25,
       );
       this.outgoingPanel.group.rotation.y = outAngle;
       this.outgoingPanel.group.scale.setScalar(1 - e * 0.16);
@@ -1313,28 +1313,28 @@ export class ThreeSlideStage {
       const inv = 1 - e;
       const inAngle = inv * 1.05;
       this.incomingPanel.group.position.set(
-        halfW - Math.cos(inAngle) * halfW + inv * 0.24,
+        dir * (halfW - Math.cos(inAngle) * halfW + inv * 0.24),
         0,
         -Math.sin(inAngle) * halfW - inv * 0.45,
       );
-      this.incomingPanel.group.rotation.y = -inAngle;
+      this.incomingPanel.group.rotation.y = -dir * inAngle;
       this.incomingPanel.group.scale.setScalar(0.92 + e * 0.08);
     } else if (this.transitionKind === "3d-helix") {
       const inv = 1 - e;
       this.outgoingPanel.group.position.set(
-        -Math.sin(e * Math.PI * 0.68) * 2.85,
+        -dir * Math.sin(e * Math.PI * 0.68) * 2.85,
         e * 0.62,
         -e * 2.75,
       );
-      this.outgoingPanel.group.rotation.set(e * 0.18, -e * 1.32, e * 0.1);
+      this.outgoingPanel.group.rotation.set(e * 0.18, -dir * e * 1.32, dir * e * 0.1);
       this.outgoingPanel.group.scale.setScalar(Math.max(0.46, 1 - e * 0.48));
 
       this.incomingPanel.group.position.set(
-        Math.sin(inv * Math.PI * 0.68) * 2.85,
+        dir * Math.sin(inv * Math.PI * 0.68) * 2.85,
         -inv * 0.62,
         -inv * 2.75,
       );
-      this.incomingPanel.group.rotation.set(-inv * 0.2, inv * 1.32, -inv * 0.12);
+      this.incomingPanel.group.rotation.set(-inv * 0.2, dir * inv * 1.32, -dir * inv * 0.12);
       this.incomingPanel.group.scale.setScalar(0.52 + e * 0.48);
     }
   }
@@ -1444,8 +1444,7 @@ export class ThreeSlideStage {
     const vFovRad = THREE.MathUtils.degToRad(this.camera.fov);
     const halfV = this.slideH * 0.56;
     const halfH = (this.slideW * 0.56) / aspect;
-    const baseDist =
-      Math.max(halfV / Math.tan(vFovRad / 2), halfH / Math.tan(vFovRad / 2)) * 1.12;
+    const baseDist = Math.max(halfV / Math.tan(vFovRad / 2), halfH / Math.tan(vFovRad / 2)) * 1.12;
     const dist = baseDist * this.orbitZoom + this.cameraDolly;
 
     const pitchOffset = 0.06 + this.orbitPitch;

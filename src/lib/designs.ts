@@ -51,11 +51,7 @@ export async function saveDesign(input: {
     if (error) throw error;
     return data as unknown as SavedDesign;
   }
-  const { data, error } = await supabase
-    .from("designs")
-    .insert(payload)
-    .select()
-    .single();
+  const { data, error } = await supabase.from("designs").insert(payload).select().single();
   if (error) throw error;
   return data as unknown as SavedDesign;
 }
@@ -136,7 +132,13 @@ export type PublicTemplate = {
   style?: string | null;
   creator?: string | null;
   license?: string | null;
-  creator_profile?: { id?: string; username?: string | null; pronouns?: string | null; display_name: string | null; avatar_url: string | null } | null;
+  creator_profile?: {
+    id?: string;
+    username?: string | null;
+    pronouns?: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
 };
 
 export async function listPublicTemplates(): Promise<PublicTemplate[]> {
@@ -150,7 +152,9 @@ export async function listPublicTemplates(): Promise<PublicTemplate[]> {
   const ids = [...new Set(rows.map((row) => row.user_id))];
   if (!ids.length) return rows;
   const { data: profiles } = await (supabase as any).rpc("get_creator_profiles", { _ids: ids });
-  const byId = new Map<string, NonNullable<PublicTemplate["creator_profile"]>>((profiles ?? []).map((profile: any) => [profile.id, profile]));
+  const byId = new Map<string, NonNullable<PublicTemplate["creator_profile"]>>(
+    (profiles ?? []).map((profile: any) => [profile.id, profile]),
+  );
   return rows.map((row) => ({ ...row, creator_profile: byId.get(row.user_id) ?? null }));
 }
 
@@ -209,7 +213,9 @@ export async function listTemplateLikeCounts(
 ): Promise<Record<string, number>> {
   const remoteIds = templateIds.filter((id) => !id.startsWith("builtin-"));
   if (remoteIds.length === 0) return {};
-  const { data, error } = await (supabase as any).rpc("get_template_like_counts", { _ids: remoteIds });
+  const { data, error } = await (supabase as any).rpc("get_template_like_counts", {
+    _ids: remoteIds,
+  });
   if (error) throw error;
   const counts: Record<string, number> = {};
   for (const row of (data ?? []) as Array<{ template_id: string; like_count: number }>) {

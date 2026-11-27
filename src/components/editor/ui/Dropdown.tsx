@@ -71,7 +71,12 @@ export function Dropdown<T extends string = string>({
     if (disabled) return;
     if (!open && (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
-      setActiveIndex(Math.max(0, normalized.findIndex((o) => o.value === value)));
+      setActiveIndex(
+        Math.max(
+          0,
+          normalized.findIndex((o) => o.value === value),
+        ),
+      );
       setOpen(true);
       return;
     }
@@ -101,7 +106,12 @@ export function Dropdown<T extends string = string>({
         disabled={disabled}
         onClick={() => {
           if (!open)
-            setActiveIndex(Math.max(0, normalized.findIndex((o) => o.value === value)));
+            setActiveIndex(
+              Math.max(
+                0,
+                normalized.findIndex((o) => o.value === value),
+              ),
+            );
           setOpen((v) => !v);
         }}
         onKeyDown={onKeyDown}
@@ -115,7 +125,9 @@ export function Dropdown<T extends string = string>({
             />
           )}
           {selected?.icon}
-          <span className="truncate">{selected?.label ?? selected?.value ?? placeholder ?? ""}</span>
+          <span className="truncate">
+            {selected?.label ?? selected?.value ?? placeholder ?? ""}
+          </span>
         </span>
         <ChevronDown
           className={`size-3.5 shrink-0 text-slate-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
@@ -158,7 +170,9 @@ export function Dropdown<T extends string = string>({
                   {o.icon}
                   <span className="truncate">{o.label ?? o.value}</span>
                 </span>
-                {isSelected && <Check className="size-3 shrink-0 text-indigo-600" strokeWidth={2.5} />}
+                {isSelected && (
+                  <Check className="size-3 shrink-0 text-indigo-600" strokeWidth={2.5} />
+                )}
               </button>
             );
           })}

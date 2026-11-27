@@ -7,8 +7,16 @@ const parseColor = (raw: string): [number, number, number] | null => {
   const m = raw.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
   if (!m) return null;
   let hex = m[1];
-  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
-  return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
+  if (hex.length === 3)
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  return [
+    parseInt(hex.slice(0, 2), 16),
+    parseInt(hex.slice(2, 4), 16),
+    parseInt(hex.slice(4, 6), 16),
+  ];
 };
 const firstColor = (raw?: string): [number, number, number] | null => {
   if (!raw) return null;
@@ -71,7 +79,10 @@ export function A11yPanel() {
         }
       }
       if (el.type === "chart" || el.type === "table") {
-        const ratio = contrast((el as { fgColor: string }).fgColor, (el as { bgColor: string }).bgColor);
+        const ratio = contrast(
+          (el as { fgColor: string }).fgColor,
+          (el as { bgColor: string }).bgColor,
+        );
         if (ratio !== null && ratio < 4.5) {
           list.push({
             key: el.id + ":contrast",
@@ -81,7 +92,12 @@ export function A11yPanel() {
           });
         }
       }
-      if (el.x < -2 || el.y < -2 || el.x + el.width > canvasW + 2 || el.y + el.height > canvasH + 2) {
+      if (
+        el.x < -2 ||
+        el.y < -2 ||
+        el.x + el.width > canvasW + 2 ||
+        el.y + el.height > canvasH + 2
+      ) {
         list.push({
           key: el.id + ":bounds",
           label: "Off-canvas",
@@ -109,7 +125,9 @@ export function A11yPanel() {
         >
           {issues.length}
         </span>
-        <ChevronDown className={`size-3.5 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`size-3.5 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && (
         <div className="max-h-64 overflow-y-auto border-t border-slate-100 p-2">
@@ -129,8 +147,12 @@ export function A11yPanel() {
                   >
                     <AlertTriangle className="mt-px size-3.5 shrink-0 text-amber-500" />
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-semibold text-slate-700">{issue.label}</span>
-                      <span className="block truncate text-[9px] text-slate-400">{issue.detail}</span>
+                      <span className="block text-[10px] font-semibold text-slate-700">
+                        {issue.label}
+                      </span>
+                      <span className="block truncate text-[9px] text-slate-400">
+                        {issue.detail}
+                      </span>
                     </span>
                   </button>
                 </li>

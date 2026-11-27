@@ -1,22 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SettingsDialog } from "@/components/editor/SettingsDialog";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
-  head: () => ({
-    meta: [
-      { title: "Settings — DiapoLab" },
-      {
-        name: "description",
-        content: "Customize DiapoLab editor behavior, AI features, panels, motion, and themes.",
-      },
-      { property: "og:title", content: "Settings — DiapoLab" },
-      { property: "og:description", content: "Customize your DiapoLab design editor experience." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.lovable.app/settings" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "Editor Settings – Customize DiapoLab Workspace",
+      description:
+        "Customize DiapoLab editor themes, toolbar colors, Liquid Glass chrome, workspace backgrounds, grid snapping, and reduced motion.",
+      path: "/settings",
+      twitterCard: "summary",
+    }),
 });
 
 function SettingsPage() {

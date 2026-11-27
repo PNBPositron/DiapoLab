@@ -187,9 +187,7 @@ export function SlideGridDialog({
                     />
                     <span
                       className={`absolute left-2 top-2 rounded px-1.5 py-0.5 font-mono text-[10px] font-bold tabular-nums shadow-xs ${
-                        active
-                          ? "bg-blue-600 text-white"
-                          : "bg-slate-900/75 text-white"
+                        active ? "bg-blue-600 text-white" : "bg-slate-900/75 text-white"
                       }`}
                     >
                       {idx + 1}
@@ -229,7 +227,11 @@ export function SlideGridDialog({
                       <button
                         type="button"
                         onClick={() => togglePageHiddenInPresent(idx)}
-                        title={p.hiddenInPresent ? "Show slide in present mode" : "Hide slide in present mode"}
+                        title={
+                          p.hiddenInPresent
+                            ? "Show slide in present mode"
+                            : "Hide slide in present mode"
+                        }
                         className={`grid size-6 place-items-center rounded-lg transition ${
                           p.hiddenInPresent
                             ? "bg-amber-500/20 text-amber-500"
@@ -238,7 +240,11 @@ export function SlideGridDialog({
                               : "text-slate-600 hover:bg-slate-200/80"
                         }`}
                       >
-                        {p.hiddenInPresent ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                        {p.hiddenInPresent ? (
+                          <EyeOff className="size-3.5" />
+                        ) : (
+                          <Eye className="size-3.5" />
+                        )}
                       </button>
                       <button
                         type="button"

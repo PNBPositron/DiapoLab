@@ -9,7 +9,10 @@ export const Route = createFileRoute("/api/context-fetch")({
         const raw = typeof body?.url === "string" ? body.url.trim() : "";
         const check = validateExternalUrl(raw);
         if (!check.url) {
-          return Response.json({ error: check.error ?? "Invalid URL." }, { status: check.status ?? 400 });
+          return Response.json(
+            { error: check.error ?? "Invalid URL." },
+            { status: check.status ?? 400 },
+          );
         }
         const target = check.url;
         try {
@@ -21,7 +24,10 @@ export const Route = createFileRoute("/api/context-fetch")({
             signal: AbortSignal.timeout(12000),
           });
           if (!response.ok) {
-            return Response.json({ error: `The site responded ${response.status}.` }, { status: 502 });
+            return Response.json(
+              { error: `The site responded ${response.status}.` },
+              { status: 502 },
+            );
           }
           const html = (await response.text()).slice(0, 800_000);
           const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "")

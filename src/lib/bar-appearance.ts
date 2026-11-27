@@ -3,7 +3,13 @@ import type { CSSProperties } from "react";
 export function parseHexRgb(hex: string): [number, number, number] | null {
   const clean = hex.trim().replace(/^#/, "");
   if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(clean)) return null;
-  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean;
   const n = parseInt(full, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }

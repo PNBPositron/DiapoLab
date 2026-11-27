@@ -57,8 +57,17 @@ function paintBackground(
   const bg = typeof bgColor === "string" && bgColor ? bgColor : "#ffffff";
   if (bg.includes("radial-gradient(")) {
     const stops = extractColorStops(bg);
-    const grad = ctx.createRadialGradient(w * 0.5, h * 0.5, w * 0.05, w * 0.5, h * 0.5, Math.max(w, h) * 0.72);
-    stops.forEach((c, idx) => grad.addColorStop(stops.length === 1 ? 0 : idx / (stops.length - 1), c));
+    const grad = ctx.createRadialGradient(
+      w * 0.5,
+      h * 0.5,
+      w * 0.05,
+      w * 0.5,
+      h * 0.5,
+      Math.max(w, h) * 0.72,
+    );
+    stops.forEach((c, idx) =>
+      grad.addColorStop(stops.length === 1 ? 0 : idx / (stops.length - 1), c),
+    );
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
   } else if (bg.includes("gradient(")) {
@@ -75,7 +84,9 @@ function paintBackground(
       cy + Math.sin(rad) * r,
     );
     const stops = extractColorStops(bg);
-    stops.forEach((c, idx) => grad.addColorStop(stops.length === 1 ? 0 : idx / (stops.length - 1), c));
+    stops.forEach((c, idx) =>
+      grad.addColorStop(stops.length === 1 ? 0 : idx / (stops.length - 1), c),
+    );
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
   } else {
@@ -265,7 +276,15 @@ function paintElement(
         : el.textTransform === "lowercase"
           ? el.text.toLowerCase()
           : el.text;
-    drawWrappedText(ctx, text, el.width, el.height, fontSize, el.lineHeight ?? 1.2, el.align ?? "left");
+    drawWrappedText(
+      ctx,
+      text,
+      el.width,
+      el.height,
+      fontSize,
+      el.lineHeight ?? 1.2,
+      el.align ?? "left",
+    );
   } else if (el.type === "image") {
     const img = getCachedImage(el.src, onAsyncAsset);
     drawRoundedRectPath(ctx, 0, 0, el.width, el.height, el.cornerRadius ?? 0);
@@ -278,7 +297,10 @@ function paintElement(
       if (fit === "fill") {
         ctx.drawImage(img, 0, 0, el.width, el.height);
       } else {
-        const s = fit === "contain" ? Math.min(el.width / iw, el.height / ih) : Math.max(el.width / iw, el.height / ih);
+        const s =
+          fit === "contain"
+            ? Math.min(el.width / iw, el.height / ih)
+            : Math.max(el.width / iw, el.height / ih);
         const dw = iw * s;
         const dh = ih * s;
         ctx.drawImage(img, (el.width - dw) / 2, (el.height - dh) / 2, dw, dh);

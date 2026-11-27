@@ -60,12 +60,7 @@ export const DEFAULT_TEXT_STYLES: Record<"title" | "subtitle" | "body", TextStyl
 export type TransitionSoundStyle = "whoosh" | "click";
 
 export type WorkspaceBgId =
-  | "clean"
-  | "aurora"
-  | "warm-paper"
-  | "sage-mist"
-  | "custom-color"
-  | "custom-image";
+  "clean" | "aurora" | "warm-paper" | "sage-mist" | "custom-color" | "custom-image";
 
 export const DEFAULT_WORKSPACE_BG: WorkspaceBgId = "clean";
 
@@ -242,7 +237,9 @@ export const useSettings = create<SettingsState>()(
       setPresentHideInk: (presentHideInk) => set({ presentHideInk }),
       setPresentHideSlideCounter: (presentHideSlideCounter) => set({ presentHideSlideCounter }),
       setTextStyle: (role, patch) =>
-        set((s) => ({ textStyles: { ...s.textStyles, [role]: { ...s.textStyles[role], ...patch } } })),
+        set((s) => ({
+          textStyles: { ...s.textStyles, [role]: { ...s.textStyles[role], ...patch } },
+        })),
       resetMotion: () =>
         set({
           panelDurationMs: DEFAULT_PANEL_DURATION,
@@ -270,11 +267,19 @@ export const useSettings = create<SettingsState>()(
         delete (panels as Record<string, boolean | undefined>).unsplash;
         delete (panels as Record<string, boolean | undefined>).illustrations;
         delete (panels as Record<string, boolean | undefined>).plugins;
-        if (panels.library === undefined) panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
+        if (panels.library === undefined)
+          panels.library = prevPanels.unsplash ?? prevPanels.illustrations ?? true;
         if (panels.media === undefined) panels.media = true;
         if (panels.layers === undefined) panels.layers = true;
         const prevBg = previous?.workspaceBg as string | undefined;
-        const validBgs: WorkspaceBgId[] = ["clean", "aurora", "warm-paper", "sage-mist", "custom-color", "custom-image"];
+        const validBgs: WorkspaceBgId[] = [
+          "clean",
+          "aurora",
+          "warm-paper",
+          "sage-mist",
+          "custom-color",
+          "custom-image",
+        ];
         const workspaceBg: WorkspaceBgId =
           prevBg && validBgs.includes(prevBg as WorkspaceBgId)
             ? (prevBg as WorkspaceBgId)

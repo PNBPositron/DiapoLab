@@ -266,9 +266,7 @@ export function ThreeSceneDialog({
                   <Shapes className="size-3.5" />
                   Floating prisms
                 </span>
-                <span className="text-[10px] opacity-80">
-                  {scene.showParticles ? "On" : "Off"}
-                </span>
+                <span className="text-[10px] opacity-80">{scene.showParticles ? "On" : "Off"}</span>
               </button>
             </div>
           </div>

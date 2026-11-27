@@ -8,6 +8,8 @@ import { matchMorphElements, type MorphGeometry } from "@/lib/morph";
 import {
   THREE_TRANSITIONS,
   formatTransitionLabel,
+  getDefaultTransitionDurationMs,
+  isGlitchTransition,
   isThreeTransition,
   type ThreeSlideTransition,
 } from "@/lib/motion-catalog";
@@ -148,18 +150,23 @@ export function PresentationMode() {
 
   const page = pages[currentIndex];
 
-  useEffect(() => useEditor.subscribe((next, previous) => {
-    if (!next.presenting || !previous.presenting) {
-      prevGeomRef.current = new Map();
-      return;
-    }
-    if (next.currentIndex === previous.currentIndex) return;
-    const outgoing = previous.pages[previous.currentIndex];
-    const incoming = next.pages[next.currentIndex];
-    prevGeomRef.current = outgoing && incoming?.transition === "morph"
-      ? matchMorphElements(outgoing.elements, incoming.elements)
-      : new Map();
-  }), []);
+  useEffect(
+    () =>
+      useEditor.subscribe((next, previous) => {
+        if (!next.presenting || !previous.presenting) {
+          prevGeomRef.current = new Map();
+          return;
+        }
+        if (next.currentIndex === previous.currentIndex) return;
+        const outgoing = previous.pages[previous.currentIndex];
+        const incoming = next.pages[next.currentIndex];
+        prevGeomRef.current =
+          outgoing && incoming?.transition === "morph"
+            ? matchMorphElements(outgoing.elements, incoming.elements)
+            : new Map();
+      }),
+    [],
+  );
 
   // Viewport scaling, body scroll lock, and fullscreen teardown — must NOT depend on HUD menu/modal flags
   // so clicking Display, Overview, Blackout, or Hide HUD never tears down fullscreen and exits Present Mode.
@@ -286,7 +293,10 @@ export function PresentationMode() {
         setStage3dPlayTrigger((n) => n + 1);
         const cur = useEditor.getState().pages[useEditor.getState().currentIndex];
         if (cur?.transition && cur.transition !== "none") {
-          playTransitionSound({ isThreeD: isThreeTransition(cur.transition) });
+          playTransitionSound({
+            isThreeD: isThreeTransition(cur.transition),
+            isGlitch: isGlitchTransition(cur.transition),
+          });
         }
       }
       if (e.key === "3") {
@@ -337,7 +347,16 @@ export function PresentationMode() {
 
   // Auto-hide presenter HUD & cursor after inactivity when enabled
   useEffect(() => {
-    if (!presenting || !presentAutoHideHud || presenterOpen || gridOverviewOpen || displayMenuOpen || drawOn || stage3dOpen || curtain !== "none") {
+    if (
+      !presenting ||
+      !presentAutoHideHud ||
+      presenterOpen ||
+      gridOverviewOpen ||
+      displayMenuOpen ||
+      drawOn ||
+      stage3dOpen ||
+      curtain !== "none"
+    ) {
       setIdleHidden(false);
       if (idleTimerRef.current !== null) {
         window.clearTimeout(idleTimerRef.current);
@@ -356,7 +375,16 @@ export function PresentationMode() {
         idleTimerRef.current = null;
       }
     };
-  }, [presenting, presentAutoHideHud, presenterOpen, gridOverviewOpen, displayMenuOpen, drawOn, stage3dOpen, curtain]);
+  }, [
+    presenting,
+    presentAutoHideHud,
+    presenterOpen,
+    gridOverviewOpen,
+    displayMenuOpen,
+    drawOn,
+    stage3dOpen,
+    curtain,
+  ]);
 
   // Prune old laser trail points
   useEffect(() => {
@@ -385,11 +413,14 @@ export function PresentationMode() {
 
   // Explicit outgoing-slide backdrop + Three.js 3D transition handoff
   const [backdropIndex, setBackdropIndex] = useState<number | null>(null);
+  const [navDir, setNavDir] = useState<1 | -1>(1);
   const prevIndexRef = useRef(currentIndex);
   useEffect(() => {
     if (prevIndexRef.current === currentIndex) return;
     const prevIndex = prevIndexRef.current;
     prevIndexRef.current = currentIndex;
+    const dir: 1 | -1 = currentIndex < prevIndex ? -1 : 1;
+    setNavDir(dir);
     const prev = pages[prevIndex];
     const incoming = pages[currentIndex];
     if (!incoming) {
@@ -423,18 +454,30 @@ export function PresentationMode() {
       return;
     }
     setThreeTransition(null);
-    if (!prev || incoming.transition === "morph" || incoming.transition === "none") {
+    if (
+      !prev ||
+      !incoming.transition ||
+      incoming.transition === "morph" ||
+      incoming.transition === "none"
+    ) {
       if (incoming.transition === "morph") {
         playTransitionSound({ isThreeD: false });
       }
       setBackdropIndex(null);
       return;
     }
-    if (incoming.transition) {
-      playTransitionSound({ isThreeD: incoming.transition === "cube" || incoming.transition === "flip" || incoming.transition === "origami" });
-    }
+    playTransitionSound({
+      isThreeD:
+        incoming.transition === "cube" ||
+        incoming.transition === "flip" ||
+        incoming.transition === "origami",
+      isGlitch: isGlitchTransition(incoming.transition),
+    });
     setBackdropIndex(prevIndex);
-    const t = setTimeout(() => setBackdropIndex(null), 1000);
+    const durMs = incoming.transitionDuration
+      ? Math.round(incoming.transitionDuration * 1000)
+      : getDefaultTransitionDurationMs(incoming.transition);
+    const t = setTimeout(() => setBackdropIndex(null), Math.max(360, durMs + 80));
     return () => clearTimeout(t);
   }, [currentIndex, pages, stage3dOpen, stage3dKind]);
 
@@ -454,28 +497,35 @@ export function PresentationMode() {
   // Shared and older designs may omit background fields. Presentation must
   // still render those pages instead of throwing while the overlay mounts.
   const pageBgColor = typeof page.bgColor === "string" ? page.bgColor : "#ffffff";
-  const backdropBgColor = backdropPage && typeof backdropPage.bgColor === "string"
-    ? backdropPage.bgColor
-    : "#ffffff";
+  const backdropBgColor =
+    backdropPage && typeof backdropPage.bgColor === "string" ? backdropPage.bgColor : "#ffffff";
   const morphing = page.transition === "morph";
   const isThree = isThreeTransition(page.transition);
-  const motionTransitionNames = new Set(["tv", "neon", "cube", "prism", "origami"]);
+  const transitionDurMs = page.transitionDuration
+    ? Math.round(page.transitionDuration * 1000)
+    : getDefaultTransitionDurationMs(page.transition);
+  const motionTransitionNames = new Set(["fade", "tv", "neon", "prism", "origami", "cube"]);
   const transition =
     page.transition &&
     page.transition !== "none" &&
     !morphing &&
     !isThree &&
-    page.transition !== "zoom" &&
     !motionTransitionNames.has(page.transition)
       ? `slide-transition-${page.transition}`
       : "";
-  const preset = transitionPreset(page.transition);
+  const backdropExitClass =
+    page.transition && page.transition !== "none" && !morphing && !isThree
+      ? `slide-exit-${page.transition}`
+      : "";
+  const preset = transitionPreset(page.transition, navDir, transitionDurMs / 1000);
   const showThreeCanvas = !!threeTransition || stage3dOpen;
   const activeThreeKind: ThreeSlideTransition = stage3dOpen
     ? stage3dKind
-    : threeTransition?.transition ?? (isThreeTransition(page.transition) ? page.transition : "3d-cube");
+    : (threeTransition?.transition ??
+      (isThreeTransition(page.transition) ? page.transition : "3d-cube"));
   const activeOutgoing =
-    threeTransition?.outgoingPage ?? (currentIndex > 0 ? pages[currentIndex - 1] : pages[currentIndex + 1]);
+    threeTransition?.outgoingPage ??
+    (currentIndex > 0 ? pages[currentIndex - 1] : pages[currentIndex + 1]);
   const activeIncoming = threeTransition?.incomingPage ?? page;
   const activeTrigger = stage3dOpen ? stage3dPlayTrigger : (threeTransition?.playTrigger ?? 0);
 
@@ -486,13 +536,25 @@ export function PresentationMode() {
   const hiddenSlidesCount = pages.filter((p) => p.hiddenInPresent).length;
   const hiddenElsOnSlide = page.elements.filter((el) => el.hideInPresent).length;
   const anyHideOptionOn =
-    zenMode || presentHideHud || presentHide3dButton || presentAutoHideHud || presentHideInk || presentHideSlideCounter;
+    zenMode ||
+    presentHideHud ||
+    presentHide3dButton ||
+    presentAutoHideHud ||
+    presentHideInk ||
+    presentHideSlideCounter;
 
   const wakeHud = () => {
     if (!presentAutoHideHud) return;
     if (idleHidden) setIdleHidden(false);
     if (idleTimerRef.current !== null) window.clearTimeout(idleTimerRef.current);
-    if (!presenterOpen && !gridOverviewOpen && !displayMenuOpen && !drawOn && !stage3dOpen && curtain === "none") {
+    if (
+      !presenterOpen &&
+      !gridOverviewOpen &&
+      !displayMenuOpen &&
+      !drawOn &&
+      !stage3dOpen &&
+      curtain === "none"
+    ) {
       idleTimerRef.current = window.setTimeout(() => setIdleHidden(true), 2400);
     }
   };
@@ -521,17 +583,24 @@ export function PresentationMode() {
         >
           <div
             className="absolute left-0 top-0 overflow-hidden ring-1 ring-black/10"
-            style={{ width: canvasW, height: canvasH, transform: `scale(${scale})`, transformOrigin: "top left" }}
+            style={{
+              width: canvasW,
+              height: canvasH,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+            }}
           >
             {backdropPage && (
               <div
-                key={`backdrop-${backdropIndex}`}
+                key={`backdrop-${backdropIndex}-${currentIndex}`}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden"
+                className={`pointer-events-none absolute left-0 top-0 h-full w-full overflow-hidden ${backdropExitClass}`}
                 style={
                   {
                     width: canvasW,
                     height: canvasH,
+                    "--tx-dir": navDir,
+                    "--tx-dur": `${transitionDurMs}ms`,
                     ...backgroundStyle(backdropBgColor, backdropPage.bgImage, backdropPage.bgFit),
                   } as React.CSSProperties
                 }
@@ -545,7 +614,7 @@ export function PresentationMode() {
             )}
             <AnimatePresence initial mode="sync">
               <motion.div
-                key={`slide-${currentIndex}-${page.transition ?? "none"}`}
+                key={`slide-${currentIndex}-${page.transition ?? "none"}-${replayEpoch}`}
                 initial={preset.initial}
                 animate={preset.animate}
                 exit={{ opacity: 1, transition: { duration: 0 } }}
@@ -564,13 +633,15 @@ export function PresentationMode() {
                     : laserOn || (idleHidden && !drawOn)
                       ? "cursor-none"
                       : "cursor-pointer"
-                } ${transition}${page.transition === "zoom" ? " slide-transition-zoom" : ""}`}
+                } ${transition}`}
                 style={
                   {
                     width: canvasW,
                     height: canvasH,
                     ...backgroundStyle(pageBgColor, page.bgImage, page.bgFit),
                     "--fit": scale,
+                    "--tx-dir": navDir,
+                    "--tx-dur": `${transitionDurMs}ms`,
                     transformStyle: "preserve-3d",
                     perspective: page.transition === "cube" ? 1200 : undefined,
                     transition: morphing ? "background-color 620ms ease" : undefined,
@@ -588,72 +659,80 @@ export function PresentationMode() {
                     ) : (
                       // Elements with no morph match (new on this slide) keep
                       // their entrance animation even during a morph transition.
-                      <CanvasElement key={el.id} element={el} scale={scale} replayEpoch={replayEpoch} />
+                      <CanvasElement
+                        key={el.id}
+                        element={el}
+                        scale={scale}
+                        replayEpoch={replayEpoch}
+                      />
                     );
                   })}
-                <TransitionFx name={page.transition} />
+                <TransitionFx name={page.transition} durationSec={transitionDurMs / 1000} />
               </motion.div>
             </AnimatePresence>
           </div>
 
           {/* Per-slide presenter ink annotations + drawing surface */}
-          {(!presentHideInk || drawOn) && ((inkStrokes[page.id]?.length ?? 0) > 0 || activeStroke || drawOn) && (
-            <svg
-              viewBox={`0 0 ${canvasW} ${canvasH}`}
-              onPointerDown={(e) => {
-                if (!drawOn) return;
-                e.stopPropagation();
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * canvasW;
-                const y = ((e.clientY - rect.top) / rect.height) * canvasH;
-                drawingInkRef.current = true;
-                e.currentTarget.setPointerCapture(e.pointerId);
-                setActiveStroke({ color: inkColor, points: [{ x, y }] });
-              }}
-              onPointerMove={(e) => {
-                if (!drawOn || !drawingInkRef.current) return;
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * canvasW;
-                const y = ((e.clientY - rect.top) / rect.height) * canvasH;
-                setActiveStroke((prev) =>
-                  prev ? { ...prev, points: [...prev.points, { x, y }] } : null,
-                );
-              }}
-              onPointerUp={() => {
-                if (!drawingInkRef.current) return;
-                drawingInkRef.current = false;
-                if (activeStroke && activeStroke.points.length > 0) {
-                  setInkStrokes((prev) => ({
-                    ...prev,
-                    [page.id]: [...(prev[page.id] ?? []), activeStroke],
-                  }));
-                }
-                setActiveStroke(null);
-              }}
-              className={`absolute left-0 top-0 z-20 size-full ${
-                drawOn ? "pointer-events-auto cursor-crosshair touch-none" : "pointer-events-none"
-              }`}
-            >
-              {[...(inkStrokes[page.id] ?? []), ...(activeStroke ? [activeStroke] : [])].map(
-                (stroke, sIdx) => {
-                  const d = stroke.points
-                    .map((pt, i) => `${i === 0 ? "M" : "L"} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`)
-                    .join(" ");
-                  return (
-                    <path
-                      key={sIdx}
-                      d={d}
-                      fill="none"
-                      stroke={stroke.color}
-                      strokeWidth={Math.max(4, Math.round(canvasW * 0.004))}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+          {(!presentHideInk || drawOn) &&
+            ((inkStrokes[page.id]?.length ?? 0) > 0 || activeStroke || drawOn) && (
+              <svg
+                viewBox={`0 0 ${canvasW} ${canvasH}`}
+                onPointerDown={(e) => {
+                  if (!drawOn) return;
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * canvasW;
+                  const y = ((e.clientY - rect.top) / rect.height) * canvasH;
+                  drawingInkRef.current = true;
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  setActiveStroke({ color: inkColor, points: [{ x, y }] });
+                }}
+                onPointerMove={(e) => {
+                  if (!drawOn || !drawingInkRef.current) return;
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * canvasW;
+                  const y = ((e.clientY - rect.top) / rect.height) * canvasH;
+                  setActiveStroke((prev) =>
+                    prev ? { ...prev, points: [...prev.points, { x, y }] } : null,
                   );
-                },
-              )}
-            </svg>
-          )}
+                }}
+                onPointerUp={() => {
+                  if (!drawingInkRef.current) return;
+                  drawingInkRef.current = false;
+                  if (activeStroke && activeStroke.points.length > 0) {
+                    setInkStrokes((prev) => ({
+                      ...prev,
+                      [page.id]: [...(prev[page.id] ?? []), activeStroke],
+                    }));
+                  }
+                  setActiveStroke(null);
+                }}
+                className={`absolute left-0 top-0 z-20 size-full ${
+                  drawOn ? "pointer-events-auto cursor-crosshair touch-none" : "pointer-events-none"
+                }`}
+              >
+                {[...(inkStrokes[page.id] ?? []), ...(activeStroke ? [activeStroke] : [])].map(
+                  (stroke, sIdx) => {
+                    const d = stroke.points
+                      .map(
+                        (pt, i) => `${i === 0 ? "M" : "L"} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`,
+                      )
+                      .join(" ");
+                    return (
+                      <path
+                        key={sIdx}
+                        d={d}
+                        fill="none"
+                        stroke={stroke.color}
+                        strokeWidth={Math.max(4, Math.round(canvasW * 0.004))}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    );
+                  },
+                )}
+              </svg>
+            )}
         </div>
       </div>
 
@@ -671,9 +750,7 @@ export function PresentationMode() {
           <svg className="pointer-events-none size-full">
             {laserTrail.length > 1 && (
               <path
-                d={laserTrail
-                  .map((pt, i) => `${i === 0 ? "M" : "L"} ${pt.x} ${pt.y}`)
-                  .join(" ")}
+                d={laserTrail.map((pt, i) => `${i === 0 ? "M" : "L"} ${pt.x} ${pt.y}`).join(" ")}
                 fill="none"
                 stroke="rgba(239,68,68,0.45)"
                 strokeWidth="5"
@@ -717,7 +794,17 @@ export function PresentationMode() {
             playTrigger={activeTrigger}
             interactive={stage3dOpen}
             resetSignal={stage3dResetSignal}
-            sceneConfig={stage3dOpen && stage3dSceneOverride ? stage3dSceneOverride : activeIncoming.threeScene}
+            direction={navDir}
+            sceneConfig={
+              stage3dOpen && stage3dSceneOverride
+                ? stage3dSceneOverride
+                : activeIncoming.transitionDuration
+                  ? {
+                      ...resolveThreeScene(activeIncoming.threeScene),
+                      duration: activeIncoming.transitionDuration,
+                    }
+                  : activeIncoming.threeScene
+            }
             onTransitionComplete={() => {
               if (!stage3dOpen) setThreeFadingOut(true);
             }}
@@ -922,7 +1009,15 @@ export function PresentationMode() {
               <ColorPickerPopover
                 value={inkColor}
                 onChange={setInkColor}
-                swatches={["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7", "#ffffff", "#0f172a"]}
+                swatches={[
+                  "#ef4444",
+                  "#3b82f6",
+                  "#10b981",
+                  "#f59e0b",
+                  "#a855f7",
+                  "#ffffff",
+                  "#0f172a",
+                ]}
                 dark={editorDark}
                 side="top"
                 align="center"
@@ -1058,9 +1153,7 @@ export function PresentationMode() {
                 }`}
               >
                 <div className="flex items-center justify-between px-2.5 py-1.5">
-                  <span className="text-xs font-semibold">
-                    Hide in present mode
-                  </span>
+                  <span className="text-xs font-semibold">Hide in present mode</span>
                   <span
                     className={`font-mono text-[10px] ${
                       editorDark ? "text-slate-400" : "text-slate-500"
@@ -1124,7 +1217,9 @@ export function PresentationMode() {
                       {opt.hint && (
                         <span
                           className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${
-                            editorDark ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"
+                            editorDark
+                              ? "bg-slate-800 text-slate-300"
+                              : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           {opt.hint}
@@ -1133,11 +1228,7 @@ export function PresentationMode() {
                     </span>
                     <span
                       className={`relative h-4 w-7 shrink-0 rounded transition-colors ${
-                        opt.checked
-                          ? "bg-blue-600"
-                          : editorDark
-                            ? "bg-slate-700"
-                            : "bg-slate-300"
+                        opt.checked ? "bg-blue-600" : editorDark ? "bg-slate-700" : "bg-slate-300"
                       }`}
                     >
                       <span
@@ -1158,8 +1249,12 @@ export function PresentationMode() {
                     >
                       Hidden from deck:{" "}
                       {[
-                        hiddenSlidesCount > 0 ? `${hiddenSlidesCount} slide${hiddenSlidesCount > 1 ? "s" : ""}` : null,
-                        hiddenElsOnSlide > 0 ? `${hiddenElsOnSlide} object${hiddenElsOnSlide > 1 ? "s" : ""} on slide` : null,
+                        hiddenSlidesCount > 0
+                          ? `${hiddenSlidesCount} slide${hiddenSlidesCount > 1 ? "s" : ""}`
+                          : null,
+                        hiddenElsOnSlide > 0
+                          ? `${hiddenElsOnSlide} object${hiddenElsOnSlide > 1 ? "s" : ""} on slide`
+                          : null,
                       ]
                         .filter(Boolean)
                         .join(" · ")}
@@ -1184,119 +1279,122 @@ export function PresentationMode() {
       {/* Compact bottom HUD dock — never uses backdrop-blur over WebGL */}
       {!stage3dHidden && (
         <div className="fixed bottom-4 right-4 z-[55] flex items-center gap-1.5">
-        {stage3dOpen ? (
-          <div className="studio-dock flex flex-wrap items-center gap-1 px-2 py-1">
-            <button
-              type="button"
-              onClick={() => prevSlideIdx !== null && setCurrentPage(prevSlideIdx)}
-              disabled={prevSlideIdx === null}
-              aria-label="Previous slide"
-              className="grid size-7 place-items-center rounded-md disabled:opacity-35"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-            {!presentHideSlideCounter && (
-              <span
-                className={`px-1.5 font-mono text-[11px] font-medium tabular-nums ${
-                  editorDark ? "text-slate-300" : "text-slate-600"
-                }`}
-              >
-                {currentIndex + 1}/{pages.length}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={() => nextSlideIdx !== null && setCurrentPage(nextSlideIdx)}
-              disabled={nextSlideIdx === null}
-              aria-label="Next slide"
-              className="grid size-7 place-items-center rounded-md disabled:opacity-35"
-            >
-              <ChevronRight className="size-4" />
-            </button>
-            <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
-            {THREE_TRANSITIONS.map((kind) => (
+          {stage3dOpen ? (
+            <div className="studio-dock flex flex-wrap items-center gap-1 px-2 py-1">
               <button
-                key={kind}
+                type="button"
+                onClick={() => prevSlideIdx !== null && setCurrentPage(prevSlideIdx)}
+                disabled={prevSlideIdx === null}
+                aria-label="Previous slide"
+                className="grid size-7 place-items-center rounded-md disabled:opacity-35"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              {!presentHideSlideCounter && (
+                <span
+                  className={`px-1.5 font-mono text-[11px] font-medium tabular-nums ${
+                    editorDark ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  {currentIndex + 1}/{pages.length}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => nextSlideIdx !== null && setCurrentPage(nextSlideIdx)}
+                disabled={nextSlideIdx === null}
+                aria-label="Next slide"
+                className="grid size-7 place-items-center rounded-md disabled:opacity-35"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+              <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
+              {THREE_TRANSITIONS.map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  onClick={() => {
+                    setStage3dKind(kind);
+                    setStage3dPlayTrigger((n) => n + 1);
+                    playTransitionSound({ isThreeD: true });
+                  }}
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+                    stage3dKind === kind ? "!bg-blue-600 !text-white" : ""
+                  }`}
+                >
+                  {formatTransitionLabel(kind)}
+                </button>
+              ))}
+              <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
+              <button
                 type="button"
                 onClick={() => {
-                  setStage3dKind(kind);
+                  const current = resolveThreeScene(
+                    stage3dSceneOverride ?? activeIncoming.threeScene,
+                  );
+                  const idx = THREE_SCENE_PRESETS.findIndex((p) => p.id === current.scenePreset);
+                  const nextPreset = THREE_SCENE_PRESETS[(idx + 1) % THREE_SCENE_PRESETS.length];
+                  setStage3dSceneOverride(nextPreset.config);
+                }}
+                title="Cycle 3D scene environment"
+                className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium"
+              >
+                <Palette className="size-3.5 text-blue-600" />
+                <span>
+                  {THREE_SCENE_PRESETS.find(
+                    (p) =>
+                      p.id ===
+                      resolveThreeScene(stage3dSceneOverride ?? activeIncoming.threeScene)
+                        .scenePreset,
+                  )?.label ?? "Scene"}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
                   setStage3dPlayTrigger((n) => n + 1);
                   playTransitionSound({ isThreeD: true });
                 }}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium ${
-                  stage3dKind === kind ? "!bg-blue-600 !text-white" : ""
-                }`}
+                title="Replay 3D transition (R)"
+                className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium"
               >
-                {formatTransitionLabel(kind)}
+                <Rotate3d className="size-3.5" />
+                Replay
               </button>
-            ))}
-            <span className={`mx-1 h-4 w-px ${editorDark ? "bg-slate-700" : "bg-slate-200"}`} />
+              <button
+                type="button"
+                onClick={() => setStage3dResetSignal((n) => n + 1)}
+                title="Reset 3D camera"
+                className="grid size-7 place-items-center rounded-md"
+              >
+                <RotateCcw className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setStage3dOpen(false)}
+                title="Exit 3D stage (3)"
+                className="grid size-7 place-items-center rounded-md"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
               onClick={() => {
-                const current = resolveThreeScene(stage3dSceneOverride ?? activeIncoming.threeScene);
-                const idx = THREE_SCENE_PRESETS.findIndex((p) => p.id === current.scenePreset);
-                const nextPreset = THREE_SCENE_PRESETS[(idx + 1) % THREE_SCENE_PRESETS.length];
-                setStage3dSceneOverride(nextPreset.config);
-              }}
-              title="Cycle 3D scene environment"
-              className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium"
-            >
-              <Palette className="size-3.5 text-blue-600" />
-              <span>
-                {THREE_SCENE_PRESETS.find(
-                  (p) =>
-                    p.id ===
-                    resolveThreeScene(stage3dSceneOverride ?? activeIncoming.threeScene).scenePreset,
-                )?.label ?? "Scene"}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
+                if (isThreeTransition(page.transition)) {
+                  setStage3dKind(page.transition);
+                }
+                setStage3dOpen(true);
                 setStage3dPlayTrigger((n) => n + 1);
-                playTransitionSound({ isThreeD: true });
               }}
-              title="Replay 3D transition (R)"
-              className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium"
+              title="Inspect & orbit slide in Three.js 3D Stage (Press 3)"
+              className="studio-dock flex h-8 items-center gap-1.5 px-2.5 text-xs font-medium"
             >
-              <Rotate3d className="size-3.5" />
-              Replay
+              <Box className="size-3.5 text-blue-600" />
+              <span>3D Stage</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setStage3dResetSignal((n) => n + 1)}
-              title="Reset 3D camera"
-              className="grid size-7 place-items-center rounded-md"
-            >
-              <RotateCcw className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setStage3dOpen(false)}
-              title="Exit 3D stage (3)"
-              className="grid size-7 place-items-center rounded-md"
-            >
-              <X className="size-3.5" />
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              if (isThreeTransition(page.transition)) {
-                setStage3dKind(page.transition);
-              }
-              setStage3dOpen(true);
-              setStage3dPlayTrigger((n) => n + 1);
-            }}
-            title="Inspect & orbit slide in Three.js 3D Stage (Press 3)"
-            className="studio-dock flex h-8 items-center gap-1.5 px-2.5 text-xs font-medium"
-          >
-            <Box className="size-3.5 text-blue-600" />
-            <span>3D Stage</span>
-          </button>
-        )}
+          )}
         </div>
       )}
 
@@ -1310,7 +1408,9 @@ export function PresentationMode() {
           } ${showThreeCanvas ? "" : "backdrop-blur-md"}`}
         >
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-xs font-semibold ${editorDark ? "text-blue-400" : "text-blue-600"}`}>
+            <span
+              className={`text-xs font-semibold ${editorDark ? "text-blue-400" : "text-blue-600"}`}
+            >
               Presenter · Slide {currentIndex + 1}/{pages.length}
             </span>
             <span className="font-mono text-sm font-semibold tabular-nums">
@@ -1355,7 +1455,9 @@ export function PresentationMode() {
           </div>
           <div className="flex gap-3">
             <div className="min-w-0 flex-1">
-              <span className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}>
+              <span
+                className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}
+              >
                 Notes
               </span>
               <div
@@ -1374,7 +1476,9 @@ export function PresentationMode() {
             </div>
             {nextSlideIdx !== null && pages[nextSlideIdx] && (
               <div className="w-40 shrink-0">
-                <span className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}>
+                <span
+                  className={`text-xs font-medium ${editorDark ? "text-slate-400" : "text-slate-500"}`}
+                >
                   Next
                 </span>
                 <SlideThumbnail
@@ -1397,37 +1501,68 @@ export function PresentationMode() {
   );
 }
 
-function transitionPreset(name: string | undefined) {
-  const ease = [0.16, 1, 0.3, 1] as const;
-  if (name === "slide-left") return { initial: { x: "100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
-  if (name === "slide-right") return { initial: { x: "-100%", opacity: 0 }, animate: { x: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
-  if (name === "slide-up") return { initial: { y: "100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
-  if (name === "slide-down") return { initial: { y: "-100%", opacity: 0 }, animate: { y: 0, opacity: 1 }, transition: { duration: 0.74, ease } };
-  if (name === "fade") return { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.56, ease } };
-  if (name === "zoom") return { initial: { opacity: 0.15, scale: 0.88 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.76, ease } };
+function transitionPreset(name: string | undefined, dir: 1 | -1 = 1, durationSec = 0.74) {
+  const ease = [0.22, 1, 0.36, 1] as const;
+  if (name === "fade")
+    return {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration: durationSec, ease },
+    };
   if (name === "tv") {
     return {
       // A CRT powers on from a bright horizontal line without enlarging the slide.
-      initial: { opacity: 0, clipPath: "inset(49.5% 0 49.5% 0)", filter: "brightness(3) saturate(1.8) contrast(1.25)" },
+      initial: {
+        opacity: 0,
+        clipPath: "inset(49.5% 0 49.5% 0)",
+        filter: "brightness(3) saturate(1.8) contrast(1.25)",
+      },
       animate: {
         opacity: [0, 1, 1, 1],
-        clipPath: ["inset(49.5% 0 49.5% 0)", "inset(10% 0 10% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
-        filter: ["brightness(3) saturate(1.8) contrast(1.25)", "brightness(1.6) saturate(1.35) contrast(1.1)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+        clipPath: [
+          "inset(49.5% 0 49.5% 0)",
+          "inset(10% 0 10% 0)",
+          "inset(0 0 0 0)",
+          "inset(0 0 0 0)",
+        ],
+        filter: [
+          "brightness(3) saturate(1.8) contrast(1.25)",
+          "brightness(1.6) saturate(1.35) contrast(1.1)",
+          "brightness(1) saturate(1) contrast(1)",
+          "brightness(1) saturate(1) contrast(1)",
+        ],
       },
-      transition: { duration: 0.84, times: [0, 0.34, 0.72, 1], ease },
+      transition: { duration: durationSec, times: [0, 0.34, 0.72, 1], ease },
     };
   }
   if (name === "neon") {
     return {
       // Digital signal lock: RGB-like horizontal jitter and scanline flashes, no zoom.
-      initial: { opacity: 0, x: 0, clipPath: "inset(0 0 100% 0)", filter: "brightness(2.4) saturate(2.8) contrast(1.5)" },
+      initial: {
+        opacity: 0,
+        x: 0,
+        clipPath: "inset(0 0 100% 0)",
+        filter: "brightness(2.4) saturate(2.8) contrast(1.5)",
+      },
       animate: {
         opacity: [0, 1, 1, 1, 1],
-        x: [0, -14, 11, -6, 0],
-        clipPath: ["inset(0 0 100% 0)", "inset(0 0 58% 0)", "inset(18% 0 28% 0)", "inset(0 0 0 0)", "inset(0 0 0 0)"],
-        filter: ["brightness(2.4) saturate(2.8) contrast(1.5)", "brightness(1.7) saturate(2.2) contrast(1.4)", "brightness(1.35) saturate(1.6) contrast(1.15)", "brightness(1) saturate(1) contrast(1)", "brightness(1) saturate(1) contrast(1)"],
+        x: [0, -14 * dir, 11 * dir, -6 * dir, 0],
+        clipPath: [
+          "inset(0 0 100% 0)",
+          "inset(0 0 58% 0)",
+          "inset(18% 0 28% 0)",
+          "inset(0 0 0 0)",
+          "inset(0 0 0 0)",
+        ],
+        filter: [
+          "brightness(2.4) saturate(2.8) contrast(1.5)",
+          "brightness(1.7) saturate(2.2) contrast(1.4)",
+          "brightness(1.35) saturate(1.6) contrast(1.15)",
+          "brightness(1) saturate(1) contrast(1)",
+          "brightness(1) saturate(1) contrast(1)",
+        ],
       },
-      transition: { duration: 0.78, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
+      transition: { duration: durationSec, times: [0, 0.2, 0.46, 0.75, 1], ease: "linear" },
     };
   }
   if (name === "prism") {
@@ -1441,7 +1576,7 @@ function transitionPreset(name: string | undefined) {
           "blur(0px) hue-rotate(0deg) saturate(1) brightness(1)",
         ],
       },
-      transition: { duration: 0.78, ease },
+      transition: { duration: durationSec, ease },
     };
   }
   if (name === "origami") {
@@ -1449,45 +1584,248 @@ function transitionPreset(name: string | undefined) {
       // Paper fold: the sheet unfolds from its top edge.
       initial: { opacity: 0, rotateX: -48, originY: 0, transformPerspective: 1400 },
       animate: { opacity: [0, 1, 1], rotateX: [-48, 3, 0] },
-      transition: { duration: 0.88, times: [0, 0.65, 1], ease },
+      transition: { duration: durationSec, times: [0, 0.65, 1], ease },
     };
   }
   if (name === "cube") {
     return {
-      initial: { opacity: 0, rotateY: -16, x: "2%", transformPerspective: 1400 },
-      animate: { opacity: [0, 1, 1], rotateY: [-16, 1.5, 0], x: ["2%", "-0.25%", "0%"], transformPerspective: 1400, originX: 0.5, originY: 0.5 },
-      transition: { duration: 0.9, times: [0, 0.68, 1], ease },
+      initial: { opacity: 0, rotateY: -22 * dir, x: `${3 * dir}%`, transformPerspective: 1400 },
+      animate: {
+        opacity: [0, 1, 1],
+        rotateY: [-22 * dir, 1.5 * dir, 0],
+        x: [`${3 * dir}%`, `${-0.25 * dir}%`, "0%"],
+        transformPerspective: 1400,
+        originX: 0.5,
+        originY: 0.5,
+      },
+      transition: { duration: durationSec, times: [0, 0.68, 1], ease },
     };
   }
   return { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } };
 }
 
-function TransitionFx({ name }: { name?: string }) {
+function TransitionFx({ name, durationSec = 0.7 }: { name?: string; durationSec?: number }) {
+  if (name === "glitch") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: durationSec, ease: "easeOut" }}
+      >
+        {[
+          { top: "14%", h: "8%", bg: "rgba(34,211,238,0.45)", x0: "-10%", x1: "8%" },
+          { top: "38%", h: "5%", bg: "rgba(244,63,94,0.42)", x0: "12%", x1: "-9%" },
+          { top: "63%", h: "11%", bg: "rgba(168,85,247,0.38)", x0: "-14%", x1: "6%" },
+          { top: "84%", h: "4%", bg: "rgba(56,189,248,0.5)", x0: "9%", x1: "-5%" },
+        ].map((band, idx) => (
+          <motion.div
+            key={band.top}
+            className="absolute left-0 w-full"
+            style={{
+              top: band.top,
+              height: band.h,
+              background: band.bg,
+              mixBlendMode: "screen",
+            }}
+            initial={{ x: band.x0, opacity: 0.9 }}
+            animate={{ x: [band.x0, band.x1, "0%"], opacity: [0.95, 0.55, 0] }}
+            transition={{ duration: durationSec * 0.85, delay: idx * 0.03, ease: "linear" }}
+          />
+        ))}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.12) 3px 4px)",
+            mixBlendMode: "overlay",
+          }}
+          animate={{ opacity: [0.9, 0.3, 0.7, 0] }}
+          transition={{ duration: durationSec * 0.9, ease: "linear" }}
+        />
+      </motion.div>
+    );
+  }
+  if (name === "glitch-rgb") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: durationSec, ease: "easeOut" }}
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(239,68,68,0.34), transparent 28%, transparent 72%, rgba(34,211,238,0.34))",
+            mixBlendMode: "screen",
+          }}
+          initial={{ x: "-4%", scaleX: 1.08 }}
+          animate={{
+            x: ["-4%", "3%", "-1.5%", "0%"],
+            scaleX: [1.08, 1.03, 1.01, 1],
+            opacity: [1, 0.75, 0.35, 0],
+          }}
+          transition={{ duration: durationSec * 0.95, ease: "easeOut" }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(90deg, rgba(244,63,94,0.16) 0 4px, rgba(34,211,238,0.16) 4px 8px, transparent 8px 24px)",
+            mixBlendMode: "screen",
+          }}
+          animate={{ opacity: [0.85, 0.25, 0.55, 0], x: [12, -10, 4, 0] }}
+          transition={{ duration: durationSec * 0.8, ease: "linear" }}
+        />
+      </motion.div>
+    );
+  }
+  if (name === "glitch-slice") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: durationSec, ease: "easeOut" }}
+      >
+        {[0, 1, 2, 3, 4].map((idx) => (
+          <motion.div
+            key={idx}
+            className="absolute left-[-5%] w-[110%]"
+            style={{
+              top: `${idx * 20}%`,
+              height: "20%",
+              borderTop: "2px solid rgba(56,189,248,0.55)",
+              borderBottom: "1px solid rgba(244,114,182,0.45)",
+              background:
+                idx % 2 === 0
+                  ? "linear-gradient(90deg, rgba(56,189,248,0.2), transparent 60%)"
+                  : "linear-gradient(270deg, rgba(244,114,182,0.2), transparent 60%)",
+              mixBlendMode: "screen",
+            }}
+            initial={{ x: idx % 2 === 0 ? "-14%" : "14%", opacity: 0.95 }}
+            animate={{ x: "0%", opacity: 0 }}
+            transition={{
+              duration: durationSec * 0.75,
+              delay: idx * 0.028,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          />
+        ))}
+      </motion.div>
+    );
+  }
+  if (name === "glitch-vhs") {
+    return (
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: durationSec, ease: "easeOut" }}
+      >
+        {/* Analog tracking noise band */}
+        <motion.div
+          className="absolute left-0 h-[14%] w-full"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent, rgba(255,255,255,0.45) 28%, rgba(56,189,248,0.3) 50%, rgba(244,63,94,0.25) 72%, transparent)",
+            mixBlendMode: "screen",
+          }}
+          initial={{ top: "-15%" }}
+          animate={{ top: ["-15%", "68%", "105%"] }}
+          transition={{ duration: durationSec * 0.92, ease: "linear" }}
+        />
+        {/* Scanline snow */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(to bottom, rgba(255,255,255,0.22) 0 2px, rgba(15,23,42,0.22) 2px 5px)",
+            mixBlendMode: "overlay",
+          }}
+          animate={{ opacity: [0.95, 0.4, 0.7, 0] }}
+          transition={{ duration: durationSec * 0.9, ease: "linear" }}
+        />
+      </motion.div>
+    );
+  }
   if (name === "tv") {
     return (
       <motion.div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-20"
         initial={{ opacity: 1, scaleY: 0.02, filter: "brightness(3)" }}
-        animate={{ opacity: [1, 0.95, 0.7, 0], scaleY: [0.02, 0.18, 1, 1], filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"] }}
-        transition={{ duration: 0.82, times: [0, 0.24, 0.68, 1], ease: "easeOut" }}
-        style={{ background: "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)", mixBlendMode: "screen", transformOrigin: "center" }}
+        animate={{
+          opacity: [1, 0.95, 0.7, 0],
+          scaleY: [0.02, 0.18, 1, 1],
+          filter: ["brightness(3)", "brightness(2)", "brightness(1.2)", "brightness(1)"],
+        }}
+        transition={{ duration: durationSec, times: [0, 0.24, 0.68, 1], ease: "easeOut" }}
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, rgba(255,255,255,.55) 0 2px, rgba(15,23,42,.18) 2px 6px)",
+          mixBlendMode: "screen",
+          transformOrigin: "center",
+        }}
       />
     );
   }
   if (name === "neon") {
     return (
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.78, ease: "linear" }}>
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: durationSec, ease: "linear" }}
+      >
         {["18%", "43%", "67%", "82%"].map((top, index) => (
-          <motion.div key={top} className="absolute left-[-8%] h-[3px] w-[116%]" style={{ top, background: index % 2 ? "#22d3ee" : "#f0abfc", boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`, mixBlendMode: "screen" }} initial={{ x: "-8%", scaleX: 0.3 }} animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }} transition={{ duration: 0.62, delay: index * 0.035, ease: "linear" }} />
+          <motion.div
+            key={top}
+            className="absolute left-[-8%] h-[3px] w-[116%]"
+            style={{
+              top,
+              background: index % 2 ? "#22d3ee" : "#f0abfc",
+              boxShadow: `0 0 18px ${index % 2 ? "#22d3ee" : "#f0abfc"}`,
+              mixBlendMode: "screen",
+            }}
+            initial={{ x: "-8%", scaleX: 0.3 }}
+            animate={{ x: ["-8%", "6%", "-3%", "0%"], scaleX: [0.3, 1.15, 0.65, 1] }}
+            transition={{ duration: durationSec * 0.8, delay: index * 0.035, ease: "linear" }}
+          />
         ))}
-        <motion.div className="absolute inset-0" style={{ background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)" }} animate={{ opacity: [1, 0.2, 1, 0] }} transition={{ duration: 0.7, ease: "linear" }} />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              "repeating-linear-gradient(0deg, transparent 0 5px, rgba(34,211,238,.14) 6px 7px)",
+          }}
+          animate={{ opacity: [1, 0.2, 1, 0] }}
+          transition={{ duration: durationSec * 0.9, ease: "linear" }}
+        />
       </motion.div>
     );
   }
   if (name === "cube") {
     return (
-      <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70" initial={{ opacity: 1, rotateY: -14, scale: 0.96 }} animate={{ opacity: 0, rotateY: 0, scale: 1 }} transition={{ duration: 0.86, ease: "easeOut" }} style={{ transformOrigin: "center", transformStyle: "preserve-3d", boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)" }} />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 border-[10px] border-amber-300/70"
+        initial={{ opacity: 1, rotateY: -14, scale: 0.96 }}
+        animate={{ opacity: 0, rotateY: 0, scale: 1 }}
+        transition={{ duration: durationSec, ease: "easeOut" }}
+        style={{
+          transformOrigin: "center",
+          transformStyle: "preserve-3d",
+          boxShadow: "inset 0 0 0 999px rgba(15,23,42,.08), 0 0 40px rgba(251,191,36,.38)",
+        }}
+      />
     );
   }
   return null;
@@ -1515,10 +1853,13 @@ function MorphItem({
     const from = prevGeom
       ? `translate(${prevGeom.x - el.x}px, ${prevGeom.y - el.y}px) scale(${prevGeom.w / (el.width || 1)}, ${prevGeom.h / (el.height || 1)}) rotate(${prevGeom.rotation - el.rotation}deg)`
       : "scale(0.92)";
-    const animation = node.animate([
-      { transform: from, opacity: prevGeom ? 1 : 0 },
-      { transform: "none", opacity: 1 },
-    ], { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" });
+    const animation = node.animate(
+      [
+        { transform: from, opacity: prevGeom ? 1 : 0 },
+        { transform: "none", opacity: 1 },
+      ],
+      { duration: 620, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "both" },
+    );
     return () => animation.cancel();
   }, [el.id, el.x, el.y, el.width, el.height, el.rotation, prevGeom]);
 
@@ -1537,7 +1878,6 @@ function MorphItem({
       }}
     >
       {children}
-
     </div>
   );
 }

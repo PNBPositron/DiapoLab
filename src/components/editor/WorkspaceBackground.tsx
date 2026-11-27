@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, RotateCcw, Trash2, Upload } from "lucide-react";
-import {
-  DEFAULT_WORKSPACE_BG,
-  useSettings,
-  type WorkspaceBgId,
-} from "@/store/settings";
+import { DEFAULT_WORKSPACE_BG, useSettings, type WorkspaceBgId } from "@/store/settings";
 import { prepareImage } from "@/lib/image-assets";
 import { ColorPickerPopover } from "./ColorPicker";
 
@@ -69,8 +65,7 @@ export function WorkspaceBackgroundLayer() {
   const editorDark = useSettings((s) => s.editorDark);
   const [imgFailed, setImgFailed] = useState(false);
 
-  const imageSrc =
-    workspaceBg === "custom-image" && workspaceBgImage ? workspaceBgImage : null;
+  const imageSrc = workspaceBg === "custom-image" && workspaceBgImage ? workspaceBgImage : null;
 
   useEffect(() => {
     setImgFailed(false);
@@ -96,89 +91,103 @@ export function WorkspaceBackgroundLayer() {
           }}
         />
       )}
-      <div className="absolute inset-0 transition-opacity duration-150" style={{ opacity: opacityFraction }}>
-      {imageSrc && !imgFailed ? (
-        <img
-          key={imageSrc}
-          src={imageSrc}
-          alt=""
-          onError={() => setImgFailed(true)}
-          className="h-full w-full object-cover"
-        />
-      ) : workspaceBg === "aurora" ? (
-        <>
+      <div
+        className="absolute inset-0 transition-opacity duration-150"
+        style={{ opacity: opacityFraction }}
+      >
+        {imageSrc && !imgFailed ? (
+          <img
+            key={imageSrc}
+            src={imageSrc}
+            alt=""
+            onError={() => setImgFailed(true)}
+            className="h-full w-full object-cover"
+          />
+        ) : workspaceBg === "aurora" ? (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                background: editorDark
+                  ? "radial-gradient(62% 56% at 88% 12%, rgba(79, 139, 255, 0.16) 0%, transparent 70%), radial-gradient(54% 58% at 10% 88%, rgba(99, 102, 241, 0.14) 0%, transparent 68%), linear-gradient(180deg, #0b1220 0%, #0d1526 100%)"
+                  : "radial-gradient(62% 56% at 88% 12%, rgba(212, 205, 255, 0.58) 0%, rgba(212, 205, 255, 0) 70%), radial-gradient(54% 58% at 10% 88%, rgba(191, 219, 254, 0.72) 0%, rgba(191, 219, 254, 0) 68%), radial-gradient(48% 45% at 14% 12%, rgba(224, 238, 255, 0.85) 0%, rgba(224, 238, 255, 0) 65%), linear-gradient(135deg, #f3f7ff 0%, #f8faff 48%, #f2f5ff 100%)",
+              }}
+            />
+            {!editorDark && (
+              <svg
+                className="absolute bottom-0 left-0 h-[44%] w-[52%] opacity-75"
+                viewBox="0 0 720 420"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M-40 240 C 120 190, 230 330, 420 360 C 560 382, 650 398, 720 420 L -40 420 Z"
+                  fill="url(#ed-wave-1)"
+                />
+                <path d="M-40 315 C 140 270, 260 365, 480 420 L -40 420 Z" fill="url(#ed-wave-2)" />
+                <defs>
+                  <linearGradient
+                    id="ed-wave-1"
+                    x1="0"
+                    y1="210"
+                    x2="540"
+                    y2="420"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop offset="0" stopColor="#dbeafe" stopOpacity="0.82" />
+                    <stop offset="1" stopColor="#eff6ff" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient
+                    id="ed-wave-2"
+                    x1="0"
+                    y1="290"
+                    x2="400"
+                    y2="420"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop offset="0" stopColor="#bfdbfe" stopOpacity="0.65" />
+                    <stop offset="1" stopColor="#e0e7ff" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            )}
+          </>
+        ) : workspaceBg === "warm-paper" ? (
           <div
             className="absolute inset-0"
             style={{
               background: editorDark
-                ? "radial-gradient(62% 56% at 88% 12%, rgba(79, 139, 255, 0.16) 0%, transparent 70%), radial-gradient(54% 58% at 10% 88%, rgba(99, 102, 241, 0.14) 0%, transparent 68%), linear-gradient(180deg, #0b1220 0%, #0d1526 100%)"
-                : "radial-gradient(62% 56% at 88% 12%, rgba(212, 205, 255, 0.58) 0%, rgba(212, 205, 255, 0) 70%), radial-gradient(54% 58% at 10% 88%, rgba(191, 219, 254, 0.72) 0%, rgba(191, 219, 254, 0) 68%), radial-gradient(48% 45% at 14% 12%, rgba(224, 238, 255, 0.85) 0%, rgba(224, 238, 255, 0) 65%), linear-gradient(135deg, #f3f7ff 0%, #f8faff 48%, #f2f5ff 100%)",
+                ? "linear-gradient(145deg, #141210 0%, #1c1815 100%)"
+                : "radial-gradient(65% 60% at 85% 15%, rgba(253, 230, 196, 0.45), transparent 70%), linear-gradient(145deg, #fbf8f3 0%, #f1e9dc 100%)",
             }}
           />
-          {!editorDark && (
-            <svg
-              className="absolute bottom-0 left-0 h-[44%] w-[52%] opacity-75"
-              viewBox="0 0 720 420"
-              fill="none"
-              preserveAspectRatio="none"
-            >
-              <path
-                d="M-40 240 C 120 190, 230 330, 420 360 C 560 382, 650 398, 720 420 L -40 420 Z"
-                fill="url(#ed-wave-1)"
-              />
-              <path
-                d="M-40 315 C 140 270, 260 365, 480 420 L -40 420 Z"
-                fill="url(#ed-wave-2)"
-              />
-              <defs>
-                <linearGradient id="ed-wave-1" x1="0" y1="210" x2="540" y2="420" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stopColor="#dbeafe" stopOpacity="0.82" />
-                  <stop offset="1" stopColor="#eff6ff" stopOpacity="0" />
-                </linearGradient>
-                <linearGradient id="ed-wave-2" x1="0" y1="290" x2="400" y2="420" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stopColor="#bfdbfe" stopOpacity="0.65" />
-                  <stop offset="1" stopColor="#e0e7ff" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
-          )}
-        </>
-      ) : workspaceBg === "warm-paper" ? (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: editorDark
-              ? "linear-gradient(145deg, #141210 0%, #1c1815 100%)"
-              : "radial-gradient(65% 60% at 85% 15%, rgba(253, 230, 196, 0.45), transparent 70%), linear-gradient(145deg, #fbf8f3 0%, #f1e9dc 100%)",
-          }}
-        />
-      ) : workspaceBg === "sage-mist" ? (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: editorDark
-              ? "radial-gradient(65% 60% at 85% 15%, rgba(16, 185, 129, 0.12), transparent 70%), linear-gradient(135deg, #0b1615 0%, #0d1722 100%)"
-              : "radial-gradient(65% 60% at 85% 15%, rgba(167, 243, 208, 0.42), transparent 70%), radial-gradient(60% 60% at 15% 85%, rgba(186, 230, 253, 0.55), transparent 70%), linear-gradient(135deg, #f3faf7 0%, #f2f8fc 100%)",
-          }}
-        />
-      ) : workspaceBg === "custom-color" ? (
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: workspaceBgColor,
-            backgroundImage: editorDark
-              ? "linear-gradient(180deg, rgba(7, 11, 22, 0.55), rgba(7, 11, 22, 0.65))"
-              : "radial-gradient(65% 60% at 82% 14%, rgba(255, 255, 255, 0.35), transparent 70%)",
-          }}
-        />
-      ) : (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: editorDark ? "#0b1220" : "#ffffff",
-          }}
-        />
-      )}
+        ) : workspaceBg === "sage-mist" ? (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: editorDark
+                ? "radial-gradient(65% 60% at 85% 15%, rgba(16, 185, 129, 0.12), transparent 70%), linear-gradient(135deg, #0b1615 0%, #0d1722 100%)"
+                : "radial-gradient(65% 60% at 85% 15%, rgba(167, 243, 208, 0.42), transparent 70%), radial-gradient(60% 60% at 15% 85%, rgba(186, 230, 253, 0.55), transparent 70%), linear-gradient(135deg, #f3faf7 0%, #f2f8fc 100%)",
+            }}
+          />
+        ) : workspaceBg === "custom-color" ? (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: workspaceBgColor,
+              backgroundImage: editorDark
+                ? "linear-gradient(180deg, rgba(7, 11, 22, 0.55), rgba(7, 11, 22, 0.65))"
+                : "radial-gradient(65% 60% at 82% 14%, rgba(255, 255, 255, 0.35), transparent 70%)",
+            }}
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: editorDark ? "#0b1220" : "#ffffff",
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -245,7 +254,9 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
                   </span>
                 )}
               </div>
-              <div className={`mt-1.5 truncate px-0.5 text-[11px] font-semibold ${active ? "text-blue-700" : "text-slate-700"}`}>
+              <div
+                className={`mt-1.5 truncate px-0.5 text-[11px] font-semibold ${active ? "text-blue-700" : "text-slate-700"}`}
+              >
                 {preset.label}
               </div>
             </button>
@@ -288,7 +299,9 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
               style={{ backgroundColor: workspaceBgColor }}
             />
             <span className="whitespace-nowrap">Color</span>
-            <span className="font-mono text-[10px] uppercase text-slate-400">{workspaceBgColor}</span>
+            <span className="font-mono text-[10px] uppercase text-slate-400">
+              {workspaceBgColor}
+            </span>
           </button>
         </ColorPickerPopover>
 
@@ -302,7 +315,11 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
               : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
           }`}
         >
-          {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
+          {uploading ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Upload className="size-3.5" />
+          )}
           <span>{workspaceBgImage ? "Replace image" : "Upload image"}</span>
         </button>
 
@@ -354,7 +371,9 @@ export function WorkspaceBackgroundPicker({ compact = false }: { compact?: boole
       {workspaceBgImage && (
         <div
           className={`flex items-center justify-between gap-2 rounded-lg border p-2 ${
-            workspaceBg === "custom-image" ? "border-blue-200 bg-blue-50/40" : "border-slate-200 bg-slate-50/70"
+            workspaceBg === "custom-image"
+              ? "border-blue-200 bg-blue-50/40"
+              : "border-slate-200 bg-slate-50/70"
           }`}
         >
           <button

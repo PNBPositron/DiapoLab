@@ -99,7 +99,11 @@ function scaleBox(box: ItemBox, factor: number) {
   box.aabbH = next.aabbH;
 }
 
-function boxesOverlap(a: { left: number; top: number; aabbW: number; aabbH: number }, b: { left: number; top: number; aabbW: number; aabbH: number }, minGap = 0): boolean {
+function boxesOverlap(
+  a: { left: number; top: number; aabbW: number; aabbH: number },
+  b: { left: number; top: number; aabbW: number; aabbH: number },
+  minGap = 0,
+): boolean {
   return (
     a.left < b.left + b.aabbW + minGap - 0.01 &&
     a.left + a.aabbW + minGap - 0.01 > b.left &&
@@ -121,7 +125,9 @@ export function countElementOverlaps(elements: AnyElement[]): number {
 }
 
 function sortReadingOrder(boxes: ItemBox[]): ItemBox[] {
-  const byY = [...boxes].sort((a, b) => a.top + a.aabbH / 2 - (b.top + b.aabbH / 2) || a.left - b.left);
+  const byY = [...boxes].sort(
+    (a, b) => a.top + a.aabbH / 2 - (b.top + b.aabbH / 2) || a.left - b.left,
+  );
   const rows: ItemBox[][] = [];
   for (const b of byY) {
     const cy = b.top + b.aabbH / 2;
@@ -151,7 +157,10 @@ function computeTargetRegion(
   canvasH: number,
   options: ArrangeOptions,
 ): Rect {
-  const safeMargin = Math.max(0, Math.min(options.margin, Math.floor(Math.min(canvasW, canvasH) * 0.35)));
+  const safeMargin = Math.max(
+    0,
+    Math.min(options.margin, Math.floor(Math.min(canvasW, canvasH) * 0.35)),
+  );
   const canvasRegion: Rect = {
     x: safeMargin,
     y: safeMargin,
@@ -169,8 +178,12 @@ function computeTargetRegion(
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
 
-  const w = options.keepInBounds ? Math.min(canvasRegion.w, Math.max(selW, Math.min(canvasRegion.w, selW * 1.15))) : selW;
-  const h = options.keepInBounds ? Math.min(canvasRegion.h, Math.max(selH, Math.min(canvasRegion.h, selH * 1.15))) : selH;
+  const w = options.keepInBounds
+    ? Math.min(canvasRegion.w, Math.max(selW, Math.min(canvasRegion.w, selW * 1.15)))
+    : selW;
+  const h = options.keepInBounds
+    ? Math.min(canvasRegion.h, Math.max(selH, Math.min(canvasRegion.h, selH * 1.15)))
+    : selH;
   let x = cx - w / 2;
   let y = cy - h / 2;
   if (options.keepInBounds) {
@@ -219,7 +232,13 @@ function clampRegionOffset(
   return { ox, oy };
 }
 
-function layoutGrid(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: number, options: ArrangeOptions) {
+function layoutGrid(
+  boxes: ItemBox[],
+  region: Rect,
+  canvasW: number,
+  canvasH: number,
+  options: ArrangeOptions,
+) {
   const ordered = sortReadingOrder(boxes);
   const n = ordered.length;
   const gap = Math.max(0, options.gap);
@@ -251,7 +270,8 @@ function layoutGrid(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: nu
     // Slight preference for multi-column over a giant 1-col stack on wide slides when n >= 3
     const singleTrackPenalty = n >= 3 && (cols === 1 || rows === 1) && n > 4 ? 0.15 : 0;
 
-    const score = avgScale * 2.2 + minScale * 0.8 - emptyPenalty - aspectPenalty - singleTrackPenalty;
+    const score =
+      avgScale * 2.2 + minScale * 0.8 - emptyPenalty - aspectPenalty - singleTrackPenalty;
     if (score > bestScore) {
       bestScore = score;
       bestCols = cols;
@@ -374,7 +394,12 @@ function layoutShelves(
 
   if (singleW <= region.w) {
     shelves = [ordered];
-  } else if (forceSingleTrackIfClose && options.allowResize && n <= 5 && region.w / singleW >= 0.55) {
+  } else if (
+    forceSingleTrackIfClose &&
+    options.allowResize &&
+    n <= 5 &&
+    region.w / singleW >= 0.55
+  ) {
     const scale = (region.w - gap * (n - 1)) / ordered.reduce((s, b) => s + b.aabbW, 0);
     for (const b of ordered) scaleBox(b, scale);
     shelves = [ordered];
@@ -393,7 +418,9 @@ function layoutShelves(
   // If total height of shelves overflows region.h and allowResize is on, scale down cleanly
   const measureShelves = () => {
     const rowH = shelves.map((row) => Math.max(...row.map((b) => b.aabbH)));
-    const rowW = shelves.map((row) => row.reduce((s, b) => s + b.aabbW, 0) + gap * (row.length - 1));
+    const rowW = shelves.map(
+      (row) => row.reduce((s, b) => s + b.aabbW, 0) + gap * (row.length - 1),
+    );
     const totalH = rowH.reduce((s, v) => s + v, 0) + gap * Math.max(0, shelves.length - 1);
     const totalW = Math.max(...rowW, 0);
     return { rowH, rowW, totalW, totalH };
@@ -444,14 +471,26 @@ function layoutShelves(
   });
 }
 
-function layoutRow(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: number, options: ArrangeOptions) {
+function layoutRow(
+  boxes: ItemBox[],
+  region: Rect,
+  canvasW: number,
+  canvasH: number,
+  options: ArrangeOptions,
+) {
   const ordered = [...boxes].sort(
     (a, b) => a.left + a.aabbW / 2 - (b.left + b.aabbW / 2) || a.top - b.top,
   );
   layoutShelves(ordered, region, canvasW, canvasH, options, true);
 }
 
-function layoutColumn(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: number, options: ArrangeOptions) {
+function layoutColumn(
+  boxes: ItemBox[],
+  region: Rect,
+  canvasW: number,
+  canvasH: number,
+  options: ArrangeOptions,
+) {
   // Transpose into shelf layout along vertical axis, then transpose back!
   const ordered = [...boxes].sort(
     (a, b) => a.top + a.aabbH / 2 - (b.top + b.aabbH / 2) || a.left - b.left,
@@ -650,8 +689,17 @@ function resolveCollisions(
   return true;
 }
 
-function layoutAlignTidy(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: number, options: ArrangeOptions) {
-  const safeMargin = Math.max(0, Math.min(options.margin, Math.floor(Math.min(canvasW, canvasH) * 0.35)));
+function layoutAlignTidy(
+  boxes: ItemBox[],
+  region: Rect,
+  canvasW: number,
+  canvasH: number,
+  options: ArrangeOptions,
+) {
+  const safeMargin = Math.max(
+    0,
+    Math.min(options.margin, Math.floor(Math.min(canvasW, canvasH) * 0.35)),
+  );
   const bounds: Rect =
     options.anchor === "canvas"
       ? {
@@ -664,10 +712,18 @@ function layoutAlignTidy(boxes: ItemBox[], region: Rect, canvasW: number, canvas
 
   const snapThresh = Math.max(24, options.gap);
   const xKeys = boxes.map((b) =>
-    options.align === "start" ? b.left : options.align === "end" ? b.left + b.aabbW : b.left + b.aabbW / 2,
+    options.align === "start"
+      ? b.left
+      : options.align === "end"
+        ? b.left + b.aabbW
+        : b.left + b.aabbW / 2,
   );
   const yKeys = boxes.map((b) =>
-    options.align === "start" ? b.top : options.align === "end" ? b.top + b.aabbH : b.top + b.aabbH / 2,
+    options.align === "start"
+      ? b.top
+      : options.align === "end"
+        ? b.top + b.aabbH
+        : b.top + b.aabbH / 2,
   );
   const snappedX = snapAxis(xKeys, snapThresh);
   const snappedY = snapAxis(yKeys, snapThresh);
@@ -703,7 +759,13 @@ function layoutAlignTidy(boxes: ItemBox[], region: Rect, canvasW: number, canvas
   }
 }
 
-function layoutSmart(boxes: ItemBox[], region: Rect, canvasW: number, canvasH: number, options: ArrangeOptions) {
+function layoutSmart(
+  boxes: ItemBox[],
+  region: Rect,
+  canvasW: number,
+  canvasH: number,
+  options: ArrangeOptions,
+) {
   const n = boxes.length;
   const gap = Math.max(0, options.gap);
 

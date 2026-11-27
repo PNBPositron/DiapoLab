@@ -49,7 +49,8 @@ import {
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 
-type CommandGroup = "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Add-ons" | "Links";
+type CommandGroup =
+  "Recent" | "Actions" | "Insert" | "Shortcuts" | "Features" | "Add-ons" | "Links";
 
 type Command = {
   id: string;
@@ -198,7 +199,10 @@ export function CommandPalette({
         label: "Group selection",
         group: "Actions",
         icon: <Group className="size-4" />,
-        hint: store.selectedIds.length > 1 ? store.selectedIds.length + " elements selected" : "select 2+ elements first (shift+click)",
+        hint:
+          store.selectedIds.length > 1
+            ? store.selectedIds.length + " elements selected"
+            : "select 2+ elements first (shift+click)",
         keywords: "group bind block together move",
         run: () => store.groupSelected(),
       },
@@ -556,7 +560,8 @@ export function CommandPalette({
   if (!open) return null;
 
   const runCommand = (c: Command) => {
-    if (c.href) window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
+    if (c.href)
+      window.open(c.href, c.href.startsWith("/") ? "_self" : "_blank", "noopener,noreferrer");
     else c.run?.();
     if (c.run) saveRecent(c.id);
     onOpenChange(false);
@@ -619,7 +624,9 @@ export function CommandPalette({
               <Search className="size-5 text-slate-300" />
               <div className="text-center">
                 <p className="text-xs font-semibold text-slate-800">No results for “{query}”</p>
-                <p className="mt-1 text-xs text-slate-500">Try “insert”, “paint”, “add-ons”, “present”…</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Try “insert”, “paint”, “add-ons”, “present”…
+                </p>
               </div>
             </div>
           ) : (
@@ -653,13 +660,13 @@ export function CommandPalette({
                       {c.icon}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className={`block truncate text-xs font-medium ${active ? "text-slate-900" : "text-slate-800"}`}>
+                      <span
+                        className={`block truncate text-xs font-medium ${active ? "text-slate-900" : "text-slate-800"}`}
+                      >
                         {highlightLabel(c.label, query)}
                       </span>
                       {c.hint && (
-                        <span className="block truncate text-[11px] text-slate-500">
-                          {c.hint}
-                        </span>
+                        <span className="block truncate text-[11px] text-slate-500">{c.hint}</span>
                       )}
                     </span>
                     {c.href && (
@@ -683,9 +690,7 @@ export function CommandPalette({
                         ))}
                       </span>
                     )}
-                    {active && (
-                      <CornerDownLeft className="size-3.5 shrink-0 text-blue-600" />
-                    )}
+                    {active && <CornerDownLeft className="size-3.5 shrink-0 text-blue-600" />}
                   </button>
                 </div>
               );
@@ -713,4 +718,3 @@ export function CommandPalette({
     </div>
   );
 }
-

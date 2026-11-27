@@ -14,12 +14,7 @@ import type {
   UiKind,
   UiStyle,
 } from "@/store/editor";
-import {
-  UI_STYLE_THEMES,
-  chartStylePatch,
-  quizStylePatch,
-  tableStylePatch,
-} from "@/store/editor";
+import { UI_STYLE_THEMES, chartStylePatch, quizStylePatch, tableStylePatch } from "@/store/editor";
 
 const W = 1920;
 const H = 1080;
@@ -445,11 +440,19 @@ const CYBER_SYSTEMS: Page[] = [
         fontFamily: "Space Grotesk",
         color: "#ecfeff",
       }),
-      t("cyb-1-sub", "Sub-12ms global packet verification across 64 edge PoPs.", 140, 590, 1050, 90, {
-        fontSize: 32,
-        fontWeight: 400,
-        color: "#67e8f9",
-      }),
+      t(
+        "cyb-1-sub",
+        "Sub-12ms global packet verification across 64 edge PoPs.",
+        140,
+        590,
+        1050,
+        90,
+        {
+          fontSize: 32,
+          fontWeight: 400,
+          color: "#67e8f9",
+        },
+      ),
     ],
     "fade",
   ),
@@ -463,7 +466,7 @@ const CYBER_SYSTEMS: Page[] = [
       }),
       ui("cyb-2-code", "code", "cyber", 120, 210, 840, 680, {
         title: "verifyEdgeNode.ts",
-        body: 'export async function verifyNode(pkt: Packet) {\n  const sig = await ed25519.verify(pkt.hash);\n  if (!sig.valid) throw new PolicyReject();\n  return dispatchToMesh(pkt.region, sig.ttl);\n}',
+        body: "export async function verifyNode(pkt: Packet) {\n  const sig = await ed25519.verify(pkt.hash);\n  if (!sig.valid) throw new PolicyReject();\n  return dispatchToMesh(pkt.region, sig.ttl);\n}",
       }),
       ui("cyb-2-term", "terminal", "cyber", 1000, 210, 800, 680, {
         title: "mesh-ctl — live cluster",
@@ -757,7 +760,12 @@ const NEO_BRUTAL_STUDIO: Page[] = [
         980,
         660,
         "Which visual direction hits hardest for Q3?",
-        ["High-contrast Neobrutal", "Frosted Liquid Glass", "Editorial Serif Grid", "Cyber Telemetry"],
+        [
+          "High-contrast Neobrutal",
+          "Frosted Liquid Glass",
+          "Editorial Serif Grid",
+          "Cyber Telemetry",
+        ],
       ),
       ui("neo-4-rt", "rating", "neobrutalist", 1160, 220, 640, 320, {
         title: "Creative Energy",
@@ -916,10 +924,18 @@ const WORKSHOP_INTERACTIVE: Page[] = [
         fontWeight: 800,
         color: "#0f172a",
       }),
-      t("wrk-1-s", "Interactive facilitation deck with live timer, clock, quiz & feedback poll.", 140, 410, 1020, 100, {
-        fontSize: 32,
-        color: "#334155",
-      }),
+      t(
+        "wrk-1-s",
+        "Interactive facilitation deck with live timer, clock, quiz & feedback poll.",
+        140,
+        410,
+        1020,
+        100,
+        {
+          fontSize: 32,
+          color: "#334155",
+        },
+      ),
       ui("wrk-1-clk", "clock", "nordic", 1260, 200, 520, 340, {
         title: "Session Clock",
         body: "Real-time",
@@ -1014,10 +1030,18 @@ const TECH_RFC: Page[] = [
         fontFamily: "JetBrains Mono",
         color: "#e0f2fe",
       }),
-      t("rfc-1-s", "Deterministic CRDT snapshots + compact binary replication", 140, 540, 1280, 90, {
-        fontSize: 32,
-        color: "#93c5fd",
-      }),
+      t(
+        "rfc-1-s",
+        "Deterministic CRDT snapshots + compact binary replication",
+        140,
+        540,
+        1280,
+        90,
+        {
+          fontSize: 32,
+          color: "#93c5fd",
+        },
+      ),
     ],
     "fade",
   ),
@@ -1069,7 +1093,10 @@ const TECH_RFC: Page[] = [
     "rfc-4",
     "#0b2550",
     [
-      t("rfc-4-h", "Security & Rollback Readiness", 140, 90, 1200, 90, { fontSize: 56, color: "#e0f2fe" }),
+      t("rfc-4-h", "Security & Rollback Readiness", 140, 90, 1200, 90, {
+        fontSize: 56,
+        color: "#e0f2fe",
+      }),
       ui("rfc-4-l", "list", "blueprint", 140, 230, 1640, 600, {
         title: "Production Sign-Off",
         items: [
@@ -1093,10 +1120,18 @@ const EMERALD_ECO: Page[] = [
         fontSize: 88,
         color: "#ecfdf5",
       }),
-      t("eco-1-s", "Measurable decarbonization across packaging, logistics, and energy.", 140, 580, 1180, 90, {
-        fontSize: 32,
-        color: "#a7f3d0",
-      }),
+      t(
+        "eco-1-s",
+        "Measurable decarbonization across packaging, logistics, and energy.",
+        140,
+        580,
+        1180,
+        90,
+        {
+          fontSize: 32,
+          color: "#a7f3d0",
+        },
+      ),
     ],
     "fade",
   ),
@@ -1104,7 +1139,10 @@ const EMERALD_ECO: Page[] = [
     "eco-2",
     "#06221b",
     [
-      t("eco-2-h", "Verified Impact Metrics", 140, 95, 1100, 90, { fontSize: 56, color: "#ecfdf5" }),
+      t("eco-2-h", "Verified Impact Metrics", 140, 95, 1100, 90, {
+        fontSize: 56,
+        color: "#ecfdf5",
+      }),
       ui("eco-2-s1", "stat", "emerald", 140, 240, 510, 300, {
         title: "Emissions Cut",
         value: 46,
@@ -1363,10 +1401,18 @@ const SUNSET_BRAND: Page[] = [
         fontFamily: "Playfair Display",
         color: "#2a140d",
       }),
-      t("sun-1-s", "Reimagining hospitality experiences across 18 coastal destinations.", 140, 580, 1180, 90, {
-        fontSize: 32,
-        color: "#7c2d12",
-      }),
+      t(
+        "sun-1-s",
+        "Reimagining hospitality experiences across 18 coastal destinations.",
+        140,
+        580,
+        1180,
+        90,
+        {
+          fontSize: 32,
+          color: "#7c2d12",
+        },
+      ),
     ],
     "fade",
   ),
@@ -1437,10 +1483,18 @@ const VAPOR_SYNTH: Page[] = [
         fontFamily: "Orbitron",
         color: "#fdf4ff",
       }),
-      t("vap-1-s", "Polyphonic analog modeling meets real-time WebAudio routing.", 140, 590, 1200, 90, {
-        fontSize: 32,
-        color: "#f5d0fe",
-      }),
+      t(
+        "vap-1-s",
+        "Polyphonic analog modeling meets real-time WebAudio routing.",
+        140,
+        590,
+        1200,
+        90,
+        {
+          fontSize: 32,
+          color: "#f5d0fe",
+        },
+      ),
     ],
     "fade",
   ),
@@ -1503,10 +1557,18 @@ const GLASS_IDENTITY: Page[] = [
         fontSize: 82,
         color: "#0f172a",
       }),
-      t("gid-1-s", "Color tokens, spacing rhythm, motion curves, and interactive components.", 140, 460, 1180, 90, {
-        fontSize: 32,
-        color: "#475569",
-      }),
+      t(
+        "gid-1-s",
+        "Color tokens, spacing rhythm, motion curves, and interactive components.",
+        140,
+        460,
+        1180,
+        90,
+        {
+          fontSize: 32,
+          color: "#475569",
+        },
+      ),
       ui("gid-1-card", "profile", "glass", 140, 610, 640, 220, {
         title: "Brand Systems Team",
         body: "Version 3.4 · Updated Quarterly",
@@ -1910,7 +1972,11 @@ export const SLIDE_LAYOUT_PRESETS: SlideLayoutPreset[] = [
           }),
           ui(`lcmp-2-${Date.now()}`, "list", style, 990, 230, 790, 650, {
             title: "Future State",
-            items: ["Automated live syncing", "Real-time shared dashboards", "Instant customer validation"],
+            items: [
+              "Automated live syncing",
+              "Real-time shared dashboards",
+              "Instant customer validation",
+            ],
           }),
         ],
         "slide",
@@ -2033,16 +2099,32 @@ export const SLIDE_LAYOUT_PRESETS: SlideLayoutPreset[] = [
             fontSize: 84,
             color: "#ffffff",
           }),
-          t(`lend-s-${Date.now()}`, "Scan to open the shared deck or reach out directly.", 140, 450, 1100, 90, {
-            fontSize: 32,
-            color: "#94a3b8",
-          }),
+          t(
+            `lend-s-${Date.now()}`,
+            "Scan to open the shared deck or reach out directly.",
+            140,
+            450,
+            1100,
+            90,
+            {
+              fontSize: 32,
+              color: "#94a3b8",
+            },
+          ),
           btn(`lend-b-${Date.now()}`, "Back to Cover", 140, 620, 320, 82, {
             action: "first-slide",
             bgColor: theme.accent,
             fgColor: theme.onAccent ?? "#ffffff",
           }),
-          qr(`lend-qr-${Date.now()}`, "https://diapolab.vercel.app", 1440, 300, 320, "#0f172a", "#ffffff"),
+          qr(
+            `lend-qr-${Date.now()}`,
+            "https://diapolab.vercel.app",
+            1440,
+            300,
+            320,
+            "#0f172a",
+            "#ffffff",
+          ),
         ],
         "fade",
       );

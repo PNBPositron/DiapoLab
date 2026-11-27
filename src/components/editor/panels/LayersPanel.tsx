@@ -342,7 +342,8 @@ export function LayersPanel() {
 
       {layers.length > 0 && (
         <p className="text-[10px] text-slate-400">
-          Tip: hold <span className="font-medium text-slate-500">Shift</span> and click to multi-select layers.
+          Tip: hold <span className="font-medium text-slate-500">Shift</span> and click to
+          multi-select layers.
         </p>
       )}
     </div>

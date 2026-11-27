@@ -81,13 +81,7 @@ const MODE_OPTIONS: Array<{
 ];
 
 export function AutoArrangePanel() {
-  const {
-    elements,
-    selectedId,
-    selectedIds,
-    selectMany,
-    autoArrangeSelected,
-  } = useEditor();
+  const { elements, selectedId, selectedIds, selectMany, autoArrangeSelected } = useEditor();
 
   const [mode, setMode] = useState<ArrangeMode>(DEFAULT_ARRANGE_OPTIONS.mode);
   const [align, setAlign] = useState<ArrangeAlign>(DEFAULT_ARRANGE_OPTIONS.align);
@@ -128,9 +122,7 @@ export function AutoArrangePanel() {
           <div className="flex items-center gap-2 min-w-0">
             <span
               className={`grid size-7 shrink-0 place-items-center rounded-xl ${
-                canArrangeSelected
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-200/80 text-slate-500"
+                canArrangeSelected ? "bg-blue-600 text-white" : "bg-slate-200/80 text-slate-500"
               }`}
             >
               <MousePointerClick className="size-3.5" />
@@ -203,9 +195,7 @@ export function AutoArrangePanel() {
         >
           <span
             className={`grid size-7 shrink-0 place-items-center rounded-xl ${
-              mode === "align-tidy"
-                ? "bg-blue-600 text-white"
-                : "bg-slate-100 text-slate-500"
+              mode === "align-tidy" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"
             }`}
           >
             <Sparkles className="size-3.5" />
@@ -222,9 +212,7 @@ export function AutoArrangePanel() {
       {/* Alignment & target region */}
       <div className="space-y-2.5">
         <div className="space-y-1.5">
-          <div className="text-[10px] font-semibold tracking-wide text-slate-500">
-            Alignment
-          </div>
+          <div className="text-[10px] font-semibold tracking-wide text-slate-500">Alignment</div>
           <SegmentedControl
             label="Element alignment"
             value={align}
@@ -238,9 +226,7 @@ export function AutoArrangePanel() {
         </div>
 
         <div className="space-y-1.5">
-          <div className="text-[10px] font-semibold tracking-wide text-slate-500">
-            Target area
-          </div>
+          <div className="text-[10px] font-semibold tracking-wide text-slate-500">Target area</div>
           <SegmentedControl
             label="Target area"
             value={anchor}
@@ -309,7 +295,9 @@ export function AutoArrangePanel() {
             <Shrink className="size-3.5" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className={`block text-[11px] font-semibold ${allowResize ? "text-blue-700" : "text-slate-700"}`}>
+            <span
+              className={`block text-[11px] font-semibold ${allowResize ? "text-blue-700" : "text-slate-700"}`}
+            >
               Auto-fit oversized items
             </span>
             <span className="block text-[10px] text-slate-400">

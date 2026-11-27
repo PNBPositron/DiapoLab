@@ -56,7 +56,13 @@ const SHAPE_CATEGORIES: ShapeCategory[] = [
       { kind: "arrow_down", label: "Arrow Down", tags: "direction drop", w: 180, h: 340 },
       { kind: "double_arrow", label: "Double Arrow", tags: "sync bidirectional", w: 380, h: 170 },
       { kind: "chevron", label: "Chevron", tags: "pointer flow" },
-      { kind: "process_step", label: "Process Step", tags: "timeline stage chevron", w: 360, h: 170 },
+      {
+        kind: "process_step",
+        label: "Process Step",
+        tags: "timeline stage chevron",
+        w: 360,
+        h: 170,
+      },
       { kind: "curved_arrow", label: "Curved Arrow", tags: "turn redirect" },
       { kind: "pin", label: "Map Pin", tags: "location marker", w: 240, h: 320 },
     ],
@@ -219,10 +225,9 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
       fill: isStrokeOnly ? "transparent" : activeStyle.fill,
       stroke:
         isStrokeOnly && (activeStyle.stroke === "transparent" || activeStyle.strokeWidth <= 0)
-          ? activeStyle.gradient?.from ?? activeStyle.fill
+          ? (activeStyle.gradient?.from ?? activeStyle.fill)
           : activeStyle.stroke,
-      strokeWidth:
-        isStrokeOnly && activeStyle.strokeWidth <= 0 ? 6 : activeStyle.strokeWidth,
+      strokeWidth: isStrokeOnly && activeStyle.strokeWidth <= 0 ? 6 : activeStyle.strokeWidth,
       ...(activeStyle.gradient ? { gradient: activeStyle.gradient } : {}),
     };
     add(newShape(item.kind, overrides));
@@ -258,11 +263,7 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
       {/* Live insert style switcher */}
       <div className="space-y-1.5">
         <div className="panel-section-label">Insert style</div>
-        <div
-          className="grid grid-cols-5 gap-1.5"
-          role="group"
-          aria-label="Shape insert style"
-        >
+        <div className="grid grid-cols-5 gap-1.5" role="group" aria-label="Shape insert style">
           {styles.map((s) => {
             const active = s.id === activeStyle.id;
             const swatchBg = s.gradient
@@ -324,13 +325,7 @@ export function ShapesPanel({ embedded = false }: { embedded?: boolean }) {
   );
 }
 
-function ShapePreview({
-  kind,
-  stylePreset,
-}: {
-  kind: ShapeKind;
-  stylePreset: StylePreset;
-}) {
+function ShapePreview({ kind, stylePreset }: { kind: ShapeKind; stylePreset: StylePreset }) {
   const uid = useId().replace(/:/g, "");
   const gradId = `sp-g-${uid}`;
   const hasGradient = Boolean(stylePreset.gradient);
@@ -428,10 +423,7 @@ function ShapePreview({
     return (
       <svg viewBox="0 0 100 100" aria-hidden="true">
         {gradDefs}
-        <polygon
-          points="6,36 60,36 60,12 94,50 60,88 60,64 6,64"
-          {...shapeProps}
-        />
+        <polygon points="6,36 60,36 60,12 94,50 60,88 60,64 6,64" {...shapeProps} />
       </svg>
     );
   }

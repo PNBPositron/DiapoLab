@@ -16,6 +16,19 @@ import { useAuthInit } from "@/hooks/use-auth";
 import { useSettings } from "@/store/settings";
 import { usePlugins } from "@/lib/plugins";
 import { loadCustomUiTheme } from "@/store/editor";
+import {
+  SITE_URL,
+  SITE_NAME,
+  DEFAULT_OG_IMAGE_URL,
+  DEFAULT_OG_IMAGE_ALT,
+  DEFAULT_OG_IMAGE_WIDTH,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  absoluteUrl,
+} from "@/lib/seo";
+
+const ROOT_TITLE = "DiapoLab – Open-Source Presentation & Slide Editor";
+const ROOT_DESCRIPTION =
+  "Design, animate, and present multipage slide decks right in your browser with DiapoLab. Import PowerPoint files and export to PDF, PPTX, HTML, or MP4.";
 
 function NotFoundComponent() {
   return (
@@ -79,21 +92,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DiapoLab-The Next-Generation Open-Source Presentation Editor" },
-      { name: "description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
-      { name: "author", content: "DiapoLab" },
+      { title: ROOT_TITLE },
+      { name: "description", content: ROOT_DESCRIPTION },
+      { name: "author", content: SITE_NAME },
+      { name: "application-name", content: SITE_NAME },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#f5f4f1" },
-      { property: "og:title", content: "DiapoLab — Design workspace" },
-      { property: "og:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
-      { property: "og:site_name", content: "DiapoLab" },
+      { property: "og:locale", content: "en_US" },
+      { property: "og:site_name", content: SITE_NAME },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: ROOT_TITLE },
+      { property: "og:description", content: ROOT_DESCRIPTION },
+      { property: "og:image", content: DEFAULT_OG_IMAGE_URL },
+      { property: "og:image:alt", content: DEFAULT_OG_IMAGE_ALT },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: DEFAULT_OG_IMAGE_WIDTH },
+      { property: "og:image:height", content: DEFAULT_OG_IMAGE_HEIGHT },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
       { name: "twitter:site", content: "@diapolab" },
-      { name: "twitter:title", content: "DiapoLab — Design workspace" },
-      { name: "twitter:description", content: "DiapoLab is a focused workspace for creating polished multipage presentations." },
+      { name: "twitter:title", content: ROOT_TITLE },
+      { name: "twitter:description", content: ROOT_DESCRIPTION },
+      { name: "twitter:image", content: DEFAULT_OG_IMAGE_URL },
+      { name: "twitter:image:alt", content: DEFAULT_OG_IMAGE_ALT },
     ],
     links: [
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
@@ -118,23 +138,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              name: "DiapoLab",
-              url: "https://diapolab.vercel.app",
-              logo: "https://diapolab.vercel.app/favicon.svg",
+              name: SITE_NAME,
+              url: SITE_URL,
+              logo: absoluteUrl("/favicon.svg"),
+              sameAs: ["https://github.com/PNBPositron/DiapoLab"],
             },
             {
               "@type": "WebSite",
-              name: "DiapoLab",
-              url: "https://diapolab.vercel.app",
-            },
-            {
-              "@type": "WebApplication",
-              name: "DiapoLab",
-              url: "https://diapolab.vercel.app",
-              applicationCategory: "DesignApplication",
-              operatingSystem: "Web",
-              description: "Open-source editor for creating, presenting and sharing multipage decks.",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+              name: SITE_NAME,
+              url: SITE_URL,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: `${SITE_URL}/marketplace?q={search_term_string}`,
+                },
+                "query-input": "required name=search_term_string",
+              },
             },
           ],
         }),

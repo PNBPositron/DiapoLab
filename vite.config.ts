@@ -29,12 +29,25 @@ export default defineConfig(({ mode }) => {
     process.env.SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  const appUrl =
+    env.VITE_APP_URL || env.APP_URL || process.env.VITE_APP_URL || process.env.APP_URL || "";
+
   return {
     vite: {
       server: {
         host: "0.0.0.0",
         port: 3000,
         allowedHosts: true,
+      },
+      build: {
+        rollupOptions: {
+          onwarn(warning, warn) {
+            if (warning.code === "MODULE_LEVEL_DIRECTIVE" && /use client/i.test(warning.message)) {
+              return;
+            }
+            warn(warning);
+          },
+        },
       },
       // Keep TanStack Router in the dependency bundle so HMR never requests
       // stale deep-import URLs from an older router build.
@@ -50,14 +63,11 @@ export default defineConfig(({ mode }) => {
     },
     envPrefix: ["VITE_", "NEXT_PUBLIC_", "SUPABASE_"],
     define: {
+      "import.meta.env.VITE_APP_URL": JSON.stringify(appUrl),
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl ?? ""),
-      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey ?? "",
-      ),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey ?? ""),
       "import.meta.env.SUPABASE_URL": JSON.stringify(supabaseUrl ?? ""),
-      "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        supabasePublishableKey ?? "",
-      ),
+      "import.meta.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey ?? ""),
     },
   };
 });

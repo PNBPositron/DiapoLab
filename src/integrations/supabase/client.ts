@@ -9,9 +9,16 @@ import { brokeredPreviewStorage } from "./previewAuthStorage";
 // request because another surface briefly owns the browser lock.
 let authLock = Promise.resolve();
 
-function serializeAuth<T>(_name: string, _acquireTimeout: number, fn: () => Promise<T>): Promise<T> {
+function serializeAuth<T>(
+  _name: string,
+  _acquireTimeout: number,
+  fn: () => Promise<T>,
+): Promise<T> {
   const run = authLock.then(fn, fn);
-  authLock = run.then(() => undefined, () => undefined);
+  authLock = run.then(
+    () => undefined,
+    () => undefined,
+  );
   return run;
 }
 
@@ -79,7 +86,10 @@ function createMockSupabaseClient(): ReturnType<typeof createClient<Database>> {
       getUser: async () => ({ data: { user: null }, error: null }),
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       signOut: async () => ({ error: null }),
-      signInWithPassword: async () => ({ data: { user: null, session: null }, error: notConfiguredError }),
+      signInWithPassword: async () => ({
+        data: { user: null, session: null },
+        error: notConfiguredError,
+      }),
       signUp: async () => ({ data: { user: null, session: null }, error: notConfiguredError }),
       setSession: async () => ({ data: { user: null, session: null }, error: null }),
       exchangeCodeForSession: async () => ({ data: { user: null, session: null }, error: null }),

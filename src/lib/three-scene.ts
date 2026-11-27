@@ -210,9 +210,7 @@ export function resolveThreeScene(
   patch?: Partial<ThreeSceneConfig> | null,
   fallbackLight = false,
 ): ThreeSceneConfig {
-  const base = fallbackLight
-    ? getPresetSceneConfig("minimal")
-    : DEFAULT_THREE_SCENE;
+  const base = fallbackLight ? getPresetSceneConfig("minimal") : DEFAULT_THREE_SCENE;
   if (!patch) return { ...base };
   const presetBase = patch.scenePreset ? getPresetSceneConfig(patch.scenePreset) : base;
   return {

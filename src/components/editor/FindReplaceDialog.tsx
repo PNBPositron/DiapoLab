@@ -109,7 +109,9 @@ export function FindReplaceDialog() {
   return (
     <div
       className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 p-4"
-      onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) setOpen(false);
+      }}
     >
       <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl animate-in fade-in zoom-in-95">
         <div className="flex items-center gap-3">
@@ -117,7 +119,9 @@ export function FindReplaceDialog() {
             <Search className="size-4" />
           </span>
           <div className="flex flex-col">
-            <h2 className="font-display text-sm font-semibold tracking-tight text-slate-900">Find &amp; replace</h2>
+            <h2 className="font-display text-sm font-semibold tracking-tight text-slate-900">
+              Find &amp; replace
+            </h2>
             <p className="text-xs text-slate-500">Searches every slide of the deck</p>
           </div>
           <button
@@ -135,7 +139,10 @@ export function FindReplaceDialog() {
             <input
               ref={searchRef}
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setDone(null); }}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setDone(null);
+              }}
               placeholder="Find in deck…"
               className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
             />
@@ -143,18 +150,37 @@ export function FindReplaceDialog() {
               onClick={() => setMatchCase((v) => !v)}
               title={matchCase ? "Match case: on" : "Match case: off"}
               className={`shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-semibold transition-colors ${
-                matchCase ? "bg-blue-600 text-white" : "bg-slate-200/80 text-slate-600 hover:bg-slate-200"
+                matchCase
+                  ? "bg-blue-600 text-white"
+                  : "bg-slate-200/80 text-slate-600 hover:bg-slate-200"
               }`}
             >
               Aa
             </button>
           </div>
           <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50/70 px-3 transition-colors focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/15">
-            <svg className="size-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2 13.2 9.8M15 2l-4 4 2 2"/><path d="m16 20 2 2 4-4"/><path d="M3 3l14 14"/></svg>
+            <svg
+              className="size-3.5 shrink-0 text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 2 13.2 9.8M15 2l-4 4 2 2" />
+              <path d="m16 20 2 2 4-4" />
+              <path d="M3 3l14 14" />
+            </svg>
             <input
               value={replacement}
-              onChange={(e) => { setReplacement(e.target.value); setDone(null); }}
-              onKeyDown={(e) => { if (e.key === "Enter") replaceAll(); }}
+              onChange={(e) => {
+                setReplacement(e.target.value);
+                setDone(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") replaceAll();
+              }}
               placeholder="Replace with…"
               className="min-w-0 flex-1 bg-transparent py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
             />
@@ -196,7 +222,9 @@ export function FindReplaceDialog() {
                 </span>
                 <span className="truncate">
                   {h.before}
-                  <mark className="rounded-sm bg-blue-100 px-0.5 font-medium text-blue-900">{h.match}</mark>
+                  <mark className="rounded-sm bg-blue-100 px-0.5 font-medium text-blue-900">
+                    {h.match}
+                  </mark>
                   {h.after}
                 </span>
               </button>

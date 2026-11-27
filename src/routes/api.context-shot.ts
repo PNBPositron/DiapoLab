@@ -9,7 +9,10 @@ export const Route = createFileRoute("/api/context-shot")({
         const raw = typeof body?.url === "string" ? body.url.trim() : "";
         const check = validateExternalUrl(raw);
         if (!check.url) {
-          return Response.json({ error: check.error ?? "Invalid URL." }, { status: check.status ?? 400 });
+          return Response.json(
+            { error: check.error ?? "Invalid URL." },
+            { status: check.status ?? 400 },
+          );
         }
         const target = check.url;
         const toDataUrl = (bytes: ArrayBuffer, mime: string) =>
@@ -40,10 +43,9 @@ export const Route = createFileRoute("/api/context-shot")({
 
         // 2) thum.io render service (keyless fallback).
         try {
-          const res = await fetch(
-            "https://image.thum.io/check/width/1280/" + target.toString(),
-            { signal: AbortSignal.timeout(20000) },
-          );
+          const res = await fetch("https://image.thum.io/check/width/1280/" + target.toString(), {
+            signal: AbortSignal.timeout(20000),
+          });
           const mime = res.headers.get("content-type") ?? "image/jpeg";
           if (res.ok && mime.startsWith("image/")) {
             const bytes = await res.arrayBuffer();
@@ -74,7 +76,8 @@ export const Route = createFileRoute("/api/context-shot")({
               (typeof payload.lighthouseResult?.fullPageScreenshot?.screenshot?.data === "string"
                 ? payload.lighthouseResult.fullPageScreenshot.screenshot.data
                 : undefined) ??
-              (typeof payload.lighthouseResult?.audits?.["final-screenshot"]?.details?.data === "string"
+              (typeof payload.lighthouseResult?.audits?.["final-screenshot"]?.details?.data ===
+              "string"
                 ? payload.lighthouseResult.audits["final-screenshot"].details?.data
                 : undefined);
             if (base64 && base64.length > 1000) {

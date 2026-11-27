@@ -5,7 +5,10 @@ export const Route = createFileRoute("/home")({
   head: () => ({
     meta: [
       { title: "DiapoLab — The visual workspace for expressive decks" },
-      { name: "description", content: "Design, search, version, and publish expressive presentations with DiapoLab." },
+      {
+        name: "description",
+        content: "Design, search, version, and publish expressive presentations with DiapoLab.",
+      },
       { name: "robots", content: "noindex, follow" },
     ],
   }),
@@ -14,4 +17,3 @@ export const Route = createFileRoute("/home")({
 function HomePage() {
   return <Navigate to="/" />;
 }
-

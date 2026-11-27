@@ -3,9 +3,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEditor, type Page } from "@/store/editor";
-import { PresentationMode, requestPresentationFullscreen } from "@/components/editor/PresentationMode";
+import {
+  PresentationMode,
+  requestPresentationFullscreen,
+} from "@/components/editor/PresentationMode";
 import { SlideThumbnail } from "@/components/editor/SlideThumbnail";
 import { formatTransitionLabel, isThreeTransition } from "@/lib/motion-catalog";
+import { buildBreadcrumbJsonLd, buildPageHead, absoluteUrl, SITE_NAME } from "@/lib/seo";
 import {
   Check,
   ChevronLeft,
@@ -26,26 +30,86 @@ import {
   Sun,
 } from "lucide-react";
 
+type SharedDeckHeadMeta = {
+  isPrivate: boolean;
+  name?: string;
+  slideCount?: number;
+  authorName?: string | null;
+};
+
 export const Route = createFileRoute("/t/$id")({
   component: SharedTemplate,
   validateSearch: (search: Record<string, unknown>) => ({
     share: typeof search.share === "string" ? search.share : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Shared deck — DiapoLab" },
-      {
-        name: "description",
-        content: "View a deck shared privately or publicly from DiapoLab, a focused presentation workspace.",
-      },
-      { property: "og:title", content: "Shared deck — DiapoLab" },
-      { property: "og:description", content: "View a shared presentation deck on DiapoLab." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-    ],
-  }),
+  loaderDeps: ({ search }) => ({ share: search.share }),
+  loader: async ({ params, deps }): Promise<SharedDeckHeadMeta> => {
+    if (deps.share) return { isPrivate: true };
+    try {
+      const { data } = await supabase
+        .from("public_templates")
+        .select("name, pages, author_name")
+        .eq("id", params.id)
+        .maybeSingle();
+      if (!data) return { isPrivate: false };
+      const slides = Array.isArray(data.pages) ? data.pages.length : undefined;
+      return {
+        isPrivate: false,
+        name: data.name ?? undefined,
+        slideCount: slides,
+        authorName: (data as { author_name?: string | null }).author_name ?? null,
+      };
+    } catch {
+      return { isPrivate: false };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const meta = loaderData as SharedDeckHeadMeta | undefined;
+    if (meta?.isPrivate) {
+      return buildPageHead({
+        title: "Private Shared Deck – DiapoLab",
+        description:
+          "View a privately shared presentation deck in DiapoLab's distraction-free stage viewer.",
+        path: `/t/${params.id}`,
+        robots: "noindex, nofollow",
+        canonical: false,
+        twitterCard: "summary",
+      });
+    }
+    const deckName = meta?.name?.trim();
+    const slideInfo =
+      typeof meta?.slideCount === "number" && meta.slideCount > 0
+        ? ` (${meta.slideCount} slide${meta.slideCount === 1 ? "" : "s"})`
+        : "";
+    const title = deckName
+      ? `${deckName.slice(0, 38)} – DiapoLab Presentation`
+      : "Shared Presentation Deck – DiapoLab";
+    const description = deckName
+      ? `Explore "${deckName}"${slideInfo} on DiapoLab. Inspect every slide, present in fullscreen, or open a copy in the editor.`
+      : "Explore a shared multipage presentation deck on DiapoLab. Inspect every slide, present in fullscreen, or open a copy in the editor.";
+
+    return buildPageHead({
+      title,
+      description,
+      path: `/t/${params.id}`,
+      ogType: "article",
+      jsonLd: [
+        {
+          "@type": "CreativeWork",
+          name: deckName || "DiapoLab Shared Presentation",
+          description,
+          url: absoluteUrl(`/t/${params.id}`),
+          ...(meta?.authorName ? { author: { "@type": "Person", name: meta.authorName } } : {}),
+          publisher: { "@type": "Organization", name: SITE_NAME },
+        },
+        buildBreadcrumbJsonLd([
+          { name: "DiapoLab", path: "/" },
+          { name: "Marketplace", path: "/marketplace" },
+          { name: deckName || "Shared deck", path: `/t/${params.id}` },
+        ]),
+      ],
+    });
+  },
 });
 
 function formatAspectRatio(w: number, h: number): string {
@@ -193,7 +257,10 @@ function SharedTemplate() {
     if (!ready || error || presenting) return;
     const onKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+      ) {
         return;
       }
       if (e.key === "ArrowRight" || e.key === "PageDown") {
@@ -376,7 +443,9 @@ function SharedTemplate() {
                 </h1>
                 <div className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500">
                   <span className="inline-flex items-center gap-1.5 font-medium text-slate-700">
-                    {isPrivateShare && <Lock className="size-3.5 text-slate-500" aria-hidden="true" />}
+                    {isPrivateShare && (
+                      <Lock className="size-3.5 text-slate-500" aria-hidden="true" />
+                    )}
                     {isPrivateShare ? "Private link" : "Public template"}
                   </span>
                   <span aria-hidden="true">·</span>
@@ -398,7 +467,11 @@ function SharedTemplate() {
                   onClick={handleCopyLink}
                   className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                 >
-                  {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5 text-slate-500" />}
+                  {copied ? (
+                    <Check className="size-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="size-3.5 text-slate-500" />
+                  )}
                   <span>{copied ? "Link copied" : "Copy link"}</span>
                 </button>
                 {!isPrivateShare && (
@@ -501,7 +574,11 @@ function SharedTemplate() {
                                 : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                             }`}
                           >
-                            {autoAdvance ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+                            {autoAdvance ? (
+                              <Pause className="size-3.5" />
+                            ) : (
+                              <Play className="size-3.5" />
+                            )}
                             <span>{autoAdvance ? "Pause preview" : "Auto-advance"}</span>
                           </button>
                         )}
@@ -608,7 +685,13 @@ function SharedTemplate() {
                                   />
                                 </div>
                                 <div className="mt-1.5 flex items-center justify-between px-0.5 text-[11px] tabular-nums">
-                                  <span className={selected ? "font-semibold text-blue-600" : "font-mono text-slate-500"}>
+                                  <span
+                                    className={
+                                      selected
+                                        ? "font-semibold text-blue-600"
+                                        : "font-mono text-slate-500"
+                                    }
+                                  >
                                     {String(visIdx + 1).padStart(2, "0")}
                                   </span>
                                   {page.transition && page.transition !== "none" && (
@@ -629,7 +712,8 @@ function SharedTemplate() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5">
                       <span className="text-xs font-medium text-slate-600 tabular-nums">
-                        All {visibleSlides.length} {visibleSlides.length === 1 ? "slide" : "slides"} · Click to inspect or double-click to present
+                        All {visibleSlides.length} {visibleSlides.length === 1 ? "slide" : "slides"}{" "}
+                        · Click to inspect or double-click to present
                       </span>
                       <div className="flex items-center gap-0.5 rounded-lg bg-slate-100 p-1">
                         <button
@@ -766,7 +850,11 @@ function SharedTemplate() {
                     onClick={handleCopyLink}
                     className="flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition-colors hover:bg-slate-50"
                   >
-                    {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5 text-slate-500" />}
+                    {copied ? (
+                      <Check className="size-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="size-3.5 text-slate-500" />
+                    )}
                     <span>{copied ? "Link copied to clipboard" : "Copy share link"}</span>
                   </button>
                   {!isPrivateShare && (

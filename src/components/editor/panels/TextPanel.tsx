@@ -235,75 +235,144 @@ const FONT_PAIRINGS: FontPairing[] = [
     id: "editorial-serif",
     name: "Editorial Contrast",
     vibe: "Magazine · Keynote",
-    heading: { family: "Playfair Display", weight: 800, text: "Designing With Intention", size: 74 },
-    body: { family: "Inter", weight: 400, text: "Pair crisp high-contrast serif headlines with clean sans body copy.", size: 28 },
+    heading: {
+      family: "Playfair Display",
+      weight: 800,
+      text: "Designing With Intention",
+      size: 74,
+    },
+    body: {
+      family: "Inter",
+      weight: 400,
+      text: "Pair crisp high-contrast serif headlines with clean sans body copy.",
+      size: 28,
+    },
   },
   {
     id: "modern-product",
     name: "Modern SaaS",
     vibe: "Clean · Product",
     heading: { family: "Plus Jakarta Sans", weight: 800, text: "Ship Faster Together", size: 72 },
-    body: { family: "DM Sans", weight: 400, text: "Geometric clarity built for customer metrics, dashboards, and roadmaps.", size: 28 },
+    body: {
+      family: "DM Sans",
+      weight: 400,
+      text: "Geometric clarity built for customer metrics, dashboards, and roadmaps.",
+      size: 28,
+    },
   },
   {
     id: "expressive-studio",
     name: "Creative Studio",
     vibe: "Expressive · Bold",
     heading: { family: "Syne", weight: 800, text: "BRAND SYSTEMS 2026", size: 70 },
-    body: { family: "Space Grotesk", weight: 400, text: "Wide neo-grotesque titles paired with structured technical paragraphs.", size: 28 },
+    body: {
+      family: "Space Grotesk",
+      weight: 400,
+      text: "Wide neo-grotesque titles paired with structured technical paragraphs.",
+      size: 28,
+    },
   },
   {
     id: "warm-craft",
     name: "Warm Heritage",
     vibe: "Literary · Craft",
     heading: { family: "Fraunces", weight: 800, text: "Storytelling at Scale", size: 74 },
-    body: { family: "Work Sans", weight: 400, text: "Soft organic curves balanced against neutral geometric legibility.", size: 28 },
+    body: {
+      family: "Work Sans",
+      weight: 400,
+      text: "Soft organic curves balanced against neutral geometric legibility.",
+      size: 28,
+    },
   },
   {
     id: "swiss-poster",
     name: "Swiss Poster",
     vibe: "Minimal · Grid",
-    heading: { family: "Bricolage Grotesque", weight: 800, text: "Architecture of Clarity", size: 72 },
-    body: { family: "IBM Plex Mono", weight: 500, text: "01 // Structured typography for design reviews and technical briefs.", size: 24 },
+    heading: {
+      family: "Bricolage Grotesque",
+      weight: 800,
+      text: "Architecture of Clarity",
+      size: 72,
+    },
+    body: {
+      family: "IBM Plex Mono",
+      weight: 500,
+      text: "01 // Structured typography for design reviews and technical briefs.",
+      size: 24,
+    },
   },
   {
     id: "futurist-tech",
     name: "Cyber Telemetry",
     vibe: "Futuristic · Hardware",
     heading: { family: "Orbitron", weight: 800, text: "NEXT-GEN TELEMETRY", size: 64 },
-    body: { family: "JetBrains Mono", weight: 500, text: "Real-time node status and low-latency stream diagnostics.", size: 24 },
+    body: {
+      family: "JetBrains Mono",
+      weight: 500,
+      text: "Real-time node status and low-latency stream diagnostics.",
+      size: 24,
+    },
   },
   {
     id: "luxury-monograph",
     name: "Luxury Monograph",
     vibe: "Fine Print · High Fashion",
-    heading: { family: "Cormorant Garamond", weight: 700, text: "Timeless Form & Detail", size: 80 },
-    body: { family: "Manrope", weight: 400, text: "Delicate editorial serifs anchored by modern sans proportions.", size: 26 },
+    heading: {
+      family: "Cormorant Garamond",
+      weight: 700,
+      text: "Timeless Form & Detail",
+      size: 80,
+    },
+    body: {
+      family: "Manrope",
+      weight: 400,
+      text: "Delicate editorial serifs anchored by modern sans proportions.",
+      size: 26,
+    },
   },
   {
     id: "bold-condensed",
     name: "Campaign Impact",
     vibe: "Athletic · Launch",
     heading: { family: "Anton", weight: 400, text: "MAKE EVERY SECOND COUNT", size: 76 },
-    body: { family: "Outfit", weight: 400, text: "High-density condensed headlines with friendly rounded subtext.", size: 28 },
+    body: {
+      family: "Outfit",
+      weight: 400,
+      text: "High-density condensed headlines with friendly rounded subtext.",
+      size: 28,
+    },
   },
   {
     id: "journal-essay",
     name: "Longform Brief",
     vibe: "Research · Memo",
     heading: { family: "Instrument Serif", weight: 400, text: "Quarterly Field Notes", size: 78 },
-    body: { family: "Newsreader", weight: 400, text: "Reader-first serif hierarchy tailored for narrative slides and reports.", size: 28 },
+    body: {
+      family: "Newsreader",
+      weight: 400,
+      text: "Reader-first serif hierarchy tailored for narrative slides and reports.",
+      size: 28,
+    },
   },
   {
     id: "handwritten-note",
     name: "Workshop Sketch",
     vibe: "Playful · Ideation",
     heading: { family: "Permanent Marker", weight: 400, text: "Sprint Brainstorm!", size: 68 },
-    body: { family: "Nunito", weight: 500, text: "Approachable whiteboard energy for workshops and team retros.", size: 28 },
+    body: {
+      family: "Nunito",
+      weight: 500,
+      text: "Approachable whiteboard energy for workshops and team retros.",
+      size: 28,
+    },
   },
 ];
 
-const CATEGORIES = ["All", "Saved", ...Array.from(new Set([...FONTS.map((f) => f.category), "Custom"]))];
+const CATEGORIES = [
+  "All",
+  "Saved",
+  ...Array.from(new Set([...FONTS.map((f) => f.category), "Custom"])),
+];
 const FAV_KEY = "diapolab.favorite-fonts";
 const RECENT_KEY = "diapolab.recent-fonts";
 
@@ -404,7 +473,10 @@ function FontSpecimenRow({
 
       <div className="flex shrink-0 items-center gap-1">
         {isActive && (
-          <span className="grid size-5 place-items-center rounded bg-blue-600 text-white" title="Current font">
+          <span
+            className="grid size-5 place-items-center rounded bg-blue-600 text-white"
+            title="Current font"
+          >
             <Check className="size-3" />
           </span>
         )}
@@ -579,9 +651,7 @@ export function TextPanel() {
             ? favSet.has(font.family)
             : font.category === activeCategory;
       const matchesSearch =
-        !q ||
-        font.family.toLowerCase().includes(q) ||
-        font.category.toLowerCase().includes(q);
+        !q || font.family.toLowerCase().includes(q) || font.category.toLowerCase().includes(q);
       return matchesCategory && matchesSearch;
     });
   }, [allFonts, search, activeCategory, favSet]);
@@ -747,9 +817,7 @@ export function TextPanel() {
                     key={rf}
                     type="button"
                     onClick={() =>
-                      hasSelection && clickApplies
-                        ? applyFontToSelection(rf)
-                        : insertFontBox(rf)
+                      hasSelection && clickApplies ? applyFontToSelection(rf) : insertFontBox(rf)
                     }
                     className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-700 transition hover:border-blue-400 hover:text-blue-700"
                     style={{ fontFamily: `"${rf}", sans-serif` }}
@@ -824,13 +892,19 @@ export function TextPanel() {
               </div>
               <div
                 className="truncate text-[17px] leading-tight text-slate-900"
-                style={{ fontFamily: `"${pair.heading.family}", sans-serif`, fontWeight: pair.heading.weight }}
+                style={{
+                  fontFamily: `"${pair.heading.family}", sans-serif`,
+                  fontWeight: pair.heading.weight,
+                }}
               >
                 {pair.heading.text}
               </div>
               <div
                 className="line-clamp-2 text-[11px] leading-snug text-slate-500"
-                style={{ fontFamily: `"${pair.body.family}", sans-serif`, fontWeight: pair.body.weight }}
+                style={{
+                  fontFamily: `"${pair.body.family}", sans-serif`,
+                  fontWeight: pair.body.weight,
+                }}
               >
                 {pair.body.text}
               </div>

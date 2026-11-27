@@ -1,28 +1,37 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ShieldCheck, BookOpen, User, HardDrive, CloudCog, Cpu, Globe2, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowLeft,
+  ShieldCheck,
+  BookOpen,
+  User,
+  HardDrive,
+  CloudCog,
+  Cpu,
+  Globe2,
+  SlidersHorizontal,
+} from "lucide-react";
+import { buildBreadcrumbJsonLd, buildPageHead, absoluteUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacypolicy")({
   component: PrivacyPolicy,
-  head: () => ({
-    meta: [
-      { title: "Privacy Policy — DiapoLab" },
-      {
-        name: "description",
-        content:
-          "How DiapoLab handles your designs, account data, AI prompts and published templates.",
-      },
-      { property: "og:title", content: "Privacy Policy — DiapoLab" },
-      {
-        property: "og:description",
-        content: "How DiapoLab handles your designs, account data and AI prompts.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/privacypolicy" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "Privacy Policy – DiapoLab Data & Account Handling",
+      description:
+        "Read how DiapoLab handles saved designs, local browser storage, account authentication, AI prompts, and published public templates.",
+      path: "/privacypolicy",
+      jsonLd: [
+        {
+          "@type": "WebPage",
+          name: "Privacy Policy – DiapoLab",
+          url: absoluteUrl("/privacypolicy"),
+        },
+        buildBreadcrumbJsonLd([
+          { name: "DiapoLab", path: "/" },
+          { name: "Privacy Policy", path: "/privacypolicy" },
+        ]),
+      ],
+    }),
 });
 
 const PP_SECTIONS = [
@@ -36,7 +45,12 @@ const PP_SECTIONS = [
 
 function PrivacyPolicy() {
   return (
-    <LegalShell title="Privacy Policy" subtitle="Last updated · October 2026" icon={<ShieldCheck className="size-5" />} kicker="Documentation">
+    <LegalShell
+      title="Privacy Policy"
+      subtitle="Last updated · October 2026"
+      icon={<ShieldCheck className="size-5" />}
+      kicker="Documentation"
+    >
       <Section title="What we store" icon={<CloudCog className="size-4" />}>
         <p>
           Designs you save, templates and themes you publish, and the likes you give are stored in
@@ -98,7 +112,10 @@ export function LegalShell({
       <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-4xl items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900"
+            >
               <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-md object-contain" />
               <span>DiapoLab</span>
             </Link>
@@ -131,7 +148,9 @@ export function LegalShell({
             </span>
             <div>
               <p className="text-xs font-semibold text-blue-600">{kicker}</p>
-              <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h1>
+              <h1 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+                {title}
+              </h1>
             </div>
           </div>
           <p className="mt-3 text-sm text-slate-500">{subtitle}</p>

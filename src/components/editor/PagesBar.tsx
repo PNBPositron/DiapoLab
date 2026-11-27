@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/store/editor";
-import { Plus, Copy, Trash2, ChevronLeft, ChevronRight, LayoutGrid, FileText, Eye, EyeOff } from "lucide-react";
+import {
+  Plus,
+  Copy,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  FileText,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { SlideThumbnail } from "./SlideThumbnail";
 import { SlideGridDialog } from "./SlideGridDialog";
 
@@ -55,7 +65,10 @@ export function PagesBar() {
 
   return (
     <div className="pages-bar flex shrink-0 items-center bg-transparent px-5 pb-3.5 pt-1 text-slate-700">
-      <div ref={rowRef} className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1">
+      <div
+        ref={rowRef}
+        className="flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto py-1"
+      >
         {pages.map((p, i) => {
           const active = i === currentIndex;
           return (
@@ -101,9 +114,13 @@ export function PagesBar() {
                     <EyeOff className="size-2.5" />
                   </span>
                 )}
-                <span className={`absolute bottom-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded px-1 font-mono text-[10px] font-semibold tabular-nums transition-opacity ${
-                  active ? "bg-blue-600 text-white opacity-100" : "bg-slate-900/80 text-white opacity-0 group-hover:opacity-100"
-                }`}>
+                <span
+                  className={`absolute bottom-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded px-1 font-mono text-[10px] font-semibold tabular-nums transition-opacity ${
+                    active
+                      ? "bg-blue-600 text-white opacity-100"
+                      : "bg-slate-900/80 text-white opacity-0 group-hover:opacity-100"
+                  }`}
+                >
                   {i + 1}
                 </span>
               </div>
@@ -130,8 +147,14 @@ export function PagesBar() {
                 )}
                 <button
                   onClick={() => togglePageHiddenInPresent(i)}
-                  title={p.hiddenInPresent ? "Show slide in present mode" : "Hide slide in present mode"}
-                  aria-label={p.hiddenInPresent ? `Show page ${i + 1} in present mode` : `Hide page ${i + 1} in present mode`}
+                  title={
+                    p.hiddenInPresent ? "Show slide in present mode" : "Hide slide in present mode"
+                  }
+                  aria-label={
+                    p.hiddenInPresent
+                      ? `Show page ${i + 1} in present mode`
+                      : `Hide page ${i + 1} in present mode`
+                  }
                   className={`grid h-5 w-5 place-items-center rounded ${
                     p.hiddenInPresent ? "!bg-amber-100 !text-amber-700" : ""
                   }`}

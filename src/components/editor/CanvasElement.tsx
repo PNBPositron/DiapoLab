@@ -26,7 +26,18 @@ import { pathFor } from "./ShapeRender";
 import { UiRender } from "./UiRender";
 import type { LucideProps } from "lucide-react";
 import { LUCIDE_ICONS } from "@/lib/lucide-icons";
-import { HelpCircle, Check, X as XIcon, QrCode, Lock, MonitorOff, Volume2, Play, Pause, VolumeX } from "lucide-react";
+import {
+  HelpCircle,
+  Check,
+  X as XIcon,
+  QrCode,
+  Lock,
+  MonitorOff,
+  Volume2,
+  Play,
+  Pause,
+  VolumeX,
+} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { isSafeBrowserUrl } from "@/lib/url-safety";
@@ -395,7 +406,8 @@ export function CanvasElement({
   const cropping = !presenting && !preview && croppingId === sourceElement.id;
   // Natural size of the rendered image — needed to lay out PPT-style crop.
   const [natSize, setNatSize] = useState<{ w: number; h: number } | null>(null);
-  const cropLayout = sourceElement.type === "image" ? cropRectLayout(sourceElement as never, natSize) : null;
+  const cropLayout =
+    sourceElement.type === "image" ? cropRectLayout(sourceElement as never, natSize) : null;
   const ref = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -469,7 +481,10 @@ export function CanvasElement({
   // Both paths replay on demand (press R / presenter Replay button).
   // audio cue: entrance, keyframes and motion path all wait for this
   // timestamp (seconds from slide / background-music start)
-  const cueDelayMs = Math.max(0, Math.min(120000, ((element as { audioCue?: number }).audioCue ?? 0) * 1000));
+  const cueDelayMs = Math.max(
+    0,
+    Math.min(120000, ((element as { audioCue?: number }).audioCue ?? 0) * 1000),
+  );
   const entryDelayMs = Math.max(0, Math.min(120000, (element.animationDelay ?? 0) + cueDelayMs));
   const entryShorthand =
     element.animation && element.animation !== "none"
@@ -556,15 +571,15 @@ export function CanvasElement({
     const kfFiltersOf = (k: ElementKeyframe) =>
       k.filters ?? (k.snapshot as { filters?: ImageFilters } | undefined)?.filters;
     const kfEffectOf = (k: ElementKeyframe) =>
-      k.effect ??
-      (k.snapshot as { effect?: ElementKeyframe["effect"] } | undefined)?.effect;
+      k.effect ?? (k.snapshot as { effect?: ElementKeyframe["effect"] } | undefined)?.effect;
     const anyShadow = sorted.some((k) => kfShadowOf(k));
     const anyFilters = sorted.some((k) => kfFiltersOf(k));
     const anyEffect = sorted.some((k) => kfEffectOf(k));
     if (!anyShadow && !anyFilters && !anyEffect) return;
     const duration = Math.max(
       200,
-      (sourceElement as { keyframeDuration?: number }).keyframeDuration ?? sorted[sorted.length - 1].t,
+      (sourceElement as { keyframeDuration?: number }).keyframeDuration ??
+        sorted[sorted.length - 1].t,
     );
     const start = performance.now();
     let raf = 0;
@@ -614,7 +629,9 @@ export function CanvasElement({
     const node = ref.current;
     if (!node) return;
     const ease = (t: number) =>
-      (KF_EASE_FN[motionPath.easing ?? "expo-out"] ?? KF_EASE_FN.linear)(Math.min(1, Math.max(0, t)));
+      (KF_EASE_FN[motionPath.easing ?? "expo-out"] ?? KF_EASE_FN.linear)(
+        Math.min(1, Math.max(0, t)),
+      );
     const point = (t: number): { x: number; y: number; rot: number } => {
       const dx = motionPath.dx;
       const dy = motionPath.dy;
@@ -623,7 +640,11 @@ export function CanvasElement({
           // quadratic bezier arcing above the straight chord
           const cx = dx / 2;
           const cy = dy / 2 - (Math.abs(dx) + Math.abs(dy)) * 0.28;
-          return { x: 2 * (1 - t) * t * cx + t * t * dx, y: 2 * (1 - t) * t * cy + t * t * dy, rot: 0 };
+          return {
+            x: 2 * (1 - t) * t * cx + t * t * dx,
+            y: 2 * (1 - t) * t * cy + t * t * dy,
+            rot: 0,
+          };
         }
         case "s-curve": {
           // cubic bezier with horizontal controls: smooth S through the box
@@ -718,7 +739,17 @@ export function CanvasElement({
       raf = requestAnimationFrame(tick);
       return () => cancelAnimationFrame(raf);
     }
-  }, [presenting, preview, morph, replayEpoch, kfPreviewEpoch, sourceElement, srcText, typeSpeed, countUp]);
+  }, [
+    presenting,
+    preview,
+    morph,
+    replayEpoch,
+    kfPreviewEpoch,
+    sourceElement,
+    srcText,
+    typeSpeed,
+    countUp,
+  ]);
   const [useCssEntry, setUseCssEntry] = useState(true);
 
   useEffect(() => {
@@ -799,11 +830,13 @@ export function CanvasElement({
   const pathT = pathPose
     ? `translate(${pathPose.x.toFixed(1)}px, ${pathPose.y.toFixed(1)}px) rotate(${pathPose.rot.toFixed(1)}deg) `
     : "";
-  const transform = pathT + (tilt
-    ? `perspective(${element.perspective ?? 800}px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotate(${element.rotation}deg)`
-    : allow3d
-      ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
-      : `rotate(${element.rotation}deg)`);
+  const transform =
+    pathT +
+    (tilt
+      ? `perspective(${element.perspective ?? 800}px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotate(${element.rotation}deg)`
+      : allow3d
+        ? `perspective(${element.perspective}px) rotateX(${element.rotateX ?? 0}deg) rotateY(${element.rotateY ?? 0}deg) rotate(${element.rotation}deg)`
+        : `rotate(${element.rotation}deg)`);
 
   // Vector mask (clipped by a shape path, 0-100 viewBox scaled to the box).
   // Works for images (existing) and now text/shapes (clip on the root node).
@@ -1222,7 +1255,10 @@ export function CanvasElement({
           useEditor.getState().setCroppingId(element.id);
         }
         // Double-click any rich element: open the inspector on its content.
-        if (!presenting && ["ui", "chart", "quiz", "table", "button", "icon", "embed"].includes(element.type)) {
+        if (
+          !presenting &&
+          ["ui", "chart", "quiz", "table", "button", "icon", "embed"].includes(element.type)
+        ) {
           e.stopPropagation();
           window.dispatchEvent(new CustomEvent("diapolab:open-inspector"));
         }
@@ -1405,13 +1441,10 @@ export function CanvasElement({
                 position: "absolute",
                 inset: 0,
                 ...fx,
-                filter: [
-                  fx.filter,
-                  sFilter,
-                  element.feather ? `blur(${element.feather}px)` : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ") || undefined,
+                filter:
+                  [fx.filter, sFilter, element.feather ? `blur(${element.feather}px)` : ""]
+                    .filter(Boolean)
+                    .join(" ") || undefined,
               }}
             >
               {/* Slide-bg knockout: an overlay clipped by the shape's own
@@ -1766,14 +1799,12 @@ export function CanvasElement({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    useEditor
-                      .getState()
-                      .update(element.id, {
-                        cropZoom: 1,
-                        cropX: 50,
-                        cropY: 50,
-                        cropRect: undefined,
-                      });
+                    useEditor.getState().update(element.id, {
+                      cropZoom: 1,
+                      cropX: 50,
+                      cropY: 50,
+                      cropRect: undefined,
+                    });
                   }}
                   style={{
                     border: "2px solid #0a0f1f",
@@ -1837,7 +1868,11 @@ export function CanvasElement({
             return (
               <div
                 aria-hidden="true"
-                className={element.iconAnim && element.iconAnim !== "none" ? `icon-anim-${element.iconAnim}` : undefined}
+                className={
+                  element.iconAnim && element.iconAnim !== "none"
+                    ? `icon-anim-${element.iconAnim}`
+                    : undefined
+                }
                 style={{
                   width: "100%",
                   height: "100%",
@@ -1864,7 +1899,11 @@ export function CanvasElement({
             <Comp
               color={element.color}
               strokeWidth={element.strokeWidth}
-              className={element.iconAnim && element.iconAnim !== "none" ? `icon-anim-${element.iconAnim}` : undefined}
+              className={
+                element.iconAnim && element.iconAnim !== "none"
+                  ? `icon-anim-${element.iconAnim}`
+                  : undefined
+              }
               style={{ width: "100%", height: "100%", display: "block" }}
             />
           );
@@ -2007,7 +2046,24 @@ export function CanvasElement({
       )}
 
       {element.locked && !preview && !presenting && (
-        <div title="Element locked — unlock in the inspector" style={{ position: "absolute", right: -12, top: -12, zIndex: 6, display: "grid", placeItems: "center", width: 22, height: 22, borderRadius: 999, background: "#0f172a", color: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)", pointerEvents: "none" }}>
+        <div
+          title="Element locked — unlock in the inspector"
+          style={{
+            position: "absolute",
+            right: -12,
+            top: -12,
+            zIndex: 6,
+            display: "grid",
+            placeItems: "center",
+            width: 22,
+            height: 22,
+            borderRadius: 999,
+            background: "#0f172a",
+            color: "#ffffff",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            pointerEvents: "none",
+          }}
+        >
           <Lock className="size-3" />
         </div>
       )}
@@ -2459,7 +2515,9 @@ function QuizRender({ element, interactive }: { element: QuizElement; interactiv
 }
 
 /** Per-pack chart recipes — how the plot frame and grid "sound" like the pack. */
-const CHART_STYLE_RECIPES: Partial<Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>> = {
+const CHART_STYLE_RECIPES: Partial<
+  Record<UiStyle, { dashGrid?: boolean; glow?: boolean; flat?: boolean; radius?: number }>
+> = {
   sketch: { dashGrid: true },
   blueprint: { dashGrid: true, radius: 4 },
   swiss: { flat: true, radius: 0 },
@@ -2655,7 +2713,7 @@ function ChartRender({ element }: { element: ChartElement }) {
           element.effect === "liquid_glass"
             ? "inset 1px 1px 1px rgba(255,255,255,0.55), inset -1px -1px 2px rgba(0,0,0,0.18), 0 18px 40px rgba(0,0,0,0.24)"
             : chartRecipe.glow
-              ? `0 0 24px ${(element.colors?.[0] ?? "#22d3ee")}55`
+              ? `0 0 24px ${element.colors?.[0] ?? "#22d3ee"}55`
               : chartRecipe.flat
                 ? undefined
                 : theme
@@ -2685,7 +2743,15 @@ function ChartRender({ element }: { element: ChartElement }) {
         )}
         {showAxes && chart !== "pie" && chart !== "donut" && (
           <g>
-            <line x1={padL} y1={padT} x2={padL} y2={padT + plotH} stroke={stroke} strokeWidth={1} strokeDasharray={gridDash} />
+            <line
+              x1={padL}
+              y1={padT}
+              x2={padL}
+              y2={padT + plotH}
+              stroke={stroke}
+              strokeWidth={1}
+              strokeDasharray={gridDash}
+            />
             <line
               x1={padL}
               y1={padT + plotH}
@@ -2807,7 +2873,10 @@ function TableRender({ element }: { element: TableElement }) {
                   : ri < element.rows.length - 1
                     ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}`
                     : undefined,
-                borderRight: !noVGrid && ci < cols - 1 ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}` : undefined,
+                borderRight:
+                  !noVGrid && ci < cols - 1
+                    ? `${element.gridWidth ?? 1}px ${gridStyle} ${gridColor}`
+                    : undefined,
               }}
             >
               {cell}
@@ -2904,7 +2973,10 @@ function ButtonRender({ element, interactive }: { element: ButtonElement; intera
 /* ------------------------------------------------------------------ */
 function QrRender({ element }: { element: QrElement }) {
   return (
-    <div className="grid size-full place-items-center overflow-hidden" style={{ background: element.bgColor }}>
+    <div
+      className="grid size-full place-items-center overflow-hidden"
+      style={{ background: element.bgColor }}
+    >
       <QRCodeSVG
         value={element.value || " "}
         size={512}
@@ -2928,7 +3000,13 @@ const fmtTime = (s: number) => {
   return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 };
 
-function VideoPresentPlayer({ element, presenting }: { element: VideoElement; presenting: boolean }) {
+function VideoPresentPlayer({
+  element,
+  presenting,
+}: {
+  element: VideoElement;
+  presenting: boolean;
+}) {
   const ref = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
     if (ref.current) ref.current.playbackRate = element.rate ?? 1;

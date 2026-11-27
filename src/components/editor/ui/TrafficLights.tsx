@@ -32,7 +32,12 @@ export function TrafficLights({
       <button type="button" title="Close" onClick={stop(onClose)} className={`${DOT} bg-[#ff5f57]`}>
         <span className="opacity-0 transition-opacity hover:opacity-100">×</span>
       </button>
-      <button type="button" title="Hide" onClick={stop(onMinimize)} className={`${DOT} bg-[#febc2e]`}>
+      <button
+        type="button"
+        title="Hide"
+        onClick={stop(onMinimize)}
+        className={`${DOT} bg-[#febc2e]`}
+      >
         <span className="opacity-0 transition-opacity hover:opacity-100">−</span>
       </button>
       <button

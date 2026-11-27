@@ -18,6 +18,7 @@ export function ThreeTransitionStage({
   cameraPreset,
   cameraPresetSignal = 0,
   sceneConfig,
+  direction = 1,
   onTransitionComplete,
   className = "",
 }: {
@@ -33,6 +34,7 @@ export function ThreeTransitionStage({
   cameraPreset?: StageCameraPreset;
   cameraPresetSignal?: number;
   sceneConfig?: Partial<ThreeSceneConfig>;
+  direction?: 1 | -1;
   onTransitionComplete?: () => void;
   className?: string;
 }) {
@@ -51,6 +53,7 @@ export function ThreeTransitionStage({
     canvasH,
     interactive,
     sceneConfig,
+    direction,
   });
 
   useEffect(() => {
@@ -117,6 +120,7 @@ export function ThreeTransitionStage({
     stage.playTransition(init.transition, {
       duration: init.sceneConfig?.duration ?? (init.mode === "mini" ? 1.4 : 1.25),
       loop: init.mode === "mini",
+      direction: init.direction,
     });
 
     return () => {
@@ -181,8 +185,9 @@ export function ThreeTransitionStage({
     stageRef.current?.playTransition(transition, {
       duration: duration ?? (mode === "mini" ? 1.4 : 1.25),
       loop: mode === "mini",
+      direction,
     });
-  }, [mode, transition, playTrigger, duration]);
+  }, [mode, transition, playTrigger, duration, direction]);
 
   // Push live 3D scene preset & color changes in place (zero WebGL teardown)
   useEffect(() => {

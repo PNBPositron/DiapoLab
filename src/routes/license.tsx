@@ -1,29 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalShell } from "./privacypolicy";
 import { Scale, BadgeCheck, FileText, Users, Check, ArrowRight } from "lucide-react";
+import { buildBreadcrumbJsonLd, buildPageHead, absoluteUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/license")({
   component: LicensePage,
-  head: () => ({
-    meta: [
-      { title: "MIT License — DiapoLab" },
-      {
-        name: "description",
-        content:
-          "DiapoLab is open source under the MIT License. Read the permissions, conditions and limitations.",
-      },
-      { property: "og:title", content: "MIT License — DiapoLab" },
-      {
-        property: "og:description",
-        content: "DiapoLab is open source under the MIT License.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/license" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "MIT License – DiapoLab Open-Source Permissions",
+      description:
+        "DiapoLab is open-source software under the MIT License. Review commercial use, modification, redistribution, and warranty terms.",
+      path: "/license",
+      jsonLd: [
+        {
+          "@type": "WebPage",
+          name: "MIT License – DiapoLab",
+          url: absoluteUrl("/license"),
+          license: "https://opensource.org/licenses/MIT",
+        },
+        buildBreadcrumbJsonLd([
+          { name: "DiapoLab", path: "/" },
+          { name: "MIT License", path: "/license" },
+        ]),
+      ],
+    }),
 });
 
 const PERMISSIONS = [
@@ -54,9 +54,8 @@ function LicensePage() {
     >
       <section className="rounded-xl border border-slate-200 bg-white p-6">
         <p className="max-w-2xl text-sm leading-relaxed text-slate-600">
-          DiapoLab is free software for creating, remixing, exporting and sharing
-          presentations. You can use the editor in personal and commercial projects
-          without asking permission.
+          DiapoLab is free software for creating, remixing, exporting and sharing presentations. You
+          can use the editor in personal and commercial projects without asking permission.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {PERMISSIONS.map((p) => (
@@ -124,15 +123,15 @@ SOFTWARE.`}</pre>
           <span className="grid size-8 shrink-0 place-items-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
             <Users className="size-4" />
           </span>
-          <h2 className="font-display text-sm font-semibold text-slate-900">
-            Community content
-          </h2>
+          <h2 className="font-display text-sm font-semibold text-slate-900">Community content</h2>
         </div>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          The MIT license covers the editor itself. Templates and themes published to
-          the <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>{" "}
-          stay the property of their authors, who grant everyone the right to use and
-          remix them inside DiapoLab.
+          The MIT license covers the editor itself. Templates and themes published to the{" "}
+          <Link to="/marketplace" className="font-medium text-blue-600 underline">
+            marketplace
+          </Link>{" "}
+          stay the property of their authors, who grant everyone the right to use and remix them
+          inside DiapoLab.
         </p>
       </section>
     </LegalShell>

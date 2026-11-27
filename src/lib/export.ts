@@ -102,7 +102,11 @@ function cssColorToHex(color: string): string {
   const s = color.trim();
   if (/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(s)) return s.slice(1, 7);
   if (/^#[0-9a-fA-F]{3}$/.test(s)) {
-    return s.slice(1).split("").map((ch) => ch + ch).join("");
+    return s
+      .slice(1)
+      .split("")
+      .map((ch) => ch + ch)
+      .join("");
   }
   try {
     const probe = document.createElement("i");
@@ -145,7 +149,14 @@ async function waitForExportReady() {
 async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]> {
   const { pages, currentIndex, setCurrentPage, canvasW, canvasH, select } = useEditor.getState();
   select(null);
-  await ensureFontsForPages(pages.map((page) => ({ elements: page.elements.filter((element): element is Extract<typeof element, { fontFamily?: string }> => "fontFamily" in element) })));
+  await ensureFontsForPages(
+    pages.map((page) => ({
+      elements: page.elements.filter(
+        (element): element is Extract<typeof element, { fontFamily?: string }> =>
+          "fontFamily" in element,
+      ),
+    })),
+  );
   const original = currentIndex;
   const shots: string[] = [];
   for (let i = 0; i < pages.length; i++) {
@@ -167,11 +178,17 @@ async function captureAllPages(format: "png" | "jpeg" = "png"): Promise<string[]
       const pageBg = pages[i].bgColor;
       const raw =
         format === "jpeg"
-          ? await toJpeg(node, { ...options, quality: JPEG_QUALITY, backgroundColor: solidFallback(pageBg) })
+          ? await toJpeg(node, {
+              ...options,
+              quality: JPEG_QUALITY,
+              backgroundColor: solidFallback(pageBg),
+            })
           : await toPng(node, options);
       // Safety net: repaint the page background under the capture (solid or
       // gradient) so it can never be lost by the DOM capture.
-      shots.push(await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, format));
+      shots.push(
+        await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, format),
+      );
     } finally {
       delete node.dataset.exporting;
     }
@@ -204,7 +221,14 @@ export async function exportJPG(name: string) {
   } finally {
     delete node.dataset.exporting;
   }
-  const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "jpeg");
+  const dataUrl = await compositeWithBackground(
+    raw,
+    pageBg,
+    canvasW,
+    canvasH,
+    EXPORT_PIXEL_RATIO,
+    "jpeg",
+  );
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.jpg`;
   link.href = dataUrl;
@@ -234,7 +258,14 @@ export async function exportPNG(name: string) {
   } finally {
     delete node.dataset.exporting;
   }
-  const dataUrl = await compositeWithBackground(raw, pageBg, canvasW, canvasH, EXPORT_PIXEL_RATIO, "png");
+  const dataUrl = await compositeWithBackground(
+    raw,
+    pageBg,
+    canvasW,
+    canvasH,
+    EXPORT_PIXEL_RATIO,
+    "png",
+  );
   const link = document.createElement("a");
   link.download = `${name || "positron"}-${Date.now()}.png`;
   link.href = dataUrl;
@@ -294,6 +325,10 @@ const TRANSITION_XML: Record<string, string> = {
   slide: '<p:push dir="l"/>',
   zoom: '<p:zoom dir="in"/>',
   flip: '<p:wipe dir="l"/>',
+  glitch: "<p:newsflash/>",
+  "glitch-rgb": "<p:dissolve/>",
+  "glitch-slice": '<p:strips dir="ld"/>',
+  "glitch-vhs": "<p:dissolve/>",
   tv: "<p:dissolve/>",
   neon: "<p:newsflash/>",
   cube: '<p:cover dir="l"/>',
@@ -378,13 +413,31 @@ function entranceTimingXml(effects: Array<{ spid: string; delay: number }>): str
 /** DiapoLab shape kind -> PowerPoint preset geometry (prst). Kinds with
  *  no real OOXML equivalent fall back to a plain rect so nothing is lost. */
 const PPTX_SHAPES: Record<string, string> = {
-  rect: "rect", circle: "ellipse", capsule: "roundRect", ring: "donut",
-  triangle: "triangle", star: "star5", starburst: "star12", gear: "gear9",
-  heart: "heart", diamond: "diamond", hexagon: "hexagon", pentagon: "pentagon",
-  parallelogram: "parallelogram", trapezoid: "trapezoid", cross: "plus",
-  lightning: "lightningBolt", cloud: "cloud", speech: "wedgeEllipseCallout",
-  octagon: "octagon", semicircle: "chord", quarter_circle: "pie",
-  chevron: "chevron", arrow: "rightArrow", moon: "moon", drop: "teardrop",
+  rect: "rect",
+  circle: "ellipse",
+  capsule: "roundRect",
+  ring: "donut",
+  triangle: "triangle",
+  star: "star5",
+  starburst: "star12",
+  gear: "gear9",
+  heart: "heart",
+  diamond: "diamond",
+  hexagon: "hexagon",
+  pentagon: "pentagon",
+  parallelogram: "parallelogram",
+  trapezoid: "trapezoid",
+  cross: "plus",
+  lightning: "lightningBolt",
+  cloud: "cloud",
+  speech: "wedgeEllipseCallout",
+  octagon: "octagon",
+  semicircle: "chord",
+  quarter_circle: "pie",
+  chevron: "chevron",
+  arrow: "rightArrow",
+  moon: "moon",
+  drop: "teardrop",
   wave: "wave",
 };
 
@@ -394,7 +447,13 @@ function pptxShadow(sh: { x: number; y: number; blur: number; color: string }) {
   const angle = Math.round((Math.atan2(-sh.y, Math.max(1e-6, sh.x)) * 180) / Math.PI);
   const offset = Math.round(Math.hypot(sh.x, sh.y) * 0.75 * 100) / 100;
   const blur = Math.max(0, Math.round(sh.blur * 0.75));
-  return { type: "outer" as const, angle, offset, blur, color: cssColorToHex(sh.color) || "000000" };
+  return {
+    type: "outer" as const,
+    angle,
+    offset,
+    blur,
+    color: cssColorToHex(sh.color) || "000000",
+  };
 }
 
 export async function exportPPTX(name: string) {
@@ -516,7 +575,9 @@ export async function exportPPTX(name: string) {
             : "FFFFFF";
         const tableSt = element.tableStyle ? UI_STYLE_THEMES[element.tableStyle] : null;
         const tableRecipe = element.tableStyle ? TABLE_STYLE_RECIPES[element.tableStyle] : null;
-        const tableFontFace = tableSt ? tableSt.font.split(",")[0].replace(/['"]/g, "").trim() : undefined;
+        const tableFontFace = tableSt
+          ? tableSt.font.split(",")[0].replace(/['"]/g, "").trim()
+          : undefined;
         const tableRows = element.rows.map((row, ri) =>
           row.map((cell, ci) => ({
             text: cell,

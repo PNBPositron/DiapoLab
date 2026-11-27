@@ -7,11 +7,7 @@ import type { CSSProperties } from "react";
  * assigning them to `backgroundImage` drops the position/size/color parts
  * and browsers reject the whole value.
  */
-export function backgroundStyle(
-  bgColor?: string,
-  bgImage?: string,
-  bgFit?: string,
-): CSSProperties {
+export function backgroundStyle(bgColor?: string, bgImage?: string, bgFit?: string): CSSProperties {
   const bg = typeof bgColor === "string" && bgColor ? bgColor : "#ffffff";
   if (bgImage) {
     return {

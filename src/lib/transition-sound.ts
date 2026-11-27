@@ -5,7 +5,9 @@ let noiseBuffer: AudioBuffer | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
-  const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const Ctx =
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Ctx) return null;
   if (!sharedCtx || sharedCtx.state === "closed") {
     sharedCtx = new Ctx();
@@ -99,22 +101,71 @@ function playClick(ctx: AudioContext) {
   osc.stop(now + 0.05);
 }
 
+function playGlitchSound(ctx: AudioContext) {
+  const now = ctx.currentTime;
+  const dur = 0.19;
+
+  // Short high-passed digital static burst
+  const src = ctx.createBufferSource();
+  src.buffer = getNoiseBuffer(ctx);
+
+  const hp = ctx.createBiquadFilter();
+  hp.type = "bandpass";
+  hp.frequency.setValueAtTime(1850, now);
+  hp.frequency.exponentialRampToValueAtTime(3400, now + 0.06);
+  hp.frequency.exponentialRampToValueAtTime(780, now + dur);
+  hp.Q.setValueAtTime(2.6, now);
+
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.0001, now);
+  nGain.gain.linearRampToValueAtTime(0.055, now + 0.015);
+  nGain.gain.exponentialRampToValueAtTime(0.008, now + 0.08);
+  nGain.gain.linearRampToValueAtTime(0.042, now + 0.11);
+  nGain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+  src.connect(hp);
+  hp.connect(nGain);
+  nGain.connect(ctx.destination);
+  src.start(now);
+  src.stop(now + dur + 0.02);
+
+  // Subtle FM-like bit chirp
+  const osc = ctx.createOscillator();
+  const oGain = ctx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(520, now);
+  osc.frequency.setValueAtTime(1140, now + 0.045);
+  osc.frequency.setValueAtTime(360, now + 0.095);
+  oGain.gain.setValueAtTime(0.0001, now);
+  oGain.gain.linearRampToValueAtTime(0.018, now + 0.01);
+  oGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+  osc.connect(oGain);
+  oGain.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.15);
+}
+
 /**
  * Play a short, subtle synthesized transition audio effect when enabled in settings.
  * Pass `force = true` to preview the sound even when toggling/testing in settings.
  */
-export function playTransitionSound(options: {
-  style?: TransitionSoundStyle;
-  isThreeD?: boolean;
-  force?: boolean;
-} = {}) {
+export function playTransitionSound(
+  options: {
+    style?: TransitionSoundStyle;
+    isThreeD?: boolean;
+    isGlitch?: boolean;
+    force?: boolean;
+  } = {},
+) {
   try {
     const state = useSettings.getState();
     if (!options.force && !state.transitionSound) return;
     const ctx = getAudioContext();
     if (!ctx) return;
     const style = options.style ?? state.transitionSoundStyle ?? "whoosh";
-    if (style === "click") {
+    if (options.isGlitch && style !== "click") {
+      playGlitchSound(ctx);
+    } else if (style === "click") {
       playClick(ctx);
     } else {
       playWhoosh(ctx, options.isThreeD);

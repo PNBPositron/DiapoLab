@@ -28,7 +28,12 @@ function isPrivateIpv4(ip: string): boolean {
 
 function isBlockedIpv6(host: string): boolean {
   const clean = host.split("%")[0].toLowerCase();
-  if (clean === "::" || clean === "::1" || clean === "0:0:0:0:0:0:0:1" || clean === "0:0:0:0:0:0:0:0") {
+  if (
+    clean === "::" ||
+    clean === "::1" ||
+    clean === "0:0:0:0:0:0:0:1" ||
+    clean === "0:0:0:0:0:0:0:0"
+  ) {
     return true;
   }
   if (clean.startsWith("::ffff:")) {
@@ -55,7 +60,8 @@ function isBlockedIpv6(host: string): boolean {
 export function isBlockedRemoteHost(hostname: string): boolean {
   const host = normalizeHostname(hostname);
   if (!host) return true;
-  if (host === "localhost" || host === "metadata.google.internal" || host === "metadata") return true;
+  if (host === "localhost" || host === "metadata.google.internal" || host === "metadata")
+    return true;
   if (BLOCKED_HOST_SUFFIXES.some((suffix) => host.endsWith(suffix))) return true;
   // Block integer, hex, or octal IP literals (e.g. 2130706433, 0x7f000001, 0177.0.0.1).
   if (/^\d+$/.test(host) || /^0x[0-9a-f]+$/i.test(host) || /(^|\.)0[0-7]+(\.|$)/.test(host)) {
@@ -135,5 +141,8 @@ export function isSafeBrowserUrl(raw: string | undefined | null): string | null 
 }
 
 export function escapeHtmlAttr(value: string): string {
-  return value.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[ch] ?? ch);
+  return value.replace(
+    /[&<>"']/g,
+    (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[ch] ?? ch,
+  );
 }

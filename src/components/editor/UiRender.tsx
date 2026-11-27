@@ -76,7 +76,10 @@ function WidgetControl({
   );
 }
 
-function getTimeParts(now: Date | null, tz: string): {
+function getTimeParts(
+  now: Date | null,
+  tz: string,
+): {
   hours24: number;
   minutes: number;
   seconds: number;
@@ -126,7 +129,22 @@ function pad2(n: number) {
 }
 
 function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, preview, interactive, t, accent, onAccent, s, sharp, softFill, line, shell, titleStyle, bodyStyle, xpTitleBar } = ctx;
+  const {
+    element,
+    preview,
+    interactive,
+    t,
+    accent,
+    onAccent,
+    s,
+    sharp,
+    softFill,
+    line,
+    shell,
+    titleStyle,
+    bodyStyle,
+    xpTitleBar,
+  } = ctx;
   const baseMode = element.files?.[0] === "analog" ? "analog" : "digital";
   const base12h = element.files?.[1] === "12h";
   const showSeconds = element.files?.[2] !== "off";
@@ -155,7 +173,7 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
   const { hours24, minutes, seconds, dateLabel } = getTimeParts(preview ? null : now, tz);
 
   const period = hours24 >= 12 ? "PM" : "AM";
-  const displayHour = use12h ? (hours24 % 12 || 12) : hours24;
+  const displayHour = use12h ? hours24 % 12 || 12 : hours24;
   const hourStr = use12h ? String(displayHour) : pad2(displayHour);
   const minStr = pad2(minutes);
   const secStr = pad2(seconds);
@@ -178,9 +196,23 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
   });
 
   return (
-    <div style={{ ...shell, padding: (preview ? 18 : 24) * s * (element.padScale ?? 1), gap: 8 * s, justifyContent: "space-between" }}>
+    <div
+      style={{
+        ...shell,
+        padding: (preview ? 18 : 24) * s * (element.padScale ?? 1),
+        gap: 8 * s,
+        justifyContent: "space-between",
+      }}
+    >
       {xpTitleBar}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: 8 * s, minWidth: 0 }}>
           <span
             style={{
@@ -212,7 +244,9 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
                 type="button"
                 style={pillBtn(mode === "analog")}
                 {...interactiveHandlers(interactive, () =>
-                  setModeOverride((prev) => ((prev ?? baseMode) === "analog" ? "digital" : "analog")),
+                  setModeOverride((prev) =>
+                    (prev ?? baseMode) === "analog" ? "digital" : "analog",
+                  ),
                 )}
               >
                 {mode === "analog" ? "Digital" : "Analog"}
@@ -245,10 +279,25 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
       </div>
 
       {mode === "analog" ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 * s, flex: 1, minHeight: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16 * s,
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
           <svg
             viewBox="0 0 120 120"
-            style={{ height: "100%", maxHeight: 112 * s, width: "auto", aspectRatio: "1 / 1", flexShrink: 0 }}
+            style={{
+              height: "100%",
+              maxHeight: 112 * s,
+              width: "auto",
+              aspectRatio: "1 / 1",
+              flexShrink: 0,
+            }}
           >
             <circle cx="60" cy="60" r="55" fill={softFill} stroke={line} strokeWidth="2.5" />
             {Array.from({ length: 12 }, (_, i) => {
@@ -302,21 +351,61 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
             )}
             <circle cx="60" cy="60" r="4" fill={accent} />
           </svg>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 * s, minWidth: 0 }}>
-            <div style={{ ...titleStyle, fontSize: 34 * s, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 4 * s,
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                ...titleStyle,
+                fontSize: 34 * s,
+                fontVariantNumeric: "tabular-nums",
+                lineHeight: 1,
+              }}
+            >
               {hourStr}:{minStr}
-              {use12h && <span style={{ fontSize: 14 * s, marginLeft: 5 * s, color: accent }}>{period}</span>}
+              {use12h && (
+                <span style={{ fontSize: 14 * s, marginLeft: 5 * s, color: accent }}>{period}</span>
+              )}
             </div>
             <div style={{ ...bodyStyle, fontSize: 14 * s }}>{dateLabel}</div>
           </div>
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6 * s, fontVariantNumeric: "tabular-nums" }}>
-          <span style={{ ...titleStyle, fontSize: 56 * s, lineHeight: 1, letterSpacing: "-0.02em", color: t.fg }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 6 * s,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          <span
+            style={{
+              ...titleStyle,
+              fontSize: 56 * s,
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+              color: t.fg,
+            }}
+          >
             {hourStr}:{minStr}
           </span>
           {showSeconds && (
-            <span style={{ ...titleStyle, fontSize: 28 * s, lineHeight: 1, color: accent, fontWeight: 700 }}>
+            <span
+              style={{
+                ...titleStyle,
+                fontSize: 28 * s,
+                lineHeight: 1,
+                color: accent,
+                fontWeight: 700,
+              }}
+            >
               :{secStr}
             </span>
           )}
@@ -338,7 +427,14 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
         <span style={{ ...bodyStyle, fontSize: 14 * s }}>{dateLabel}</span>
         {element.body && element.body !== "Live clock" && (
           <span style={{ ...bodyStyle, fontSize: 13 * s, opacity: 0.85 }}>{element.body}</span>
@@ -349,7 +445,22 @@ function ClockWidget({ ctx }: { ctx: WidgetCtx }) {
 }
 
 function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, preview, interactive, t, accent, onAccent, s, sharp, softFill, line, shell, titleStyle, bodyStyle, xpTitleBar } = ctx;
+  const {
+    element,
+    preview,
+    interactive,
+    t,
+    accent,
+    onAccent,
+    s,
+    sharp,
+    softFill,
+    line,
+    shell,
+    titleStyle,
+    bodyStyle,
+    xpTitleBar,
+  } = ctx;
   const initialSec = Math.max(10, Math.round(element.value || 300));
   const [remaining, setRemaining] = useState(initialSec);
   const [running, setRunning] = useState(false);
@@ -399,7 +510,14 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
   return (
     <div style={{ ...shell, justifyContent: "space-between" }}>
       {xpTitleBar}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
         <span style={{ ...bodyStyle, fontSize: 17 * s, fontWeight: 700, color: t.fg }}>
           {element.title || "Break Timer"}
         </span>
@@ -418,7 +536,14 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
         </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 10 * s,
+        }}
+      >
         <span
           style={{
             ...titleStyle,
@@ -444,7 +569,14 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
           overflow: "hidden",
         }}
       >
-        <div style={{ width: `${pct}%`, height: "100%", background: accent, transition: "width 250ms linear" }} />
+        <div
+          style={{
+            width: `${pct}%`,
+            height: "100%",
+            background: accent,
+            transition: "width 250ms linear",
+          }}
+        />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 * s }}>
@@ -488,7 +620,22 @@ function TimerWidget({ ctx }: { ctx: WidgetCtx }) {
 }
 
 function StopwatchWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, preview, interactive, t, accent, onAccent, s, sharp, softFill, line, shell, titleStyle, bodyStyle, xpTitleBar } = ctx;
+  const {
+    element,
+    preview,
+    interactive,
+    t,
+    accent,
+    onAccent,
+    s,
+    sharp,
+    softFill,
+    line,
+    shell,
+    titleStyle,
+    bodyStyle,
+    xpTitleBar,
+  } = ctx;
   const [elapsedMs, setElapsedMs] = useState(0);
   const [running, setRunning] = useState(false);
   const [laps, setLaps] = useState<number[]>([]);
@@ -529,19 +676,43 @@ function StopwatchWidget({ ctx }: { ctx: WidgetCtx }) {
   return (
     <div style={{ ...shell, justifyContent: "space-between" }}>
       {xpTitleBar}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
         <span style={{ ...bodyStyle, fontSize: 17 * s, fontWeight: 700, color: t.fg }}>
           {element.title || "Stopwatch"}
         </span>
         <span style={{ ...bodyStyle, fontSize: 13 * s }}>{element.body || "Elapsed"}</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 * s }}>
-        <span style={{ ...titleStyle, fontSize: 52 * s, lineHeight: 1, fontVariantNumeric: "tabular-nums", color: running ? accent : t.fg }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 10 * s,
+        }}
+      >
+        <span
+          style={{
+            ...titleStyle,
+            fontSize: 52 * s,
+            lineHeight: 1,
+            fontVariantNumeric: "tabular-nums",
+            color: running ? accent : t.fg,
+          }}
+        >
           {fmtMs(elapsedMs)}
         </span>
         {laps.length > 0 && (
-          <div style={{ display: "flex", gap: 6 * s, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div
+            style={{ display: "flex", gap: 6 * s, flexWrap: "wrap", justifyContent: "flex-end" }}
+          >
             {laps.slice(0, 2).map((lap, idx) => (
               <span
                 key={idx}
@@ -596,7 +767,21 @@ function StopwatchWidget({ ctx }: { ctx: WidgetCtx }) {
 }
 
 function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, interactive, t, accent, onAccent, s, sharp, softFill, line, shell, titleStyle, bodyStyle, xpTitleBar } = ctx;
+  const {
+    element,
+    interactive,
+    t,
+    accent,
+    onAccent,
+    s,
+    sharp,
+    softFill,
+    line,
+    shell,
+    titleStyle,
+    bodyStyle,
+    xpTitleBar,
+  } = ctx;
   const initial = Number.isFinite(element.value) ? element.value : 0;
   const step = Math.max(1, Number(element.files?.[0]) || 1);
   const [count, setCount] = useState(initial);
@@ -623,8 +808,17 @@ function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
   return (
     <div style={{ ...shell, justifyContent: "space-between" }}>
       {xpTitleBar}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
-        <span style={{ ...bodyStyle, fontSize: 17 * s, fontWeight: 700, color: t.fg }}>{element.title || "Counter"}</span>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
+        <span style={{ ...bodyStyle, fontSize: 17 * s, fontWeight: 700, color: t.fg }}>
+          {element.title || "Counter"}
+        </span>
         {count !== initial && interactive && (
           <button
             type="button"
@@ -645,7 +839,14 @@ function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
         )}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 * s }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12 * s,
+        }}
+      >
         <WidgetControl
           interactive={interactive}
           style={btnStyle(false)}
@@ -653,7 +854,15 @@ function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
         >
           −
         </WidgetControl>
-        <span style={{ ...titleStyle, fontSize: 60 * s, lineHeight: 1, fontVariantNumeric: "tabular-nums", color: accent }}>
+        <span
+          style={{
+            ...titleStyle,
+            fontSize: 60 * s,
+            lineHeight: 1,
+            fontVariantNumeric: "tabular-nums",
+            color: accent,
+          }}
+        >
           {count.toLocaleString("en-US")}
         </span>
         <WidgetControl
@@ -671,7 +880,19 @@ function CounterWidget({ ctx }: { ctx: WidgetCtx }) {
 }
 
 function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, interactive, t, accent, s, softFill, line, shell, titleStyle, bodyStyle, xpTitleBar } = ctx;
+  const {
+    element,
+    interactive,
+    t,
+    accent,
+    s,
+    softFill,
+    line,
+    shell,
+    titleStyle,
+    bodyStyle,
+    xpTitleBar,
+  } = ctx;
   const initial = Math.max(1, Math.min(5, Math.round(element.value || 4)));
   const [score, setScore] = useState(initial);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -681,14 +902,24 @@ function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
   }, [initial, interactive]);
 
   const active = hovered ?? score;
-  const labels = element.items.length > 0 ? element.items : ["Poor", "Fair", "Good", "Great", "Loved it"];
+  const labels =
+    element.items.length > 0 ? element.items : ["Poor", "Fair", "Good", "Great", "Loved it"];
   const feedback = labels[Math.min(labels.length - 1, Math.max(0, active - 1))] ?? `${active} / 5`;
 
   return (
     <div style={{ ...shell, justifyContent: "space-between" }}>
       {xpTitleBar}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 * s }}>
-        <span style={{ ...titleStyle, fontSize: 22 * s }}>{element.title || "Rate this session"}</span>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8 * s,
+        }}
+      >
+        <span style={{ ...titleStyle, fontSize: 22 * s }}>
+          {element.title || "Rate this session"}
+        </span>
         <span
           style={{
             padding: `${3 * s}px ${9 * s}px`,
@@ -728,13 +959,29 @@ function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
               }}
               onActivate={() => setScore(n)}
             >
-              <svg width={34 * s} height={34 * s} viewBox="0 0 24 24" fill={filled ? accent : "none"} stroke={filled ? accent : t.muted} strokeWidth="2" strokeLinejoin="round">
+              <svg
+                width={34 * s}
+                height={34 * s}
+                viewBox="0 0 24 24"
+                fill={filled ? accent : "none"}
+                stroke={filled ? accent : t.muted}
+                strokeWidth="2"
+                strokeLinejoin="round"
+              >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             </WidgetControl>
           );
         })}
-        <span style={{ ...bodyStyle, fontSize: 16 * s, fontWeight: 700, color: t.fg, marginLeft: 4 * s }}>
+        <span
+          style={{
+            ...bodyStyle,
+            fontSize: 16 * s,
+            fontWeight: 700,
+            color: t.fg,
+            marginLeft: 4 * s,
+          }}
+        >
           {feedback}
         </span>
       </div>
@@ -745,7 +992,8 @@ function RatingWidget({ ctx }: { ctx: WidgetCtx }) {
 }
 
 function InteractiveTabsWidget({ ctx }: { ctx: WidgetCtx }) {
-  const { element, interactive, t, accent, s, softFill, line, chromeShell, titleStyle, bodyStyle } = ctx;
+  const { element, interactive, t, accent, s, softFill, line, chromeShell, titleStyle, bodyStyle } =
+    ctx;
   const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
@@ -786,8 +1034,19 @@ function InteractiveTabsWidget({ ctx }: { ctx: WidgetCtx }) {
           );
         })}
       </div>
-      <div style={{ padding: 20 * s, flex: 1, display: "flex", flexDirection: "column", gap: 10 * s, borderTop: `1px solid ${line}` }}>
-        <div style={{ ...titleStyle, fontSize: 26 * s }}>{interactive ? activeLabel : element.title}</div>
+      <div
+        style={{
+          padding: 20 * s,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10 * s,
+          borderTop: `1px solid ${line}`,
+        }}
+      >
+        <div style={{ ...titleStyle, fontSize: 26 * s }}>
+          {interactive ? activeLabel : element.title}
+        </div>
         <div style={bodyStyle}>{panelBody}</div>
       </div>
     </div>
@@ -829,7 +1088,9 @@ function InteractiveToggleWidget({ ctx }: { ctx: WidgetCtx }) {
                 pointerEvents: interactive ? "auto" : "none",
               }}
               onActivate={() =>
-                setStates((prev) => element.items.map((_, j) => (j === i ? !on : prev[j] ?? j % 2 === 0)))
+                setStates((prev) =>
+                  element.items.map((_, j) => (j === i ? !on : (prev[j] ?? j % 2 === 0))),
+                )
               }
             >
               <span>{it}</span>
@@ -848,7 +1109,14 @@ function InteractiveToggleWidget({ ctx }: { ctx: WidgetCtx }) {
                   transition: "background 150ms ease",
                 }}
               >
-                <span style={{ width: 22 * s, height: 22 * s, borderRadius: sharp ? 0 : "50%", background: "#fff" }} />
+                <span
+                  style={{
+                    width: 22 * s,
+                    height: 22 * s,
+                    borderRadius: sharp ? 0 : "50%",
+                    background: "#fff",
+                  }}
+                />
               </span>
             </WidgetControl>
           );
@@ -960,7 +1228,8 @@ export function UiRender({
     height: "100%",
     background: t.bg,
     color: t.fg,
-    border: frameBorderStyle === "none" ? "none" : `${t.borderWidth}px ${frameBorderStyle} ${t.border}`,
+    border:
+      frameBorderStyle === "none" ? "none" : `${t.borderWidth}px ${frameBorderStyle} ${t.border}`,
     borderRadius: frameRadius,
     clipPath: frameClip,
     boxShadow: t.shadow,
@@ -1062,7 +1331,9 @@ export function UiRender({
           padding: 0,
         }}
       >
-        <span style={{ ...titleStyle, fontSize: 30 * s, letterSpacing: t.letterSpacing }}>{element.title}</span>
+        <span style={{ ...titleStyle, fontSize: 30 * s, letterSpacing: t.letterSpacing }}>
+          {element.title}
+        </span>
       </div>
     );
   }
@@ -1072,7 +1343,9 @@ export function UiRender({
     return (
       <div style={{ ...shell, justifyContent: "center" }}>
         {xpTitleBar}
-        <div style={{ display: "flex", justifyContent: "space-between", ...bodyStyle, color: t.fg }}>
+        <div
+          style={{ display: "flex", justifyContent: "space-between", ...bodyStyle, color: t.fg }}
+        >
           <span>{element.body || element.title}</span>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>{pct}%</span>
         </div>
@@ -1104,8 +1377,17 @@ export function UiRender({
     return (
       <div style={{ ...shell, justifyContent: "center" }}>
         {xpTitleBar}
-        <div style={{ ...bodyStyle, textTransform: t.uppercase ? "uppercase" : "none" }}>{element.title}</div>
-        <div style={{ ...titleStyle, fontSize: 72 * s, color: accent, fontVariantNumeric: "tabular-nums" }}>
+        <div style={{ ...bodyStyle, textTransform: t.uppercase ? "uppercase" : "none" }}>
+          {element.title}
+        </div>
+        <div
+          style={{
+            ...titleStyle,
+            fontSize: 72 * s,
+            color: accent,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
           {element.value.toLocaleString("en-US")}
         </div>
         <div style={bodyStyle}>{element.body}</div>
@@ -1117,7 +1399,9 @@ export function UiRender({
     return (
       <div style={{ ...shell, justifyContent: "center" }}>
         <div style={{ fontSize: 64 * s, lineHeight: 0.6, color: accent }}>“</div>
-        <div style={{ ...titleStyle, fontSize: 28 * s, fontWeight: 600, textTransform: "none" }}>{element.title}</div>
+        <div style={{ ...titleStyle, fontSize: 28 * s, fontWeight: 600, textTransform: "none" }}>
+          {element.title}
+        </div>
         <div style={{ ...bodyStyle, fontSize: 18 * s }}>— {element.body}</div>
       </div>
     );
@@ -1215,8 +1499,22 @@ export function UiRender({
       }}
     >
       {isXP ? null : dots}
-      <span style={{ flex: 1, textAlign: isXP ? "left" : "center", overflow: "hidden", whiteSpace: "nowrap" }}>{label}</span>
-      {right ?? (isXP ? <span style={{ letterSpacing: "0.2em" }}>_ □ ✕</span> : <span style={{ width: 46 * s }} />)}
+      <span
+        style={{
+          flex: 1,
+          textAlign: isXP ? "left" : "center",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}
+      </span>
+      {right ??
+        (isXP ? (
+          <span style={{ letterSpacing: "0.2em" }}>_ □ ✕</span>
+        ) : (
+          <span style={{ width: 46 * s }} />
+        ))}
     </div>
   );
   const field = (text: string, extra: CSSProperties = {}) => (
@@ -1242,7 +1540,16 @@ export function UiRender({
     return (
       <div style={chromeShell}>
         {bar(element.title || "Window")}
-        <div style={{ display: "flex", gap: 16 * s, padding: `${8 * s}px ${14 * s}px`, borderBottom: `1px solid ${line}`, fontSize: 14 * s, color: t.muted }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 16 * s,
+            padding: `${8 * s}px ${14 * s}px`,
+            borderBottom: `1px solid ${line}`,
+            fontSize: 14 * s,
+            color: t.muted,
+          }}
+        >
           {element.items.map((it, i) => (
             <span key={i}>{it}</span>
           ))}
@@ -1255,17 +1562,45 @@ export function UiRender({
   if (K === "browser") {
     return (
       <div style={chromeShell}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 * s, padding: `${10 * s}px ${14 * s}px`, background: barBg, borderBottom: `${t.borderWidth}px solid ${line}` }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10 * s,
+            padding: `${10 * s}px ${14 * s}px`,
+            background: barBg,
+            borderBottom: `${t.borderWidth}px solid ${line}`,
+          }}
+        >
           {dots}
           <span style={{ color: barFg, fontSize: 15 * s, opacity: 0.8 }}>◀ ▶ ⟳</span>
           {field(element.body || "https://example.com", { borderRadius: 999 })}
         </div>
-        <div style={{ display: "flex", gap: 18 * s, padding: `${10 * s}px ${16 * s}px`, borderBottom: `1px solid ${line}`, fontSize: 15 * s, color: t.muted }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 18 * s,
+            padding: `${10 * s}px ${16 * s}px`,
+            borderBottom: `1px solid ${line}`,
+            fontSize: 15 * s,
+            color: t.muted,
+          }}
+        >
           {element.items.map((it, i) => (
-            <span key={i} style={i === 0 ? { color: accent, fontWeight: 700 } : undefined}>{it}</span>
+            <span key={i} style={i === 0 ? { color: accent, fontWeight: 700 } : undefined}>
+              {it}
+            </span>
           ))}
         </div>
-        <div style={{ padding: 20 * s, flex: 1, display: "flex", flexDirection: "column", gap: 10 * s }}>
+        <div
+          style={{
+            padding: 20 * s,
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10 * s,
+          }}
+        >
           <div style={{ ...titleStyle, fontSize: 28 * s }}>{element.title}</div>
           <div style={{ height: 10 * s, width: "80%", background: t.muted, opacity: 0.35 }} />
           <div style={{ height: 10 * s, width: "65%", background: t.muted, opacity: 0.35 }} />
@@ -1282,13 +1617,55 @@ export function UiRender({
         <div style={{ ...titleStyle, fontSize: 11 * s }}>{element.title}</div>
         <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 0 }}>
           {timelineItems.map((item, index) => (
-            <div key={`${item}-${index}`} style={{ display: "flex", alignItems: "center", flex: 1 }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 * s, minWidth: 0 }}>
-                <div style={{ width: 12 * s, height: 12 * s, borderRadius: "50%", background: index / Math.max(1, timelineItems.length - 1) <= element.value / 100 ? element.accentColor : `${element.fgColor ?? "#fff"}55`, border: `2px solid ${element.accentColor}` }} />
-                <span style={{ ...bodyStyle, fontSize: 8 * s, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 72 * s }}>{item}</span>
+            <div
+              key={`${item}-${index}`}
+              style={{ display: "flex", alignItems: "center", flex: 1 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 5 * s,
+                  minWidth: 0,
+                }}
+              >
+                <div
+                  style={{
+                    width: 12 * s,
+                    height: 12 * s,
+                    borderRadius: "50%",
+                    background:
+                      index / Math.max(1, timelineItems.length - 1) <= element.value / 100
+                        ? element.accentColor
+                        : `${element.fgColor ?? "#fff"}55`,
+                    border: `2px solid ${element.accentColor}`,
+                  }}
+                />
+                <span
+                  style={{
+                    ...bodyStyle,
+                    fontSize: 8 * s,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 72 * s,
+                  }}
+                >
+                  {item}
+                </span>
               </div>
               {index < timelineItems.length - 1 && (
-                <div style={{ height: 2 * s, flex: 1, background: index / Math.max(1, timelineItems.length - 1) < element.value / 100 ? element.accentColor : `${element.fgColor ?? "#fff"}35` }} />
+                <div
+                  style={{
+                    height: 2 * s,
+                    flex: 1,
+                    background:
+                      index / Math.max(1, timelineItems.length - 1) < element.value / 100
+                        ? element.accentColor
+                        : `${element.fgColor ?? "#fff"}35`,
+                  }}
+                />
               )}
             </div>
           ))}
@@ -1350,7 +1727,16 @@ export function UiRender({
               title={element.title}
             >
               {[0, 1, 2, 3].map((i) => (
-                <span key={i} style={{ width: 7 * s, height: 7 * s, background: accent, display: "block", borderRadius: sharp ? 0 : 1.5 * s }} />
+                <span
+                  key={i}
+                  style={{
+                    width: 7 * s,
+                    height: 7 * s,
+                    background: accent,
+                    display: "block",
+                    borderRadius: sharp ? 0 : 1.5 * s,
+                  }}
+                />
               ))}
             </div>
           )}
@@ -1418,9 +1804,26 @@ export function UiRender({
             </div>
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 * s, fontSize: 14 * s, color: barFg, opacity: 0.92, whiteSpace: "nowrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10 * s,
+            fontSize: 14 * s,
+            color: barFg,
+            opacity: 0.92,
+            whiteSpace: "nowrap",
+          }}
+        >
           <span style={{ letterSpacing: "0.12em" }}>∧ ᯤ 🔊 ▮</span>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.1 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              lineHeight: 1.1,
+            }}
+          >
             <span style={{ fontWeight: 700 }}>{element.body}</span>
             <span style={{ fontSize: 11 * s, opacity: 0.75 }}>{element.title || "Windows"}</span>
           </div>
@@ -1445,7 +1848,9 @@ export function UiRender({
             gap: 8 * s,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 * s, paddingBottom: 6 * s }}>{dots}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 * s, paddingBottom: 6 * s }}>
+            {dots}
+          </div>
           {element.items.map((it, i) => (
             <div
               key={i}
@@ -1465,18 +1870,44 @@ export function UiRender({
                 overflow: "hidden",
               }}
             >
-              <span style={{ width: 10 * s, height: 10 * s, background: accent, borderRadius: "50%", flexShrink: 0 }} />
+              <span
+                style={{
+                  width: 10 * s,
+                  height: 10 * s,
+                  background: accent,
+                  borderRadius: "50%",
+                  flexShrink: 0,
+                }}
+              />
               {it}
             </div>
           ))}
-          <div style={{ marginTop: "auto", fontSize: 14 * s, color: t.muted }}>{element.files?.[0] || "+ New tab"}</div>
+          <div style={{ marginTop: "auto", fontSize: 14 * s, color: t.muted }}>
+            {element.files?.[0] || "+ New tab"}
+          </div>
         </div>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 * s, padding: `${10 * s}px ${14 * s}px`, borderBottom: `1px solid ${line}` }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10 * s,
+              padding: `${10 * s}px ${14 * s}px`,
+              borderBottom: `1px solid ${line}`,
+            }}
+          >
             <span style={{ color: t.muted, fontSize: 15 * s }}>◀ ▶ ⟳</span>
             {field(element.body || "https://example.com", { borderRadius: 999 })}
           </div>
-          <div style={{ padding: 20 * s, flex: 1, display: "flex", flexDirection: "column", gap: 10 * s }}>
+          <div
+            style={{
+              padding: 20 * s,
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10 * s,
+            }}
+          >
             <div style={{ ...titleStyle, fontSize: 26 * s }}>{element.title}</div>
             <div style={{ height: 10 * s, width: "80%", background: t.muted, opacity: 0.35 }} />
             <div style={{ height: 10 * s, width: "62%", background: t.muted, opacity: 0.35 }} />
@@ -1489,7 +1920,15 @@ export function UiRender({
 
   if (K === "search") {
     return (
-      <div style={{ ...shell, flexDirection: "row", alignItems: "center", gap: 12 * s, padding: 16 * s }}>
+      <div
+        style={{
+          ...shell,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 12 * s,
+          padding: 16 * s,
+        }}
+      >
         <span style={{ fontSize: 24 * s, color: accent }}>⌕</span>
         <span style={{ ...bodyStyle, flex: 1, fontSize: 22 * s }}>{element.title}</span>
         <span
@@ -1511,14 +1950,35 @@ export function UiRender({
     return (
       <div style={{ ...chromeShell, background: element.uiStyle === "cyber" ? "#05080f" : t.bg }}>
         {bar(element.title || "terminal")}
-        <div style={{ padding: 16 * s, fontFamily: "'JetBrains Mono', monospace", fontSize: 16 * s, lineHeight: 1.6, color: accent, flex: 1, overflow: "hidden" }}>
+        <div
+          style={{
+            padding: 16 * s,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 16 * s,
+            lineHeight: 1.6,
+            color: accent,
+            flex: 1,
+            overflow: "hidden",
+          }}
+        >
           {element.items.map((it, i) => (
-            <div key={i} style={{ color: it.startsWith("$") ? accent : t.muted }}>{it}</div>
+            <div key={i} style={{ color: it.startsWith("$") ? accent : t.muted }}>
+              {it}
+            </div>
           ))}
           <div>
             <span style={{ color: accent }}>$ </span>
             {element.body}
-            <span style={{ background: accent, marginLeft: 2 * s, display: "inline-block", width: 9 * s, height: 16 * s, verticalAlign: "middle" }} />
+            <span
+              style={{
+                background: accent,
+                marginLeft: 2 * s,
+                display: "inline-block",
+                width: 9 * s,
+                height: 16 * s,
+                verticalAlign: "middle",
+              }}
+            />
           </div>
         </div>
       </div>
@@ -1527,14 +1987,41 @@ export function UiRender({
 
   if (K === "phone") {
     return (
-      <div style={{ ...chromeShell, borderRadius: sharp ? 0 : 36 * s, borderWidth: Math.max(4, t.borderWidth * 2) }}>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: `${10 * s}px ${18 * s}px`, fontSize: 13 * s, color: t.muted, flexShrink: 0 }}>
+      <div
+        style={{
+          ...chromeShell,
+          borderRadius: sharp ? 0 : 36 * s,
+          borderWidth: Math.max(4, t.borderWidth * 2),
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: `${10 * s}px ${18 * s}px`,
+            fontSize: 13 * s,
+            color: t.muted,
+            flexShrink: 0,
+          }}
+        >
           <span>9:41</span>
           <span>▮▮▮ ▮</span>
         </div>
-        <div style={{ padding: `${6 * s}px ${18 * s}px`, ...titleStyle, fontSize: 26 * s }}>{element.title}</div>
-        <div style={{ padding: `0 ${18 * s}px`, ...bodyStyle, fontSize: 16 * s }}>{element.body}</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 * s, padding: 18 * s, flex: 1 }}>
+        <div style={{ padding: `${6 * s}px ${18 * s}px`, ...titleStyle, fontSize: 26 * s }}>
+          {element.title}
+        </div>
+        <div style={{ padding: `0 ${18 * s}px`, ...bodyStyle, fontSize: 16 * s }}>
+          {element.body}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10 * s,
+            padding: 18 * s,
+            flex: 1,
+          }}
+        >
           {element.items.map((it, i) => (
             <div
               key={i}
@@ -1549,7 +2036,16 @@ export function UiRender({
               {it}
             </div>
           ))}
-          <div style={{ marginTop: "auto", height: 6 * s, width: "40%", alignSelf: "center", background: t.muted, borderRadius: 999 }} />
+          <div
+            style={{
+              marginTop: "auto",
+              height: 6 * s,
+              width: "40%",
+              alignSelf: "center",
+              background: t.muted,
+              borderRadius: 999,
+            }}
+          />
         </div>
       </div>
     );
@@ -1560,7 +2056,15 @@ export function UiRender({
       <div style={{ ...chromeShell }}>
         {bar(element.title || "Confirm")}
         <div style={{ padding: 22 * s, ...bodyStyle, color: t.fg, flex: 1 }}>{element.body}</div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 * s, padding: 16 * s, borderTop: `1px solid ${line}` }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 10 * s,
+            padding: 16 * s,
+            borderTop: `1px solid ${line}`,
+          }}
+        >
           {element.items.map((it, i) => (
             <span
               key={i}
@@ -1588,7 +2092,9 @@ export function UiRender({
         <div style={{ ...titleStyle, fontSize: 32 * s }}>{element.title}</div>
         <div style={bodyStyle}>{element.body}</div>
         {element.items.map((it, i) => (
-          <div key={i} style={{ display: "flex" }}>{field(it)}</div>
+          <div key={i} style={{ display: "flex" }}>
+            {field(it)}
+          </div>
         ))}
         <div
           style={{
@@ -1611,7 +2117,15 @@ export function UiRender({
 
   if (K === "notification") {
     return (
-      <div style={{ ...shell, flexDirection: "row", alignItems: "center", gap: 14 * s, padding: 18 * s }}>
+      <div
+        style={{
+          ...shell,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 14 * s,
+          padding: 18 * s,
+        }}
+      >
         <span
           style={{
             width: 44 * s,
@@ -1646,7 +2160,8 @@ export function UiRender({
       number: dark ? "#fbbf24" : "#b45309",
       keyword: dark ? accent : "#2563eb",
     };
-    const RX = /(\/\/[^\n]*|#[^\n]*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(const|let|var|function|return|if|else|for|while|class|new|import|export|from|default|async|await|try|catch|throw|type|interface|def|fn|struct|enum|pub|mut)\b|\b(\d+(?:\.\d+)?)\b/g;
+    const RX =
+      /(\/\/[^\n]*|#[^\n]*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(const|let|var|function|return|if|else|for|while|class|new|import|export|from|default|async|await|try|catch|throw|type|interface|def|fn|struct|enum|pub|mut)\b|\b(\d+(?:\.\d+)?)\b/g;
     const tokenize = (codeLine: string) => {
       const out: Array<{ text: string; kind: string }> = [];
       let last = 0;
@@ -1662,23 +2177,97 @@ export function UiRender({
       return out;
     };
     return (
-      <div style={{ ...shell, padding: 0, gap: 0, fontFamily: "'JetBrains Mono', 'Fira Code', monospace", fontSize: 16 * s }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 * s, padding: `${10 * s}px ${14 * s}px`, borderBottom: `${Math.max(1, t.borderWidth - 1)}px solid ${line}`, background: softFill }}>
+      <div
+        style={{
+          ...shell,
+          padding: 0,
+          gap: 0,
+          fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+          fontSize: 16 * s,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10 * s,
+            padding: `${10 * s}px ${14 * s}px`,
+            borderBottom: `${Math.max(1, t.borderWidth - 1)}px solid ${line}`,
+            background: softFill,
+          }}
+        >
           <span style={{ display: "flex", gap: 6 * s }}>
             {[0, 1, 2].map((i) => (
-              <span key={i} style={{ width: 10 * s, height: 10 * s, borderRadius: "50%", background: i === 0 ? "#ff5f57" : i === 1 ? "#febc2e" : "#28c840" }} />
+              <span
+                key={i}
+                style={{
+                  width: 10 * s,
+                  height: 10 * s,
+                  borderRadius: "50%",
+                  background: i === 0 ? "#ff5f57" : i === 1 ? "#febc2e" : "#28c840",
+                }}
+              />
             ))}
           </span>
-          <span style={{ flex: 1, textAlign: "center", color: t.muted, fontSize: 13 * s, whiteSpace: "nowrap", overflow: "hidden" }}>{element.title}</span>
+          <span
+            style={{
+              flex: 1,
+              textAlign: "center",
+              color: t.muted,
+              fontSize: 13 * s,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+            }}
+          >
+            {element.title}
+          </span>
           <span style={{ width: 10 * s }} />
         </div>
-        <div style={{ flex: 1, minHeight: 0, overflow: "hidden", padding: `${12 * s}px 0`, display: "flex", flexDirection: "column", gap: 3 * s }}>
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflow: "hidden",
+            padding: `${12 * s}px 0`,
+            display: "flex",
+            flexDirection: "column",
+            gap: 3 * s,
+          }}
+        >
           {lines.map((ln, i) => (
             <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 12 * s }}>
-              <span style={{ width: 40 * s, flexShrink: 0, textAlign: "right", paddingRight: 14 * s, color: t.muted, opacity: 0.55, fontSize: 12 * s, userSelect: "none" }}>{i + 1}</span>
+              <span
+                style={{
+                  width: 40 * s,
+                  flexShrink: 0,
+                  textAlign: "right",
+                  paddingRight: 14 * s,
+                  color: t.muted,
+                  opacity: 0.55,
+                  fontSize: 12 * s,
+                  userSelect: "none",
+                }}
+              >
+                {i + 1}
+              </span>
               <span style={{ whiteSpace: "pre", flex: 1, overflow: "hidden", color: t.fg }}>
                 {tokenize(ln).map((tok, j) => (
-                  <span key={j} style={{ color: tok.kind === "comment" ? C.comment : tok.kind === "string" ? C.string : tok.kind === "keyword" ? C.keyword : tok.kind === "number" ? C.number : t.fg, fontStyle: tok.kind === "comment" ? "italic" : undefined }}>
+                  <span
+                    key={j}
+                    style={{
+                      color:
+                        tok.kind === "comment"
+                          ? C.comment
+                          : tok.kind === "string"
+                            ? C.string
+                            : tok.kind === "keyword"
+                              ? C.keyword
+                              : tok.kind === "number"
+                                ? C.number
+                                : t.fg,
+                      fontStyle: tok.kind === "comment" ? "italic" : undefined,
+                    }}
+                  >
                     {tok.text}
                   </span>
                 ))}

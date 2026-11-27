@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Eye, EyeOff, ArrowRight, Cloud, Palette, MonitorSmartphone } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Cloud,
+  Palette,
+  MonitorSmartphone,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/hooks/use-auth";
+import { buildPageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -12,20 +22,14 @@ export const Route = createFileRoute("/auth")({
         ? s.next
         : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Sign in — DiapoLab" },
-      { name: "description", content: "Sign in to DiapoLab to save and sync your designs." },
-      { property: "og:title", content: "Sign in — DiapoLab" },
-      { property: "og:description", content: "Sign in to save and sync your DiapoLab projects." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-    links: [
-      { rel: "canonical", href: "https://diapolab.lovable.app/auth" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-    ],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "Sign In – DiapoLab Presentation Editor",
+      description:
+        "Sign in or create a DiapoLab account to save slide decks to the cloud, publish templates, and sync projects across devices.",
+      path: "/auth",
+      twitterCard: "summary",
+    }),
 });
 
 function AuthPage() {
@@ -101,8 +105,7 @@ function AuthPage() {
             <div>
               <p className="text-xs font-semibold text-blue-600">Presentation studio</p>
               <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-slate-900">
-                Design slides that{" "}
-                <span className="text-blue-600">feel alive.</span>
+                Design slides that <span className="text-blue-600">feel alive.</span>
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 Build decks with shapes, morph transitions, live polls, and clean exports.
@@ -113,9 +116,15 @@ function AuthPage() {
               {[
                 { icon: Cloud, text: "Save your designs and pick up on any device" },
                 { icon: Palette, text: "40+ shape effects, liquid glass, themes" },
-                { icon: MonitorSmartphone, text: "Present fullscreen with laser & annotation tools" },
+                {
+                  icon: MonitorSmartphone,
+                  text: "Present fullscreen with laser & annotation tools",
+                },
               ].map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-center gap-3 text-xs font-medium text-slate-700">
+                <li
+                  key={text}
+                  className="flex items-center gap-3 text-xs font-medium text-slate-700"
+                >
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-blue-600">
                     <Icon className="size-4" />
                   </span>
@@ -125,9 +134,7 @@ function AuthPage() {
             </ul>
           </div>
 
-          <p className="text-xs text-slate-500">
-            DiapoLab · Design &amp; presentation editor
-          </p>
+          <p className="text-xs text-slate-500">DiapoLab · Design &amp; presentation editor</p>
         </div>
 
         {/* Right panel — form */}
@@ -204,7 +211,9 @@ function AuthPage() {
             >
               {loading && <Loader2 className="size-4 animate-spin" />}
               {mode === "signin" ? "Sign in" : "Create account"}
-              {!loading && <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />}
+              {!loading && (
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              )}
             </button>
           </form>
 
@@ -218,11 +227,13 @@ function AuthPage() {
             >
               {mode === "signin" ? (
                 <>
-                  No account yet? <span className="font-semibold text-blue-600 hover:underline">Sign up</span>
+                  No account yet?{" "}
+                  <span className="font-semibold text-blue-600 hover:underline">Sign up</span>
                 </>
               ) : (
                 <>
-                  Already have an account? <span className="font-semibold text-blue-600 hover:underline">Sign in</span>
+                  Already have an account?{" "}
+                  <span className="font-semibold text-blue-600 hover:underline">Sign in</span>
                 </>
               )}
             </button>
@@ -236,9 +247,7 @@ function AuthPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-slate-700">
-        {label}
-      </span>
+      <span className="mb-1.5 block text-xs font-semibold text-slate-700">{label}</span>
       {children}
     </label>
   );

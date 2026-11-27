@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, Heart, LayoutGrid, Search, Users, Download, Layers, SlidersHorizontal, FilePlus2, FileUp, Presentation, X } from "lucide-react";
+import {
+  Loader2,
+  Heart,
+  LayoutGrid,
+  Search,
+  Users,
+  Download,
+  Layers,
+  SlidersHorizontal,
+  FilePlus2,
+  FileUp,
+  Presentation,
+  X,
+} from "lucide-react";
 import { useEditor, type Page } from "@/store/editor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PanelHeader } from "./TextPanel";
@@ -23,7 +36,9 @@ function readBuiltinLikes(): Set<string> {
   try {
     const raw = localStorage.getItem(BUILTIN_LIKES_KEY);
     const arr = raw ? (JSON.parse(raw) as unknown) : [];
-    return Array.isArray(arr) ? new Set(arr.filter((x): x is string => typeof x === "string")) : new Set();
+    return Array.isArray(arr)
+      ? new Set(arr.filter((x): x is string => typeof x === "string"))
+      : new Set();
   } catch {
     return new Set();
   }
@@ -68,24 +83,41 @@ function inferTemplateStyle(template: PublicTemplate): TemplateStyle {
   const text = `${template.name} ${JSON.stringify(template.pages)}`.toLowerCase();
 
   if (
-    text.includes("cyber") || text.includes("neon") || text.includes("glitch") ||
-    text.includes("synthwave") || /\b(orbitron|zen dots|rampart|unbounded|major mono)\b/i.test(text)
-  ) return "cyber";
+    text.includes("cyber") ||
+    text.includes("neon") ||
+    text.includes("glitch") ||
+    text.includes("synthwave") ||
+    /\b(orbitron|zen dots|rampart|unbounded|major mono)\b/i.test(text)
+  )
+    return "cyber";
 
   if (
-    text.includes("glass") || text.includes("frosted") || text.includes("liquid") ||
-    text.includes("translucent") || text.includes("blur")
-  ) return "glass";
+    text.includes("glass") ||
+    text.includes("frosted") ||
+    text.includes("liquid") ||
+    text.includes("translucent") ||
+    text.includes("blur")
+  )
+    return "glass";
 
   if (
-    text.includes("brutal") || text.includes("loud") || text.includes("poster") ||
-    text.includes("sticker") || /\b(archivo black|anton|bungee|shrikhand|tilt prism)\b/i.test(text)
-  ) return "neobrutalist";
+    text.includes("brutal") ||
+    text.includes("loud") ||
+    text.includes("poster") ||
+    text.includes("sticker") ||
+    /\b(archivo black|anton|bungee|shrikhand|tilt prism)\b/i.test(text)
+  )
+    return "neobrutalist";
 
   if (
-    text.includes("corporate") || text.includes("business") || text.includes("report") ||
-    text.includes("pitch") || text.includes("professional") || text.includes("deck")
-  ) return "corporate";
+    text.includes("corporate") ||
+    text.includes("business") ||
+    text.includes("report") ||
+    text.includes("pitch") ||
+    text.includes("professional") ||
+    text.includes("deck")
+  )
+    return "corporate";
 
   return "minimal";
 }
@@ -132,7 +164,7 @@ export function TemplatesPanel() {
         remote.forEach((t) => ensureFontsForPages(t.pages as never));
         const ids = remote.map((t) => t.id);
         const [counts, mine] = await Promise.all([
-          listTemplateLikeCounts(ids).catch(() => ({} as Record<string, number>)),
+          listTemplateLikeCounts(ids).catch(() => ({}) as Record<string, number>),
           listMyLikedTemplateIds().catch(() => new Set<string>()),
         ]);
         const builtinCounts: Record<string, number> = {};
@@ -235,7 +267,12 @@ export function TemplatesPanel() {
 
   return (
     <div className="panel-content flex flex-col gap-4">
-      <PanelHeader kicker="Home" title="Start from a deck" description="Create from scratch, import PowerPoint, or pick a template." icon={LayoutGrid} />
+      <PanelHeader
+        kicker="Home"
+        title="Start from a deck"
+        description="Create from scratch, import PowerPoint, or pick a template."
+        icon={LayoutGrid}
+      />
 
       {/* ── Quick start ─────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2">
@@ -246,14 +283,24 @@ export function TemplatesPanel() {
           <span className="grid size-8 place-items-center rounded-md bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
             <FilePlus2 className="size-4" />
           </span>
-          <span className="text-[11px] font-semibold tracking-tight text-slate-700">Blank deck</span>
+          <span className="text-[11px] font-semibold tracking-tight text-slate-700">
+            Blank deck
+          </span>
         </button>
 
-        <label className={`group flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/70 px-2 py-3 text-center transition-colors hover:border-blue-300 hover:bg-white ${importingPptx ? "pointer-events-none opacity-60" : ""}`}>
+        <label
+          className={`group flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/70 px-2 py-3 text-center transition-colors hover:border-blue-300 hover:bg-white ${importingPptx ? "pointer-events-none opacity-60" : ""}`}
+        >
           <span className="grid size-8 place-items-center rounded-md bg-slate-100 text-slate-700 transition-colors group-hover:bg-slate-900 group-hover:text-white">
-            {importingPptx ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
+            {importingPptx ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <FileUp className="size-4" />
+            )}
           </span>
-          <span className="text-[11px] font-semibold tracking-tight text-slate-700">{importingPptx ? "Importing…" : "Import PPTX"}</span>
+          <span className="text-[11px] font-semibold tracking-tight text-slate-700">
+            {importingPptx ? "Importing…" : "Import PPTX"}
+          </span>
           <input
             type="file"
             accept=".pptx"
@@ -403,7 +450,9 @@ export function TemplatesPanel() {
       {/* Template list */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2 text-[11px]">
-          <span className="font-semibold text-slate-500">Ranked by {sortBy === "likes" ? "likes · date" : "newest · likes"}</span>
+          <span className="font-semibold text-slate-500">
+            Ranked by {sortBy === "likes" ? "likes · date" : "newest · likes"}
+          </span>
           <div className="inline-flex rounded-md border border-slate-200 bg-slate-50 p-0.5">
             {(["likes", "recent"] as const).map((s) => (
               <button
@@ -411,7 +460,9 @@ export function TemplatesPanel() {
                 type="button"
                 onClick={() => setSortBy(s)}
                 className={`rounded px-2 py-0.5 text-[10px] font-semibold transition-colors ${
-                  sortBy === s ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-800"
+                  sortBy === s
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 {s === "likes" ? "Most liked" : "Recent"}
@@ -514,7 +565,9 @@ function StyleChip({
     >
       {dot && <span className="size-1.5 rounded-sm" style={{ backgroundColor: dot }} />}
       <span>{label}</span>
-      <span className={`font-mono text-[10px] tabular-nums ${active ? "text-blue-100" : "text-slate-400"}`}>
+      <span
+        className={`font-mono text-[10px] tabular-nums ${active ? "text-blue-100" : "text-slate-400"}`}
+      >
         {count}
       </span>
     </button>
@@ -623,16 +676,23 @@ function TemplateCard({
 
       {c.creator_profile?.username && (
         <Link
-          to="/profile/$username" params={{ username: c.creator_profile.username }}
+          to="/profile/$username"
+          params={{ username: c.creator_profile.username }}
           onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-2 border-b border-slate-100 px-3.5 py-2 text-left transition-colors hover:bg-slate-50/80"
           title={`View ${c.creator_profile.display_name || c.creator_profile.username}'s profile`}
         >
           {c.creator_profile.avatar_url ? (
-            <img src={c.creator_profile.avatar_url} alt="" className="size-5 rounded-full object-cover" />
+            <img
+              src={c.creator_profile.avatar_url}
+              alt=""
+              className="size-5 rounded-full object-cover"
+            />
           ) : (
             <span className="flex size-5 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-600">
-              {(c.creator_profile.display_name || c.creator_profile.username).slice(0, 1).toUpperCase()}
+              {(c.creator_profile.display_name || c.creator_profile.username)
+                .slice(0, 1)
+                .toUpperCase()}
             </span>
           )}
           <span className="min-w-0 truncate text-[11px] font-medium text-slate-600">
@@ -643,14 +703,19 @@ function TemplateCard({
 
       {/* Footer — crisp title + unboxed single-line metadata */}
       <div className="px-3.5 py-2.5">
-        <div className="truncate text-[13px] font-semibold tracking-tight text-slate-900" title={c.name}>
+        <div
+          className="truncate text-[13px] font-semibold tracking-tight text-slate-900"
+          title={c.name}
+        >
           {c.name}
         </div>
         <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500 tabular-nums">
           <span className="size-1.5 shrink-0 rounded-sm" style={{ backgroundColor: meta.dot }} />
           <span>{meta.label}</span>
           <span className="text-slate-300">·</span>
-          <span>{slides} slide{slides === 1 ? "" : "s"}</span>
+          <span>
+            {slides} slide{slides === 1 ? "" : "s"}
+          </span>
         </div>
       </div>
     </div>
@@ -777,4 +842,3 @@ function AllTemplatesDialog({
     </Dialog>
   );
 }
-

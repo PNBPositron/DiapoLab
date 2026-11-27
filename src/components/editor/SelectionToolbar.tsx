@@ -60,8 +60,7 @@ export function SelectionToolbar() {
 
   const isText = el.type === "text" || el.type === "button";
   const text = el as { fontSize?: number; fontWeight?: number };
-  const btn =
-    "grid size-7 place-items-center rounded-md transition";
+  const btn = "grid size-7 place-items-center rounded-md transition";
   const clampFont = (v: number) => Math.max(8, Math.min(400, Math.round(v)));
 
   // Arrange the multi-selection into a photo grid over its bounding box,
@@ -105,7 +104,9 @@ export function SelectionToolbar() {
           <button
             type="button"
             title="Smaller text"
-            onClick={() => update(el.id, { fontSize: clampFont((text.fontSize ?? 16) - 2) } as never)}
+            onClick={() =>
+              update(el.id, { fontSize: clampFont((text.fontSize ?? 16) - 2) } as never)
+            }
             className={btn}
           >
             <Minus className="size-3.5" />
@@ -116,7 +117,9 @@ export function SelectionToolbar() {
           <button
             type="button"
             title="Bigger text"
-            onClick={() => update(el.id, { fontSize: clampFont((text.fontSize ?? 16) + 2) } as never)}
+            onClick={() =>
+              update(el.id, { fontSize: clampFont((text.fontSize ?? 16) + 2) } as never)
+            }
             className={btn}
           >
             <Plus className="size-3.5" />
@@ -127,22 +130,52 @@ export function SelectionToolbar() {
       {selectedIds.length > 1 && (
         <>
           <div className="flex items-center gap-0.5">
-            <button type="button" title="Align left" onClick={() => alignSelected("left")} className={btn}>
+            <button
+              type="button"
+              title="Align left"
+              onClick={() => alignSelected("left")}
+              className={btn}
+            >
               <AlignStartVertical className="size-3.5" />
             </button>
-            <button type="button" title="Align center horizontally" onClick={() => alignSelected("center-h")} className={btn}>
+            <button
+              type="button"
+              title="Align center horizontally"
+              onClick={() => alignSelected("center-h")}
+              className={btn}
+            >
               <AlignCenterVertical className="size-3.5" />
             </button>
-            <button type="button" title="Align right" onClick={() => alignSelected("right")} className={btn}>
+            <button
+              type="button"
+              title="Align right"
+              onClick={() => alignSelected("right")}
+              className={btn}
+            >
               <AlignEndVertical className="size-3.5" />
             </button>
-            <button type="button" title="Align top" onClick={() => alignSelected("top")} className={btn}>
+            <button
+              type="button"
+              title="Align top"
+              onClick={() => alignSelected("top")}
+              className={btn}
+            >
               <AlignStartHorizontal className="size-3.5" />
             </button>
-            <button type="button" title="Align middle vertically" onClick={() => alignSelected("middle")} className={btn}>
+            <button
+              type="button"
+              title="Align middle vertically"
+              onClick={() => alignSelected("middle")}
+              className={btn}
+            >
               <AlignCenterHorizontal className="size-3.5" />
             </button>
-            <button type="button" title="Align bottom" onClick={() => alignSelected("bottom")} className={btn}>
+            <button
+              type="button"
+              title="Align bottom"
+              onClick={() => alignSelected("bottom")}
+              className={btn}
+            >
               <AlignEndHorizontal className="size-3.5" />
             </button>
           </div>
@@ -192,10 +225,20 @@ export function SelectionToolbar() {
           </button>
         </>
       )}
-      <button type="button" title="Bring forward" onClick={() => bringForward(el.id)} className={btn}>
+      <button
+        type="button"
+        title="Bring forward"
+        onClick={() => bringForward(el.id)}
+        className={btn}
+      >
         <ChevronUp className="size-3.5" />
       </button>
-      <button type="button" title="Send backward" onClick={() => sendBackward(el.id)} className={btn}>
+      <button
+        type="button"
+        title="Send backward"
+        onClick={() => sendBackward(el.id)}
+        className={btn}
+      >
         <ChevronDown className="size-3.5" />
       </button>
       <button type="button" title="Duplicate" onClick={duplicateSelected} className={btn}>

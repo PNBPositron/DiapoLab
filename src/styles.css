@@ -474,15 +474,28 @@
   }
 }
 
-/* --- slide : enters smoothly from the right edge --- */
+/* --- slide : enters smoothly respecting navigation direction --- */
 @keyframes slide-slide-in {
   from {
-    transform: translateX(100%);
-    opacity: 0.92;
+    transform: translateX(calc(100% * var(--tx-dir, 1)));
+    opacity: 0.94;
   }
   to {
     transform: none;
     opacity: 1;
+  }
+}
+
+@keyframes slide-slide-out {
+  from {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+  to {
+    transform: translateX(calc(-24% * var(--tx-dir, 1))) scale(0.965);
+    opacity: 0.32;
+    filter: brightness(0.82);
   }
 }
 
@@ -498,36 +511,82 @@
   }
 }
 
-/* --- flip : 3D perspective turn --- */
-@keyframes slide-flip-in {
+@keyframes slide-zoom-out {
   from {
-    transform: perspective(1600px) rotateY(-82deg);
-    transform-origin: left center;
-    opacity: 0;
-  }
-  25% {
+    transform: scale(1);
     opacity: 1;
   }
   to {
+    transform: scale(1.08);
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+/* --- flip : true center-axis 3D card turn --- */
+@keyframes slide-flip-in {
+  0% {
+    transform: perspective(1800px) rotateY(calc(86deg * var(--tx-dir, 1))) scale(0.92);
+    opacity: 0;
+  }
+  38% {
+    opacity: 1;
+  }
+  100% {
     transform: none;
-    transform-origin: left center;
     opacity: 1;
   }
 }
 
-/* --- glitch --- */
+@keyframes slide-flip-out {
+  0% {
+    transform: perspective(1800px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: perspective(1800px) rotateY(calc(-86deg * var(--tx-dir, 1))) scale(0.92);
+    opacity: 0;
+  }
+}
+
+/* --- glitch : cybernetic slice tear + chromatic snap --- */
 @keyframes slide-glitch-in {
   0% {
     opacity: 0;
-    transform: translate(-6px, 0);
-    filter: hue-rotate(0deg) saturate(2);
-    clip-path: inset(40% 0);
+    transform: translate3d(calc(-18px * var(--tx-dir, 1)), 4px, 0) skewX(-3deg);
+    filter: hue-rotate(-35deg) saturate(2.4) contrast(1.45) brightness(1.35);
+    clip-path: inset(38% 0 42% 0);
+  }
+  16% {
+    opacity: 1;
+    transform: translate3d(calc(16px * var(--tx-dir, 1)), -6px, 0) skewX(2.5deg);
+    filter: hue-rotate(95deg) saturate(2.2) contrast(1.35);
+    clip-path: inset(12% 0 58% 0);
+  }
+  32% {
+    opacity: 0.88;
+    transform: translate3d(-11px, 3px, 0) scale(1.012);
+    filter: hue-rotate(-70deg) saturate(1.9) brightness(1.25);
+    clip-path: inset(52% 0 8% 0);
   }
   50% {
     opacity: 1;
-    transform: translate(6px, -4px);
-    filter: hue-rotate(120deg) saturate(2);
-    clip-path: inset(10% 0 70%);
+    transform: translate3d(9px, -2px, 0) skewX(-1.5deg);
+    filter: hue-rotate(35deg) saturate(1.6) contrast(1.2);
+    clip-path: inset(4% 0 18% 0);
+  }
+  68% {
+    transform: translate3d(-5px, 1px, 0);
+    filter: hue-rotate(-14deg) saturate(1.25);
+    clip-path: inset(0 0 6% 0);
+  }
+  84% {
+    transform: translate3d(2px, 0, 0);
+    filter: saturate(1.1);
+    clip-path: inset(0);
   }
   100% {
     opacity: 1;
@@ -537,51 +596,227 @@
   }
 }
 
+/* --- glitch-rgb : chromatic RGB aberration split + convergence --- */
+@keyframes slide-glitch-rgb-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(24px * var(--tx-dir, 1)), 0, 0) scaleX(1.04);
+    filter: saturate(3) contrast(1.6) brightness(1.4) drop-shadow(-14px 0 0 rgba(239, 68, 68, 0.75)) drop-shadow(14px 0 0 rgba(34, 211, 238, 0.75));
+  }
+  20% {
+    opacity: 0.95;
+    transform: translate3d(calc(-18px * var(--tx-dir, 1)), -3px, 0) scaleX(0.985);
+    filter: saturate(2.5) contrast(1.4) drop-shadow(12px -2px 0 rgba(236, 72, 153, 0.7)) drop-shadow(-12px 2px 0 rgba(56, 189, 248, 0.7));
+  }
+  42% {
+    opacity: 1;
+    transform: translate3d(10px, 2px, 0);
+    filter: saturate(1.8) contrast(1.25) drop-shadow(-8px 0 0 rgba(244, 63, 94, 0.55)) drop-shadow(8px 0 0 rgba(34, 211, 238, 0.55));
+  }
+  66% {
+    transform: translate3d(-6px, 0, 0);
+    filter: saturate(1.35) drop-shadow(4px 0 0 rgba(244, 63, 94, 0.35)) drop-shadow(-4px 0 0 rgba(34, 211, 238, 0.35));
+  }
+  84% {
+    transform: translate3d(2px, 0, 0);
+    filter: saturate(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* --- glitch-slice : jagged horizontal band lock --- */
+@keyframes slide-glitch-slice-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(38px * var(--tx-dir, 1)), 0, 0);
+    clip-path: polygon(0 0, 100% 0, 100% 22%, 0 22%, 0 46%, 100% 46%, 100% 68%, 0 68%);
+    filter: contrast(1.35) saturate(1.6);
+  }
+  24% {
+    opacity: 1;
+    transform: translate3d(calc(-24px * var(--tx-dir, 1)), 0, 0);
+    clip-path: polygon(0 16%, 100% 16%, 100% 42%, 0 42%, 0 64%, 100% 64%, 100% 94%, 0 94%);
+    filter: contrast(1.25) hue-rotate(25deg);
+  }
+  48% {
+    transform: translate3d(12px, -2px, 0);
+    clip-path: inset(6% 0 12% 0);
+    filter: contrast(1.15);
+  }
+  72% {
+    transform: translate3d(-5px, 1px, 0);
+    clip-path: inset(0 0 2% 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0);
+    filter: none;
+  }
+}
+
+/* --- glitch-vhs : analog tape tracking roll & static snow --- */
+@keyframes slide-glitch-vhs-in {
+  0% {
+    opacity: 0.15;
+    transform: translate3d(0, 14px, 0) skewX(6deg) scaleY(1.03);
+    filter: saturate(0.25) contrast(1.75) brightness(1.45);
+  }
+  20% {
+    opacity: 0.92;
+    transform: translate3d(-12px, -8px, 0) skewX(-4deg);
+    filter: saturate(1.8) contrast(1.45) hue-rotate(-18deg);
+  }
+  40% {
+    opacity: 0.85;
+    transform: translate3d(10px, 5px, 0) skewX(2.5deg);
+    filter: saturate(0.6) contrast(1.35) brightness(1.2);
+  }
+  62% {
+    opacity: 1;
+    transform: translate3d(-5px, -2px, 0) skewX(-1deg);
+    filter: saturate(1.3) contrast(1.15);
+  }
+  82% {
+    transform: translate3d(2px, 1px, 0);
+    filter: saturate(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes slide-glitch-out {
+  0% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+  35% {
+    opacity: 0.85;
+    transform: translate3d(calc(-12px * var(--tx-dir, 1)), 2px, 0) skewX(-2deg);
+    filter: hue-rotate(80deg) saturate(2) contrast(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(16px * var(--tx-dir, 1)), -3px, 0);
+    filter: brightness(1.5) blur(2px);
+  }
+}
+
+@keyframes slide-soft-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
 .slide-transition-fade {
-  animation: slide-fade-in 540ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-fade-in var(--tx-dur, 560ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-slide {
-  animation: slide-slide-in 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-slide-in var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform, opacity;
 }
+.slide-exit-slide {
+  animation: slide-slide-out var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity, filter;
+}
 .slide-transition-zoom {
-  animation: slide-zoom-in 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-zoom-in var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: center center;
   will-change: transform, opacity;
 }
+.slide-exit-zoom {
+  animation: slide-zoom-out var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center center;
+}
 .slide-transition-flip {
-  animation: slide-flip-in 820ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-flip-in var(--tx-dur, 780ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   will-change: transform, opacity;
 }
+.slide-exit-flip {
+  animation: slide-flip-out var(--tx-dur, 780ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
 .slide-transition-glitch {
-  animation: slide-glitch-in 620ms steps(8, end) both;
+  animation: slide-glitch-in var(--tx-dur, 640ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, filter, clip-path, opacity;
+}
+.slide-transition-glitch-rgb {
+  animation: slide-glitch-rgb-in var(--tx-dur, 640ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, filter, opacity;
+}
+.slide-transition-glitch-slice {
+  animation: slide-glitch-slice-in var(--tx-dur, 640ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, filter, clip-path, opacity;
+}
+.slide-transition-glitch-vhs {
+  animation: slide-glitch-vhs-in var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, filter, opacity;
+}
+.slide-exit-glitch,
+.slide-exit-glitch-rgb,
+.slide-exit-glitch-slice,
+.slide-exit-glitch-vhs,
+.slide-exit-tv,
+.slide-exit-neon {
+  animation: slide-glitch-out calc(var(--tx-dur, 640ms) * 0.72) ease-out both;
+}
+.slide-exit-fade,
+.slide-exit-blur,
+.slide-exit-prism,
+.slide-exit-reveal,
+.slide-exit-shutter,
+.slide-exit-swirl,
+.slide-exit-warp,
+.slide-exit-origami,
+.slide-exit-cube,
+.slide-exit-parallax-left,
+.slide-exit-parallax-up,
+.slide-exit-parallax-depth {
+  animation: slide-soft-out var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-tv {
-  animation: slide-tv-in 760ms steps(8, end) both;
+  animation: slide-tv-in var(--tx-dur, 780ms) cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: center;
 }
 .slide-transition-neon {
-  animation: slide-neon-in 820ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-neon-in var(--tx-dur, 780ms) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .slide-transition-cube {
-  animation: slide-cube-in 840ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-cube-in var(--tx-dur, 820ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: 50% 50%;
 }
 .slide-transition-blur {
-  animation: slide-blur-in 840ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-blur-in var(--tx-dur, 780ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes slide-tv-in {
   0% {
     opacity: 0;
     transform: scaleY(0.02) scaleX(1.03);
-    filter: brightness(2) saturate(2);
+    filter: brightness(2.2) saturate(1.9);
   }
   35% {
     opacity: 1;
-    transform: scaleY(0.8) scaleX(1);
+    transform: scaleY(0.84) scaleX(1);
+    filter: brightness(1.35) saturate(1.3);
   }
-  55% {
-    transform: scaleY(0.96);
+  60% {
+    transform: scaleY(0.98);
   }
   100% {
     transform: none;
@@ -591,12 +826,12 @@
 @keyframes slide-neon-in {
   0% {
     opacity: 0;
-    filter: brightness(3) saturate(2) blur(12px);
+    filter: brightness(2.6) saturate(2) blur(10px);
     box-shadow: 0 0 80px #67e8f9;
   }
   60% {
     opacity: 1;
-    filter: brightness(1.3) saturate(1.4) blur(1px);
+    filter: brightness(1.25) saturate(1.35) blur(1px);
   }
   100% {
     filter: none;
@@ -606,7 +841,7 @@
 @keyframes slide-cube-in {
   from {
     opacity: 0;
-    transform: perspective(1400px) rotateY(-24deg) translateX(3%);
+    transform: perspective(1500px) rotateY(calc(-28deg * var(--tx-dir, 1))) translateX(calc(4% * var(--tx-dir, 1)));
   }
   to {
     opacity: 1;
@@ -616,8 +851,8 @@
 @keyframes slide-blur-in {
   from {
     opacity: 0;
-    filter: blur(22px);
-    transform: scale(1.015);
+    filter: blur(24px) saturate(1.15);
+    transform: scale(1.025);
   }
   to {
     opacity: 1;
@@ -633,7 +868,7 @@
 .slide-transition-parallax-left,
 .slide-transition-parallax-up,
 .slide-transition-parallax-depth {
-  animation: slide-parallax-base 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-parallax-base var(--tx-dur, 860ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .slide-transition-parallax-left > *,
@@ -644,7 +879,7 @@
 
 /* ---- Horizontal parallax: deeper elements lag behind ---- */
 .slide-transition-parallax-left > * {
-  animation: px-left-1 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: px-left-1 var(--tx-dur, 860ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-parallax-left > *:nth-child(2n) {
   animation-name: px-left-2;
@@ -658,7 +893,7 @@
 
 /* ---- Vertical parallax ---- */
 .slide-transition-parallax-up > * {
-  animation: px-up-1 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: px-up-1 var(--tx-dur, 860ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-parallax-up > *:nth-child(2n) {
   animation-name: px-up-2;
@@ -669,7 +904,7 @@
 
 /* ---- Depth parallax: camera dolly — scale + blur ---- */
 .slide-transition-parallax-depth > * {
-  animation: px-depth-1 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: px-depth-1 var(--tx-dur, 920ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-parallax-depth > *:nth-child(2n) {
   animation-name: px-depth-2;
@@ -688,7 +923,7 @@
 }
 @keyframes px-left-1 {
   from {
-    transform: translateX(-40px);
+    transform: translateX(calc(44px * var(--tx-dir, 1)));
     opacity: 0;
   }
   to {
@@ -698,7 +933,7 @@
 }
 @keyframes px-left-2 {
   from {
-    transform: translateX(-90px);
+    transform: translateX(calc(96px * var(--tx-dir, 1)));
     opacity: 0;
   }
   to {
@@ -708,7 +943,7 @@
 }
 @keyframes px-left-3 {
   from {
-    transform: translateX(-150px);
+    transform: translateX(calc(156px * var(--tx-dir, 1)));
     opacity: 0;
   }
   to {
@@ -718,7 +953,7 @@
 }
 @keyframes px-left-4 {
   from {
-    transform: translateX(-220px);
+    transform: translateX(calc(224px * var(--tx-dir, 1)));
     opacity: 0;
   }
   to {
@@ -1240,7 +1475,22 @@
   animation: selector-flip 1.8s ease infinite;
 }
 .transition-mini-stage[data-transition="glitch"] {
-  animation: selector-glitch 1.8s steps(4) infinite;
+  animation: selector-glitch 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.transition-mini-stage[data-transition="glitch-rgb"] {
+  animation: selector-glitch-rgb 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.transition-mini-stage[data-transition="glitch-slice"] > * {
+  animation: selector-glitch-slice 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.transition-mini-stage[data-transition="glitch-slice"] > :nth-child(2) {
+  animation-delay: -90ms;
+}
+.transition-mini-stage[data-transition="glitch-slice"] > :nth-child(3) {
+  animation-delay: -170ms;
+}
+.transition-mini-stage[data-transition="glitch-vhs"] {
+  animation: selector-glitch-vhs 1.7s linear infinite;
 }
 .transition-mini-stage[data-transition="tv"] {
   animation: selector-tv 1.8s steps(6) infinite;
@@ -1334,17 +1584,72 @@
 @keyframes selector-glitch {
   0%,
   10% {
-    clip-path: inset(25% 0 45%);
-    transform: translateX(-5px);
+    clip-path: inset(25% 0 42%);
+    transform: translateX(-6px) skewX(-3deg);
+    filter: hue-rotate(40deg) saturate(2);
   }
   20% {
-    clip-path: inset(55% 0 10%);
-    transform: translateX(5px);
+    clip-path: inset(52% 0 12%);
+    transform: translateX(6px) skewX(2deg);
+    filter: hue-rotate(-60deg) saturate(2);
   }
-  40%,
+  32% {
+    clip-path: inset(6% 0 18%);
+    transform: translateX(-3px);
+  }
+  46%,
   100% {
     clip-path: inset(0);
     transform: none;
+    filter: none;
+  }
+}
+@keyframes selector-glitch-rgb {
+  0%,
+  10% {
+    transform: translateX(-5px);
+    filter: drop-shadow(-6px 0 0 rgba(239, 68, 68, 0.75)) drop-shadow(6px 0 0 rgba(34, 211, 238, 0.75));
+  }
+  25% {
+    transform: translateX(4px);
+    filter: drop-shadow(5px 0 0 rgba(236, 72, 153, 0.7)) drop-shadow(-5px 0 0 rgba(56, 189, 248, 0.7));
+  }
+  44%,
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes selector-glitch-slice {
+  0%,
+  10% {
+    transform: translateX(-18px);
+    opacity: 0.4;
+  }
+  26% {
+    transform: translateX(12px);
+    opacity: 0.9;
+  }
+  45%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes selector-glitch-vhs {
+  0%,
+  10% {
+    transform: translateY(6px) skewX(5deg);
+    filter: saturate(0.35) contrast(1.5);
+  }
+  24% {
+    transform: translateY(-4px) skewX(-3deg);
+    filter: saturate(1.7) hue-rotate(-15deg);
+  }
+  45%,
+  100% {
+    transform: none;
+    filter: none;
   }
 }
 @keyframes selector-tv {
@@ -1428,23 +1733,25 @@
    and no keyframe multiplies by var(--fit) — the parent frame already scales.
    ============================================================ */
 .slide-transition-reveal {
-  animation: slide-reveal-in 780ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-reveal-in var(--tx-dur, 760ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes slide-reveal-in {
   from {
     clip-path: circle(0% at 50% 50%);
+    transform: scale(1.025);
   }
   to {
     clip-path: circle(150% at 50% 50%);
+    transform: none;
   }
 }
 
 .slide-transition-shutter {
-  animation: slide-shutter-in 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: slide-shutter-in var(--tx-dur, 700ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes slide-shutter-in {
   from {
-    clip-path: inset(0 100% 0 0);
+    clip-path: inset(0 50% 0 50%);
   }
   to {
     clip-path: inset(0 0 0 0);
@@ -1452,10 +1759,10 @@
 }
 
 .slide-transition-swirl {
-  animation: slide-parallax-base 860ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-parallax-base var(--tx-dur, 860ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .slide-transition-swirl > * {
-  animation: swirl-child 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: swirl-child var(--tx-dur, 760ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform, opacity;
 }
 .slide-transition-swirl > *:nth-child(2n) {
@@ -1496,12 +1803,12 @@
 }
 
 .slide-transition-warp {
-  animation: slide-warp-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-warp-in var(--tx-dur, 720ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-style: preserve-3d;
 }
 @keyframes slide-warp-in {
   0% {
-    transform: perspective(1400px) translateX(5%) rotateY(22deg) scaleX(0.72);
+    transform: perspective(1400px) translateX(calc(6% * var(--tx-dir, 1))) rotateY(calc(24deg * var(--tx-dir, 1))) scaleX(0.72);
     opacity: 0;
   }
   55% {
@@ -1514,7 +1821,7 @@
 }
 
 .slide-transition-prism {
-  animation: slide-prism-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-prism-in var(--tx-dur, 740ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes slide-prism-in {
   0% {
@@ -1528,7 +1835,7 @@
 }
 
 .slide-transition-origami {
-  animation: slide-origami-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-origami-in var(--tx-dur, 780ms) cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: top center;
 }
 @keyframes slide-origami-in {

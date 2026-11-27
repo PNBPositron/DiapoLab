@@ -1,5 +1,17 @@
 import { useEffect, useState } from "react";
-import { Home, Type, Shapes, Layers, Layers3, Palette, Folder, Library, Image, Sun, Moon } from "lucide-react";
+import {
+  Home,
+  Type,
+  Shapes,
+  Layers,
+  Layers3,
+  Palette,
+  Folder,
+  Library,
+  Image,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useEditor } from "@/store/editor";
 import { useSettings, springEasing, type PanelId } from "@/store/settings";
 import { CUSTOM_THEME_PREFIX, DEFAULT_THEME_TOKENS, themeCssVars } from "@/lib/themes";
@@ -28,7 +40,15 @@ const TOOLS = [
 
 export function Sidebar() {
   const { tool, setTool } = useEditor();
-  const { panels, panelDurationMs, panelStiffness, reduceMotion, editorTheme, editorDark, setEditorDark } = useSettings();
+  const {
+    panels,
+    panelDurationMs,
+    panelStiffness,
+    reduceMotion,
+    editorTheme,
+    editorDark,
+    setEditorDark,
+  } = useSettings();
   const [hovering, setHovering] = useState(false);
   // Pinned panels stay open after the cursor leaves (Doory-style).
   const [pinned, setPinned] = useState(false);
@@ -53,8 +73,11 @@ export function Sidebar() {
       ? customThemes.find((t) => `${CUSTOM_THEME_PREFIX}${t.id}` === editorTheme)
       : undefined;
     root.dataset.editorTheme = custom ? "custom" : editorTheme;
-    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS))) root.style.removeProperty(key);
-    if (custom) for (const [k, v] of Object.entries(themeCssVars(custom.tokens))) root.style.setProperty(k, v);
+    for (const key of Object.keys(themeCssVars(DEFAULT_THEME_TOKENS)))
+      root.style.removeProperty(key);
+    if (custom)
+      for (const [k, v] of Object.entries(themeCssVars(custom.tokens)))
+        root.style.setProperty(k, v);
   }, [editorTheme, customThemes]);
 
   useEffect(() => {
@@ -85,7 +108,11 @@ export function Sidebar() {
       <button
         key={t.id}
         onClick={() => {
-          if (t.id === "my-designs") { setHovering(false); setTool(t.id); return; }
+          if (t.id === "my-designs") {
+            setHovering(false);
+            setTool(t.id);
+            return;
+          }
           setPinned(tool === t.id && pinned ? false : true);
           setTool(t.id);
           setHovering(true);
@@ -98,7 +125,10 @@ export function Sidebar() {
         }`}
       >
         {active && (
-          <span aria-hidden className="absolute left-0 top-1/2 h-5 w-[2.5px] -translate-y-1/2 rounded-r bg-blue-600" />
+          <span
+            aria-hidden
+            className="absolute left-0 top-1/2 h-5 w-[2.5px] -translate-y-1/2 rounded-r bg-blue-600"
+          />
         )}
         <Icon className="h-[17px] w-[17px]" strokeWidth={active ? 2.1 : 1.75} />
         <span className="leading-none">{t.label}</span>
@@ -116,9 +146,7 @@ export function Sidebar() {
         aria-label="Editor tools"
         className="editor-tool-rail flex h-full w-[68px] min-h-0 shrink-0 flex-col justify-between overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white px-1.5 py-2 shadow-[0_8px_24px_-6px_rgba(15,23,42,0.10)]"
       >
-        <div className="flex flex-col gap-0.5">
-          {primaryTools.map(renderToolBtn)}
-        </div>
+        <div className="flex flex-col gap-0.5">{primaryTools.map(renderToolBtn)}</div>
         <div className="mt-2 flex flex-col gap-2 border-t border-slate-200 pt-2">
           {bottomTools.map(renderToolBtn)}
           <div
@@ -161,7 +189,9 @@ export function Sidebar() {
         aria-hidden={!panelOpen}
         style={{ transition: panelTransition }}
         className={`editor-side-panel absolute left-[84px] top-2.5 z-40 h-[calc(100%-1.25rem)] w-[300px] origin-left overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 will-change-[transform,opacity] ${
-          panelOpen ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-[104%] opacity-0"
+          panelOpen
+            ? "translate-x-0 opacity-100"
+            : "pointer-events-none -translate-x-[104%] opacity-0"
         }`}
       >
         {tool === "home" && <TemplatesPanel />}

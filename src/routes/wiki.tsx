@@ -28,26 +28,70 @@ import {
   Puzzle,
   Plug,
 } from "lucide-react";
+import { buildBreadcrumbJsonLd, buildPageHead, absoluteUrl, SITE_NAME } from "@/lib/seo";
 
 export const Route = createFileRoute("/wiki")({
   component: Wiki,
-  head: () => ({
-    meta: [
-      { title: "Wiki — DiapoLab documentation" },
-      {
-        name: "description",
-        content:
-          "Learn DiapoLab: formats, panels, elements, plugins and widget packs, motion paths, 3D scene transitions, audio, rotoscope, auto-arrange, shortcuts, effects and transitions, dark mode, accessibility, publishing templates and sharing decks.",
-      },
-      { property: "og:title", content: "Wiki — DiapoLab documentation" },
-      { property: "og:description", content: "Guides and shortcuts for the DiapoLab editor." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/wiki" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "DiapoLab Wiki – Documentation, Shortcuts & Guides",
+      description:
+        "Learn DiapoLab features including canvas formats, interactive widgets, 3D scene transitions, PowerPoint import, keyboard shortcuts, and sharing.",
+      path: "/wiki",
+      ogType: "article",
+      jsonLd: [
+        {
+          "@type": "TechArticle",
+          headline: "DiapoLab Documentation, Shortcuts & Guides",
+          description:
+            "Learn DiapoLab features including canvas formats, interactive widgets, 3D scene transitions, PowerPoint import, keyboard shortcuts, and sharing.",
+          url: absoluteUrl("/wiki"),
+          author: { "@type": "Organization", name: SITE_NAME },
+          publisher: { "@type": "Organization", name: SITE_NAME },
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Is DiapoLab free?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. The editor, templates and themes are free to use and remix.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Where are my designs stored?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Locally in your browser, and in your account when you sign in. Publish or share to move them onto the server.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I import and export PowerPoint files?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. The import button brings a .pptx into the editor, and the Export menu writes .pptx, PDF and more.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "How do I report a bug?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Open an issue directly on GitHub, or use the command palette (Ctrl+K) and search 'report a bug'.",
+              },
+            },
+          ],
+        },
+        buildBreadcrumbJsonLd([
+          { name: "DiapoLab", path: "/" },
+          { name: "Wiki", path: "/wiki" },
+        ]),
+      ],
+    }),
 });
 
 const SECTIONS = [
@@ -67,33 +111,99 @@ const SECTIONS = [
 ];
 
 const PANELS = [
-  { icon: <LayoutGrid className="size-4" />, name: "Home", desc: "Community templates and starter decks, loaded in one click." },
-  { icon: <Type className="size-4" />, name: "Text", desc: "Titles, headings and paragraphs, with custom fonts." },
-  { icon: <Shapes className="size-4" />, name: "Elements", desc: "Shapes, icons, charts, tables, quizzes, buttons and more." },
-  { icon: <Image className="size-4" />, name: "Library", desc: "Searchable stock photos and illustrations." },
-  { icon: <Camera className="size-4" />, name: "Media", desc: "Upload your own photos, videos and audio, or record your screen and webcam." },
-  { icon: <Layers className="size-4" />, name: "Presets", desc: "Ready-made widgets, whole-slide blocks and layout presets." },
-  { icon: <Palette className="size-4" />, name: "Design", desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size, magic resize and speaker notes." },
-  { icon: <Layers3 className="size-4" />, name: "Layers", desc: "Select, reorder, hide, lock and multi-select elements on the current slide." },
-  { icon: <Folder className="size-4" />, name: "Projects", desc: "Open and manage your saved designs." },
+  {
+    icon: <LayoutGrid className="size-4" />,
+    name: "Home",
+    desc: "Community templates and starter decks, loaded in one click.",
+  },
+  {
+    icon: <Type className="size-4" />,
+    name: "Text",
+    desc: "Titles, headings and paragraphs, with custom fonts.",
+  },
+  {
+    icon: <Shapes className="size-4" />,
+    name: "Elements",
+    desc: "Shapes, icons, charts, tables, quizzes, buttons and more.",
+  },
+  {
+    icon: <Image className="size-4" />,
+    name: "Library",
+    desc: "Searchable stock photos and illustrations.",
+  },
+  {
+    icon: <Camera className="size-4" />,
+    name: "Media",
+    desc: "Upload your own photos, videos and audio, or record your screen and webcam.",
+  },
+  {
+    icon: <Layers className="size-4" />,
+    name: "Presets",
+    desc: "Ready-made widgets, whole-slide blocks and layout presets.",
+  },
+  {
+    icon: <Palette className="size-4" />,
+    name: "Design",
+    desc: "Colors, background presets, multi-stop gradients, brand kit, canvas size, magic resize and speaker notes.",
+  },
+  {
+    icon: <Layers3 className="size-4" />,
+    name: "Layers",
+    desc: "Select, reorder, hide, lock and multi-select elements on the current slide.",
+  },
+  {
+    icon: <Folder className="size-4" />,
+    name: "Projects",
+    desc: "Open and manage your saved designs.",
+  },
 ];
 
 const ELEMENTS: Array<[string, string]> = [
-  ["Text", "Inline-editable titles and paragraphs, with fonts, transforms, typewriter and count-up animations, masks."],
-  ["Shapes", "Seventy-six vector shapes in six searchable categories (Basics, Arrows & Flow, Callouts, Stars & Nature, Cyber and Decorative), with five insert styles, plus fills, gradients, strokes and visual effects."],
+  [
+    "Text",
+    "Inline-editable titles and paragraphs, with fonts, transforms, typewriter and count-up animations, masks.",
+  ],
+  [
+    "Shapes",
+    "Seventy-six vector shapes in six searchable categories (Basics, Arrows & Flow, Callouts, Stars & Nature, Cyber and Decorative), with five insert styles, plus fills, gradients, strokes and visual effects.",
+  ],
   ["Icons", "A searchable icon library, recolorable per element, with animated icons."],
-  ["Images", "Crop, shape masks, one-click remove background and rotoscope cutouts, plus filters including glitch, pixelate and posterize."],
+  [
+    "Images",
+    "Crop, shape masks, one-click remove background and rotoscope cutouts, plus filters including glitch, pixelate and posterize.",
+  ],
   ["Photo grids", "Photo and illustration grids where any cell can be swapped for a video."],
-  ["Whole-slide blocks", "Full-canvas blocks (cover, agenda, section, closing) you fill in a single pass."],
-  ["Video & audio", "Trim window, playback speed, loop and a custom poster frame, straight on the slide."],
-  ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options) and chart style recipes that re-skin every chart to match the deck's UI style pack."],
+  [
+    "Whole-slide blocks",
+    "Full-canvas blocks (cover, agenda, section, closing) you fill in a single pass.",
+  ],
+  [
+    "Video & audio",
+    "Trim window, playback speed, loop and a custom poster frame, straight on the slide.",
+  ],
+  [
+    "Charts",
+    "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options).",
+  ],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
-  ["Quizzes & polls", "Right-or-wrong quizzes (re-skinned by the UI style pack), and live polls synced via Supabase Realtime, with a QR code so the audience votes from their phone."],
-  ["QR codes", "A standalone QR element with editable colors and styling, ready to place on any slide."],
+  [
+    "Quizzes & polls",
+    "Right-or-wrong quizzes (re-skinned by the UI style pack), and live polls synced via Supabase Realtime, with a QR code so the audience votes from their phone.",
+  ],
+  [
+    "QR codes",
+    "A standalone QR element with editable colors and styling, ready to place on any slide.",
+  ],
   ["Buttons", "Open a link or jump to any slide during a presentation."],
   ["UI components", "Twenty-four kinds (cards, terminals, phones...) in thirteen style packs."],
-  ["FlowCraft diagrams", "Sixteen diagram types: flows, structures, networks and layouts, with per-style gradients and group restyling."],
-  ["Embeds", "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically."],
+  [
+    "FlowCraft diagrams",
+    "Sixteen diagram types: flows, structures, networks and layouts, with per-style gradients and group restyling.",
+  ],
+  [
+    "Embeds",
+    "YouTube, Vimeo, Spotify, SoundCloud, Google Maps and Figma links become embeds automatically.",
+  ],
 ];
 
 const SHORTCUTS: Array<[string, string]> = [
@@ -119,7 +229,10 @@ function Wiki() {
       <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-sm font-semibold tracking-tight text-slate-900"
+            >
               <img src="/favicon.ico" alt="DiapoLab" className="size-6 rounded-lg object-contain" />
               <span>DiapoLab</span>
             </Link>
@@ -164,9 +277,9 @@ function Wiki() {
             </div>
           </div>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600">
-            Everything you need to build decks fast: formats, panels, elements,
-            motion, audio, rotoscope cutouts, shortcuts, effects, dark mode, and how
-            to share your work with the community.
+            Everything you need to build decks fast: formats, panels, elements, motion, audio,
+            rotoscope cutouts, shortcuts, effects, dark mode, and how to share your work with the
+            community.
           </p>
         </div>
       </header>
@@ -174,9 +287,7 @@ function Wiki() {
       <div className="mx-auto flex max-w-6xl gap-10 px-6 py-10">
         {/* TOC */}
         <aside className="sticky top-20 hidden h-fit w-52 shrink-0 flex-col gap-0.5 lg:flex">
-          <p className="mb-2 px-3 text-xs font-semibold text-slate-500">
-            On this page
-          </p>
+          <p className="mb-2 px-3 text-xs font-semibold text-slate-500">On this page</p>
           {SECTIONS.map((s) => (
             <a
               key={s.id}
@@ -198,43 +309,38 @@ function Wiki() {
             title="Getting started"
           >
             <p>
-              The first time you open the editor, a welcome dialog walks you through
-              three quick choices: your canvas format, whether to start from a public
-              template, and which panel to open first. Prefer to explore on your own?
-              Hit <em>Skip</em>. You can always pick a template later from the{" "}
-              <strong>Home</strong> panel, a format from <strong>Design</strong>, and
-              your saved designs from <strong>Projects</strong>.
+              The first time you open the editor, a welcome dialog walks you through three quick
+              choices: your canvas format, whether to start from a public template, and which panel
+              to open first. Prefer to explore on your own? Hit <em>Skip</em>. You can always pick a
+              template later from the <strong>Home</strong> panel, a format from{" "}
+              <strong>Design</strong>, and your saved designs from <strong>Projects</strong>.
             </p>
             <p>
-              Name your deck in the toolbar, and press <strong>Save</strong> to store
-              it in your account once you are signed in. The <strong>History</strong>{" "}
-              button in the bottom dock snapshots versions of your deck so you can
-              go back to any of them.
+              Name your deck in the toolbar, and press <strong>Save</strong> to store it in your
+              account once you are signed in. The <strong>History</strong> button in the bottom dock
+              snapshots versions of your deck so you can go back to any of them.
             </p>
             <Callout icon={<Zap className="size-3.5" />}>
-              The fastest route to a finished deck: load a template from Home, restyle
-              it with the Design panel and the brand kit, then hit{" "}
-              <strong>Present</strong> in the toolbar.
+              The fastest route to a finished deck: load a template from Home, restyle it with the
+              Design panel and the brand kit, then hit <strong>Present</strong> in the toolbar.
             </Callout>
             <p>
               Each slide can also carry <strong>speaker notes</strong>, written in the{" "}
-              <strong>Speaker notes</strong> section of the Design panel. They are
-              saved with the slide, never rendered on the canvas, and show up in{" "}
-              <strong>presenter view</strong> next to the timer and a preview of the
-              next slide, and each slide thumbnail can show a badge when it carries
-              notes, so nothing gets lost while you rehearse.
+              <strong>Speaker notes</strong> section of the Design panel. They are saved with the
+              slide, never rendered on the canvas, and show up in <strong>presenter view</strong>{" "}
+              next to the timer and a preview of the next slide, and each slide thumbnail can show a
+              badge when it carries notes, so nothing gets lost while you rehearse.
             </p>
             <p>
-              Two more helpers live in the pages bar: the <strong>slide grid</strong>{" "}
-              button opens an overview of every slide, so you can jump anywhere or
-              reorder the deck at a glance (it supports keyboard navigation), and the <strong>eye</strong> toggle on any
-              slide hides it from the presentation — the deck keeps it while editing,
-              but the audience never sees it during Present.
+              Two more helpers live in the pages bar: the <strong>slide grid</strong> button opens
+              an overview of every slide, so you can jump anywhere or reorder the deck at a glance,
+              and the <strong>eye</strong> toggle on any slide hides it from the presentation — the
+              deck keeps it while editing, but the audience never sees it during Present.
             </p>
             <p>
-              Individual <strong>elements</strong> can be hidden from the presentation
-              too, using the same <strong>Hide in presentation</strong> action from the
-              element menu: handy for off-slide staging areas or helper notes.
+              Individual <strong>elements</strong> can be hidden from the presentation too, using
+              the same <strong>Hide in presentation</strong> action from the element menu: handy for
+              off-slide staging areas or helper notes.
             </p>
           </Section>
 
@@ -245,9 +351,9 @@ function Wiki() {
             title="Canvas formats"
           >
             <p>
-              Pick the right canvas for the job. You can change the size at any time
-              from <strong>Design</strong>: magic resize re-flows every slide to the
-              new proportions, keeping the composition and scaling type along the way.
+              Pick the right canvas for the job. You can change the size at any time from{" "}
+              <strong>Design</strong>: magic resize re-flows every slide to the new proportions,
+              keeping the composition and scaling type along the way.
             </p>
             <ul>
               <li>• Slide 16:9 — 1920×1080, the default for decks</li>
@@ -266,11 +372,11 @@ function Wiki() {
             title="Panels"
           >
             <p>
-              Hover the left rail to open the sidebar, or click a tool to pin it open.
-              Each tool is a panel with its own job. Hide or show panels in{" "}
-              <strong>Settings → Visible panels</strong>, and press{" "}
-              <Kbd>Esc</Kbd> to unpin. Use the <strong>Layers</strong> panel under Design
-              to toggle visibility, lock, reorder and multi-select elements.
+              Hover the left rail to open the sidebar, or click a tool to pin it open. Each tool is
+              a panel with its own job. Hide or show panels in{" "}
+              <strong>Settings → Visible panels</strong>, and press <Kbd>Esc</Kbd> to unpin. Use the{" "}
+              <strong>Layers</strong> panel under Design to toggle visibility, lock, reorder and
+              multi-select elements.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {PANELS.map((p) => (
@@ -297,16 +403,14 @@ function Wiki() {
             title="Elements"
           >
             <p>
-              Everything that can live on a slide. Insert them from the panels or the
-              command palette, then style each one in the inspector on the right.
-              Align and distribute actions work on a single element or a multi-selection,
-              and smart snapping keeps everything on the grid (hold <Kbd>Alt</Kbd> to
-              bypass it while dragging). To tidy a crowded slide, use{" "}
-              <strong>Auto-arrange</strong> in the Design panel: <strong>Smart
-              auto</strong>, <strong>Balanced grid</strong>, <strong>Row flow</strong>{" "}
-              or <strong>Column flow</strong> places your selection (or every unlocked
-              element on the slide) without overlaps, with an auto-fit for oversized
-              items.
+              Everything that can live on a slide. Insert them from the panels or the command
+              palette, then style each one in the inspector on the right. Align and distribute
+              actions work on a single element or a multi-selection, and smart snapping keeps
+              everything on the grid (hold <Kbd>Alt</Kbd> to bypass it while dragging). To tidy a
+              crowded slide, use <strong>Auto-arrange</strong> in the Design panel:{" "}
+              <strong>Smart auto</strong>, <strong>Balanced grid</strong>, <strong>Row flow</strong>{" "}
+              or <strong>Column flow</strong> places your selection (or every unlocked element on
+              the slide) without overlaps, with an auto-fit for oversized items.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {ELEMENTS.map(([name, desc]) => (
@@ -328,30 +432,26 @@ function Wiki() {
             title="Plugins & widget packs"
           >
             <p>
-              Plugins extend the editor with ready-made widgets and mini-apps. Four
-              ships built in — you never have to install them: <strong>Widget
-              packs</strong> (glitch, terminal, digital, glass and modern text and
-              shape groups that drop on the canvas as one grouped block),{" "}
-              <strong>Paint</strong> (a drawing studio: brush, shapes, arrows),{" "}
-              <strong>Video</strong> (upload, trim and insert clips) and{" "}
-              <strong>AI Search</strong> (web search with sourced results from
-              Context.dev).
+              Plugins extend the editor with ready-made widgets and mini-apps. Four ships built in —
+              you never have to install them: <strong>Widget packs</strong> (glitch, terminal,
+              digital, glass and modern text and shape groups that drop on the canvas as one grouped
+              block), <strong>Paint</strong> (a drawing studio: brush, shapes, arrows),{" "}
+              <strong>Video</strong> (upload, trim and insert clips) and <strong>AI Search</strong>{" "}
+              (web search with sourced results from Context.dev).
             </p>
             <p>
-              You can also plug in your own: the plugin formats are small pieces of
-              JavaScript — <code>diapolabPlugin({"{ name, apps, widgets }"})</code>,
+              You can also plug in your own: the plugin formats are small pieces of JavaScript —{" "}
+              <code>diapolabPlugin({"{ name, apps, widgets }"})</code>,
               <code>diapolabApp({"{ name, apps }"})</code> for apps only, or{" "}
-              <code>diapolabPack({"{ name, widgets }"})</code> for widget packs only.
-              Import the code from the Components panel or the command palette, then
-              enable, disable or remove each plugin. Apps of type{" "}
-              <strong>runtime</strong> run your HTML in a sandboxed iframe with a tiny{" "}
-              <code>diapolab.insert()</code> API that places elements on the slide, and
-              any imported plugin can be exported back to portable code to share or
-              publish it.
+              <code>diapolabPack({"{ name, widgets }"})</code> for widget packs only. Import the
+              code from the Components panel or the command palette, then enable, disable or remove
+              each plugin. Apps of type <strong>runtime</strong> run your HTML in a sandboxed iframe
+              with a tiny <code>diapolab.insert()</code> API that places elements on the slide, and
+              any imported plugin can be exported back to portable code to share or publish it.
             </p>
             <Callout icon={<Zap className="size-3.5" />}>
-              Plugin widgets behave like native elements: they are restyled by the
-              inspector, group as one block, and can be saved inside any deck.
+              Plugin widgets behave like native elements: they are restyled by the inspector, group
+              as one block, and can be saved inside any deck.
             </Callout>
           </Section>
 
@@ -362,21 +462,21 @@ function Wiki() {
             title="Rotoscope & cutouts"
           >
             <p>
-              Select an image and open the <strong>rotoscope editor</strong> from the
-              inspector to cut a subject out of its background. Paint over the areas to
-              hide with the erase/restore brushes, or switch to{" "}
-              <strong>Outline (points)</strong> mode and click point by point around the
-              subject, then close the shape. The tinted overlay shows exactly what will
-              be hidden, and you choose whether the outlined shape is kept or masked out.
+              Select an image and open the <strong>rotoscope editor</strong> from the inspector to
+              cut a subject out of its background. Paint over the areas to hide with the
+              erase/restore brushes, or switch to <strong>Outline (points)</strong> mode and click
+              point by point around the subject, then close the shape. The tinted overlay shows
+              exactly what will be hidden, and you choose whether the outlined shape is kept or
+              masked out.
             </p>
             <p>
-              The cutout is stored as a <strong>non-destructive mask</strong> on the
-              element: the original image is never modified, and you can reopen the
-              editor at any time to refine the mask.
+              The cutout is stored as a <strong>non-destructive mask</strong> on the element: the
+              original image is never modified, and you can reopen the editor at any time to refine
+              the mask.
             </p>
             <Callout icon={<Zap className="size-3.5" />}>
-              For a quick cutout, start from Outline mode and click a point every few
-              pixels around the subject; undo a point with the step-back button.
+              For a quick cutout, start from Outline mode and click a point every few pixels around
+              the subject; undo a point with the step-back button.
             </Callout>
           </Section>
 
@@ -387,11 +487,11 @@ function Wiki() {
             title="Command palette"
           >
             <p>
-              Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> anywhere in the editor to open the
-              command palette. It fuzzy-searches across actions, insertions, shortcuts,
-              feature guides, add-on widgets and links, and remembers your recent
-              commands. Type “insert chart”, “group”, or “undo”, navigate with the
-              arrow keys, run with <Kbd>↵</Kbd>, close with <Kbd>Esc</Kbd>.
+              Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> anywhere in the editor to open the command
+              palette. It fuzzy-searches across actions, insertions, shortcuts, feature guides,
+              add-on widgets and links, and remembers your recent commands. Type “insert chart”,
+              “group”, or “undo”, navigate with the arrow keys, run with <Kbd>↵</Kbd>, close with{" "}
+              <Kbd>Esc</Kbd>.
             </p>
           </Section>
 
@@ -402,21 +502,23 @@ function Wiki() {
             title="Generate slideshows with AI"
           >
             <p>
-              Give an LLM the editor contract below, then ask it to return only valid
-              JSON. The example shows the shape of a complete deck: canvas settings,
-              pages, and elements with position, size, styling, and content. Pages can
-              also set a background, a transition and presenter notes, and elements
-              cover the whole catalog above: shapes, images, text, charts, tables,
-              quizzes, buttons, UI components and embeds. Keep element types and
-              properties consistent with the example so the result can be imported
-              safely as a .json design.
+              Give an LLM the editor contract below, then ask it to return only valid JSON. The
+              example shows the shape of a complete deck: canvas settings, pages, and elements with
+              position, size, styling, and content. Pages can also set a background, a transition
+              and presenter notes, and elements cover the whole catalog above: shapes, images, text,
+              charts, tables, quizzes, buttons, UI components and embeds. Keep element types and
+              properties consistent with the example so the result can be imported safely as a .json
+              design.
             </p>
             <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
               <div className="flex items-center justify-between border-b border-slate-800 px-4 py-2.5">
-                <span className="font-mono text-xs font-semibold text-blue-300">slideshow.json</span>
+                <span className="font-mono text-xs font-semibold text-blue-300">
+                  slideshow.json
+                </span>
                 <span className="text-xs text-slate-400">Starter contract</span>
               </div>
-              <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-slate-200"><code>{`{
+              <pre className="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-slate-200">
+                <code>{`{
   "title": "Product launch",
   "canvas": { "width": 1920, "height": 1080, "format": "16:9" },
   "pages": [
@@ -446,12 +548,13 @@ function Wiki() {
       ]
     }
   ]
-}`}</code></pre>
+}`}</code>
+              </pre>
             </div>
             <Callout icon={<Braces className="size-3.5" />}>
-              Prompt pattern: “Create a 5-page investor pitch about [topic]. Return only
-              JSON matching the DiapoLab slideshow contract. Use unique ids, a
-              1920×1080 canvas, and keep every element inside the page bounds.”
+              Prompt pattern: “Create a 5-page investor pitch about [topic]. Return only JSON
+              matching the DiapoLab slideshow contract. Use unique ids, a 1920×1080 canvas, and keep
+              every element inside the page bounds.”
             </Callout>
           </Section>
 
@@ -463,39 +566,33 @@ function Wiki() {
           >
             <div className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
               {SHORTCUTS.map(([keys, label]) => (
-                <div
-                  key={keys}
-                  className="flex items-center justify-between gap-3 px-4 py-2.5"
-                >
+                <div key={keys} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <span className="text-xs font-medium text-slate-700">{label}</span>
                   <Kbd>{keys}</Kbd>
                 </div>
               ))}
             </div>
             <p className="mt-3">
-              <strong>While presenting:</strong> <Kbd>←</Kbd> <Kbd>→</Kbd> or{" "}
-              <Kbd>Space</Kbd> navigate slides, <Kbd>1</Kbd>–<Kbd>9</Kbd> jump to a
-              slide, <Kbd>P</Kbd> toggles the presenter view (notes, timer and next
-              slide), <Kbd>R</Kbd> replays the slide animations, and <Kbd>Esc</Kbd>{" "}
-              leaves the presentation.
+              <strong>While presenting:</strong> <Kbd>←</Kbd> <Kbd>→</Kbd> or <Kbd>Space</Kbd>{" "}
+              navigate slides, <Kbd>1</Kbd>–<Kbd>9</Kbd> jump to a slide, <Kbd>P</Kbd> toggles the
+              presenter view (notes, timer and next slide), <Kbd>R</Kbd> replays the slide
+              animations, and <Kbd>Esc</Kbd> leaves the presentation.
             </p>
             <p className="mt-3">
-              <strong>Presenter toolkit:</strong> the presentation HUD doubles as a live
-              annotation layer. <Kbd>L</Kbd> turns the cursor into a{" "}
-              <strong>laser pointer</strong> with a glowing trail, <Kbd>D</Kbd> lets you{" "}
-              <strong>draw ink</strong> directly on the slide (pick a pen color from the
-              palette, and press <Kbd>C</Kbd> to wipe it clean), <Kbd>B</Kbd> /{" "}
-              <Kbd>W</Kbd> drop a <strong>black or white curtain</strong> over the stage
-              so you can pause the projection, and <Kbd>G</Kbd> opens the full{" "}
+              <strong>Presenter toolkit:</strong> the presentation HUD doubles as a live annotation
+              layer. <Kbd>L</Kbd> turns the cursor into a <strong>laser pointer</strong> with a
+              glowing trail, <Kbd>D</Kbd> lets you <strong>draw ink</strong> directly on the slide
+              (pick a pen color from the palette, and press <Kbd>C</Kbd> to wipe it clean),{" "}
+              <Kbd>B</Kbd> / <Kbd>W</Kbd> drop a <strong>black or white curtain</strong> over the
+              stage so you can pause the projection, and <Kbd>G</Kbd> opens the full{" "}
               <strong>slide overview grid</strong>, just like in the editor.
             </p>
             <p className="mt-3">
-              The same HUD can <strong>auto-play</strong> the deck: set the interval in
-              seconds, toggle looping, and the presentation advances on its own while
-              respecting hidden slides. Settings gathers the matching display options:
-              auto-hide the controls and cursor after inactivity, hide the ink
-              annotations, the 3D stage button or the slide counter, for a cleaner
-              broadcast.
+              The same HUD can <strong>auto-play</strong> the deck: set the interval in seconds,
+              toggle looping, and the presentation advances on its own while respecting hidden
+              slides. Settings gathers the matching display options: auto-hide the controls and
+              cursor after inactivity, hide the ink annotations, the 3D stage button or the slide
+              counter, for a cleaner broadcast.
             </p>
           </Section>
 
@@ -507,77 +604,69 @@ function Wiki() {
           >
             <ul className="space-y-2">
               <li>
-                <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph,
-                tv, neon, cube, blur, three parallax modes, reveal, shutter, swirl,
-                warp, prism and origami, plus five true 3D scene transitions rendered
-                in WebGL: <strong>cube, carousel, flip, fold and helix</strong>. Pick
-                one per slide from the dock under the canvas, with a live preview. A
-                short sound can accompany each transition: enable{" "}
-                <strong>Slide sound effects</strong> in Settings and pick a soft whoosh
-                or a subtle click, then use <strong>Test sound</strong> to preview it.
+                <strong>Slide transitions</strong> — fade, slide, zoom, flip, morph, tv, neon, cube,
+                blur, three parallax modes, reveal, shutter, swirl, warp, prism and origami, plus
+                five true 3D scene transitions rendered in WebGL:{" "}
+                <strong>cube, carousel, flip, fold and helix</strong>. Pick one per slide from the
+                dock under the canvas, with a live preview. A short sound can accompany each
+                transition: enable <strong>Slide sound effects</strong> in Settings and pick a soft
+                whoosh or a subtle click, then use <strong>Test sound</strong> to preview it.
               </li>
               <li>
                 <strong>3D scenes</strong> — with a 3D transition selected, the{" "}
-                <strong>3D Scene &amp; Colors</strong> dialog gives your slides a real
-                Three.js stage: ten scene environments, a draggable live preview with
-                front, hero and low camera angles, a duration slider (0.6–2.2 s),
-                stage floor and floating prisms toggles, and per-part color pickers
-                (backdrop, accent &amp; glow, frame, floor) with a palette shuffle.
-                Apply the scene to all slides in one click.
+                <strong>3D Scene &amp; Colors</strong> dialog gives your slides a real Three.js
+                stage: ten scene environments, a draggable live preview with front, hero and low
+                camera angles, a duration slider (0.6–2.2 s), stage floor and floating prisms
+                toggles, and per-part color pickers (backdrop, accent &amp; glow, frame, floor) with
+                a palette shuffle. Apply the scene to all slides in one click.
               </li>
               <li>
-                <strong>Element animations</strong> — entrance animations per element
-                (pop, fade-up, glitch, bounce, spin, blur-in and more, including 3D
-                entrances like flip, tumble, orbit or depth pop), with a delay to
-                stagger objects.
+                <strong>Element animations</strong> — entrance animations per element (pop, fade-up,
+                glitch, bounce, spin, blur-in and more, including 3D entrances like flip, tumble,
+                orbit or depth pop), with a delay to stagger objects.
               </li>
               <li>
-                <strong>Typewriter & count-up</strong> — animate text typing itself
-                letter by letter, and count numbers up to their final value, ideal for
-                big figures and KPI slides.
+                <strong>Typewriter & count-up</strong> — animate text typing itself letter by
+                letter, and count numbers up to their final value, ideal for big figures and KPI
+                slides.
               </li>
               <li>
-                <strong>Motion paths</strong> — trace a custom path in the inspector and
-                make any element travel along it, with audio cues that fire as the
-                element passes each point.
+                <strong>Motion paths</strong> — trace a custom path in the inspector and make any
+                element travel along it, with audio cues that fire as the element passes each point.
               </li>
               <li>
-                <strong>Audio & music</strong> — attach audio cues to elements, and set
-                a background music track per slide. Everything stays synced to the slide
-                timeline while presenting.
+                <strong>Audio & music</strong> — attach audio cues to elements, and set a background
+                music track per slide. Everything stays synced to the slide timeline while
+                presenting.
               </li>
               <li>
-                <strong>Keyframe animations</strong> — capture any element state on a
-                timeline and tween between keyframes with easing curves, from expo-out
-                to overshoot.
+                <strong>Keyframe animations</strong> — capture any element state on a timeline and
+                tween between keyframes with easing curves, from expo-out to overshoot.
               </li>
               <li>
-                <strong>Shape effects</strong> — Liquid Glass for a frosted translucent
-                look, plus neon, soft shadow, inner glow, holographic, glitch and
-                honeycomb.
+                <strong>Shape effects</strong> — Liquid Glass for a frosted translucent look, plus
+                neon, soft shadow, inner glow, holographic, glitch and honeycomb.
               </li>
               <li>
-                <strong>Shape masks</strong> — clip text, shapes and images into
-                circles, hexagons, blobs and more.
+                <strong>Shape masks</strong> — clip text, shapes and images into circles, hexagons,
+                blobs and more.
               </li>
               <li>
-                <strong>Image filters</strong> — brightness, contrast, saturation,
-                temperature and tint, blur, sepia and hue-rotate, plus live glitch,
-                pixelate, posterize and film-grain noise effects.
+                <strong>Image filters</strong> — brightness, contrast, saturation, temperature and
+                tint, blur, sepia and hue-rotate, plus live glitch, pixelate, posterize and
+                film-grain noise effects.
               </li>
               <li>
-                <strong>Gradients</strong> — build multi-stop gradients with up to six
-                color stops and position sliders, for element fills and slide
-                backgrounds alike.
+                <strong>Gradients</strong> — build multi-stop gradients with up to six color stops
+                and position sliders, for element fills and slide backgrounds alike.
               </li>
               <li>
-                <strong>3D transforms</strong> — add perspective, rotate on X/Y, and
-                optional cursor-following tilt in presentation mode.
+                <strong>3D transforms</strong> — add perspective, rotate on X/Y, and optional
+                cursor-following tilt in presentation mode.
               </li>
               <li>
-                <strong>Interactions</strong> — hover effects (glitch, color, gradient)
-                and click-to-jump so any element can navigate to another slide during
-                a presentation.
+                <strong>Interactions</strong> — hover effects (glitch, color, gradient) and
+                click-to-jump so any element can navigate to another slide during a presentation.
               </li>
             </ul>
           </Section>
@@ -589,30 +678,27 @@ function Wiki() {
             title="Dark mode & accessibility"
           >
             <p>
-              Toggle <strong>dark mode</strong> with the moon/sun pill at the bottom of
-              the tool rail. The whole editor chrome switches to dark — panels, toolbar,
-              zoom dock and scrollbars — while the canvas keeps your slide's own
-              colors, so what you design is exactly what your audience sees.
+              Toggle <strong>dark mode</strong> with the moon/sun pill at the bottom of the tool
+              rail. The whole editor chrome switches to dark — panels, toolbar, zoom dock and
+              scrollbars — while the canvas keeps your slide's own colors, so what you design is
+              exactly what your audience sees.
             </p>
             <p>
-              The built-in <strong>accessibility checker</strong> (in Settings) checks
-              the current slide for WCAG contrast issues, fonts that are too small to
-              read from a distance, and elements that sit outside the visible canvas,
-              so you can fix them before presenting.
+              The built-in <strong>accessibility checker</strong> (in Settings) checks the current
+              slide for WCAG contrast issues, fonts that are too small to read from a distance, and
+              elements that sit outside the visible canvas, so you can fix them before presenting.
             </p>
             <p>
               Settings also gathers the rest of the comfort options: an{" "}
               <strong>editor theme</strong> picker for the chrome, with a{" "}
-              <strong>Theme Studio</strong> to build a custom theme from color tokens
-              and save it on this device or publish it to the marketplace, plus{" "}
-              <strong>toolbar &amp; sidebar tints</strong> (a preset palette from Pure
-              White and Frost Slate to Obsidian and Midnight Blue) with a{" "}
-              <strong>Liquid Glass</strong> option for a translucent chrome, a{" "}
-              <strong>canvas grid</strong> toggle, a{" "}
-              <strong>workspace background</strong> behind the canvas (a preset
-              backdrop, a solid tint or your own image), and <strong>reduced motion</strong>{" "}
-              controls with duration and spring sliders for panel animations.
-              Preferences are stored on the device.
+              <strong>Theme Studio</strong> to build a custom theme from color tokens and save it on
+              this device or publish it to the marketplace, plus{" "}
+              <strong>toolbar &amp; sidebar tints</strong> (a preset palette from Pure White and
+              Frost Slate to Obsidian and Midnight Blue) with a <strong>Liquid Glass</strong> option
+              for a translucent chrome, a <strong>canvas grid</strong> toggle, a{" "}
+              <strong>workspace background</strong> behind the canvas (a preset backdrop, a solid
+              tint or your own image), and <strong>reduced motion</strong> controls with duration
+              and spring sliders for panel animations. Preferences are stored on the device.
             </p>
           </Section>
 
@@ -624,36 +710,38 @@ function Wiki() {
           >
             <p>
               <FileUp className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Publish a template</strong> — from the toolbar menu, share your
-              deck with the community. It appears in the Home panel and on the{" "}
-              <Link to="/marketplace" className="font-medium text-blue-600 underline">marketplace</Link>,
-              and you can rename or unpublish it at any time from{" "}
+              <strong>Publish a template</strong> — from the toolbar menu, share your deck with the
+              community. It appears in the Home panel and on the{" "}
+              <Link to="/marketplace" className="font-medium text-blue-600 underline">
+                marketplace
+              </Link>
+              , and you can rename or unpublish it at any time from{" "}
               <strong>Settings → My published templates</strong>.
             </p>
             <p className="mt-2">
               <Presentation className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Share a deck</strong> — the share button copies a private share
-              link. Anyone with the link opens a clean view-only page with a Present
-              button and a page counter, without ever seeing your editor. Manage your
-              links from <strong>Settings → Private share links</strong>: copy them
-              again or revoke any link, cutting off access instantly.
+              <strong>Share a deck</strong> — the share button copies a private share link. Anyone
+              with the link opens a clean view-only page with a Present button and a page counter,
+              without ever seeing your editor. Manage your links from{" "}
+              <strong>Settings → Private share links</strong>: copy them again or revoke any link,
+              cutting off access instantly.
             </p>
             <p className="mt-2">
-              <strong>Export & import</strong> — the Export menu saves the current
-              slide as PNG or JPG, the whole deck as PDF, PPTX or Markdown, an animated
-              GIF, or the editable JSON source file. The import button brings{" "}
-              .pptx decks and .json designs back into the editor.
+              <strong>Export & import</strong> — the Export menu saves the current slide as PNG or
+              JPG, the whole deck as PDF, PPTX or Markdown, an animated GIF, or the editable JSON
+              source file. The import button brings .pptx decks and .json designs back into the
+              editor.
             </p>
             <p className="mt-2">
-              <strong>Creator profiles</strong> — sign in to set a username, display
-              name and avatar. Your published templates appear on your public profile
-              page, and other users can follow your work by subscribing to you from
-              the marketplace and their profile pages.
+              <strong>Creator profiles</strong> — sign in to set a username, display name and
+              avatar. Your published templates appear on your public profile page, and other users
+              can follow your work by subscribing to you from the marketplace and their profile
+              pages.
             </p>
             <p className="mt-2">
               <Plug className="mr-1 inline size-3.5 text-blue-500" />
-              <strong>Cloud saving</strong> — sign in to save your designs online and
-              reopen them from the Projects panel on any device.
+              <strong>Cloud saving</strong> — sign in to save your designs online and reopen them
+              from the Projects panel on any device.
             </p>
           </Section>
 
@@ -667,12 +755,12 @@ function Wiki() {
               Yes. The editor, templates and themes are free to use and remix.
             </Faq>
             <Faq q="Where are my designs stored?">
-              Locally in your browser, and in your account when you sign in. Publish
-              or share to move them onto the server.
+              Locally in your browser, and in your account when you sign in. Publish or share to
+              move them onto the server.
             </Faq>
             <Faq q="Can I import and export PowerPoint files?">
-              Yes. The import button brings a .pptx into the editor, and the Export
-              menu writes .pptx, PDF and more.
+              Yes. The import button brings a .pptx into the editor, and the Export menu writes
+              .pptx, PDF and more.
             </Faq>
             <Faq q="How do I report a bug?">
               Open an issue directly on{" "}
@@ -682,8 +770,7 @@ function Wiki() {
               >
                 GitHub
               </a>
-              , or use the command palette (<Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>) and search
-              “report a bug”.
+              , or use the command palette (<Kbd>Ctrl</Kbd>+<Kbd>K</Kbd>) and search “report a bug”.
             </Faq>
           </Section>
 
@@ -730,10 +817,14 @@ function Section({
   return (
     <section id={id} className="scroll-mt-20 rounded-3xl border border-slate-200 bg-white p-6">
       <div className="flex items-center gap-2">
-        <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">{icon}</span>
+        <span className="grid size-8 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600">
+          {icon}
+        </span>
         <p className="text-xs font-semibold text-blue-600">{kicker}</p>
       </div>
-      <h2 className="mt-2 font-display text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
+      <h2 className="mt-2 font-display text-lg font-semibold tracking-tight text-slate-900">
+        {title}
+      </h2>
       <div className="mt-3 space-y-2.5 text-sm leading-relaxed text-slate-600">{children}</div>
     </section>
   );

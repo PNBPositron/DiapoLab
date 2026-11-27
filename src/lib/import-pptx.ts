@@ -184,7 +184,10 @@ function hexToRgbTuple(hex: string): [number, number, number] {
 }
 
 function rgbTupleToHex(r: number, g: number, b: number): string {
-  const c = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+  const c = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${c(r)}${c(g)}${c(b)}`;
 }
 
@@ -216,7 +219,9 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   const c = (1 - Math.abs(2 * ln - 1)) * sn;
   const x = c * (1 - Math.abs(((hn / 60) % 2) - 1));
   const m = ln - c / 2;
-  let rn = 0, gn = 0, bn = 0;
+  let rn = 0,
+    gn = 0,
+    bn = 0;
   if (hn < 60) [rn, gn, bn] = [c, x, 0];
   else if (hn < 120) [rn, gn, bn] = [x, c, 0];
   else if (hn < 180) [rn, gn, bn] = [0, c, x];
@@ -277,7 +282,12 @@ function applyColorTransforms(baseHex: string, colorEl: Element): ResolvedColor 
 
 function resolveSchemeKey(key: string, ctx: ColorContext): string | undefined {
   const mapped = ctx.clrMap[key] ?? key;
-  return ctx.scheme[mapped] ?? ctx.scheme[key] ?? DEFAULT_SCHEME_COLORS[mapped] ?? DEFAULT_SCHEME_COLORS[key];
+  return (
+    ctx.scheme[mapped] ??
+    ctx.scheme[key] ??
+    DEFAULT_SCHEME_COLORS[mapped] ??
+    DEFAULT_SCHEME_COLORS[key]
+  );
 }
 
 function resolveColorNode(
@@ -294,9 +304,10 @@ function resolveColorNode(
     }
   }
   if (!colorEl) {
-    colorEl = Array.from(container.getElementsByTagName("*")).find((e) =>
-      colorNodes.includes(e.localName),
-    ) ?? null;
+    colorEl =
+      Array.from(container.getElementsByTagName("*")).find((e) =>
+        colorNodes.includes(e.localName),
+      ) ?? null;
   }
   if (!colorEl) return undefined;
 
@@ -345,7 +356,10 @@ function resolveColorNode(
   return applyColorTransforms(baseHex, colorEl);
 }
 
-function parseClrMapAttrs(el: Element | null, base: Record<string, string>): Record<string, string> {
+function parseClrMapAttrs(
+  el: Element | null,
+  base: Record<string, string>,
+): Record<string, string> {
   if (!el) return base;
   const next = { ...base };
   for (const key of Object.keys(DEFAULT_CLR_MAP)) {
@@ -450,8 +464,8 @@ function parseXfrm(sp: Element, allowZeroExt = false): Partial<Xfrm> {
   return {
     x,
     y,
-    width: allowZeroExt && ext ? width : (width || 200),
-    height: allowZeroExt && ext ? height : (height || 60),
+    width: allowZeroExt && ext ? width : width || 200,
+    height: allowZeroExt && ext ? height : height || 60,
     rotation,
     flipH,
     flipV,
@@ -525,7 +539,11 @@ const PRST_TO_KIND: Record<string, ShapeKind> = {
   bracePair: "curly_brace",
 };
 
-function parseShapeKind(sp: Element, flipH?: boolean, flipV?: boolean): { kind: ShapeKind; prst: string | null } {
+function parseShapeKind(
+  sp: Element,
+  flipH?: boolean,
+  flipV?: boolean,
+): { kind: ShapeKind; prst: string | null } {
   const geom = firstChildByLocal(sp, "prstGeom");
   const prst = geom?.getAttribute("prst") ?? null;
   let kind: ShapeKind = prst ? (PRST_TO_KIND[prst] ?? "rect") : "rect";
@@ -590,7 +608,10 @@ function resolveTypeface(raw: string | null | undefined, ctx: ColorContext): str
   return tf;
 }
 
-function parseRPrDefaults(rPr: Element | null | undefined, ctx: ColorContext): Partial<PlaceholderInfo> {
+function parseRPrDefaults(
+  rPr: Element | null | undefined,
+  ctx: ColorContext,
+): Partial<PlaceholderInfo> {
   if (!rPr) return {};
   const out: Partial<PlaceholderInfo> = {};
   const sz = Number(rPr.getAttribute("sz") ?? 0) / 100;
@@ -607,7 +628,10 @@ function parseRPrDefaults(rPr: Element | null | undefined, ctx: ColorContext): P
   return out;
 }
 
-function parsePPrStyle(pPr: Element | null | undefined, ctx: ColorContext): Partial<PlaceholderInfo> {
+function parsePPrStyle(
+  pPr: Element | null | undefined,
+  ctx: ColorContext,
+): Partial<PlaceholderInfo> {
   if (!pPr) return {};
   const out = parseRPrDefaults(directChild(pPr, "defRPr"), ctx);
   const algn = pPr.getAttribute("algn");
@@ -621,7 +645,9 @@ function buildPartStyleIndex(doc: Document | null, ctx: ColorContext): PartStyle
   const idx: PartStyleIndex = { byKey: new Map(), byType: new Map() };
   if (!doc) return idx;
 
-  const txStyles = Array.from(doc.getElementsByTagName("*")).find((e) => e.localName === "txStyles");
+  const txStyles = Array.from(doc.getElementsByTagName("*")).find(
+    (e) => e.localName === "txStyles",
+  );
   if (txStyles) {
     const readTx = (name: string) => {
       const node = directChild(txStyles, name);
@@ -661,10 +687,9 @@ function lookupPlaceholderDefaults(
 ): PlaceholderInfo {
   const ph = getPhKey(sp);
   if (!ph) return {};
-  const keys = [
-    ph.type && ph.idx ? `${ph.type}:${ph.idx}` : "",
-    ph.idx ? `:${ph.idx}` : "",
-  ].filter(Boolean);
+  const keys = [ph.type && ph.idx ? `${ph.type}:${ph.idx}` : "", ph.idx ? `:${ph.idx}` : ""].filter(
+    Boolean,
+  );
 
   const pickFrom = (src: PartStyleIndex | null): PlaceholderInfo => {
     if (!src) return {};
@@ -674,7 +699,8 @@ function lookupPlaceholderDefaults(
     }
     if (ph.type && src.byType.has(ph.type)) return src.byType.get(ph.type)!;
     if (ph.type === "title" || ph.type === "ctrTitle") return src.titleStyle ?? {};
-    if (ph.type === "body" || ph.type === "subTitle" || ph.type === "obj") return src.bodyStyle ?? {};
+    if (ph.type === "body" || ph.type === "subTitle" || ph.type === "obj")
+      return src.bodyStyle ?? {};
     return src.otherStyle ?? {};
   };
 
@@ -745,7 +771,11 @@ function parseTextBody(
   let lineHeight: number | undefined;
   let textTransform: "uppercase" | "none" | undefined;
 
-  type ParaOut = { text: string; bulletKind: "none" | "dot" | "custom" | "num"; bulletChar?: string };
+  type ParaOut = {
+    text: string;
+    bulletKind: "none" | "dot" | "custom" | "num";
+    bulletChar?: string;
+  };
   const paraOuts: ParaOut[] = [];
   let autoIndex = 1;
 
@@ -753,7 +783,8 @@ function parseTextBody(
     const pPr = directChild(p, "pPr");
     const pDefaults = parsePPrStyle(pPr, ctx);
     if (pDefaults.defAlign) align = pDefaults.defAlign;
-    if (pDefaults.defFontSize && fontSizePt === 0) fontSizePt = Math.round(pDefaults.defFontSize * (72 / 96));
+    if (pDefaults.defFontSize && fontSizePt === 0)
+      fontSizePt = Math.round(pDefaults.defFontSize * (72 / 96));
     if (pDefaults.defColor && !color) color = pDefaults.defColor;
     if (pDefaults.defFontFamily) fontFamily = pDefaults.defFontFamily;
     if (pDefaults.defBold !== undefined) bold = pDefaults.defBold;
@@ -782,7 +813,7 @@ function parseTextBody(
           if (rPr.getAttribute("cap") === "all") textTransform = "uppercase";
           const spc = Number(rPr.getAttribute("spc") ?? 0);
           if (spc !== 0 && fontSizePt > 0) {
-            letterSpacingEm = Number(((spc / 100) / fontSizePt).toFixed(3));
+            letterSpacingEm = Number((spc / 100 / fontSizePt).toFixed(3));
           }
           const solid = directChild(rPr, "solidFill");
           const c = resolveColorNode(solid ?? rPr, ctx);
@@ -827,7 +858,8 @@ function parseTextBody(
   const nonEmptyParas = paraOuts.filter((p) => p.text.trim().length > 0);
   if (nonEmptyParas.length === 0) return null;
 
-  const allDotBullets = nonEmptyParas.length > 0 && nonEmptyParas.every((p) => p.bulletKind === "dot");
+  const allDotBullets =
+    nonEmptyParas.length > 0 && nonEmptyParas.every((p) => p.bulletKind === "dot");
   const finalText = paraOuts
     .map((p) => {
       if (!p.text.trim()) return p.text;
@@ -844,12 +876,9 @@ function parseTextBody(
   if (!finalText) return null;
 
   const finalFontSize =
-    fontSizePt > 0
-      ? ptToPx(fontSizePt)
-      : lstLvl1.defFontSize ?? inherited.defFontSize ?? 24;
+    fontSizePt > 0 ? ptToPx(fontSizePt) : (lstLvl1.defFontSize ?? inherited.defFontSize ?? 24);
 
-  const finalColor =
-    color || lstLvl1.defColor || inherited.defColor || fontRefColor || "#0f172a";
+  const finalColor = color || lstLvl1.defColor || inherited.defColor || fontRefColor || "#0f172a";
 
   return {
     text: finalText,
@@ -887,11 +916,17 @@ async function mediaToDataUrl(
   const base64 = await entry.async("base64");
   const ext = path.split(".").pop()?.toLowerCase() ?? "png";
   const mime =
-    ext === "png" ? "image/png" :
-    ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-    ext === "gif" ? "image/gif" :
-    ext === "svg" ? "image/svg+xml" :
-    ext === "webp" ? "image/webp" : "image/png";
+    ext === "png"
+      ? "image/png"
+      : ext === "jpg" || ext === "jpeg"
+        ? "image/jpeg"
+        : ext === "gif"
+          ? "image/gif"
+          : ext === "svg"
+            ? "image/svg+xml"
+            : ext === "webp"
+              ? "image/webp"
+              : "image/png";
   return `data:${mime};base64,${base64}`;
 }
 
@@ -941,7 +976,12 @@ function collectLeafNodes(root: Element): Array<{ node: Element; xf: GroupXf }> 
       const local = child.localName ?? "";
       if (local === "grpSp") {
         walk(child, composeXf(xf, parseGroupXf(child)));
-      } else if (local === "sp" || local === "pic" || local === "cxnSp" || local === "graphicFrame") {
+      } else if (
+        local === "sp" ||
+        local === "pic" ||
+        local === "cxnSp" ||
+        local === "graphicFrame"
+      ) {
         out.push({ node: child, xf });
       }
     }
@@ -954,7 +994,11 @@ function collectLeafNodes(root: Element): Array<{ node: Element; xf: GroupXf }> 
 /* Tables & Native PowerPoint Charts                                          */
 /* -------------------------------------------------------------------------- */
 
-function tableToElement(frame: Element, box: Partial<Xfrm>, ctx: ColorContext): TableElement | null {
+function tableToElement(
+  frame: Element,
+  box: Partial<Xfrm>,
+  ctx: ColorContext,
+): TableElement | null {
   const tbl = firstChildByLocal(frame, "tbl");
   if (!tbl) return null;
   const rows: string[][] = [];
@@ -992,7 +1036,9 @@ function tableToElement(frame: Element, box: Partial<Xfrm>, ctx: ColorContext): 
                         if (rc) bodyFgHex = rc.hex;
                       }
                     }
-                    return directChildren(c, "t").map((t) => t.textContent ?? "").join("");
+                    return directChildren(c, "t")
+                      .map((t) => t.textContent ?? "")
+                      .join("");
                   }
                   if (c.localName === "br") return "\n";
                   return "";
@@ -1286,10 +1332,15 @@ function parseEntranceTimings(
     let animation: ElementAnimation = "fade-up";
     if (preset === 2) {
       animation =
-        subtype === 4 ? "move-up" :
-        subtype === 1 ? "move-down" :
-        subtype === 2 ? "move-right" :
-        subtype === 8 ? "move-left" : "fade-up";
+        subtype === 4
+          ? "move-up"
+          : subtype === 1
+            ? "move-down"
+            : subtype === 2
+              ? "move-right"
+              : subtype === 8
+                ? "move-left"
+                : "fade-up";
     } else if (preset === 16) animation = "pop";
     else if (preset === 23) animation = "flip-in";
     else if (preset === 26) animation = "spin-in";
@@ -1325,7 +1376,10 @@ function shade(hex: string, amount: number): string {
   return rgbTupleToHex(mix(r0), mix(g0), mix(b0));
 }
 
-async function parseTheme(zip: JSZip, themePath = "ppt/theme/theme1.xml"): Promise<PptxTheme | null> {
+async function parseTheme(
+  zip: JSZip,
+  themePath = "ppt/theme/theme1.xml",
+): Promise<PptxTheme | null> {
   const doc = await parseXml(zip, themePath);
   if (!doc) return null;
   const all = Array.from(doc.getElementsByTagName("*"));
@@ -1333,25 +1387,42 @@ async function parseTheme(zip: JSZip, themePath = "ppt/theme/theme1.xml"): Promi
   if (!schemeEl) return null;
   const scheme: Record<string, string> = { ...DEFAULT_SCHEME_COLORS };
   const slots = [
-    "dk1", "lt1", "dk2", "lt2",
-    "accent1", "accent2", "accent3", "accent4", "accent5", "accent6",
-    "hlink", "folHlink",
+    "dk1",
+    "lt1",
+    "dk2",
+    "lt2",
+    "accent1",
+    "accent2",
+    "accent3",
+    "accent4",
+    "accent5",
+    "accent6",
+    "hlink",
+    "folHlink",
   ];
   for (const slot of slots) {
     const node = Array.from(schemeEl.getElementsByTagName("*")).find((el) => el.localName === slot);
     if (!node) continue;
-    const srgb = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "srgbClr");
+    const srgb = Array.from(node.getElementsByTagName("*")).find(
+      (el) => el.localName === "srgbClr",
+    );
     const sys = Array.from(node.getElementsByTagName("*")).find((el) => el.localName === "sysClr");
     const hex =
       srgb?.getAttribute("val") ??
       sys?.getAttribute("lastClr") ??
-      (sys?.getAttribute("val") === "window" ? "ffffff" : sys?.getAttribute("val") === "windowText" ? "000000" : undefined);
+      (sys?.getAttribute("val") === "window"
+        ? "ffffff"
+        : sys?.getAttribute("val") === "windowText"
+          ? "000000"
+          : undefined);
     if (hex) scheme[slot] = "#" + hex.replace("#", "").slice(0, 6);
   }
   const fontScheme = all.find((el) => el.localName === "fontScheme");
   const latinTypeface = (scope: "majorFont" | "minorFont"): string | undefined => {
     if (!fontScheme) return undefined;
-    const part = Array.from(fontScheme.getElementsByTagName("*")).find((el) => el.localName === scope);
+    const part = Array.from(fontScheme.getElementsByTagName("*")).find(
+      (el) => el.localName === scope,
+    );
     if (!part) return undefined;
     const latin = Array.from(part.getElementsByTagName("*")).find((el) => el.localName === "latin");
     const tf = latin?.getAttribute("typeface");
@@ -1421,7 +1492,9 @@ async function convertLeafNodes(params: {
     };
 
     if (node.localName === "sp") {
-      const inherited = isBackgroundLayer ? {} : lookupPlaceholderDefaults(node, layoutIdx, masterIdx);
+      const inherited = isBackgroundLayer
+        ? {}
+        : lookupPlaceholderDefaults(node, layoutIdx, masterIdx);
       const rawBox = parseXfrm(node);
       const mergedBox = rawBox.hasCoords ? rawBox : (inherited.xfrm ?? rawBox);
       const box = applyXf(mergedBox, xf);
@@ -1470,7 +1543,9 @@ async function convertLeafNodes(params: {
       const explicitStrokeColor = resolveColorNode(lnSolid, ctx);
       const lnRefIdx = Number(lnRef?.getAttribute("idx") ?? 0);
       const refStrokeColor = lnRef && lnRefIdx > 0 ? resolveColorNode(lnRef, ctx) : undefined;
-      const strokeColor = lnNoFill ? undefined : (explicitStrokeColor ?? (ln ? undefined : refStrokeColor));
+      const strokeColor = lnNoFill
+        ? undefined
+        : (explicitStrokeColor ?? (ln ? undefined : refStrokeColor));
 
       const lnWpt = ln ? Number(ln.getAttribute("w") ?? 0) / 12700 : 0;
       const strokeWidth = strokeColor
@@ -1478,7 +1553,9 @@ async function convertLeafNodes(params: {
         : 0;
       const prstDash = ln ? directChild(ln, "prstDash")?.getAttribute("val") : undefined;
       const strokeStyle: "solid" | "dashed" | "dotted" | undefined =
-        prstDash && prstDash.toLowerCase().includes("dot") && !prstDash.toLowerCase().includes("dash")
+        prstDash &&
+        prstDash.toLowerCase().includes("dot") &&
+        !prstDash.toLowerCase().includes("dash")
           ? "dotted"
           : prstDash && prstDash !== "solid"
             ? "dashed"
@@ -1486,16 +1563,15 @@ async function convertLeafNodes(params: {
 
       const fillCss = noFill
         ? "transparent"
-        : solidColor?.css ?? parsedGrad?.fallbackHex ?? refFillColor?.css ?? "transparent";
-      const hasFill = !noFill && (Boolean(solidColor) || Boolean(parsedGrad) || Boolean(refFillColor));
+        : (solidColor?.css ?? parsedGrad?.fallbackHex ?? refFillColor?.css ?? "transparent");
+      const hasFill =
+        !noFill && (Boolean(solidColor) || Boolean(parsedGrad) || Boolean(refFillColor));
       const { kind, prst } = parseShapeKind(node, box.flipH, box.flipV);
       const cornerRadius = roundRectRadius(node, box);
       const shadow = parseOuterShadow(spPr, ctx);
 
       const fontRefColor = resolveColorNode(fontRef, ctx)?.css;
-      const body = isBackgroundLayer
-        ? null
-        : parseTextBody(node, ctx, inherited, fontRefColor);
+      const body = isBackgroundLayer ? null : parseTextBody(node, ctx, inherited, fontRefColor);
 
       const isPlainBox = !prst || prst === "rect" || prst === "textBox";
       const hasVisibleShape = hasFill || strokeWidth > 0 || !isPlainBox;
@@ -1521,7 +1597,9 @@ async function convertLeafNodes(params: {
         const textColor =
           body.color !== "#0f172a" || !hasFill
             ? body.color
-            : relativeLuminance(solidColor?.hex ?? parsedGrad?.fallbackHex ?? refFillColor?.hex ?? "#ffffff") < 0.45
+            : relativeLuminance(
+                  solidColor?.hex ?? parsedGrad?.fallbackHex ?? refFillColor?.hex ?? "#ffffff",
+                ) < 0.45
               ? "#ffffff"
               : "#0f172a";
 
@@ -1531,7 +1609,10 @@ async function convertLeafNodes(params: {
         const padY = Math.min(Math.floor(bh * 0.25), Math.max(4, body.insets.t));
         const textW = Math.max(24, bw - padX * 2);
         const lineCount = Math.max(1, body.text.split("\n").length);
-        const estTextH = Math.min(bh - padY * 2, Math.round(lineCount * body.fontSize * (body.lineHeight ?? 1.15) + 10));
+        const estTextH = Math.min(
+          bh - padY * 2,
+          Math.round(lineCount * body.fontSize * (body.lineHeight ?? 1.15) + 10),
+        );
         let textY = (box.y ?? 0) + padY;
         let textH = Math.max(20, bh - padY * 2);
         if (body.valign === "middle" && estTextH < textH) {
@@ -1685,8 +1766,7 @@ async function convertLeafNodes(params: {
         const srcRect = Array.from(node.getElementsByTagName("*")).find(
           (el) => el.localName === "srcRect",
         );
-        const frac = (v: string | null) =>
-          v ? Math.min(0.9, Math.max(0, Number(v) / 100000)) : 0;
+        const frac = (v: string | null) => (v ? Math.min(0.9, Math.max(0, Number(v) / 100000)) : 0);
         const crop = srcRect
           ? {
               l: frac(srcRect.getAttribute("l")),
@@ -1789,8 +1869,12 @@ export async function importPPTXFile(file: File): Promise<void> {
     }
     const rels = await parseRels(zip, masterPath);
     const themeTarget = Array.from(rels.values()).find((t) => /theme\/[^/]+\.xml$/.test(t));
-    const theme = themeTarget ? await parseTheme(zip, resolveRelPath(masterPath, themeTarget)) : defaultTheme;
-    const clrMapEl = Array.from(doc.getElementsByTagName("*")).find((e) => e.localName === "clrMap");
+    const theme = themeTarget
+      ? await parseTheme(zip, resolveRelPath(masterPath, themeTarget))
+      : defaultTheme;
+    const clrMapEl = Array.from(doc.getElementsByTagName("*")).find(
+      (e) => e.localName === "clrMap",
+    );
     const clrMap = parseClrMapAttrs(clrMapEl ?? null, DEFAULT_CLR_MAP);
     const ctx: ColorContext = {
       scheme: theme?.scheme ?? DEFAULT_SCHEME_COLORS,
@@ -1806,7 +1890,11 @@ export async function importPPTXFile(file: File): Promise<void> {
 
   const loadLayoutPart = async (
     layoutPath: string,
-  ): Promise<{ layout: CachedPart | null; master: CachedPart | null; masterPath: string | null }> => {
+  ): Promise<{
+    layout: CachedPart | null;
+    master: CachedPart | null;
+    masterPath: string | null;
+  }> => {
     const doc = await parseXml(zip, layoutPath);
     if (!doc) return { layout: null, master: null, masterPath: null };
     const rels = await parseRels(zip, layoutPath);
@@ -1814,7 +1902,9 @@ export async function importPPTXFile(file: File): Promise<void> {
     const masterPath = masterTarget ? resolveRelPath(layoutPath, masterTarget) : null;
     const master = masterPath ? await loadMasterPart(masterPath) : null;
     const baseClrMap = master?.clrMap ?? DEFAULT_CLR_MAP;
-    const ovr = Array.from(doc.getElementsByTagName("*")).find((e) => e.localName === "overrideClrMapping");
+    const ovr = Array.from(doc.getElementsByTagName("*")).find(
+      (e) => e.localName === "overrideClrMapping",
+    );
     const clrMap = parseClrMapAttrs(ovr ?? null, baseClrMap);
     const activeTheme = master?.theme ?? defaultTheme;
     const ctx: ColorContext = {
@@ -1847,7 +1937,10 @@ export async function importPPTXFile(file: File): Promise<void> {
       (e) => e.localName === "overrideClrMapping",
     );
     const activeTheme = master?.theme ?? defaultTheme;
-    const clrMap = parseClrMapAttrs(slideOvr ?? null, layout?.clrMap ?? master?.clrMap ?? DEFAULT_CLR_MAP);
+    const clrMap = parseClrMapAttrs(
+      slideOvr ?? null,
+      layout?.clrMap ?? master?.clrMap ?? DEFAULT_CLR_MAP,
+    );
     const ctx: ColorContext = {
       scheme: activeTheme?.scheme ?? DEFAULT_SCHEME_COLORS,
       clrMap,
@@ -1862,7 +1955,9 @@ export async function importPPTXFile(file: File): Promise<void> {
     const layoutShowMaster = layout?.doc.documentElement.getAttribute("showMasterSp") !== "0";
 
     if (slideShowMaster && layoutShowMaster && master && masterPath) {
-      const mTree = Array.from(master.doc.getElementsByTagName("*")).find((e) => e.localName === "spTree");
+      const mTree = Array.from(master.doc.getElementsByTagName("*")).find(
+        (e) => e.localName === "spTree",
+      );
       if (mTree) {
         await convertLeafNodes({
           zip,
@@ -1880,7 +1975,9 @@ export async function importPPTXFile(file: File): Promise<void> {
     }
 
     if (slideShowMaster && layout && layoutPath) {
-      const lTree = Array.from(layout.doc.getElementsByTagName("*")).find((e) => e.localName === "spTree");
+      const lTree = Array.from(layout.doc.getElementsByTagName("*")).find(
+        (e) => e.localName === "spTree",
+      );
       if (lTree) {
         await convertLeafNodes({
           zip,
@@ -1897,7 +1994,9 @@ export async function importPPTXFile(file: File): Promise<void> {
       }
     }
 
-    const spTree = Array.from(doc.getElementsByTagName("*")).find((el) => el.localName === "spTree");
+    const spTree = Array.from(doc.getElementsByTagName("*")).find(
+      (el) => el.localName === "spTree",
+    );
     if (spTree) {
       await convertLeafNodes({
         zip,

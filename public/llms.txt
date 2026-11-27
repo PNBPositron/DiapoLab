@@ -1,12 +1,16 @@
 # DiapoLab
 
-> A futuristic presentation and design editor for creating bold multipage slides, posters, and social graphics.
+> Open-source browser presentation and slide editor for creating animated multipage decks, importing and exporting PowerPoint files, and presenting with interactive widgets.
 
-DiapoLab is a browser-based design tool. Users build multipage designs on a canvas with text, shapes, icons, images, AI-generated assets, interactive quizzes, and animated timelines, then export to PNG, PDF, PPTX, HTML, MP4, or JSON. Signed-in users can save designs to the cloud and publish them as community templates.
+DiapoLab runs directly in the browser with no install required. Creators design multipage slide decks, posters, and social graphics using 90+ Google Fonts, shapes, icons, charts, tables, interactive widgets (live clocks, timers, stopwatches, counters, ratings, tabs, toggles, polls), 3D scene transitions, morph animations, and keyframe motion paths. Decks can be exported to PNG, JPG, PDF, PPTX, HTML, Markdown, GIF, MP4, or JSON.
 
-## Pages
+## Key Pages
 
-- [Editor](/): The main design and presentation editor.
-- [Sign in](/auth): Sign in or create an account to save and sync designs.
-- [Settings](/settings): Edit the editor settings.
-- [Marketplace](/marketplace): Find themes and templates.
+- [Presentation Editor](/): Main visual slide editor and presentation stage.
+- [Marketplace](/marketplace): Browse built-in and community slide templates, UI themes, and add-on widget packs.
+- [Wiki & Documentation](/wiki): Complete guides for formats, interactive widgets, 3D transitions, presenter toolkit, shortcuts, and sharing.
+- [MCP Guide](/mcp-guide): Connect Model Context Protocol clients to create and edit DiapoLab decks.
+- [Settings](/settings): Customize editor themes, Liquid Glass chrome, grid snapping, and reduced motion.
+- [Sign In](/auth): Sign in to save decks to the cloud, publish templates, and manage private share links.
+- [MIT License](/license): Open-source licensing terms.
+- [Privacy Policy](/privacypolicy): How saved designs, local storage, and account data are handled.

@@ -15,23 +15,42 @@ import { WorkspaceBackgroundLayer } from "@/components/editor/WorkspaceBackgroun
 import { useSettings } from "@/store/settings";
 import { registerCustomFont } from "@/lib/fontLoader";
 import { getBarChromeProps } from "@/lib/bar-appearance";
+import { buildPageHead, DEFAULT_OG_IMAGE_URL, SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   component: Editor,
-  head: () => ({
-    meta: [
-      { title: "DiapoLab — NextGen Open Source Presentation Editor" },
-      { name: "description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, import and export PowerPoint files, and make every slide your own." },
-      { property: "og:title", content: "DiapoLab — NextGen Open Source Presentation Editor" },
-      { property: "og:description", content: "DiapoLab — the next-generation open source presentation editor. Design polished decks right in your browser, import and export PowerPoint files, and make every slide your own." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:image", content: "https://diapolab.vercel.app/screenshot.png" },
-      { property: "og:url", content: "https://diapolab.vercel.app/" },
-    ],
-    links: [{ rel: "canonical", href: "https://diapolab.vercel.app/" }],
-  }),
+  head: () =>
+    buildPageHead({
+      title: "DiapoLab – Open-Source Presentation & Slide Editor",
+      description:
+        "Design, animate, and present multipage slide decks right in your browser with DiapoLab. Import PowerPoint files and export to PDF, PPTX, HTML, or MP4.",
+      path: "/",
+      jsonLd: {
+        "@type": "WebApplication",
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        applicationCategory: "DesignApplication",
+        operatingSystem: "Any",
+        browserRequirements: "Requires JavaScript. Requires HTML5.",
+        isAccessibleForFree: true,
+        license: "https://opensource.org/licenses/MIT",
+        screenshot: DEFAULT_OG_IMAGE_URL,
+        description:
+          "Design, animate, and present multipage slide decks right in your browser with DiapoLab. Import PowerPoint files and export to PDF, PPTX, HTML, or MP4.",
+        featureList: [
+          "Multipage visual slide editor with 90+ Google Fonts",
+          "PowerPoint (.pptx) import and export to PDF, PPTX, HTML, PNG, GIF, and MP4",
+          "Interactive presenter widgets including live clocks, timers, counters, and polls",
+          "3D scene transitions, morph animations, and keyframe timelines",
+          "Community template marketplace and custom add-on widget packs",
+        ],
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+      },
+    }),
 });
 
 function Editor() {
