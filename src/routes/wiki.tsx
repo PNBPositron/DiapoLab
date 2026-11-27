@@ -86,7 +86,7 @@ const ELEMENTS: Array<[string, string]> = [
   ["Photo grids", "Photo and illustration grids where any cell can be swapped for a video."],
   ["Whole-slide blocks", "Full-canvas blocks (cover, agenda, section, closing) you fill in a single pass."],
   ["Video & audio", "Trim window, playback speed, loop and a custom poster frame, straight on the slide."],
-  ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options)."],
+  ["Charts", "Bar, line, area, pie and donut charts, with a data editor in the inspector (type, style pack, title, data points and options) and chart style recipes that re-skin every chart to match the deck's UI style pack."],
   ["Tables", "Styled grids with headers, zebra rows and per-style recipes."],
   ["Quizzes & polls", "Right-or-wrong quizzes (re-skinned by the UI style pack), and live polls synced via Supabase Realtime, with a QR code so the audience votes from their phone."],
   ["QR codes", "A standalone QR element with editable colors and styling, ready to place on any slide."],
@@ -227,7 +227,7 @@ function Wiki() {
             <p>
               Two more helpers live in the pages bar: the <strong>slide grid</strong>{" "}
               button opens an overview of every slide, so you can jump anywhere or
-              reorder the deck at a glance, and the <strong>eye</strong> toggle on any
+              reorder the deck at a glance (it supports keyboard navigation), and the <strong>eye</strong> toggle on any
               slide hides it from the presentation — the deck keeps it while editing,
               but the audience never sees it during Present.
             </p>
