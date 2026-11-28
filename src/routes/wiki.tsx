@@ -608,7 +608,10 @@ function Wiki() {
                 blur, three parallax modes, reveal, shutter, swirl, warp, prism and origami, plus
                 five true 3D scene transitions rendered in WebGL:{" "}
                 <strong>cube, carousel, flip, fold and helix</strong>. Pick one per slide from the
-                dock under the canvas, with a live preview. A short sound can accompany each
+                dock under the canvas, with a live preview, and filter the picker by category —{" "}
+                <strong>All</strong>, <strong>Classic</strong>, <strong>Glitch</strong>,{" "}
+                <strong>Cinema</strong> or <strong>3D</strong> — to find the right transition
+                faster. A short sound can accompany each
                 transition: enable <strong>Slide sound effects</strong> in Settings and pick a soft
                 whoosh or a subtle click, then use <strong>Test sound</strong> to preview it.
               </li>
